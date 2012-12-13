@@ -6,9 +6,12 @@ License:        LGPL-2.1+
 Group:          Development/Libraries/GNOME
 Url:            http://live.gnome.org/Libgee
 Source:         http://download.gnome.org/sources/libgee/0.6/%{name}-%{version}.tar.xz
+
 BuildRequires:  glib2-devel
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  vala
+BuildRequires:  gnome-common
+
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -38,9 +41,11 @@ classes for commonly used data structures.
 
 %prep
 %setup -q
+touch ChangeLog
 
 %build
-%configure --disable-static
+%autogen
+%reconfigure --disable-static
 make %{?jobs:-j%jobs}
 
 %install
