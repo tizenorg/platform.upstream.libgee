@@ -106,7 +106,7 @@ typelib_DATA = \
 	$(NULL)
 
 Gee-1.0.typelib: Gee-1.0.gir
-	@INTROSPECTION_COMPILER@ -o $@ $^
+	@INTROSPECTION_COMPILER@ --shared-library=libgee.so.2 -o $@ $^
 endif
 
 EXTRA_DIST += $(libgee_la_VALASOURCES) gee-1.0.vapi Gee-1.0.gir gee.vala.stamp
