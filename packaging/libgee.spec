@@ -55,7 +55,7 @@ make %{?jobs:-j%jobs}
 
 %postun -p /sbin/ldconfig
 
-%files 
+%files
 %defattr(-, root, root)
 %doc COPYING
 %{_libdir}/*.so.*
@@ -73,3 +73,4 @@ make %{?jobs:-j%jobs}
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/*.vapi
+
