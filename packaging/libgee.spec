@@ -1,5 +1,5 @@
 Name:           libgee
-Version:        0.6.4
+Version:        0.6.7
 Release:        0
 Summary:        GObject-based library providing commonly used data structures
 License:        LGPL-2.1+
