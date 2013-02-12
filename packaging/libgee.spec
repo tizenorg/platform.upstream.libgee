@@ -1,67 +1,93 @@
+%define baseline 0.9
+%define apiversion 0.8
+%define _suffix 2_1
+
+
 Name:           libgee
-Version:        0.6.7
+Version:        0.9.0
 Release:        0
 Summary:        GObject-based library providing commonly used data structures
 License:        LGPL-2.1+
-Group:          Development/Libraries/GNOME
+Group:          Development/Libraries
 Url:            http://live.gnome.org/Libgee
-Source:         http://download.gnome.org/sources/libgee/0.6/%{name}-%{version}.tar.xz
+Source:         http://download.gnome.org/sources/libgee/%{baseline}/%{name}-%{version}.tar.xz
+
 BuildRequires:  glib2-devel
+BuildRequires:  gnome-common
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  vala
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
 Libgee is a collection library providing GObject-based interfaces and
 classes for commonly used data structures.
 
 
-%package -n typelib-Gee
-Summary:        GObject-based library providing commonly used data structures -- Introspection bindings
+%package -n %{name}%{_suffix}
+Summary:        GObject-based library providing common data structures -- Introspection binding
 Group:          System/Libraries
 
-%description -n typelib-Gee
+Requires(post): /sbin/ldconfig
+Requires(postun): /sbin/ldconfig
+
+%description  -n %{name}%{_suffix}
+Libgee is a collection library providing GObject-based interfaces and
+classes for commonly used data structures.
+
+
+%package -n typelib-Gee%{_suffix}
+Summary:        GObject-based library providing common data structures -- Introspection binding
+Group:          System/Libraries
+
+%description -n typelib-Gee%{_suffix}
 Libgee is a collection library providing GObject-based interfaces and
 classes for commonly used data structures.
 
 This package provides the GObject Introspection bindings for libgee.
 
-%package -n libgee-devel
-Summary:        GObject-based library providing useful data structures - Development Files
-Group:          Development/Libraries/GNOME
-Requires:       libgee = %{version}
-Requires:       typelib-Gee = %{version}
 
-%description -n libgee-devel
+%package -n libgee%{_suffix}-devel
+Summary:        GObject-based library providing useful data structures - Development Files
+Group:          Development/Libraries
+Requires:       libgee%{_suffix} = %{version}
+Requires:       typelib-Gee%{_suffix} = %{version}
+
+%description -n libgee%{_suffix}-devel
 Libgee is a collection library providing GObject-based interfaces and
 classes for commonly used data structures.
 
 %prep
 %setup -q
+touch ChangeLog
 
 %build
-%configure --disable-static
+
+%autogen \
+ --disable-static
+
 make %{?jobs:-j%jobs}
 
 %install
 %make_install
 
-%post  -p /sbin/ldconfig
+%post -n %{name}%{_suffix} -p /sbin/ldconfig
 
-%postun -p /sbin/ldconfig
+%postun -n %{name}%{_suffix} -p /sbin/ldconfig
 
-%files
+
+%files -n %{name}%{_suffix}
 %defattr(-, root, root)
-%doc COPYING
+%license COPYING
 %{_libdir}/*.so.*
 
-%files -n typelib-Gee
-%defattr(-,root,root)
-%{_libdir}/girepository-1.0/Gee-1.0.typelib
 
-%files -n libgee-devel
+%files -n typelib-Gee%{_suffix}
+%defattr(-,root,root)
+%{_libdir}/girepository-1.0/Gee-%{apiversion}.typelib
+
+
+%files -n libgee%{_suffix}-devel
 %defattr(-, root, root)
-%{_includedir}/gee-1.0/
+%{_includedir}/gee-%{apiversion}/
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_datadir}/gir-1.0/*.gir
