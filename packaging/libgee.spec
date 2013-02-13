@@ -12,10 +12,11 @@ Group:          Development/Libraries
 Url:            http://live.gnome.org/Libgee
 Source:         http://download.gnome.org/sources/libgee/%{baseline}/%{name}-%{version}.tar.xz
 
-BuildRequires:  glib2-devel
 BuildRequires:  gnome-common
-BuildRequires:  gobject-introspection-devel
 BuildRequires:  vala
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(gobject-introspection-1.0)
+
 
 %description
 Libgee is a collection library providing GObject-based interfaces and
@@ -57,7 +58,7 @@ classes for commonly used data structures.
 
 %prep
 %setup -q
-touch ChangeLog
+
 
 %build
 
