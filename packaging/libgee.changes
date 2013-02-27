@@ -1,3 +1,6 @@
+* Wed Feb 27 2013 Corentin Lecouvey <corentin.lecouvey@eurogiciel.fr> submit/devel/20130225.112651@fa0bfa8
+- Bump to 0.9.91
+
 * Thu Feb 14 2013 Philippe Coval <philippe.coval@eurogiciel.fr> submit/devel/20130213.152447@d9c04f2
 - packaging: change package names to just libgee
 
