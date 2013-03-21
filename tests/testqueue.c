@@ -108,7 +108,7 @@ enum  {
 };
 QueueTests* queue_tests_construct (GType object_type, const gchar* name);
 CollectionTests* collection_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 void queue_tests_test_capacity_bound (QueueTests* self);
 static void _queue_tests_test_capacity_bound_gee_test_case_test_method (gpointer self);
 void queue_tests_test_one_element_operation (QueueTests* self);
@@ -138,9 +138,9 @@ QueueTests* queue_tests_construct (GType object_type, const gchar* name) {
 	g_return_val_if_fail (name != NULL, NULL);
 	_tmp0_ = name;
 	self = (QueueTests*) collection_tests_construct (object_type, _tmp0_);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Queue] capacity bound", _queue_tests_test_capacity_bound_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Queue] one element operation", _queue_tests_test_one_element_operation_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Queue] GObject properties", _queue_tests_test_gobject_properties_gee_test_case_test_method, self);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Queue] capacity bound", _queue_tests_test_capacity_bound_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Queue] one element operation", _queue_tests_test_one_element_operation_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Queue] GObject properties", _queue_tests_test_gobject_properties_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 
@@ -368,7 +368,7 @@ void queue_tests_test_one_element_operation (QueueTests* self) {
 	_tmp0_ = ((CollectionTests*) self)->test_collection;
 	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_QUEUE) ? ((GeeQueue*) _tmp0_) : NULL);
 	test_queue = _tmp1_;
-	_tmp2_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp2_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	recipient = _tmp2_;
 	_vala_assert (test_queue != NULL, "test_queue != null");
 	_tmp3_ = gee_queue_offer (test_queue, "one");

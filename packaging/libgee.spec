@@ -7,12 +7,12 @@
 
 Name:       libgee
 Summary:    GObject collection library
-Version:    0.6.6
+Version:    0.9.92
 Release:    1
 Group:      System/Libraries
 License:    LGPLv2+
 URL:        http://live.gnome.org/Libgee
-Source0:    http://download.gnome.org/sources/%{name}/0.6/%{name}-%{version}.tar.bz2
+Source0:    http://download.gnome.org/sources/%{name}/0.9/%{name}-%{version}.tar.bz2
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig(glib-2.0)
@@ -87,6 +87,6 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 # >> files devel
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/pkgconfig/gee-1.0.pc
-%{_datadir}/vala/vapi/gee-1.0.vapi
+%{_libdir}/pkgconfig/gee-0.8.pc
+%{_datadir}/vala/vapi/gee-0.8.vapi
 # << files devel

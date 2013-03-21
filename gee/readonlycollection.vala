@@ -31,7 +31,7 @@ using GLib;
  *
  * @see Collection
  */
-internal class Gee.ReadOnlyCollection<G> : Object, Iterable<G>, Collection<G> {
+internal class Gee.ReadOnlyCollection<G> : Object, Traversable<G>, Iterable<G>, Collection<G> {
 
 	/**
 	 * {@inheritDoc}
@@ -46,6 +46,13 @@ internal class Gee.ReadOnlyCollection<G> : Object, Iterable<G>, Collection<G> {
 	public bool is_empty {
 		get { return _collection.is_empty; }
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public bool read_only {
+		get { return true; }
+	}
 
 	protected Collection<G> _collection;
 
@@ -57,6 +64,34 @@ internal class Gee.ReadOnlyCollection<G> : Object, Iterable<G>, Collection<G> {
 	 */
 	public ReadOnlyCollection (Collection<G> collection) {
 		this._collection = collection;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public bool foreach (ForallFunc<G> f) {
+		return _collection.foreach (f);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Gee.Iterator<A> stream<A> (owned StreamFunc<A> f) {
+		return _collection.stream<A> ((owned)f);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Gee.Iterator<G> filter (owned Predicate<G> f) {
+		return _collection.filter ((owned)f);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Gee.Iterator<G> chop (int offset, int length = -1) {
+		return _collection.chop (offset, length);
 	}
 
 	/**
@@ -136,7 +171,7 @@ internal class Gee.ReadOnlyCollection<G> : Object, Iterable<G>, Collection<G> {
 		return _collection.to_array ();
 	}
 
-	protected class Iterator<G> : Object, Gee.Iterator<G> {
+	protected class Iterator<G> : Object, Traversable<G>, Gee.Iterator<G> {
 		protected Gee.Iterator<G> _iter;
 
 		public Iterator (Gee.Iterator<G> iterator) {
@@ -151,16 +186,44 @@ internal class Gee.ReadOnlyCollection<G> : Object, Iterable<G>, Collection<G> {
 			return _iter.has_next ();
 		}
 
-		public bool first () {
-			return _iter.first ();
-		}
-
 		public new G get () {
 			return _iter.get ();
 		}
 
 		public void remove () {
 			assert_not_reached ();
+		}
+
+		public bool valid {
+			get {
+				return _iter.valid;
+			}
+		}
+
+		public bool read_only {
+			get {
+				return true;
+			}
+		}
+
+		public Type element_type {
+			get { return typeof (G); }
+		}
+
+		public bool foreach (ForallFunc<G> f) {
+			return _iter.foreach (f);
+		}
+
+		public Gee.Iterator<A> stream<A> (owned StreamFunc<A, G> f) {
+			return _iter.stream<A> ((owned)f);
+		}
+
+		public Gee.Iterator<G> filter (owned Predicate<G> f) {
+			return _iter.filter ((owned)f);
+		}
+
+		public Gee.Iterator<G> chop (int offset, int length = -1) {
+			return _iter.chop ( offset, length);
 		}
 	}
 

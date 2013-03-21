@@ -75,7 +75,6 @@ typedef struct _HashSetTests HashSetTests;
 typedef struct _HashSetTestsClass HashSetTestsClass;
 typedef struct _HashSetTestsPrivate HashSetTestsPrivate;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
-#define _vala_assert(expr, msg) if G_LIKELY (expr) ; else g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
 
 struct _GeeTestCase {
 	GObject parent_instance;
@@ -117,7 +116,6 @@ struct _HashSetTestsClass {
 	SetTestsClass parent_class;
 };
 
-typedef void (*GeeTestCaseTestMethod) (void* user_data);
 
 static gpointer hash_set_tests_parent_class = NULL;
 
@@ -131,30 +129,13 @@ enum  {
 HashSetTests* hash_set_tests_new (void);
 HashSetTests* hash_set_tests_construct (GType object_type);
 SetTests* set_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
-void hash_set_tests_test_selected_functions (HashSetTests* self);
-static void _hash_set_tests_test_selected_functions_gee_test_case_test_method (gpointer self);
-void hash_set_tests_test_gobject_properties (HashSetTests* self);
-static void _hash_set_tests_test_gobject_properties_gee_test_case_test_method (gpointer self);
 static void hash_set_tests_real_set_up (GeeTestCase* base);
 static void hash_set_tests_real_tear_down (GeeTestCase* base);
-
-
-static void _hash_set_tests_test_selected_functions_gee_test_case_test_method (gpointer self) {
-	hash_set_tests_test_selected_functions (self);
-}
-
-
-static void _hash_set_tests_test_gobject_properties_gee_test_case_test_method (gpointer self) {
-	hash_set_tests_test_gobject_properties (self);
-}
 
 
 HashSetTests* hash_set_tests_construct (GType object_type) {
 	HashSetTests * self = NULL;
 	self = (HashSetTests*) set_tests_construct (object_type, "HashSet");
-	gee_test_case_add_test ((GeeTestCase*) self, "[HashSet] selected functions", _hash_set_tests_test_selected_functions_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[HashSet] GObject properties", _hash_set_tests_test_gobject_properties_gee_test_case_test_method, self);
 	return self;
 }
 
@@ -168,7 +149,7 @@ static void hash_set_tests_real_set_up (GeeTestCase* base) {
 	HashSetTests * self;
 	GeeHashSet* _tmp0_;
 	self = (HashSetTests*) base;
-	_tmp0_ = gee_hash_set_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL);
+	_tmp0_ = gee_hash_set_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL, NULL, NULL, NULL);
 	_g_object_unref0 (((CollectionTests*) self)->test_collection);
 	((CollectionTests*) self)->test_collection = (GeeCollection*) _tmp0_;
 }
@@ -179,83 +160,6 @@ static void hash_set_tests_real_tear_down (GeeTestCase* base) {
 	self = (HashSetTests*) base;
 	_g_object_unref0 (((CollectionTests*) self)->test_collection);
 	((CollectionTests*) self)->test_collection = NULL;
-}
-
-
-static gpointer _g_object_ref0 (gpointer self) {
-	return self ? g_object_ref (self) : NULL;
-}
-
-
-void hash_set_tests_test_selected_functions (HashSetTests* self) {
-	GeeCollection* _tmp0_;
-	GeeHashSet* _tmp1_;
-	GeeHashSet* test_set;
-	GHashFunc _tmp2_;
-	GHashFunc _tmp3_;
-	GHashFunc _tmp4_;
-	GEqualFunc _tmp5_;
-	GEqualFunc _tmp6_;
-	GEqualFunc _tmp7_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((CollectionTests*) self)->test_collection;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_HASH_SET) ? ((GeeHashSet*) _tmp0_) : NULL);
-	test_set = _tmp1_;
-	_vala_assert (test_set != NULL, "test_set != null");
-	_tmp2_ = gee_hash_set_get_hash_func (test_set);
-	_tmp3_ = _tmp2_;
-	_tmp4_ = g_str_hash;
-	_vala_assert (_tmp3_ == _tmp4_, "test_set.hash_func == str_hash");
-	_tmp5_ = gee_hash_set_get_equal_func (test_set);
-	_tmp6_ = _tmp5_;
-	_tmp7_ = g_str_equal;
-	_vala_assert (_tmp6_ == _tmp7_, "test_set.equal_func == str_equal");
-	_g_object_unref0 (test_set);
-}
-
-
-void hash_set_tests_test_gobject_properties (HashSetTests* self) {
-	GeeCollection* _tmp0_;
-	GeeHashSet* _tmp1_;
-	GeeHashSet* test_set;
-	GValue value = {0};
-	GValue _tmp2_ = {0};
-	GValue _tmp3_;
-	void* _tmp4_ = NULL;
-	GHashFunc _tmp5_;
-	GHashFunc _tmp6_;
-	GValue _tmp7_ = {0};
-	GValue _tmp8_;
-	void* _tmp9_ = NULL;
-	GEqualFunc _tmp10_;
-	GEqualFunc _tmp11_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((CollectionTests*) self)->test_collection;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_HASH_SET) ? ((GeeHashSet*) _tmp0_) : NULL);
-	test_set = _tmp1_;
-	_vala_assert (test_set != NULL, "test_set != null");
-	g_value_init (&_tmp2_, G_TYPE_POINTER);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	value = _tmp2_;
-	_tmp3_ = value;
-	g_object_get_property ((GObject*) test_set, "hash-func", &value);
-	_tmp4_ = g_value_get_pointer (&value);
-	_tmp5_ = gee_hash_set_get_hash_func (test_set);
-	_tmp6_ = _tmp5_;
-	_vala_assert (_tmp4_ == ((void*) _tmp6_), "value.get_pointer () == (void*) test_set.hash_func");
-	g_value_unset (&value);
-	g_value_init (&_tmp7_, G_TYPE_POINTER);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	value = _tmp7_;
-	_tmp8_ = value;
-	g_object_get_property ((GObject*) test_set, "equal-func", &value);
-	_tmp9_ = g_value_get_pointer (&value);
-	_tmp10_ = gee_hash_set_get_equal_func (test_set);
-	_tmp11_ = _tmp10_;
-	_vala_assert (_tmp9_ == ((void*) _tmp11_), "value.get_pointer () == (void*) test_set.equal_func");
-	g_value_unset (&value);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	_g_object_unref0 (test_set);
 }
 
 

@@ -69,6 +69,8 @@ static void gee_comparable_base_init (GeeComparableIface * iface) {
 /**
  * This interface defines a total ordering among instances of each class
  * implementing it.
+ *
+ * @see Hashable
  */
 GType gee_comparable_get_type (void) {
 	static volatile gsize gee_comparable_type_id__volatile = 0;

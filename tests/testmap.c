@@ -3,8 +3,8 @@
 
 /* testmap.vala
  *
- * Copyright (C) 2008  Jürg Billeter, Maciej Piechotka
- * Copyright (C) 2009  Didier Villevalois, Julien Peeters
+ * Copyright (C) 2008  Jürg Billeter
+ * Copyright (C) 2009  Didier Villevalois, Julien Peeters, Maciej Piechotka
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -66,6 +66,7 @@ typedef struct _MapTestsPrivate MapTestsPrivate;
 
 typedef struct _MapTestsTestEntry MapTestsTestEntry;
 typedef struct _MapTestsTestEntryClass MapTestsTestEntryClass;
+typedef struct _Block9Data Block9Data;
 typedef struct _MapTestsTestEntryPrivate MapTestsTestEntryPrivate;
 #define _k_destroy_func0(var) (((var == NULL) || (k_destroy_func == NULL)) ? NULL : (var = (k_destroy_func (var), NULL)))
 #define _vala_assert(expr, msg) if G_LIKELY (expr) ; else g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
@@ -92,6 +93,12 @@ struct _MapTestsClass {
 };
 
 typedef void (*GeeTestCaseTestMethod) (void* user_data);
+struct _Block9Data {
+	int _ref_count_;
+	MapTests * self;
+	gint count;
+};
+
 struct _MapTestsTestEntry {
 	GeeMapEntry parent_instance;
 	MapTestsTestEntryPrivate * priv;
@@ -123,7 +130,7 @@ enum  {
 };
 MapTests* map_tests_construct (GType object_type, const gchar* name);
 GeeTestCase* gee_test_case_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 void map_tests_test_type_correctness (MapTests* self);
 static void _map_tests_test_type_correctness_gee_test_case_test_method (gpointer self);
 void map_tests_test_has_key_size_is_empty (MapTests* self);
@@ -142,10 +149,27 @@ void map_tests_test_has_all (MapTests* self);
 static void _map_tests_test_has_all_gee_test_case_test_method (gpointer self);
 void map_tests_test_gobject_properties (MapTests* self);
 static void _map_tests_test_gobject_properties_gee_test_case_test_method (gpointer self);
-MapTestsTestEntry* map_tests_test_entry_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, gconstpointer key, gconstpointer value);
-MapTestsTestEntry* map_tests_test_entry_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, gconstpointer key, gconstpointer value);
-GType map_tests_test_entry_get_type (void) G_GNUC_CONST;
+void map_tests_test_fold (MapTests* self);
+static void _map_tests_test_fold_gee_test_case_test_method (gpointer self);
+void map_tests_test_foreach (MapTests* self);
+static void _map_tests_test_foreach_gee_test_case_test_method (gpointer self);
+static MapTestsTestEntry* map_tests_test_entry_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, gconstpointer key, gconstpointer value);
+static MapTestsTestEntry* map_tests_test_entry_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, gconstpointer key, gconstpointer value);
+static GType map_tests_test_entry_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
 void map_tests_test_clear (MapTests* self);
+static gint __lambda15_ (MapTests* self, const gchar* x, const gchar* y, gint z);
+static gpointer ___lambda15__gee_fold_map_func (gconstpointer k, gconstpointer v, gpointer a, gpointer self);
+static gint __lambda16_ (MapTests* self, const gchar* x, const gchar* y, gint z);
+static gpointer ___lambda16__gee_fold_map_func (gconstpointer k, gconstpointer v, gpointer a, gpointer self);
+static Block9Data* block9_data_ref (Block9Data* _data9_);
+static void block9_data_unref (void * _userdata_);
+static gboolean __lambda17_ (Block9Data* _data9_, const gchar* x, const gchar* y);
+static gboolean ___lambda17__gee_forall_map_func (gconstpointer k, gconstpointer v, gpointer self);
+static gboolean __lambda18_ (Block9Data* _data9_, const gchar* x, const gchar* y);
+static gboolean ___lambda18__gee_forall_map_func (gconstpointer k, gconstpointer v, gpointer self);
+GeeMapEntry* map_tests_entry_for (const gchar* key, const gchar* value);
+gboolean map_tests_check_entry (GeeMapEntry* e, const gchar* key, const gchar* value);
+void map_tests_assert_entry (GeeMapEntry* e, const gchar* key, const gchar* value);
 #define MAP_TESTS_TEST_ENTRY_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), MAP_TESTS_TYPE_TEST_ENTRY, MapTestsTestEntryPrivate))
 enum  {
 	MAP_TESTS_TEST_ENTRY_DUMMY_PROPERTY,
@@ -156,7 +180,8 @@ enum  {
 	MAP_TESTS_TEST_ENTRY_V_DUP_FUNC,
 	MAP_TESTS_TEST_ENTRY_V_DESTROY_FUNC,
 	MAP_TESTS_TEST_ENTRY_KEY,
-	MAP_TESTS_TEST_ENTRY_VALUE
+	MAP_TESTS_TEST_ENTRY_VALUE,
+	MAP_TESTS_TEST_ENTRY_READ_ONLY
 };
 static void map_tests_test_entry_finalize (GObject* obj);
 static void _vala_map_tests_test_entry_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
@@ -209,21 +234,33 @@ static void _map_tests_test_gobject_properties_gee_test_case_test_method (gpoint
 }
 
 
+static void _map_tests_test_fold_gee_test_case_test_method (gpointer self) {
+	map_tests_test_fold (self);
+}
+
+
+static void _map_tests_test_foreach_gee_test_case_test_method (gpointer self) {
+	map_tests_test_foreach (self);
+}
+
+
 MapTests* map_tests_construct (GType object_type, const gchar* name) {
 	MapTests * self = NULL;
 	const gchar* _tmp0_;
 	g_return_val_if_fail (name != NULL, NULL);
 	_tmp0_ = name;
 	self = (MapTests*) gee_test_case_construct (object_type, _tmp0_);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Map] type correctness", _map_tests_test_type_correctness_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Map] has_key, size and is_empty", _map_tests_test_has_key_size_is_empty_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Map] keys", _map_tests_test_keys_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Map] values", _map_tests_test_values_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Map] entries", _map_tests_test_entries_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Map] set all", _map_tests_test_set_all_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Map] unset all", _map_tests_test_unset_all_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Map] has all", _map_tests_test_has_all_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Map] GObject properties", _map_tests_test_gobject_properties_gee_test_case_test_method, self);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Map] type correctness", _map_tests_test_type_correctness_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Map] has_key, size and is_empty", _map_tests_test_has_key_size_is_empty_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Map] keys", _map_tests_test_keys_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Map] values", _map_tests_test_values_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Map] entries", _map_tests_test_entries_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Map] set all", _map_tests_test_set_all_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Map] unset all", _map_tests_test_unset_all_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Map] has all", _map_tests_test_has_all_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Map] GObject properties", _map_tests_test_gobject_properties_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Map] fold", _map_tests_test_fold_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Map] foreach", _map_tests_test_foreach_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 
@@ -1349,30 +1386,30 @@ void map_tests_test_clear (MapTests* self) {
 
 
 void map_tests_test_set_all (MapTests* self) {
-	GHashFunc _tmp0_;
-	GEqualFunc _tmp1_;
-	GEqualFunc _tmp2_;
-	GeeHashMap* _tmp3_;
+	GeeHashMap* _tmp0_;
 	GeeHashMap* another_map;
+	GeeMap* _tmp1_;
+	GeeMap* _tmp2_;
+	GeeMap* _tmp3_;
 	GeeMap* _tmp4_;
 	GeeMap* _tmp5_;
-	GeeMap* _tmp6_;
-	GeeMap* _tmp7_;
+	gint _tmp6_;
+	gint _tmp7_;
 	GeeMap* _tmp8_;
-	gint _tmp9_;
-	gint _tmp10_;
-	GeeMap* _tmp11_;
-	gboolean _tmp12_ = FALSE;
-	GeeMap* _tmp13_;
-	gboolean _tmp14_ = FALSE;
-	GeeMap* _tmp15_;
-	gboolean _tmp16_ = FALSE;
-	GeeMap* _tmp17_;
-	gboolean _tmp18_ = FALSE;
-	GeeMap* _tmp19_;
-	gboolean _tmp20_ = FALSE;
-	GeeMap* _tmp21_;
-	gboolean _tmp22_ = FALSE;
+	gboolean _tmp9_ = FALSE;
+	GeeMap* _tmp10_;
+	gboolean _tmp11_ = FALSE;
+	GeeMap* _tmp12_;
+	gboolean _tmp13_ = FALSE;
+	GeeMap* _tmp14_;
+	gboolean _tmp15_ = FALSE;
+	GeeMap* _tmp16_;
+	gboolean _tmp17_ = FALSE;
+	GeeMap* _tmp18_;
+	gboolean _tmp19_ = FALSE;
+	GeeMap* _tmp20_;
+	gpointer _tmp21_ = NULL;
+	gchar* _tmp22_;
 	GeeMap* _tmp23_;
 	gpointer _tmp24_ = NULL;
 	gchar* _tmp25_;
@@ -1388,393 +1425,194 @@ void map_tests_test_set_all (MapTests* self) {
 	GeeMap* _tmp35_;
 	gpointer _tmp36_ = NULL;
 	gchar* _tmp37_;
-	GeeMap* _tmp38_;
-	gpointer _tmp39_ = NULL;
-	gchar* _tmp40_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = g_str_hash;
-	_tmp1_ = g_str_equal;
-	_tmp2_ = g_str_equal;
-	_tmp3_ = gee_hash_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, _tmp0_, _tmp1_, _tmp2_);
-	another_map = _tmp3_;
-	_tmp4_ = self->test_map;
-	gee_map_set (_tmp4_, "one", "value_of_one");
-	_tmp5_ = self->test_map;
-	gee_map_set (_tmp5_, "two", "value_of_two");
-	_tmp6_ = self->test_map;
-	gee_map_set (_tmp6_, "three", "value_of_three");
+	_tmp0_ = gee_hash_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	another_map = _tmp0_;
+	_tmp1_ = self->test_map;
+	gee_map_set (_tmp1_, "one", "value_of_one");
+	_tmp2_ = self->test_map;
+	gee_map_set (_tmp2_, "two", "value_of_two");
+	_tmp3_ = self->test_map;
+	gee_map_set (_tmp3_, "three", "value_of_three");
 	gee_abstract_map_set ((GeeAbstractMap*) another_map, "four", "value_of_four");
 	gee_abstract_map_set ((GeeAbstractMap*) another_map, "five", "value_of_five");
 	gee_abstract_map_set ((GeeAbstractMap*) another_map, "six", "value_of_six");
-	_tmp7_ = self->test_map;
-	gee_map_set_all (_tmp7_, (GeeMap*) another_map);
+	_tmp4_ = self->test_map;
+	gee_map_set_all (_tmp4_, (GeeMap*) another_map);
+	_tmp5_ = self->test_map;
+	_tmp6_ = gee_map_get_size (_tmp5_);
+	_tmp7_ = _tmp6_;
+	_vala_assert (_tmp7_ == 6, "test_map.size == 6");
 	_tmp8_ = self->test_map;
-	_tmp9_ = gee_map_get_size (_tmp8_);
-	_tmp10_ = _tmp9_;
-	_vala_assert (_tmp10_ == 6, "test_map.size == 6");
-	_tmp11_ = self->test_map;
-	_tmp12_ = gee_map_has_key (_tmp11_, "one");
-	_vala_assert (_tmp12_, "test_map.has_key (\"one\")");
-	_tmp13_ = self->test_map;
-	_tmp14_ = gee_map_has_key (_tmp13_, "two");
-	_vala_assert (_tmp14_, "test_map.has_key (\"two\")");
-	_tmp15_ = self->test_map;
-	_tmp16_ = gee_map_has_key (_tmp15_, "three");
-	_vala_assert (_tmp16_, "test_map.has_key (\"three\")");
-	_tmp17_ = self->test_map;
-	_tmp18_ = gee_map_has_key (_tmp17_, "four");
-	_vala_assert (_tmp18_, "test_map.has_key (\"four\")");
-	_tmp19_ = self->test_map;
-	_tmp20_ = gee_map_has_key (_tmp19_, "five");
-	_vala_assert (_tmp20_, "test_map.has_key (\"five\")");
-	_tmp21_ = self->test_map;
-	_tmp22_ = gee_map_has_key (_tmp21_, "six");
-	_vala_assert (_tmp22_, "test_map.has_key (\"six\")");
+	_tmp9_ = gee_map_has_key (_tmp8_, "one");
+	_vala_assert (_tmp9_, "test_map.has_key (\"one\")");
+	_tmp10_ = self->test_map;
+	_tmp11_ = gee_map_has_key (_tmp10_, "two");
+	_vala_assert (_tmp11_, "test_map.has_key (\"two\")");
+	_tmp12_ = self->test_map;
+	_tmp13_ = gee_map_has_key (_tmp12_, "three");
+	_vala_assert (_tmp13_, "test_map.has_key (\"three\")");
+	_tmp14_ = self->test_map;
+	_tmp15_ = gee_map_has_key (_tmp14_, "four");
+	_vala_assert (_tmp15_, "test_map.has_key (\"four\")");
+	_tmp16_ = self->test_map;
+	_tmp17_ = gee_map_has_key (_tmp16_, "five");
+	_vala_assert (_tmp17_, "test_map.has_key (\"five\")");
+	_tmp18_ = self->test_map;
+	_tmp19_ = gee_map_has_key (_tmp18_, "six");
+	_vala_assert (_tmp19_, "test_map.has_key (\"six\")");
+	_tmp20_ = self->test_map;
+	_tmp21_ = gee_map_get (_tmp20_, "one");
+	_tmp22_ = (gchar*) _tmp21_;
+	_vala_assert (g_strcmp0 (_tmp22_, "value_of_one") == 0, "test_map.get (\"one\") == \"value_of_one\"");
+	_g_free0 (_tmp22_);
 	_tmp23_ = self->test_map;
-	_tmp24_ = gee_map_get (_tmp23_, "one");
+	_tmp24_ = gee_map_get (_tmp23_, "two");
 	_tmp25_ = (gchar*) _tmp24_;
-	_vala_assert (g_strcmp0 (_tmp25_, "value_of_one") == 0, "test_map.get (\"one\") == \"value_of_one\"");
+	_vala_assert (g_strcmp0 (_tmp25_, "value_of_two") == 0, "test_map.get (\"two\") == \"value_of_two\"");
 	_g_free0 (_tmp25_);
 	_tmp26_ = self->test_map;
-	_tmp27_ = gee_map_get (_tmp26_, "two");
+	_tmp27_ = gee_map_get (_tmp26_, "three");
 	_tmp28_ = (gchar*) _tmp27_;
-	_vala_assert (g_strcmp0 (_tmp28_, "value_of_two") == 0, "test_map.get (\"two\") == \"value_of_two\"");
+	_vala_assert (g_strcmp0 (_tmp28_, "value_of_three") == 0, "test_map.get (\"three\") == \"value_of_three\"");
 	_g_free0 (_tmp28_);
 	_tmp29_ = self->test_map;
-	_tmp30_ = gee_map_get (_tmp29_, "three");
+	_tmp30_ = gee_map_get (_tmp29_, "four");
 	_tmp31_ = (gchar*) _tmp30_;
-	_vala_assert (g_strcmp0 (_tmp31_, "value_of_three") == 0, "test_map.get (\"three\") == \"value_of_three\"");
+	_vala_assert (g_strcmp0 (_tmp31_, "value_of_four") == 0, "test_map.get (\"four\") == \"value_of_four\"");
 	_g_free0 (_tmp31_);
 	_tmp32_ = self->test_map;
-	_tmp33_ = gee_map_get (_tmp32_, "four");
+	_tmp33_ = gee_map_get (_tmp32_, "five");
 	_tmp34_ = (gchar*) _tmp33_;
-	_vala_assert (g_strcmp0 (_tmp34_, "value_of_four") == 0, "test_map.get (\"four\") == \"value_of_four\"");
+	_vala_assert (g_strcmp0 (_tmp34_, "value_of_five") == 0, "test_map.get (\"five\") == \"value_of_five\"");
 	_g_free0 (_tmp34_);
 	_tmp35_ = self->test_map;
-	_tmp36_ = gee_map_get (_tmp35_, "five");
+	_tmp36_ = gee_map_get (_tmp35_, "six");
 	_tmp37_ = (gchar*) _tmp36_;
-	_vala_assert (g_strcmp0 (_tmp37_, "value_of_five") == 0, "test_map.get (\"five\") == \"value_of_five\"");
+	_vala_assert (g_strcmp0 (_tmp37_, "value_of_six") == 0, "test_map.get (\"six\") == \"value_of_six\"");
 	_g_free0 (_tmp37_);
-	_tmp38_ = self->test_map;
-	_tmp39_ = gee_map_get (_tmp38_, "six");
-	_tmp40_ = (gchar*) _tmp39_;
-	_vala_assert (g_strcmp0 (_tmp40_, "value_of_six") == 0, "test_map.get (\"six\") == \"value_of_six\"");
-	_g_free0 (_tmp40_);
 	_g_object_unref0 (another_map);
 }
 
 
 void map_tests_test_unset_all (MapTests* self) {
-	GHashFunc _tmp0_;
-	GEqualFunc _tmp1_;
-	GEqualFunc _tmp2_;
-	GeeHashMap* _tmp3_;
+	GeeHashMap* _tmp0_;
 	GeeHashMap* another_map;
-	GeeMap* _tmp4_;
+	GeeMap* _tmp1_;
+	gboolean _tmp2_;
+	gboolean _tmp3_;
+	gboolean _tmp4_;
 	gboolean _tmp5_;
-	gboolean _tmp6_;
-	gboolean _tmp7_;
-	gboolean _tmp8_;
-	GeeMap* _tmp9_;
-	gboolean _tmp10_ = FALSE;
-	GeeMap* _tmp11_;
-	gboolean _tmp12_;
-	gboolean _tmp13_;
-	gboolean _tmp14_;
-	gboolean _tmp15_;
-	GeeMap* _tmp16_;
-	GeeMap* _tmp17_;
-	gboolean _tmp18_;
-	gboolean _tmp19_;
-	gint _tmp20_;
-	gint _tmp21_;
-	GeeMap* _tmp22_;
-	gboolean _tmp23_ = FALSE;
-	GeeMap* _tmp24_;
-	gboolean _tmp25_;
-	gboolean _tmp26_;
-	gint _tmp27_;
-	gint _tmp28_;
-	GeeMap* _tmp29_;
-	GeeMap* _tmp30_;
-	GeeMap* _tmp31_;
-	GeeMap* _tmp32_;
-	gint _tmp33_;
-	gint _tmp34_;
-	gboolean _tmp35_;
-	gboolean _tmp36_;
-	GeeMap* _tmp37_;
-	gboolean _tmp38_ = FALSE;
-	GeeMap* _tmp39_;
-	gint _tmp40_;
-	gint _tmp41_;
-	gboolean _tmp42_;
-	gboolean _tmp43_;
-	GeeMap* _tmp44_;
-	GeeMap* _tmp45_;
-	GeeMap* _tmp46_;
-	GeeMap* _tmp47_;
-	gint _tmp48_;
-	gint _tmp49_;
-	gint _tmp50_;
-	gint _tmp51_;
-	GeeMap* _tmp52_;
-	gboolean _tmp53_ = FALSE;
-	GeeMap* _tmp54_;
-	gboolean _tmp55_;
-	gboolean _tmp56_;
-	gint _tmp57_;
-	gint _tmp58_;
-	GeeMap* _tmp59_;
-	GeeMap* _tmp60_;
-	GeeMap* _tmp61_;
-	GeeMap* _tmp62_;
-	GeeMap* _tmp63_;
-	gint _tmp64_;
-	gint _tmp65_;
-	gint _tmp66_;
-	gint _tmp67_;
-	GeeMap* _tmp68_;
-	gboolean _tmp69_ = FALSE;
-	GeeMap* _tmp70_;
-	gint _tmp71_;
-	gint _tmp72_;
-	gint _tmp73_;
-	gint _tmp74_;
-	GeeMap* _tmp75_;
-	gboolean _tmp76_ = FALSE;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = g_str_hash;
-	_tmp1_ = g_str_equal;
-	_tmp2_ = g_str_equal;
-	_tmp3_ = gee_hash_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, _tmp0_, _tmp1_, _tmp2_);
-	another_map = _tmp3_;
-	_tmp4_ = self->test_map;
-	_tmp5_ = gee_map_get_is_empty (_tmp4_);
-	_tmp6_ = _tmp5_;
-	_vala_assert (_tmp6_, "test_map.is_empty");
-	_tmp7_ = gee_abstract_map_get_is_empty ((GeeAbstractMap*) another_map);
-	_tmp8_ = _tmp7_;
-	_vala_assert (_tmp8_, "another_map.is_empty");
-	_tmp9_ = self->test_map;
-	_tmp10_ = gee_map_unset_all (_tmp9_, (GeeMap*) another_map);
-	_vala_assert (!_tmp10_, "! test_map.unset_all (another_map)");
-	_tmp11_ = self->test_map;
-	_tmp12_ = gee_map_get_is_empty (_tmp11_);
-	_tmp13_ = _tmp12_;
-	_vala_assert (_tmp13_, "test_map.is_empty");
-	_tmp14_ = gee_abstract_map_get_is_empty ((GeeAbstractMap*) another_map);
-	_tmp15_ = _tmp14_;
-	_vala_assert (_tmp15_, "another_map.is_empty");
-	_tmp16_ = self->test_map;
-	gee_map_clear (_tmp16_);
-	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
-	gee_abstract_map_set ((GeeAbstractMap*) another_map, "one", "value_of_one");
-	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "value_of_two");
-	_tmp17_ = self->test_map;
-	_tmp18_ = gee_map_get_is_empty (_tmp17_);
-	_tmp19_ = _tmp18_;
-	_vala_assert (_tmp19_, "test_map.is_empty");
-	_tmp20_ = gee_abstract_map_get_size ((GeeMap*) another_map);
-	_tmp21_ = _tmp20_;
-	_vala_assert (_tmp21_ == 2, "another_map.size == 2");
-	_tmp22_ = self->test_map;
-	_tmp23_ = gee_map_unset_all (_tmp22_, (GeeMap*) another_map);
-	_vala_assert (!_tmp23_, "! test_map.unset_all (another_map)");
-	_tmp24_ = self->test_map;
-	_tmp25_ = gee_map_get_is_empty (_tmp24_);
-	_tmp26_ = _tmp25_;
-	_vala_assert (_tmp26_, "test_map.is_empty");
-	_tmp27_ = gee_abstract_map_get_size ((GeeMap*) another_map);
-	_tmp28_ = _tmp27_;
-	_vala_assert (_tmp28_ == 2, "another_map.size == 2");
-	_tmp29_ = self->test_map;
-	gee_map_clear (_tmp29_);
-	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
-	_tmp30_ = self->test_map;
-	gee_map_set (_tmp30_, "one", "value_of_one");
-	_tmp31_ = self->test_map;
-	gee_map_set (_tmp31_, "two", "value_of_two");
-	_tmp32_ = self->test_map;
-	_tmp33_ = gee_map_get_size (_tmp32_);
-	_tmp34_ = _tmp33_;
-	_vala_assert (_tmp34_ == 2, "test_map.size == 2");
-	_tmp35_ = gee_abstract_map_get_is_empty ((GeeAbstractMap*) another_map);
-	_tmp36_ = _tmp35_;
-	_vala_assert (_tmp36_, "another_map.is_empty");
-	_tmp37_ = self->test_map;
-	_tmp38_ = gee_map_unset_all (_tmp37_, (GeeMap*) another_map);
-	_vala_assert (!_tmp38_, "! test_map.unset_all (another_map)");
-	_tmp39_ = self->test_map;
-	_tmp40_ = gee_map_get_size (_tmp39_);
-	_tmp41_ = _tmp40_;
-	_vala_assert (_tmp41_ == 2, "test_map.size == 2");
-	_tmp42_ = gee_abstract_map_get_is_empty ((GeeAbstractMap*) another_map);
-	_tmp43_ = _tmp42_;
-	_vala_assert (_tmp43_, "another_map.is_empty");
-	_tmp44_ = self->test_map;
-	gee_map_clear (_tmp44_);
-	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
-	_tmp45_ = self->test_map;
-	gee_map_set (_tmp45_, "one", "value_of_one");
-	_tmp46_ = self->test_map;
-	gee_map_set (_tmp46_, "two", "value_of_two");
-	gee_abstract_map_set ((GeeAbstractMap*) another_map, "one", "value_of_one");
-	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "value_of_two");
-	_tmp47_ = self->test_map;
-	_tmp48_ = gee_map_get_size (_tmp47_);
-	_tmp49_ = _tmp48_;
-	_vala_assert (_tmp49_ == 2, "test_map.size == 2");
-	_tmp50_ = gee_abstract_map_get_size ((GeeMap*) another_map);
-	_tmp51_ = _tmp50_;
-	_vala_assert (_tmp51_ == 2, "another_map.size == 2");
-	_tmp52_ = self->test_map;
-	_tmp53_ = gee_map_unset_all (_tmp52_, (GeeMap*) another_map);
-	_vala_assert (_tmp53_, "test_map.unset_all (another_map)");
-	_tmp54_ = self->test_map;
-	_tmp55_ = gee_map_get_is_empty (_tmp54_);
-	_tmp56_ = _tmp55_;
-	_vala_assert (_tmp56_, "test_map.is_empty");
-	_tmp57_ = gee_abstract_map_get_size ((GeeMap*) another_map);
-	_tmp58_ = _tmp57_;
-	_vala_assert (_tmp58_ == 2, "another_map.size == 2");
-	_tmp59_ = self->test_map;
-	gee_map_clear (_tmp59_);
-	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
-	_tmp60_ = self->test_map;
-	gee_map_set (_tmp60_, "one", "value_of_one");
-	_tmp61_ = self->test_map;
-	gee_map_set (_tmp61_, "two", "value_of_two");
-	_tmp62_ = self->test_map;
-	gee_map_set (_tmp62_, "three", "value_of_three");
-	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "value_of_two");
-	gee_abstract_map_set ((GeeAbstractMap*) another_map, "three", "value_of_three");
-	gee_abstract_map_set ((GeeAbstractMap*) another_map, "four", "value_of_four");
-	gee_abstract_map_set ((GeeAbstractMap*) another_map, "five", "value_of_five");
-	_tmp63_ = self->test_map;
-	_tmp64_ = gee_map_get_size (_tmp63_);
-	_tmp65_ = _tmp64_;
-	_vala_assert (_tmp65_ == 3, "test_map.size == 3");
-	_tmp66_ = gee_abstract_map_get_size ((GeeMap*) another_map);
-	_tmp67_ = _tmp66_;
-	_vala_assert (_tmp67_ == 4, "another_map.size == 4");
-	_tmp68_ = self->test_map;
-	_tmp69_ = gee_map_unset_all (_tmp68_, (GeeMap*) another_map);
-	_vala_assert (_tmp69_, "test_map.unset_all (another_map)");
-	_tmp70_ = self->test_map;
-	_tmp71_ = gee_map_get_size (_tmp70_);
-	_tmp72_ = _tmp71_;
-	_vala_assert (_tmp72_ == 1, "test_map.size == 1");
-	_tmp73_ = gee_abstract_map_get_size ((GeeMap*) another_map);
-	_tmp74_ = _tmp73_;
-	_vala_assert (_tmp74_ == 4, "another_map.size == 4");
-	_tmp75_ = self->test_map;
-	_tmp76_ = gee_map_has_key (_tmp75_, "one");
-	_vala_assert (_tmp76_, "test_map.has_key (\"one\")");
-	_g_object_unref0 (another_map);
-}
-
-
-void map_tests_test_has_all (MapTests* self) {
-	GHashFunc _tmp0_;
-	GEqualFunc _tmp1_;
-	GEqualFunc _tmp2_;
-	GeeHashMap* _tmp3_;
-	GeeHashMap* another_map;
-	GeeMap* _tmp4_;
-	gboolean _tmp5_ = FALSE;
 	GeeMap* _tmp6_;
-	GeeMap* _tmp7_;
-	gboolean _tmp8_ = FALSE;
-	GeeMap* _tmp9_;
-	GeeMap* _tmp10_;
-	gboolean _tmp11_ = FALSE;
-	GeeMap* _tmp12_;
+	gboolean _tmp7_ = FALSE;
+	GeeMap* _tmp8_;
+	gboolean _tmp9_;
+	gboolean _tmp10_;
+	gboolean _tmp11_;
+	gboolean _tmp12_;
 	GeeMap* _tmp13_;
 	GeeMap* _tmp14_;
-	GeeMap* _tmp15_;
-	gboolean _tmp16_ = FALSE;
-	GeeMap* _tmp17_;
-	GeeMap* _tmp18_;
+	gboolean _tmp15_;
+	gboolean _tmp16_;
+	gint _tmp17_;
+	gint _tmp18_;
 	GeeMap* _tmp19_;
-	GeeMap* _tmp20_;
-	gboolean _tmp21_ = FALSE;
-	GeeMap* _tmp22_;
-	GeeMap* _tmp23_;
-	GeeMap* _tmp24_;
-	gboolean _tmp25_ = FALSE;
+	gboolean _tmp20_ = FALSE;
+	GeeMap* _tmp21_;
+	gboolean _tmp22_;
+	gboolean _tmp23_;
+	gint _tmp24_;
+	gint _tmp25_;
 	GeeMap* _tmp26_;
 	GeeMap* _tmp27_;
 	GeeMap* _tmp28_;
 	GeeMap* _tmp29_;
-	GeeMap* _tmp30_;
-	GeeMap* _tmp31_;
-	GeeMap* _tmp32_;
-	GeeMap* _tmp33_;
-	gboolean _tmp34_ = FALSE;
-	GeeMap* _tmp35_;
+	gint _tmp30_;
+	gint _tmp31_;
+	gboolean _tmp32_;
+	gboolean _tmp33_;
+	GeeMap* _tmp34_;
+	gboolean _tmp35_ = FALSE;
 	GeeMap* _tmp36_;
-	GeeMap* _tmp37_;
-	GeeMap* _tmp38_;
-	GeeMap* _tmp39_;
-	GeeMap* _tmp40_;
+	gint _tmp37_;
+	gint _tmp38_;
+	gboolean _tmp39_;
+	gboolean _tmp40_;
 	GeeMap* _tmp41_;
 	GeeMap* _tmp42_;
-	gboolean _tmp43_ = FALSE;
+	GeeMap* _tmp43_;
+	GeeMap* _tmp44_;
+	gint _tmp45_;
+	gint _tmp46_;
+	gint _tmp47_;
+	gint _tmp48_;
+	GeeMap* _tmp49_;
+	gboolean _tmp50_ = FALSE;
+	GeeMap* _tmp51_;
+	gboolean _tmp52_;
+	gboolean _tmp53_;
+	gint _tmp54_;
+	gint _tmp55_;
+	GeeMap* _tmp56_;
+	GeeMap* _tmp57_;
+	GeeMap* _tmp58_;
+	GeeMap* _tmp59_;
+	GeeMap* _tmp60_;
+	gint _tmp61_;
+	gint _tmp62_;
+	gint _tmp63_;
+	gint _tmp64_;
+	GeeMap* _tmp65_;
+	gboolean _tmp66_ = FALSE;
+	GeeMap* _tmp67_;
+	gint _tmp68_;
+	gint _tmp69_;
+	gint _tmp70_;
+	gint _tmp71_;
+	GeeMap* _tmp72_;
+	gboolean _tmp73_ = FALSE;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = g_str_hash;
-	_tmp1_ = g_str_equal;
-	_tmp2_ = g_str_equal;
-	_tmp3_ = gee_hash_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, _tmp0_, _tmp1_, _tmp2_);
-	another_map = _tmp3_;
-	_tmp4_ = self->test_map;
-	_tmp5_ = gee_map_has_all (_tmp4_, (GeeMap*) another_map);
-	_vala_assert (_tmp5_, "test_map.has_all (another_map)");
+	_tmp0_ = gee_hash_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	another_map = _tmp0_;
+	_tmp1_ = self->test_map;
+	_tmp2_ = gee_map_get_is_empty (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_vala_assert (_tmp3_, "test_map.is_empty");
+	_tmp4_ = gee_map_get_is_empty ((GeeMap*) another_map);
+	_tmp5_ = _tmp4_;
+	_vala_assert (_tmp5_, "another_map.is_empty");
 	_tmp6_ = self->test_map;
-	gee_map_set (_tmp6_, "one", "value_of_one");
-	_tmp7_ = self->test_map;
-	_tmp8_ = gee_map_has_all (_tmp7_, (GeeMap*) another_map);
-	_vala_assert (_tmp8_, "test_map.has_all (another_map)");
-	_tmp9_ = self->test_map;
-	gee_map_clear (_tmp9_);
-	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
-	gee_abstract_map_set ((GeeAbstractMap*) another_map, "one", "value_of_one");
-	_tmp10_ = self->test_map;
-	_tmp11_ = gee_map_has_all (_tmp10_, (GeeMap*) another_map);
-	_vala_assert (!_tmp11_, "! test_map.has_all (another_map)");
-	_tmp12_ = self->test_map;
-	gee_map_clear (_tmp12_);
-	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
+	_tmp7_ = gee_map_unset_all (_tmp6_, (GeeMap*) another_map);
+	_vala_assert (!_tmp7_, "! test_map.unset_all (another_map)");
+	_tmp8_ = self->test_map;
+	_tmp9_ = gee_map_get_is_empty (_tmp8_);
+	_tmp10_ = _tmp9_;
+	_vala_assert (_tmp10_, "test_map.is_empty");
+	_tmp11_ = gee_map_get_is_empty ((GeeMap*) another_map);
+	_tmp12_ = _tmp11_;
+	_vala_assert (_tmp12_, "another_map.is_empty");
 	_tmp13_ = self->test_map;
-	gee_map_set (_tmp13_, "one", "value_of_one");
-	_tmp14_ = self->test_map;
-	gee_map_set (_tmp14_, "two", "value_of_two");
+	gee_map_clear (_tmp13_);
+	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
 	gee_abstract_map_set ((GeeAbstractMap*) another_map, "one", "value_of_one");
 	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "value_of_two");
-	_tmp15_ = self->test_map;
-	_tmp16_ = gee_map_has_all (_tmp15_, (GeeMap*) another_map);
-	_vala_assert (_tmp16_, "test_map.has_all (another_map)");
-	_tmp17_ = self->test_map;
-	gee_map_clear (_tmp17_);
-	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
-	_tmp18_ = self->test_map;
-	gee_map_set (_tmp18_, "one", "value_of_one");
+	_tmp14_ = self->test_map;
+	_tmp15_ = gee_map_get_is_empty (_tmp14_);
+	_tmp16_ = _tmp15_;
+	_vala_assert (_tmp16_, "test_map.is_empty");
+	_tmp17_ = gee_abstract_map_get_size ((GeeMap*) another_map);
+	_tmp18_ = _tmp17_;
+	_vala_assert (_tmp18_ == 2, "another_map.size == 2");
 	_tmp19_ = self->test_map;
-	gee_map_set (_tmp19_, "two", "value_of_two");
-	gee_abstract_map_set ((GeeAbstractMap*) another_map, "one", "another_value_of_one");
-	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "another_value_of_two");
-	_tmp20_ = self->test_map;
-	_tmp21_ = gee_map_has_all (_tmp20_, (GeeMap*) another_map);
-	_vala_assert (!_tmp21_, "! test_map.has_all (another_map)");
-	_tmp22_ = self->test_map;
-	gee_map_clear (_tmp22_);
-	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
-	_tmp23_ = self->test_map;
-	gee_map_set (_tmp23_, "one", "value_of_one");
-	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "value_of_two");
-	_tmp24_ = self->test_map;
-	_tmp25_ = gee_map_has_all (_tmp24_, (GeeMap*) another_map);
-	_vala_assert (!_tmp25_, "! test_map.has_all (another_map)");
+	_tmp20_ = gee_map_unset_all (_tmp19_, (GeeMap*) another_map);
+	_vala_assert (!_tmp20_, "! test_map.unset_all (another_map)");
+	_tmp21_ = self->test_map;
+	_tmp22_ = gee_map_get_is_empty (_tmp21_);
+	_tmp23_ = _tmp22_;
+	_vala_assert (_tmp23_, "test_map.is_empty");
+	_tmp24_ = gee_abstract_map_get_size ((GeeMap*) another_map);
+	_tmp25_ = _tmp24_;
+	_vala_assert (_tmp25_ == 2, "another_map.size == 2");
 	_tmp26_ = self->test_map;
 	gee_map_clear (_tmp26_);
 	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
@@ -1783,41 +1621,222 @@ void map_tests_test_has_all (MapTests* self) {
 	_tmp28_ = self->test_map;
 	gee_map_set (_tmp28_, "two", "value_of_two");
 	_tmp29_ = self->test_map;
-	gee_map_set (_tmp29_, "three", "value_of_three");
-	_tmp30_ = self->test_map;
-	gee_map_set (_tmp30_, "four", "value_of_four");
-	_tmp31_ = self->test_map;
-	gee_map_set (_tmp31_, "five", "value_of_five");
-	_tmp32_ = self->test_map;
-	gee_map_set (_tmp32_, "six", "value_of_six");
+	_tmp30_ = gee_map_get_size (_tmp29_);
+	_tmp31_ = _tmp30_;
+	_vala_assert (_tmp31_ == 2, "test_map.size == 2");
+	_tmp32_ = gee_map_get_is_empty ((GeeMap*) another_map);
+	_tmp33_ = _tmp32_;
+	_vala_assert (_tmp33_, "another_map.is_empty");
+	_tmp34_ = self->test_map;
+	_tmp35_ = gee_map_unset_all (_tmp34_, (GeeMap*) another_map);
+	_vala_assert (!_tmp35_, "! test_map.unset_all (another_map)");
+	_tmp36_ = self->test_map;
+	_tmp37_ = gee_map_get_size (_tmp36_);
+	_tmp38_ = _tmp37_;
+	_vala_assert (_tmp38_ == 2, "test_map.size == 2");
+	_tmp39_ = gee_map_get_is_empty ((GeeMap*) another_map);
+	_tmp40_ = _tmp39_;
+	_vala_assert (_tmp40_, "another_map.is_empty");
+	_tmp41_ = self->test_map;
+	gee_map_clear (_tmp41_);
+	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
+	_tmp42_ = self->test_map;
+	gee_map_set (_tmp42_, "one", "value_of_one");
+	_tmp43_ = self->test_map;
+	gee_map_set (_tmp43_, "two", "value_of_two");
+	gee_abstract_map_set ((GeeAbstractMap*) another_map, "one", "value_of_one");
+	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "value_of_two");
+	_tmp44_ = self->test_map;
+	_tmp45_ = gee_map_get_size (_tmp44_);
+	_tmp46_ = _tmp45_;
+	_vala_assert (_tmp46_ == 2, "test_map.size == 2");
+	_tmp47_ = gee_abstract_map_get_size ((GeeMap*) another_map);
+	_tmp48_ = _tmp47_;
+	_vala_assert (_tmp48_ == 2, "another_map.size == 2");
+	_tmp49_ = self->test_map;
+	_tmp50_ = gee_map_unset_all (_tmp49_, (GeeMap*) another_map);
+	_vala_assert (_tmp50_, "test_map.unset_all (another_map)");
+	_tmp51_ = self->test_map;
+	_tmp52_ = gee_map_get_is_empty (_tmp51_);
+	_tmp53_ = _tmp52_;
+	_vala_assert (_tmp53_, "test_map.is_empty");
+	_tmp54_ = gee_abstract_map_get_size ((GeeMap*) another_map);
+	_tmp55_ = _tmp54_;
+	_vala_assert (_tmp55_ == 2, "another_map.size == 2");
+	_tmp56_ = self->test_map;
+	gee_map_clear (_tmp56_);
+	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
+	_tmp57_ = self->test_map;
+	gee_map_set (_tmp57_, "one", "value_of_one");
+	_tmp58_ = self->test_map;
+	gee_map_set (_tmp58_, "two", "value_of_two");
+	_tmp59_ = self->test_map;
+	gee_map_set (_tmp59_, "three", "value_of_three");
 	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "value_of_two");
 	gee_abstract_map_set ((GeeAbstractMap*) another_map, "three", "value_of_three");
 	gee_abstract_map_set ((GeeAbstractMap*) another_map, "four", "value_of_four");
-	_tmp33_ = self->test_map;
-	_tmp34_ = gee_map_has_all (_tmp33_, (GeeMap*) another_map);
-	_vala_assert (_tmp34_, "test_map.has_all (another_map)");
-	_tmp35_ = self->test_map;
-	gee_map_clear (_tmp35_);
+	gee_abstract_map_set ((GeeAbstractMap*) another_map, "five", "value_of_five");
+	_tmp60_ = self->test_map;
+	_tmp61_ = gee_map_get_size (_tmp60_);
+	_tmp62_ = _tmp61_;
+	_vala_assert (_tmp62_ == 3, "test_map.size == 3");
+	_tmp63_ = gee_abstract_map_get_size ((GeeMap*) another_map);
+	_tmp64_ = _tmp63_;
+	_vala_assert (_tmp64_ == 4, "another_map.size == 4");
+	_tmp65_ = self->test_map;
+	_tmp66_ = gee_map_unset_all (_tmp65_, (GeeMap*) another_map);
+	_vala_assert (_tmp66_, "test_map.unset_all (another_map)");
+	_tmp67_ = self->test_map;
+	_tmp68_ = gee_map_get_size (_tmp67_);
+	_tmp69_ = _tmp68_;
+	_vala_assert (_tmp69_ == 1, "test_map.size == 1");
+	_tmp70_ = gee_abstract_map_get_size ((GeeMap*) another_map);
+	_tmp71_ = _tmp70_;
+	_vala_assert (_tmp71_ == 4, "another_map.size == 4");
+	_tmp72_ = self->test_map;
+	_tmp73_ = gee_map_has_key (_tmp72_, "one");
+	_vala_assert (_tmp73_, "test_map.has_key (\"one\")");
+	_g_object_unref0 (another_map);
+}
+
+
+void map_tests_test_has_all (MapTests* self) {
+	GeeHashMap* _tmp0_;
+	GeeHashMap* another_map;
+	GeeMap* _tmp1_;
+	gboolean _tmp2_ = FALSE;
+	GeeMap* _tmp3_;
+	GeeMap* _tmp4_;
+	gboolean _tmp5_ = FALSE;
+	GeeMap* _tmp6_;
+	GeeMap* _tmp7_;
+	gboolean _tmp8_ = FALSE;
+	GeeMap* _tmp9_;
+	GeeMap* _tmp10_;
+	GeeMap* _tmp11_;
+	GeeMap* _tmp12_;
+	gboolean _tmp13_ = FALSE;
+	GeeMap* _tmp14_;
+	GeeMap* _tmp15_;
+	GeeMap* _tmp16_;
+	GeeMap* _tmp17_;
+	gboolean _tmp18_ = FALSE;
+	GeeMap* _tmp19_;
+	GeeMap* _tmp20_;
+	GeeMap* _tmp21_;
+	gboolean _tmp22_ = FALSE;
+	GeeMap* _tmp23_;
+	GeeMap* _tmp24_;
+	GeeMap* _tmp25_;
+	GeeMap* _tmp26_;
+	GeeMap* _tmp27_;
+	GeeMap* _tmp28_;
+	GeeMap* _tmp29_;
+	GeeMap* _tmp30_;
+	gboolean _tmp31_ = FALSE;
+	GeeMap* _tmp32_;
+	GeeMap* _tmp33_;
+	GeeMap* _tmp34_;
+	GeeMap* _tmp35_;
+	GeeMap* _tmp36_;
+	GeeMap* _tmp37_;
+	GeeMap* _tmp38_;
+	GeeMap* _tmp39_;
+	gboolean _tmp40_ = FALSE;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = gee_hash_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	another_map = _tmp0_;
+	_tmp1_ = self->test_map;
+	_tmp2_ = gee_map_has_all (_tmp1_, (GeeMap*) another_map);
+	_vala_assert (_tmp2_, "test_map.has_all (another_map)");
+	_tmp3_ = self->test_map;
+	gee_map_set (_tmp3_, "one", "value_of_one");
+	_tmp4_ = self->test_map;
+	_tmp5_ = gee_map_has_all (_tmp4_, (GeeMap*) another_map);
+	_vala_assert (_tmp5_, "test_map.has_all (another_map)");
+	_tmp6_ = self->test_map;
+	gee_map_clear (_tmp6_);
 	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
+	gee_abstract_map_set ((GeeAbstractMap*) another_map, "one", "value_of_one");
+	_tmp7_ = self->test_map;
+	_tmp8_ = gee_map_has_all (_tmp7_, (GeeMap*) another_map);
+	_vala_assert (!_tmp8_, "! test_map.has_all (another_map)");
+	_tmp9_ = self->test_map;
+	gee_map_clear (_tmp9_);
+	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
+	_tmp10_ = self->test_map;
+	gee_map_set (_tmp10_, "one", "value_of_one");
+	_tmp11_ = self->test_map;
+	gee_map_set (_tmp11_, "two", "value_of_two");
+	gee_abstract_map_set ((GeeAbstractMap*) another_map, "one", "value_of_one");
+	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "value_of_two");
+	_tmp12_ = self->test_map;
+	_tmp13_ = gee_map_has_all (_tmp12_, (GeeMap*) another_map);
+	_vala_assert (_tmp13_, "test_map.has_all (another_map)");
+	_tmp14_ = self->test_map;
+	gee_map_clear (_tmp14_);
+	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
+	_tmp15_ = self->test_map;
+	gee_map_set (_tmp15_, "one", "value_of_one");
+	_tmp16_ = self->test_map;
+	gee_map_set (_tmp16_, "two", "value_of_two");
+	gee_abstract_map_set ((GeeAbstractMap*) another_map, "one", "another_value_of_one");
+	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "another_value_of_two");
+	_tmp17_ = self->test_map;
+	_tmp18_ = gee_map_has_all (_tmp17_, (GeeMap*) another_map);
+	_vala_assert (!_tmp18_, "! test_map.has_all (another_map)");
+	_tmp19_ = self->test_map;
+	gee_map_clear (_tmp19_);
+	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
+	_tmp20_ = self->test_map;
+	gee_map_set (_tmp20_, "one", "value_of_one");
+	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "value_of_two");
+	_tmp21_ = self->test_map;
+	_tmp22_ = gee_map_has_all (_tmp21_, (GeeMap*) another_map);
+	_vala_assert (!_tmp22_, "! test_map.has_all (another_map)");
+	_tmp23_ = self->test_map;
+	gee_map_clear (_tmp23_);
+	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
+	_tmp24_ = self->test_map;
+	gee_map_set (_tmp24_, "one", "value_of_one");
+	_tmp25_ = self->test_map;
+	gee_map_set (_tmp25_, "two", "value_of_two");
+	_tmp26_ = self->test_map;
+	gee_map_set (_tmp26_, "three", "value_of_three");
+	_tmp27_ = self->test_map;
+	gee_map_set (_tmp27_, "four", "value_of_four");
+	_tmp28_ = self->test_map;
+	gee_map_set (_tmp28_, "five", "value_of_five");
+	_tmp29_ = self->test_map;
+	gee_map_set (_tmp29_, "six", "value_of_six");
+	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "value_of_two");
+	gee_abstract_map_set ((GeeAbstractMap*) another_map, "three", "value_of_three");
+	gee_abstract_map_set ((GeeAbstractMap*) another_map, "four", "value_of_four");
+	_tmp30_ = self->test_map;
+	_tmp31_ = gee_map_has_all (_tmp30_, (GeeMap*) another_map);
+	_vala_assert (_tmp31_, "test_map.has_all (another_map)");
+	_tmp32_ = self->test_map;
+	gee_map_clear (_tmp32_);
+	gee_abstract_map_clear ((GeeAbstractMap*) another_map);
+	_tmp33_ = self->test_map;
+	gee_map_set (_tmp33_, "one", "value_of_one");
+	_tmp34_ = self->test_map;
+	gee_map_set (_tmp34_, "two", "value_of_two");
+	_tmp35_ = self->test_map;
+	gee_map_set (_tmp35_, "three", "value_of_three");
 	_tmp36_ = self->test_map;
-	gee_map_set (_tmp36_, "one", "value_of_one");
+	gee_map_set (_tmp36_, "four", "value_of_four");
 	_tmp37_ = self->test_map;
-	gee_map_set (_tmp37_, "two", "value_of_two");
+	gee_map_set (_tmp37_, "five", "value_of_five");
 	_tmp38_ = self->test_map;
-	gee_map_set (_tmp38_, "three", "value_of_three");
-	_tmp39_ = self->test_map;
-	gee_map_set (_tmp39_, "four", "value_of_four");
-	_tmp40_ = self->test_map;
-	gee_map_set (_tmp40_, "five", "value_of_five");
-	_tmp41_ = self->test_map;
-	gee_map_set (_tmp41_, "six", "value_of_six");
+	gee_map_set (_tmp38_, "six", "value_of_six");
 	gee_abstract_map_set ((GeeAbstractMap*) another_map, "two", "value_of_two");
 	gee_abstract_map_set ((GeeAbstractMap*) another_map, "three", "value_of_three");
 	gee_abstract_map_set ((GeeAbstractMap*) another_map, "four", "value_of_four");
 	gee_abstract_map_set ((GeeAbstractMap*) another_map, "height", "value_of_height");
-	_tmp42_ = self->test_map;
-	_tmp43_ = gee_map_has_all (_tmp42_, (GeeMap*) another_map);
-	_vala_assert (!_tmp43_, "! test_map.has_all (another_map)");
+	_tmp39_ = self->test_map;
+	_tmp40_ = gee_map_has_all (_tmp39_, (GeeMap*) another_map);
+	_vala_assert (!_tmp40_, "! test_map.has_all (another_map)");
 	_g_object_unref0 (another_map);
 }
 
@@ -1828,49 +1847,287 @@ void map_tests_test_gobject_properties (MapTests* self) {
 	GValue _tmp1_ = {0};
 	GValue _tmp2_;
 	GeeMap* _tmp3_;
-	gboolean _tmp4_ = FALSE;
+	gint _tmp4_ = 0;
 	GeeMap* _tmp5_;
-	gboolean _tmp6_;
-	gboolean _tmp7_;
-	GValue _tmp8_ = {0};
-	GValue _tmp9_;
-	GeeMap* _tmp10_;
-	gint _tmp11_ = 0;
-	GeeMap* _tmp12_;
-	gint _tmp13_;
-	gint _tmp14_;
+	gint _tmp6_;
+	gint _tmp7_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->test_map;
 	_vala_assert (_tmp0_ != NULL, "test_map != null");
-	g_value_init (&_tmp1_, G_TYPE_BOOLEAN);
+	g_value_init (&_tmp1_, G_TYPE_INT);
 	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
 	value = _tmp1_;
 	_tmp2_ = value;
 	_tmp3_ = self->test_map;
-	g_object_get_property ((GObject*) _tmp3_, "is-empty", &value);
-	_tmp4_ = g_value_get_boolean (&value);
+	g_object_get_property ((GObject*) _tmp3_, "size", &value);
+	_tmp4_ = g_value_get_int (&value);
 	_tmp5_ = self->test_map;
-	_tmp6_ = gee_map_get_is_empty (_tmp5_);
+	_tmp6_ = gee_map_get_size (_tmp5_);
 	_tmp7_ = _tmp6_;
-	_vala_assert (_tmp4_ == _tmp7_, "value.get_boolean () == test_map.is_empty");
-	g_value_unset (&value);
-	g_value_init (&_tmp8_, G_TYPE_INT);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	value = _tmp8_;
-	_tmp9_ = value;
-	_tmp10_ = self->test_map;
-	g_object_get_property ((GObject*) _tmp10_, "size", &value);
-	_tmp11_ = g_value_get_int (&value);
-	_tmp12_ = self->test_map;
-	_tmp13_ = gee_map_get_size (_tmp12_);
-	_tmp14_ = _tmp13_;
-	_vala_assert (_tmp11_ == _tmp14_, "value.get_int () == test_map.size");
+	_vala_assert (_tmp4_ == _tmp7_, "value.get_int () == test_map.size");
 	g_value_unset (&value);
 	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
 }
 
 
-MapTestsTestEntry* map_tests_test_entry_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, gconstpointer key, gconstpointer value) {
+static gint __lambda15_ (MapTests* self, const gchar* x, const gchar* y, gint z) {
+	gint result = 0;
+	gint _tmp0_;
+	g_return_val_if_fail (x != NULL, 0);
+	g_return_val_if_fail (y != NULL, 0);
+	_tmp0_ = z;
+	result = _tmp0_ + 1;
+	return result;
+}
+
+
+static gpointer ___lambda15__gee_fold_map_func (gconstpointer k, gconstpointer v, gpointer a, gpointer self) {
+	gpointer result;
+	result = __lambda15_ (self, k, v, a);
+	return result;
+}
+
+
+static gint __lambda16_ (MapTests* self, const gchar* x, const gchar* y, gint z) {
+	gint result = 0;
+	gint _tmp0_;
+	g_return_val_if_fail (x != NULL, 0);
+	g_return_val_if_fail (y != NULL, 0);
+	_tmp0_ = z;
+	result = _tmp0_ + 1;
+	return result;
+}
+
+
+static gpointer ___lambda16__gee_fold_map_func (gconstpointer k, gconstpointer v, gpointer a, gpointer self) {
+	gpointer result;
+	result = __lambda16_ (self, k, v, a);
+	return result;
+}
+
+
+void map_tests_test_fold (MapTests* self) {
+	GeeMap* _tmp0_;
+	GeeMap* _tmp1_;
+	GeeMap* _tmp2_;
+	gint count = 0;
+	GeeMap* _tmp3_;
+	GeeMapIterator* _tmp4_ = NULL;
+	GeeMapIterator* _tmp5_;
+	gpointer _tmp6_ = NULL;
+	gint _tmp7_;
+	GeeMap* _tmp8_;
+	GeeMapIterator* _tmp9_ = NULL;
+	GeeMapIterator* iter;
+	gboolean _tmp10_ = FALSE;
+	gpointer _tmp11_ = NULL;
+	gint _tmp12_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = self->test_map;
+	gee_map_set (_tmp0_, "one", "one");
+	_tmp1_ = self->test_map;
+	gee_map_set (_tmp1_, "two", "two");
+	_tmp2_ = self->test_map;
+	gee_map_set (_tmp2_, "three", "three");
+	_tmp3_ = self->test_map;
+	_tmp4_ = gee_map_map_iterator (_tmp3_);
+	_tmp5_ = _tmp4_;
+	_tmp6_ = gee_map_iterator_fold (_tmp5_, G_TYPE_INT, NULL, NULL, ___lambda15__gee_fold_map_func, self, (gpointer) ((gintptr) 0));
+	count = (gint) ((gintptr) _tmp6_);
+	_g_object_unref0 (_tmp5_);
+	_tmp7_ = count;
+	_vala_assert (_tmp7_ == 3, "count == 3");
+	_tmp8_ = self->test_map;
+	_tmp9_ = gee_map_map_iterator (_tmp8_);
+	iter = _tmp9_;
+	_tmp10_ = gee_map_iterator_next (iter);
+	_vala_assert (_tmp10_, "iter.next ()");
+	_tmp11_ = gee_map_iterator_fold (iter, G_TYPE_INT, NULL, NULL, ___lambda16__gee_fold_map_func, self, (gpointer) ((gintptr) 0));
+	count = (gint) ((gintptr) _tmp11_);
+	_tmp12_ = count;
+	_vala_assert (_tmp12_ == 3, "count == 3");
+	_g_object_unref0 (iter);
+}
+
+
+static Block9Data* block9_data_ref (Block9Data* _data9_) {
+	g_atomic_int_inc (&_data9_->_ref_count_);
+	return _data9_;
+}
+
+
+static void block9_data_unref (void * _userdata_) {
+	Block9Data* _data9_;
+	_data9_ = (Block9Data*) _userdata_;
+	if (g_atomic_int_dec_and_test (&_data9_->_ref_count_)) {
+		MapTests * self;
+		self = _data9_->self;
+		_g_object_unref0 (self);
+		g_slice_free (Block9Data, _data9_);
+	}
+}
+
+
+static gboolean __lambda17_ (Block9Data* _data9_, const gchar* x, const gchar* y) {
+	MapTests * self;
+	gboolean result = FALSE;
+	gint _tmp0_;
+	self = _data9_->self;
+	g_return_val_if_fail (x != NULL, FALSE);
+	g_return_val_if_fail (y != NULL, FALSE);
+	_tmp0_ = _data9_->count;
+	_data9_->count = _tmp0_ + 1;
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean ___lambda17__gee_forall_map_func (gconstpointer k, gconstpointer v, gpointer self) {
+	gboolean result;
+	result = __lambda17_ (self, k, v);
+	return result;
+}
+
+
+static gboolean __lambda18_ (Block9Data* _data9_, const gchar* x, const gchar* y) {
+	MapTests * self;
+	gboolean result = FALSE;
+	gint _tmp0_;
+	self = _data9_->self;
+	g_return_val_if_fail (x != NULL, FALSE);
+	g_return_val_if_fail (y != NULL, FALSE);
+	_tmp0_ = _data9_->count;
+	_data9_->count = _tmp0_ + 1;
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean ___lambda18__gee_forall_map_func (gconstpointer k, gconstpointer v, gpointer self) {
+	gboolean result;
+	result = __lambda18_ (self, k, v);
+	return result;
+}
+
+
+void map_tests_test_foreach (MapTests* self) {
+	Block9Data* _data9_;
+	GeeMap* _tmp0_;
+	GeeMap* _tmp1_;
+	GeeMap* _tmp2_;
+	GeeMap* _tmp3_;
+	GeeMapIterator* _tmp4_ = NULL;
+	GeeMapIterator* _tmp5_;
+	GeeMap* _tmp6_;
+	GeeMapIterator* _tmp7_ = NULL;
+	GeeMapIterator* iter;
+	gboolean _tmp8_ = FALSE;
+	g_return_if_fail (self != NULL);
+	_data9_ = g_slice_new0 (Block9Data);
+	_data9_->_ref_count_ = 1;
+	_data9_->self = g_object_ref (self);
+	_tmp0_ = self->test_map;
+	gee_map_set (_tmp0_, "one", "one");
+	_tmp1_ = self->test_map;
+	gee_map_set (_tmp1_, "two", "two");
+	_tmp2_ = self->test_map;
+	gee_map_set (_tmp2_, "three", "three");
+	_data9_->count = 0;
+	_tmp3_ = self->test_map;
+	_tmp4_ = gee_map_map_iterator (_tmp3_);
+	_tmp5_ = _tmp4_;
+	gee_map_iterator_foreach (_tmp5_, ___lambda17__gee_forall_map_func, _data9_);
+	_g_object_unref0 (_tmp5_);
+	_vala_assert (_data9_->count == 3, "count == 3");
+	_tmp6_ = self->test_map;
+	_tmp7_ = gee_map_map_iterator (_tmp6_);
+	iter = _tmp7_;
+	_tmp8_ = gee_map_iterator_next (iter);
+	_vala_assert (_tmp8_, "iter.next ()");
+	gee_map_iterator_foreach (iter, ___lambda18__gee_forall_map_func, _data9_);
+	_vala_assert (_data9_->count == 6, "count == 6");
+	_g_object_unref0 (iter);
+	block9_data_unref (_data9_);
+	_data9_ = NULL;
+}
+
+
+GeeMapEntry* map_tests_entry_for (const gchar* key, const gchar* value) {
+	GeeMapEntry* result = NULL;
+	const gchar* _tmp0_;
+	const gchar* _tmp1_;
+	MapTestsTestEntry* _tmp2_;
+	g_return_val_if_fail (key != NULL, NULL);
+	g_return_val_if_fail (value != NULL, NULL);
+	_tmp0_ = key;
+	_tmp1_ = value;
+	_tmp2_ = map_tests_test_entry_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, _tmp0_, _tmp1_);
+	result = (GeeMapEntry*) _tmp2_;
+	return result;
+}
+
+
+gboolean map_tests_check_entry (GeeMapEntry* e, const gchar* key, const gchar* value) {
+	gboolean result = FALSE;
+	gboolean _tmp0_ = FALSE;
+	GeeMapEntry* _tmp1_;
+	gconstpointer _tmp2_;
+	const gchar* _tmp3_;
+	const gchar* _tmp4_;
+	gboolean _tmp9_;
+	g_return_val_if_fail (e != NULL, FALSE);
+	g_return_val_if_fail (key != NULL, FALSE);
+	g_return_val_if_fail (value != NULL, FALSE);
+	_tmp1_ = e;
+	_tmp2_ = gee_map_entry_get_key (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = key;
+	if (g_strcmp0 ((const gchar*) _tmp3_, _tmp4_) == 0) {
+		GeeMapEntry* _tmp5_;
+		gconstpointer _tmp6_;
+		const gchar* _tmp7_;
+		const gchar* _tmp8_;
+		_tmp5_ = e;
+		_tmp6_ = gee_map_entry_get_value (_tmp5_);
+		_tmp7_ = _tmp6_;
+		_tmp8_ = value;
+		_tmp0_ = g_strcmp0 ((const gchar*) _tmp7_, _tmp8_) == 0;
+	} else {
+		_tmp0_ = FALSE;
+	}
+	_tmp9_ = _tmp0_;
+	result = _tmp9_;
+	_g_object_unref0 (e);
+	return result;
+}
+
+
+void map_tests_assert_entry (GeeMapEntry* e, const gchar* key, const gchar* value) {
+	GeeMapEntry* _tmp0_;
+	gconstpointer _tmp1_;
+	const gchar* _tmp2_;
+	const gchar* _tmp3_;
+	GeeMapEntry* _tmp4_;
+	gconstpointer _tmp5_;
+	const gchar* _tmp6_;
+	const gchar* _tmp7_;
+	g_return_if_fail (e != NULL);
+	g_return_if_fail (key != NULL);
+	g_return_if_fail (value != NULL);
+	_tmp0_ = e;
+	_tmp1_ = gee_map_entry_get_key (_tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = key;
+	_vala_assert (g_strcmp0 ((const gchar*) _tmp2_, _tmp3_) == 0, "e.key == key");
+	_tmp4_ = e;
+	_tmp5_ = gee_map_entry_get_value (_tmp4_);
+	_tmp6_ = _tmp5_;
+	_tmp7_ = value;
+	_vala_assert (g_strcmp0 ((const gchar*) _tmp6_, _tmp7_) == 0, "e.value == value");
+}
+
+
+static MapTestsTestEntry* map_tests_test_entry_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, gconstpointer key, gconstpointer value) {
 	MapTestsTestEntry * self = NULL;
 	gconstpointer _tmp0_;
 	gpointer _tmp1_;
@@ -1892,7 +2149,7 @@ MapTestsTestEntry* map_tests_test_entry_construct (GType object_type, GType k_ty
 }
 
 
-MapTestsTestEntry* map_tests_test_entry_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, gconstpointer key, gconstpointer value) {
+static MapTestsTestEntry* map_tests_test_entry_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, gconstpointer key, gconstpointer value) {
 	return map_tests_test_entry_construct (MAP_TESTS_TYPE_TEST_ENTRY, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, key, value);
 }
 
@@ -1932,12 +2189,22 @@ static void map_tests_test_entry_real_set_value (GeeMapEntry* base, gconstpointe
 }
 
 
+static gboolean map_tests_test_entry_real_get_read_only (GeeMapEntry* base) {
+	gboolean result;
+	MapTestsTestEntry* self;
+	self = (MapTestsTestEntry*) base;
+	result = FALSE;
+	return result;
+}
+
+
 static void map_tests_test_entry_class_init (MapTestsTestEntryClass * klass) {
 	map_tests_test_entry_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (MapTestsTestEntryPrivate));
 	GEE_MAP_ENTRY_CLASS (klass)->get_key = map_tests_test_entry_real_get_key;
 	GEE_MAP_ENTRY_CLASS (klass)->get_value = map_tests_test_entry_real_get_value;
 	GEE_MAP_ENTRY_CLASS (klass)->set_value = map_tests_test_entry_real_set_value;
+	GEE_MAP_ENTRY_CLASS (klass)->get_read_only = map_tests_test_entry_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_map_tests_test_entry_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_map_tests_test_entry_set_property;
 	G_OBJECT_CLASS (klass)->finalize = map_tests_test_entry_finalize;
@@ -1949,6 +2216,7 @@ static void map_tests_test_entry_class_init (MapTestsTestEntryClass * klass) {
 	g_object_class_install_property (G_OBJECT_CLASS (klass), MAP_TESTS_TEST_ENTRY_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), MAP_TESTS_TEST_ENTRY_KEY, g_param_spec_pointer ("key", "key", "key", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), MAP_TESTS_TEST_ENTRY_VALUE, g_param_spec_pointer ("value", "value", "value", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE | G_PARAM_WRITABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), MAP_TESTS_TEST_ENTRY_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -1966,7 +2234,7 @@ static void map_tests_test_entry_finalize (GObject* obj) {
 }
 
 
-GType map_tests_test_entry_get_type (void) {
+static GType map_tests_test_entry_get_type (void) {
 	static volatile gsize map_tests_test_entry_type_id__volatile = 0;
 	if (g_once_init_enter (&map_tests_test_entry_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (MapTestsTestEntryClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) map_tests_test_entry_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (MapTestsTestEntry), 0, (GInstanceInitFunc) map_tests_test_entry_instance_init, NULL };
@@ -1987,6 +2255,9 @@ static void _vala_map_tests_test_entry_get_property (GObject * object, guint pro
 		break;
 		case MAP_TESTS_TEST_ENTRY_VALUE:
 		g_value_set_pointer (value, gee_map_entry_get_value ((GeeMapEntry*) self));
+		break;
+		case MAP_TESTS_TEST_ENTRY_READ_ONLY:
+		g_value_set_boolean (value, gee_map_entry_get_read_only ((GeeMapEntry*) self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);

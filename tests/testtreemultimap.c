@@ -66,7 +66,6 @@ typedef struct _TreeMultiMapTests TreeMultiMapTests;
 typedef struct _TreeMultiMapTestsClass TreeMultiMapTestsClass;
 typedef struct _TreeMultiMapTestsPrivate TreeMultiMapTestsPrivate;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
-#define _vala_assert(expr, msg) if G_LIKELY (expr) ; else g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
 
 struct _GeeTestCase {
 	GObject parent_instance;
@@ -98,7 +97,6 @@ struct _TreeMultiMapTestsClass {
 	MultiMapTestsClass parent_class;
 };
 
-typedef void (*GeeTestCaseTestMethod) (void* user_data);
 
 static gpointer tree_multi_map_tests_parent_class = NULL;
 
@@ -111,22 +109,13 @@ enum  {
 TreeMultiMapTests* tree_multi_map_tests_new (void);
 TreeMultiMapTests* tree_multi_map_tests_construct (GType object_type);
 MultiMapTests* multi_map_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
-static void tree_multi_map_tests_test_selected_functions (TreeMultiMapTests* self);
-static void _tree_multi_map_tests_test_selected_functions_gee_test_case_test_method (gpointer self);
 static void tree_multi_map_tests_real_set_up (GeeTestCase* base);
 static void tree_multi_map_tests_real_tear_down (GeeTestCase* base);
-
-
-static void _tree_multi_map_tests_test_selected_functions_gee_test_case_test_method (gpointer self) {
-	tree_multi_map_tests_test_selected_functions (self);
-}
 
 
 TreeMultiMapTests* tree_multi_map_tests_construct (GType object_type) {
 	TreeMultiMapTests * self = NULL;
 	self = (TreeMultiMapTests*) multi_map_tests_construct (object_type, "TreeMultiMap");
-	gee_test_case_add_test ((GeeTestCase*) self, "[TreeMultiMap] selected functions", _tree_multi_map_tests_test_selected_functions_gee_test_case_test_method, self);
 	return self;
 }
 
@@ -140,7 +129,7 @@ static void tree_multi_map_tests_real_set_up (GeeTestCase* base) {
 	TreeMultiMapTests * self;
 	GeeTreeMultiMap* _tmp0_;
 	self = (TreeMultiMapTests*) base;
-	_tmp0_ = gee_tree_multi_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL);
+	_tmp0_ = gee_tree_multi_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL, NULL, NULL, NULL);
 	_g_object_unref0 (((MultiMapTests*) self)->test_multi_map);
 	((MultiMapTests*) self)->test_multi_map = (GeeMultiMap*) _tmp0_;
 }
@@ -151,38 +140,6 @@ static void tree_multi_map_tests_real_tear_down (GeeTestCase* base) {
 	self = (TreeMultiMapTests*) base;
 	_g_object_unref0 (((MultiMapTests*) self)->test_multi_map);
 	((MultiMapTests*) self)->test_multi_map = NULL;
-}
-
-
-static gpointer _g_object_ref0 (gpointer self) {
-	return self ? g_object_ref (self) : NULL;
-}
-
-
-static void tree_multi_map_tests_test_selected_functions (TreeMultiMapTests* self) {
-	GeeMultiMap* _tmp0_;
-	GeeTreeMultiMap* _tmp1_;
-	GeeTreeMultiMap* test_tree_multi_map;
-	GCompareFunc _tmp2_;
-	GCompareFunc _tmp3_;
-	GCompareFunc _tmp4_;
-	GCompareFunc _tmp5_;
-	GCompareFunc _tmp6_;
-	GCompareFunc _tmp7_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((MultiMapTests*) self)->test_multi_map;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_TREE_MULTI_MAP) ? ((GeeTreeMultiMap*) _tmp0_) : NULL);
-	test_tree_multi_map = _tmp1_;
-	_vala_assert (test_tree_multi_map != NULL, "test_tree_multi_map != null");
-	_tmp2_ = gee_tree_multi_map_get_key_compare_func (test_tree_multi_map);
-	_tmp3_ = _tmp2_;
-	_tmp4_ = g_strcmp0;
-	_vala_assert (_tmp3_ == ((GCompareFunc) _tmp4_), "test_tree_multi_map.key_compare_func == (CompareFunc) strcmp");
-	_tmp5_ = gee_tree_multi_map_get_value_compare_func (test_tree_multi_map);
-	_tmp6_ = _tmp5_;
-	_tmp7_ = g_strcmp0;
-	_vala_assert (_tmp6_ == ((GCompareFunc) _tmp7_), "test_tree_multi_map.value_compare_func == (CompareFunc) strcmp");
-	_g_object_unref0 (test_tree_multi_map);
 }
 
 

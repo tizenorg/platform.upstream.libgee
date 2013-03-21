@@ -90,7 +90,9 @@ enum  {
 };
 MultiMapTests* multi_map_tests_construct (GType object_type, const gchar* name);
 GeeTestCase* gee_test_case_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
+void multi_map_tests_test_type_correctness (MultiMapTests* self);
+static void _multi_map_tests_test_type_correctness_gee_test_case_test_method (gpointer self);
 static void multi_map_tests_test_size (MultiMapTests* self);
 static void _multi_map_tests_test_size_gee_test_case_test_method (gpointer self);
 static void multi_map_tests_test_getting_setting (MultiMapTests* self);
@@ -98,6 +100,11 @@ static void _multi_map_tests_test_getting_setting_gee_test_case_test_method (gpo
 static void multi_map_tests_test_keys_all_keys_values (MultiMapTests* self);
 static void _multi_map_tests_test_keys_all_keys_values_gee_test_case_test_method (gpointer self);
 static void multi_map_tests_finalize (GObject* obj);
+
+
+static void _multi_map_tests_test_type_correctness_gee_test_case_test_method (gpointer self) {
+	multi_map_tests_test_type_correctness (self);
+}
 
 
 static void _multi_map_tests_test_size_gee_test_case_test_method (gpointer self) {
@@ -121,10 +128,33 @@ MultiMapTests* multi_map_tests_construct (GType object_type, const gchar* name) 
 	g_return_val_if_fail (name != NULL, NULL);
 	_tmp0_ = name;
 	self = (MultiMapTests*) gee_test_case_construct (object_type, _tmp0_);
-	gee_test_case_add_test ((GeeTestCase*) self, "[MultiMap] size", _multi_map_tests_test_size_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[MultiMap] getting and setting", _multi_map_tests_test_getting_setting_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[MultiMap] keys, all keys and values", _multi_map_tests_test_keys_all_keys_values_gee_test_case_test_method, self);
+	gee_test_case_add_test ((GeeTestCase*) self, "[MultiMap] type correctness", _multi_map_tests_test_type_correctness_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[MultiMap] size", _multi_map_tests_test_size_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[MultiMap] getting and setting", _multi_map_tests_test_getting_setting_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[MultiMap] keys, all keys and values", _multi_map_tests_test_keys_all_keys_values_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
+}
+
+
+void multi_map_tests_test_type_correctness (MultiMapTests* self) {
+	GeeMultiMap* _tmp0_;
+	GeeMultiMap* _tmp1_;
+	GType _tmp2_;
+	GType _tmp3_;
+	GeeMultiMap* _tmp4_;
+	GType _tmp5_;
+	GType _tmp6_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = self->test_multi_map;
+	_vala_assert (_tmp0_ != NULL, "test_multi_map != null");
+	_tmp1_ = self->test_multi_map;
+	_tmp2_ = gee_multi_map_get_key_type (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_vala_assert (_tmp3_ == G_TYPE_STRING, "test_multi_map.key_type == typeof (string)");
+	_tmp4_ = self->test_multi_map;
+	_tmp5_ = gee_multi_map_get_value_type (_tmp4_);
+	_tmp6_ = _tmp5_;
+	_vala_assert (_tmp6_ == G_TYPE_STRING, "test_multi_map.value_type == typeof (string)");
 }
 
 

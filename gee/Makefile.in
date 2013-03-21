@@ -57,7 +57,26 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(dist_vapi_DATA) $(geeinclude_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/Makefile.decl
+	$(top_srcdir)/Makefile.decl Gee-0.8.gir abstractbidirlist.c \
+	abstractbidirsortedmap.c abstractbidirsortedset.c \
+	abstractcollection.c abstractlist.c abstractmap.c \
+	abstractmultimap.c abstractmultiset.c abstractqueue.c \
+	abstractset.c abstractsortedmap.c abstractsortedset.c \
+	arraylist.c arrayqueue.c assemblyinfo.c bidiriterator.c \
+	bidirlist.c bidirlistiterator.c bidirmapiterator.c \
+	bidirsortedmap.c bidirsortedset.c collection.c comparable.c \
+	concurrentlist.c concurrentset.c deque.c functions.c \
+	gee-0.8.vapi gee-internals-0.8.vapi gee-internals.h gee.h \
+	hashable.c hashmap.c hashmultimap.c hashmultiset.c hashset.c \
+	hazardpointer.c iterable.c iterator.c lazy.c \
+	libgee_0_8_la_vala.stamp linkedlist.c list.c listiterator.c \
+	map.c mapiterator.c multimap.c multiset.c priorityqueue.c \
+	queue.c readonlybidirlist.c readonlybidirsortedmap.c \
+	readonlybidirsortedset.c readonlycollection.c readonlylist.c \
+	readonlymap.c readonlymultimap.c readonlymultiset.c \
+	readonlyset.c readonlysortedmap.c readonlysortedset.c set.c \
+	sortedmap.c sortedset.c timsort.c traversable.c treemap.c \
+	treemultimap.c treemultiset.c treeset.c unfolditerator.c
 subdir = gee
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -102,27 +121,57 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(vapidir)" \
 	"$(DESTDIR)$(geeincludedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-libgee_la_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+libgee_0_8_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__objects_1 =
-am__objects_2 = assemblyinfo.lo abstractcollection.lo abstractlist.lo \
-	abstractmap.lo abstractmultimap.lo abstractmultiset.lo \
-	abstractqueue.lo abstractset.lo arraylist.lo bidiriterator.lo \
-	collection.lo comparable.lo deque.lo functions.lo hashmap.lo \
-	hashmultimap.lo hashmultiset.lo hashset.lo iterable.lo \
-	iterator.lo linkedlist.lo list.lo listiterator.lo map.lo \
-	mapiterator.lo multimap.lo multiset.lo priorityqueue.lo \
-	queue.lo readonlycollection.lo readonlylist.lo readonlymap.lo \
-	readonlyset.lo set.lo sortedset.lo timsort.lo treemap.lo \
-	treemultimap.lo treemultiset.lo treeset.lo $(am__objects_1)
-am_libgee_la_OBJECTS = $(am__objects_2) $(am__objects_1)
-libgee_la_OBJECTS = $(am_libgee_la_OBJECTS)
+am_libgee_0_8_la_OBJECTS = libgee_0_8_la-assemblyinfo.lo \
+	libgee_0_8_la-abstractbidirlist.lo \
+	libgee_0_8_la-abstractbidirsortedset.lo \
+	libgee_0_8_la-abstractbidirsortedmap.lo \
+	libgee_0_8_la-abstractcollection.lo \
+	libgee_0_8_la-abstractlist.lo libgee_0_8_la-abstractmap.lo \
+	libgee_0_8_la-abstractmultimap.lo \
+	libgee_0_8_la-abstractmultiset.lo \
+	libgee_0_8_la-abstractqueue.lo libgee_0_8_la-abstractset.lo \
+	libgee_0_8_la-abstractsortedmap.lo \
+	libgee_0_8_la-abstractsortedset.lo libgee_0_8_la-arraylist.lo \
+	libgee_0_8_la-arrayqueue.lo libgee_0_8_la-bidiriterator.lo \
+	libgee_0_8_la-bidirlist.lo libgee_0_8_la-bidirlistiterator.lo \
+	libgee_0_8_la-bidirmapiterator.lo \
+	libgee_0_8_la-bidirsortedset.lo \
+	libgee_0_8_la-bidirsortedmap.lo libgee_0_8_la-collection.lo \
+	libgee_0_8_la-comparable.lo libgee_0_8_la-concurrentlist.lo \
+	libgee_0_8_la-concurrentset.lo libgee_0_8_la-deque.lo \
+	libgee_0_8_la-functions.lo libgee_0_8_la-hashable.lo \
+	libgee_0_8_la-hashmap.lo libgee_0_8_la-hashmultimap.lo \
+	libgee_0_8_la-hashmultiset.lo libgee_0_8_la-hashset.lo \
+	libgee_0_8_la-hazardpointer.lo libgee_0_8_la-iterable.lo \
+	libgee_0_8_la-iterator.lo libgee_0_8_la-lazy.lo \
+	libgee_0_8_la-linkedlist.lo libgee_0_8_la-list.lo \
+	libgee_0_8_la-listiterator.lo libgee_0_8_la-map.lo \
+	libgee_0_8_la-mapiterator.lo libgee_0_8_la-multimap.lo \
+	libgee_0_8_la-multiset.lo libgee_0_8_la-priorityqueue.lo \
+	libgee_0_8_la-queue.lo libgee_0_8_la-readonlybidirlist.lo \
+	libgee_0_8_la-readonlybidirsortedset.lo \
+	libgee_0_8_la-readonlybidirsortedmap.lo \
+	libgee_0_8_la-readonlycollection.lo \
+	libgee_0_8_la-readonlylist.lo libgee_0_8_la-readonlymap.lo \
+	libgee_0_8_la-readonlymultimap.lo \
+	libgee_0_8_la-readonlymultiset.lo libgee_0_8_la-readonlyset.lo \
+	libgee_0_8_la-readonlysortedmap.lo \
+	libgee_0_8_la-readonlysortedset.lo libgee_0_8_la-set.lo \
+	libgee_0_8_la-sortedmap.lo libgee_0_8_la-sortedset.lo \
+	libgee_0_8_la-timsort.lo libgee_0_8_la-traversable.lo \
+	libgee_0_8_la-treemap.lo libgee_0_8_la-treemultimap.lo \
+	libgee_0_8_la-treemultiset.lo libgee_0_8_la-treeset.lo \
+	libgee_0_8_la-unfolditerator.lo $(am__objects_1)
+libgee_0_8_la_OBJECTS = $(am_libgee_0_8_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
-libgee_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+libgee_0_8_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libgee_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(libgee_0_8_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -146,11 +195,18 @@ LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD  " $@;
+VALACOMPILE = $(VALAC) $(AM_VALAFLAGS) $(VALAFLAGS)
+LTVALACOMPILE = $(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(VALAC) $(AM_VALAFLAGS) \
+	$(VALAFLAGS)
+AM_V_VALAC = $(am__v_VALAC_@AM_V@)
+am__v_VALAC_ = $(am__v_VALAC_@AM_DEFAULT_V@)
+am__v_VALAC_0 = @echo "  VALAC " $@;
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(libgee_la_SOURCES)
-DIST_SOURCES = $(libgee_la_SOURCES)
+SOURCES = $(libgee_0_8_la_SOURCES)
+DIST_SOURCES = $(libgee_0_8_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -300,21 +356,19 @@ GTESTER = gtester
 GTESTER_REPORT = gtester-report
 
 # initialize variables for unconditional += appending
-EXTRA_DIST = $(libgee_la_VALASOURCES) gee-1.0.vapi Gee-1.0.gir \
-	gee.vala.stamp
+EXTRA_DIST = 
 TEST_PROGS = 
+
+# useful constants
 NULL = 
-AM_CPPFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(COVERAGE_CFLAGS) \
-	$(NULL)
-
-BUILT_SOURCES = gee.vala.stamp
 lib_LTLIBRARIES = \
-	libgee.la
+	libgee-0.8.la
 
-libgee_la_VALASOURCES = \
+libgee_0_8_la_SOURCES = \
 	assemblyinfo.vala \
+	abstractbidirlist.vala \
+	abstractbidirsortedset.vala \
+	abstractbidirsortedmap.vala \
 	abstractcollection.vala \
 	abstractlist.vala \
 	abstractmap.vala \
@@ -322,18 +376,31 @@ libgee_la_VALASOURCES = \
 	abstractmultiset.vala \
 	abstractqueue.vala \
 	abstractset.vala \
+	abstractsortedmap.vala \
+	abstractsortedset.vala \
 	arraylist.vala \
+	arrayqueue.vala \
 	bidiriterator.vala \
+	bidirlist.vala \
+	bidirlistiterator.vala \
+	bidirmapiterator.vala \
+	bidirsortedset.vala \
+	bidirsortedmap.vala \
 	collection.vala \
 	comparable.vala \
+	concurrentlist.vala \
+	concurrentset.vala \
 	deque.vala \
 	functions.vala \
+	hashable.vala \
 	hashmap.vala \
 	hashmultimap.vala \
 	hashmultiset.vala \
 	hashset.vala \
+	hazardpointer.vala \
 	iterable.vala \
 	iterator.vala \
+	lazy.vala \
 	linkedlist.vala \
 	list.vala \
 	listiterator.vala \
@@ -343,75 +410,90 @@ libgee_la_VALASOURCES = \
 	multiset.vala \
 	priorityqueue.vala \
 	queue.vala \
+	readonlybidirlist.vala \
+	readonlybidirsortedset.vala \
+	readonlybidirsortedmap.vala \
 	readonlycollection.vala \
 	readonlylist.vala \
 	readonlymap.vala \
+	readonlymultimap.vala \
+	readonlymultiset.vala \
 	readonlyset.vala \
+	readonlysortedmap.vala \
+	readonlysortedset.vala \
 	set.vala \
+	sortedmap.vala \
 	sortedset.vala \
 	timsort.vala \
+	traversable.vala \
 	treemap.vala \
 	treemultimap.vala \
 	treemultiset.vala \
 	treeset.vala \
+	unfolditerator.vala \
 	$(NULL)
 
-libgee_la_SOURCES = \
-	gee.vala.stamp \
-	$(libgee_la_VALASOURCES:.vala=.c) \
-	$(NULL)
-
-geeincludedir = $(includedir)/gee-1.0
-geeinclude_HEADERS = \
-	gee.h \
-	$(NULL)
-
-AM_VALAFLAGS = \
-	-H gee.h --vapi gee-1.0.vapi \
+libgee_0_8_la_VALAFLAGS = \
+	-H gee.h --vapi gee-0.8.vapi \
 	-h gee-internals.h \
-	--internal-vapi gee-internals-1.0.vapi \
-	--library gee-1.0 --gir Gee-1.0.gir \
+	--internal-vapi gee-internals-0.8.vapi \
+	--library gee-0.8 --gir Gee-0.8.gir \
 	$(COVERAGE_VALAFLAGS) \
 	$(VALAFLAGS) \
 	$(NULL)
 
-libgee_la_LIBADD = \
+libgee_0_8_la_CPPFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(COVERAGE_CFLAGS) \
+	$(NULL)
+
+libgee_0_8_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(COVERAGE_LIBS) \
 	$(NULL)
 
-libgee_la_LDFLAGS = -version-info $(LIBGEE_LT_VERSION) -no-undefined
+libgee_0_8_la_LDFLAGS = \
+	-version-info $(LIBGEE_LT_VERSION) \
+	-no-undefined \
+	$(NULL)
+
+geeincludedir = $(includedir)/gee-0.8
+geeinclude_HEADERS = \
+	gee.h \
+	$(NULL)
+
 vapidir = $(datadir)/vala/vapi
 dist_vapi_DATA = \
-	gee-1.0.vapi \
+	gee-0.8.vapi \
 	$(NULL)
 
 @HAVE_INTROSPECTION_TRUE@girdir = @INTROSPECTION_GIRDIR@
 @HAVE_INTROSPECTION_TRUE@gir_DATA = \
-@HAVE_INTROSPECTION_TRUE@	Gee-1.0.gir \
+@HAVE_INTROSPECTION_TRUE@	Gee-0.8.gir \
 @HAVE_INTROSPECTION_TRUE@	$(NULL)
 
 @HAVE_INTROSPECTION_TRUE@typelibdir = @INTROSPECTION_TYPELIBDIR@
 @HAVE_INTROSPECTION_TRUE@typelib_DATA = \
-@HAVE_INTROSPECTION_TRUE@	Gee-1.0.typelib \
+@HAVE_INTROSPECTION_TRUE@	Gee-0.8.typelib \
 @HAVE_INTROSPECTION_TRUE@	$(NULL)
 
-MAINTAINERCLEANFILES = \
-	$(libgee_la_VALASOURCES:.vala=.c) \
-	gee.vala.stamp \
-	gee-internals-1.0.vapi \
-	gee-1.0.vapi \
-	Gee-1.0.gir \
-	gee.h \
-	gee-internals.h \
-	$(NULL)
+
+# Extract dlname from libfolks.la; see bug #658002.
+# This is what g-ir-scanner does.
+@HAVE_INTROSPECTION_TRUE@libgee_dlname = \
+@HAVE_INTROSPECTION_TRUE@	`$(SED) -nE "s/^dlname='([A-Za-z0-9.+-]+)'/\1/p" libgee-0.8.la`
+
+@HAVE_INTROSPECTION_TRUE@INTROSPECTION_COMPILER_ARGS = \
+@HAVE_INTROSPECTION_TRUE@	-l $(libgee_dlname)
 
 CLEANFILES = \
-	Gee-1.0.typelib \
+	gee-0.8.vapi \
+	gee-internals-0.8.vapi \
+	Gee-0.8.typelib \
+	Gee-0.8.gir \
 	$(NULL)
 
-all: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) all-am
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -478,8 +560,8 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libgee.la: $(libgee_la_OBJECTS) $(libgee_la_DEPENDENCIES) $(EXTRA_libgee_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libgee_la_LINK) -rpath $(libdir) $(libgee_la_OBJECTS) $(libgee_la_LIBADD) $(LIBS)
+libgee-0.8.la: $(libgee_0_8_la_OBJECTS) $(libgee_0_8_la_DEPENDENCIES) $(EXTRA_libgee_0_8_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(libgee_0_8_la_LINK) -rpath $(libdir) $(libgee_0_8_la_OBJECTS) $(libgee_0_8_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -487,46 +569,72 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/abstractcollection.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/abstractlist.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/abstractmap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/abstractmultimap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/abstractmultiset.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/abstractqueue.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/abstractset.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arraylist.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/assemblyinfo.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bidiriterator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/collection.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/comparable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/deque.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/functions.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashmap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashmultimap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashmultiset.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashset.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iterable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iterator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/linkedlist.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listiterator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/map.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mapiterator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/multimap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/multiset.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/priorityqueue.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/queue.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readonlycollection.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readonlylist.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readonlymap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readonlyset.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/set.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sortedset.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timsort.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/treemap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/treemultimap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/treemultiset.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/treeset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-abstractbidirlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-abstractbidirsortedmap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-abstractbidirsortedset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-abstractcollection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-abstractlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-abstractmap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-abstractmultimap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-abstractmultiset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-abstractqueue.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-abstractset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-abstractsortedmap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-abstractsortedset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-arraylist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-arrayqueue.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-assemblyinfo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-bidiriterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-bidirlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-bidirlistiterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-bidirmapiterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-bidirsortedmap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-bidirsortedset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-collection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-comparable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-concurrentlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-concurrentset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-deque.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-functions.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-hashable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-hashmap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-hashmultimap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-hashmultiset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-hashset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-hazardpointer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-iterable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-iterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-lazy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-linkedlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-list.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-listiterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-map.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-mapiterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-multimap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-multiset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-priorityqueue.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-queue.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-readonlybidirlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-readonlybidirsortedmap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-readonlybidirsortedset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-readonlycollection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-readonlylist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-readonlymap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-readonlymultimap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-readonlymultiset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-readonlyset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-readonlysortedmap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-readonlysortedset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-set.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-sortedmap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-sortedset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-timsort.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-traversable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-treemap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-treemultimap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-treemultiset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-treeset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgee_0_8_la-unfolditerator.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -548,6 +656,827 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+libgee_0_8_la-assemblyinfo.lo: assemblyinfo.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-assemblyinfo.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-assemblyinfo.Tpo -c -o libgee_0_8_la-assemblyinfo.lo `test -f 'assemblyinfo.c' || echo '$(srcdir)/'`assemblyinfo.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-assemblyinfo.Tpo $(DEPDIR)/libgee_0_8_la-assemblyinfo.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='assemblyinfo.c' object='libgee_0_8_la-assemblyinfo.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-assemblyinfo.lo `test -f 'assemblyinfo.c' || echo '$(srcdir)/'`assemblyinfo.c
+
+libgee_0_8_la-abstractbidirlist.lo: abstractbidirlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-abstractbidirlist.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-abstractbidirlist.Tpo -c -o libgee_0_8_la-abstractbidirlist.lo `test -f 'abstractbidirlist.c' || echo '$(srcdir)/'`abstractbidirlist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-abstractbidirlist.Tpo $(DEPDIR)/libgee_0_8_la-abstractbidirlist.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='abstractbidirlist.c' object='libgee_0_8_la-abstractbidirlist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-abstractbidirlist.lo `test -f 'abstractbidirlist.c' || echo '$(srcdir)/'`abstractbidirlist.c
+
+libgee_0_8_la-abstractbidirsortedset.lo: abstractbidirsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-abstractbidirsortedset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-abstractbidirsortedset.Tpo -c -o libgee_0_8_la-abstractbidirsortedset.lo `test -f 'abstractbidirsortedset.c' || echo '$(srcdir)/'`abstractbidirsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-abstractbidirsortedset.Tpo $(DEPDIR)/libgee_0_8_la-abstractbidirsortedset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='abstractbidirsortedset.c' object='libgee_0_8_la-abstractbidirsortedset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-abstractbidirsortedset.lo `test -f 'abstractbidirsortedset.c' || echo '$(srcdir)/'`abstractbidirsortedset.c
+
+libgee_0_8_la-abstractbidirsortedmap.lo: abstractbidirsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-abstractbidirsortedmap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-abstractbidirsortedmap.Tpo -c -o libgee_0_8_la-abstractbidirsortedmap.lo `test -f 'abstractbidirsortedmap.c' || echo '$(srcdir)/'`abstractbidirsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-abstractbidirsortedmap.Tpo $(DEPDIR)/libgee_0_8_la-abstractbidirsortedmap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='abstractbidirsortedmap.c' object='libgee_0_8_la-abstractbidirsortedmap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-abstractbidirsortedmap.lo `test -f 'abstractbidirsortedmap.c' || echo '$(srcdir)/'`abstractbidirsortedmap.c
+
+libgee_0_8_la-abstractcollection.lo: abstractcollection.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-abstractcollection.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-abstractcollection.Tpo -c -o libgee_0_8_la-abstractcollection.lo `test -f 'abstractcollection.c' || echo '$(srcdir)/'`abstractcollection.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-abstractcollection.Tpo $(DEPDIR)/libgee_0_8_la-abstractcollection.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='abstractcollection.c' object='libgee_0_8_la-abstractcollection.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-abstractcollection.lo `test -f 'abstractcollection.c' || echo '$(srcdir)/'`abstractcollection.c
+
+libgee_0_8_la-abstractlist.lo: abstractlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-abstractlist.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-abstractlist.Tpo -c -o libgee_0_8_la-abstractlist.lo `test -f 'abstractlist.c' || echo '$(srcdir)/'`abstractlist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-abstractlist.Tpo $(DEPDIR)/libgee_0_8_la-abstractlist.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='abstractlist.c' object='libgee_0_8_la-abstractlist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-abstractlist.lo `test -f 'abstractlist.c' || echo '$(srcdir)/'`abstractlist.c
+
+libgee_0_8_la-abstractmap.lo: abstractmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-abstractmap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-abstractmap.Tpo -c -o libgee_0_8_la-abstractmap.lo `test -f 'abstractmap.c' || echo '$(srcdir)/'`abstractmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-abstractmap.Tpo $(DEPDIR)/libgee_0_8_la-abstractmap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='abstractmap.c' object='libgee_0_8_la-abstractmap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-abstractmap.lo `test -f 'abstractmap.c' || echo '$(srcdir)/'`abstractmap.c
+
+libgee_0_8_la-abstractmultimap.lo: abstractmultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-abstractmultimap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-abstractmultimap.Tpo -c -o libgee_0_8_la-abstractmultimap.lo `test -f 'abstractmultimap.c' || echo '$(srcdir)/'`abstractmultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-abstractmultimap.Tpo $(DEPDIR)/libgee_0_8_la-abstractmultimap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='abstractmultimap.c' object='libgee_0_8_la-abstractmultimap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-abstractmultimap.lo `test -f 'abstractmultimap.c' || echo '$(srcdir)/'`abstractmultimap.c
+
+libgee_0_8_la-abstractmultiset.lo: abstractmultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-abstractmultiset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-abstractmultiset.Tpo -c -o libgee_0_8_la-abstractmultiset.lo `test -f 'abstractmultiset.c' || echo '$(srcdir)/'`abstractmultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-abstractmultiset.Tpo $(DEPDIR)/libgee_0_8_la-abstractmultiset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='abstractmultiset.c' object='libgee_0_8_la-abstractmultiset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-abstractmultiset.lo `test -f 'abstractmultiset.c' || echo '$(srcdir)/'`abstractmultiset.c
+
+libgee_0_8_la-abstractqueue.lo: abstractqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-abstractqueue.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-abstractqueue.Tpo -c -o libgee_0_8_la-abstractqueue.lo `test -f 'abstractqueue.c' || echo '$(srcdir)/'`abstractqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-abstractqueue.Tpo $(DEPDIR)/libgee_0_8_la-abstractqueue.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='abstractqueue.c' object='libgee_0_8_la-abstractqueue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-abstractqueue.lo `test -f 'abstractqueue.c' || echo '$(srcdir)/'`abstractqueue.c
+
+libgee_0_8_la-abstractset.lo: abstractset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-abstractset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-abstractset.Tpo -c -o libgee_0_8_la-abstractset.lo `test -f 'abstractset.c' || echo '$(srcdir)/'`abstractset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-abstractset.Tpo $(DEPDIR)/libgee_0_8_la-abstractset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='abstractset.c' object='libgee_0_8_la-abstractset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-abstractset.lo `test -f 'abstractset.c' || echo '$(srcdir)/'`abstractset.c
+
+libgee_0_8_la-abstractsortedmap.lo: abstractsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-abstractsortedmap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-abstractsortedmap.Tpo -c -o libgee_0_8_la-abstractsortedmap.lo `test -f 'abstractsortedmap.c' || echo '$(srcdir)/'`abstractsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-abstractsortedmap.Tpo $(DEPDIR)/libgee_0_8_la-abstractsortedmap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='abstractsortedmap.c' object='libgee_0_8_la-abstractsortedmap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-abstractsortedmap.lo `test -f 'abstractsortedmap.c' || echo '$(srcdir)/'`abstractsortedmap.c
+
+libgee_0_8_la-abstractsortedset.lo: abstractsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-abstractsortedset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-abstractsortedset.Tpo -c -o libgee_0_8_la-abstractsortedset.lo `test -f 'abstractsortedset.c' || echo '$(srcdir)/'`abstractsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-abstractsortedset.Tpo $(DEPDIR)/libgee_0_8_la-abstractsortedset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='abstractsortedset.c' object='libgee_0_8_la-abstractsortedset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-abstractsortedset.lo `test -f 'abstractsortedset.c' || echo '$(srcdir)/'`abstractsortedset.c
+
+libgee_0_8_la-arraylist.lo: arraylist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-arraylist.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-arraylist.Tpo -c -o libgee_0_8_la-arraylist.lo `test -f 'arraylist.c' || echo '$(srcdir)/'`arraylist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-arraylist.Tpo $(DEPDIR)/libgee_0_8_la-arraylist.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arraylist.c' object='libgee_0_8_la-arraylist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-arraylist.lo `test -f 'arraylist.c' || echo '$(srcdir)/'`arraylist.c
+
+libgee_0_8_la-arrayqueue.lo: arrayqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-arrayqueue.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-arrayqueue.Tpo -c -o libgee_0_8_la-arrayqueue.lo `test -f 'arrayqueue.c' || echo '$(srcdir)/'`arrayqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-arrayqueue.Tpo $(DEPDIR)/libgee_0_8_la-arrayqueue.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arrayqueue.c' object='libgee_0_8_la-arrayqueue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-arrayqueue.lo `test -f 'arrayqueue.c' || echo '$(srcdir)/'`arrayqueue.c
+
+libgee_0_8_la-bidiriterator.lo: bidiriterator.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-bidiriterator.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-bidiriterator.Tpo -c -o libgee_0_8_la-bidiriterator.lo `test -f 'bidiriterator.c' || echo '$(srcdir)/'`bidiriterator.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-bidiriterator.Tpo $(DEPDIR)/libgee_0_8_la-bidiriterator.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bidiriterator.c' object='libgee_0_8_la-bidiriterator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-bidiriterator.lo `test -f 'bidiriterator.c' || echo '$(srcdir)/'`bidiriterator.c
+
+libgee_0_8_la-bidirlist.lo: bidirlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-bidirlist.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-bidirlist.Tpo -c -o libgee_0_8_la-bidirlist.lo `test -f 'bidirlist.c' || echo '$(srcdir)/'`bidirlist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-bidirlist.Tpo $(DEPDIR)/libgee_0_8_la-bidirlist.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bidirlist.c' object='libgee_0_8_la-bidirlist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-bidirlist.lo `test -f 'bidirlist.c' || echo '$(srcdir)/'`bidirlist.c
+
+libgee_0_8_la-bidirlistiterator.lo: bidirlistiterator.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-bidirlistiterator.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-bidirlistiterator.Tpo -c -o libgee_0_8_la-bidirlistiterator.lo `test -f 'bidirlistiterator.c' || echo '$(srcdir)/'`bidirlistiterator.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-bidirlistiterator.Tpo $(DEPDIR)/libgee_0_8_la-bidirlistiterator.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bidirlistiterator.c' object='libgee_0_8_la-bidirlistiterator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-bidirlistiterator.lo `test -f 'bidirlistiterator.c' || echo '$(srcdir)/'`bidirlistiterator.c
+
+libgee_0_8_la-bidirmapiterator.lo: bidirmapiterator.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-bidirmapiterator.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-bidirmapiterator.Tpo -c -o libgee_0_8_la-bidirmapiterator.lo `test -f 'bidirmapiterator.c' || echo '$(srcdir)/'`bidirmapiterator.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-bidirmapiterator.Tpo $(DEPDIR)/libgee_0_8_la-bidirmapiterator.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bidirmapiterator.c' object='libgee_0_8_la-bidirmapiterator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-bidirmapiterator.lo `test -f 'bidirmapiterator.c' || echo '$(srcdir)/'`bidirmapiterator.c
+
+libgee_0_8_la-bidirsortedset.lo: bidirsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-bidirsortedset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-bidirsortedset.Tpo -c -o libgee_0_8_la-bidirsortedset.lo `test -f 'bidirsortedset.c' || echo '$(srcdir)/'`bidirsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-bidirsortedset.Tpo $(DEPDIR)/libgee_0_8_la-bidirsortedset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bidirsortedset.c' object='libgee_0_8_la-bidirsortedset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-bidirsortedset.lo `test -f 'bidirsortedset.c' || echo '$(srcdir)/'`bidirsortedset.c
+
+libgee_0_8_la-bidirsortedmap.lo: bidirsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-bidirsortedmap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-bidirsortedmap.Tpo -c -o libgee_0_8_la-bidirsortedmap.lo `test -f 'bidirsortedmap.c' || echo '$(srcdir)/'`bidirsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-bidirsortedmap.Tpo $(DEPDIR)/libgee_0_8_la-bidirsortedmap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bidirsortedmap.c' object='libgee_0_8_la-bidirsortedmap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-bidirsortedmap.lo `test -f 'bidirsortedmap.c' || echo '$(srcdir)/'`bidirsortedmap.c
+
+libgee_0_8_la-collection.lo: collection.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-collection.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-collection.Tpo -c -o libgee_0_8_la-collection.lo `test -f 'collection.c' || echo '$(srcdir)/'`collection.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-collection.Tpo $(DEPDIR)/libgee_0_8_la-collection.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='collection.c' object='libgee_0_8_la-collection.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-collection.lo `test -f 'collection.c' || echo '$(srcdir)/'`collection.c
+
+libgee_0_8_la-comparable.lo: comparable.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-comparable.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-comparable.Tpo -c -o libgee_0_8_la-comparable.lo `test -f 'comparable.c' || echo '$(srcdir)/'`comparable.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-comparable.Tpo $(DEPDIR)/libgee_0_8_la-comparable.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='comparable.c' object='libgee_0_8_la-comparable.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-comparable.lo `test -f 'comparable.c' || echo '$(srcdir)/'`comparable.c
+
+libgee_0_8_la-concurrentlist.lo: concurrentlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-concurrentlist.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-concurrentlist.Tpo -c -o libgee_0_8_la-concurrentlist.lo `test -f 'concurrentlist.c' || echo '$(srcdir)/'`concurrentlist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-concurrentlist.Tpo $(DEPDIR)/libgee_0_8_la-concurrentlist.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='concurrentlist.c' object='libgee_0_8_la-concurrentlist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-concurrentlist.lo `test -f 'concurrentlist.c' || echo '$(srcdir)/'`concurrentlist.c
+
+libgee_0_8_la-concurrentset.lo: concurrentset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-concurrentset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-concurrentset.Tpo -c -o libgee_0_8_la-concurrentset.lo `test -f 'concurrentset.c' || echo '$(srcdir)/'`concurrentset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-concurrentset.Tpo $(DEPDIR)/libgee_0_8_la-concurrentset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='concurrentset.c' object='libgee_0_8_la-concurrentset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-concurrentset.lo `test -f 'concurrentset.c' || echo '$(srcdir)/'`concurrentset.c
+
+libgee_0_8_la-deque.lo: deque.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-deque.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-deque.Tpo -c -o libgee_0_8_la-deque.lo `test -f 'deque.c' || echo '$(srcdir)/'`deque.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-deque.Tpo $(DEPDIR)/libgee_0_8_la-deque.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='deque.c' object='libgee_0_8_la-deque.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-deque.lo `test -f 'deque.c' || echo '$(srcdir)/'`deque.c
+
+libgee_0_8_la-functions.lo: functions.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-functions.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-functions.Tpo -c -o libgee_0_8_la-functions.lo `test -f 'functions.c' || echo '$(srcdir)/'`functions.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-functions.Tpo $(DEPDIR)/libgee_0_8_la-functions.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='functions.c' object='libgee_0_8_la-functions.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-functions.lo `test -f 'functions.c' || echo '$(srcdir)/'`functions.c
+
+libgee_0_8_la-hashable.lo: hashable.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-hashable.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-hashable.Tpo -c -o libgee_0_8_la-hashable.lo `test -f 'hashable.c' || echo '$(srcdir)/'`hashable.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-hashable.Tpo $(DEPDIR)/libgee_0_8_la-hashable.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hashable.c' object='libgee_0_8_la-hashable.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-hashable.lo `test -f 'hashable.c' || echo '$(srcdir)/'`hashable.c
+
+libgee_0_8_la-hashmap.lo: hashmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-hashmap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-hashmap.Tpo -c -o libgee_0_8_la-hashmap.lo `test -f 'hashmap.c' || echo '$(srcdir)/'`hashmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-hashmap.Tpo $(DEPDIR)/libgee_0_8_la-hashmap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hashmap.c' object='libgee_0_8_la-hashmap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-hashmap.lo `test -f 'hashmap.c' || echo '$(srcdir)/'`hashmap.c
+
+libgee_0_8_la-hashmultimap.lo: hashmultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-hashmultimap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-hashmultimap.Tpo -c -o libgee_0_8_la-hashmultimap.lo `test -f 'hashmultimap.c' || echo '$(srcdir)/'`hashmultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-hashmultimap.Tpo $(DEPDIR)/libgee_0_8_la-hashmultimap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hashmultimap.c' object='libgee_0_8_la-hashmultimap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-hashmultimap.lo `test -f 'hashmultimap.c' || echo '$(srcdir)/'`hashmultimap.c
+
+libgee_0_8_la-hashmultiset.lo: hashmultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-hashmultiset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-hashmultiset.Tpo -c -o libgee_0_8_la-hashmultiset.lo `test -f 'hashmultiset.c' || echo '$(srcdir)/'`hashmultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-hashmultiset.Tpo $(DEPDIR)/libgee_0_8_la-hashmultiset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hashmultiset.c' object='libgee_0_8_la-hashmultiset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-hashmultiset.lo `test -f 'hashmultiset.c' || echo '$(srcdir)/'`hashmultiset.c
+
+libgee_0_8_la-hashset.lo: hashset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-hashset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-hashset.Tpo -c -o libgee_0_8_la-hashset.lo `test -f 'hashset.c' || echo '$(srcdir)/'`hashset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-hashset.Tpo $(DEPDIR)/libgee_0_8_la-hashset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hashset.c' object='libgee_0_8_la-hashset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-hashset.lo `test -f 'hashset.c' || echo '$(srcdir)/'`hashset.c
+
+libgee_0_8_la-hazardpointer.lo: hazardpointer.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-hazardpointer.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-hazardpointer.Tpo -c -o libgee_0_8_la-hazardpointer.lo `test -f 'hazardpointer.c' || echo '$(srcdir)/'`hazardpointer.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-hazardpointer.Tpo $(DEPDIR)/libgee_0_8_la-hazardpointer.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hazardpointer.c' object='libgee_0_8_la-hazardpointer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-hazardpointer.lo `test -f 'hazardpointer.c' || echo '$(srcdir)/'`hazardpointer.c
+
+libgee_0_8_la-iterable.lo: iterable.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-iterable.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-iterable.Tpo -c -o libgee_0_8_la-iterable.lo `test -f 'iterable.c' || echo '$(srcdir)/'`iterable.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-iterable.Tpo $(DEPDIR)/libgee_0_8_la-iterable.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='iterable.c' object='libgee_0_8_la-iterable.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-iterable.lo `test -f 'iterable.c' || echo '$(srcdir)/'`iterable.c
+
+libgee_0_8_la-iterator.lo: iterator.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-iterator.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-iterator.Tpo -c -o libgee_0_8_la-iterator.lo `test -f 'iterator.c' || echo '$(srcdir)/'`iterator.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-iterator.Tpo $(DEPDIR)/libgee_0_8_la-iterator.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='iterator.c' object='libgee_0_8_la-iterator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-iterator.lo `test -f 'iterator.c' || echo '$(srcdir)/'`iterator.c
+
+libgee_0_8_la-lazy.lo: lazy.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-lazy.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-lazy.Tpo -c -o libgee_0_8_la-lazy.lo `test -f 'lazy.c' || echo '$(srcdir)/'`lazy.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-lazy.Tpo $(DEPDIR)/libgee_0_8_la-lazy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='lazy.c' object='libgee_0_8_la-lazy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-lazy.lo `test -f 'lazy.c' || echo '$(srcdir)/'`lazy.c
+
+libgee_0_8_la-linkedlist.lo: linkedlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-linkedlist.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-linkedlist.Tpo -c -o libgee_0_8_la-linkedlist.lo `test -f 'linkedlist.c' || echo '$(srcdir)/'`linkedlist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-linkedlist.Tpo $(DEPDIR)/libgee_0_8_la-linkedlist.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='linkedlist.c' object='libgee_0_8_la-linkedlist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-linkedlist.lo `test -f 'linkedlist.c' || echo '$(srcdir)/'`linkedlist.c
+
+libgee_0_8_la-list.lo: list.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-list.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-list.Tpo -c -o libgee_0_8_la-list.lo `test -f 'list.c' || echo '$(srcdir)/'`list.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-list.Tpo $(DEPDIR)/libgee_0_8_la-list.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='list.c' object='libgee_0_8_la-list.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-list.lo `test -f 'list.c' || echo '$(srcdir)/'`list.c
+
+libgee_0_8_la-listiterator.lo: listiterator.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-listiterator.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-listiterator.Tpo -c -o libgee_0_8_la-listiterator.lo `test -f 'listiterator.c' || echo '$(srcdir)/'`listiterator.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-listiterator.Tpo $(DEPDIR)/libgee_0_8_la-listiterator.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='listiterator.c' object='libgee_0_8_la-listiterator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-listiterator.lo `test -f 'listiterator.c' || echo '$(srcdir)/'`listiterator.c
+
+libgee_0_8_la-map.lo: map.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-map.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-map.Tpo -c -o libgee_0_8_la-map.lo `test -f 'map.c' || echo '$(srcdir)/'`map.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-map.Tpo $(DEPDIR)/libgee_0_8_la-map.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='map.c' object='libgee_0_8_la-map.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-map.lo `test -f 'map.c' || echo '$(srcdir)/'`map.c
+
+libgee_0_8_la-mapiterator.lo: mapiterator.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-mapiterator.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-mapiterator.Tpo -c -o libgee_0_8_la-mapiterator.lo `test -f 'mapiterator.c' || echo '$(srcdir)/'`mapiterator.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-mapiterator.Tpo $(DEPDIR)/libgee_0_8_la-mapiterator.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='mapiterator.c' object='libgee_0_8_la-mapiterator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-mapiterator.lo `test -f 'mapiterator.c' || echo '$(srcdir)/'`mapiterator.c
+
+libgee_0_8_la-multimap.lo: multimap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-multimap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-multimap.Tpo -c -o libgee_0_8_la-multimap.lo `test -f 'multimap.c' || echo '$(srcdir)/'`multimap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-multimap.Tpo $(DEPDIR)/libgee_0_8_la-multimap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='multimap.c' object='libgee_0_8_la-multimap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-multimap.lo `test -f 'multimap.c' || echo '$(srcdir)/'`multimap.c
+
+libgee_0_8_la-multiset.lo: multiset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-multiset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-multiset.Tpo -c -o libgee_0_8_la-multiset.lo `test -f 'multiset.c' || echo '$(srcdir)/'`multiset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-multiset.Tpo $(DEPDIR)/libgee_0_8_la-multiset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='multiset.c' object='libgee_0_8_la-multiset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-multiset.lo `test -f 'multiset.c' || echo '$(srcdir)/'`multiset.c
+
+libgee_0_8_la-priorityqueue.lo: priorityqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-priorityqueue.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-priorityqueue.Tpo -c -o libgee_0_8_la-priorityqueue.lo `test -f 'priorityqueue.c' || echo '$(srcdir)/'`priorityqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-priorityqueue.Tpo $(DEPDIR)/libgee_0_8_la-priorityqueue.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='priorityqueue.c' object='libgee_0_8_la-priorityqueue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-priorityqueue.lo `test -f 'priorityqueue.c' || echo '$(srcdir)/'`priorityqueue.c
+
+libgee_0_8_la-queue.lo: queue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-queue.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-queue.Tpo -c -o libgee_0_8_la-queue.lo `test -f 'queue.c' || echo '$(srcdir)/'`queue.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-queue.Tpo $(DEPDIR)/libgee_0_8_la-queue.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='queue.c' object='libgee_0_8_la-queue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-queue.lo `test -f 'queue.c' || echo '$(srcdir)/'`queue.c
+
+libgee_0_8_la-readonlybidirlist.lo: readonlybidirlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-readonlybidirlist.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-readonlybidirlist.Tpo -c -o libgee_0_8_la-readonlybidirlist.lo `test -f 'readonlybidirlist.c' || echo '$(srcdir)/'`readonlybidirlist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-readonlybidirlist.Tpo $(DEPDIR)/libgee_0_8_la-readonlybidirlist.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readonlybidirlist.c' object='libgee_0_8_la-readonlybidirlist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-readonlybidirlist.lo `test -f 'readonlybidirlist.c' || echo '$(srcdir)/'`readonlybidirlist.c
+
+libgee_0_8_la-readonlybidirsortedset.lo: readonlybidirsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-readonlybidirsortedset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-readonlybidirsortedset.Tpo -c -o libgee_0_8_la-readonlybidirsortedset.lo `test -f 'readonlybidirsortedset.c' || echo '$(srcdir)/'`readonlybidirsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-readonlybidirsortedset.Tpo $(DEPDIR)/libgee_0_8_la-readonlybidirsortedset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readonlybidirsortedset.c' object='libgee_0_8_la-readonlybidirsortedset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-readonlybidirsortedset.lo `test -f 'readonlybidirsortedset.c' || echo '$(srcdir)/'`readonlybidirsortedset.c
+
+libgee_0_8_la-readonlybidirsortedmap.lo: readonlybidirsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-readonlybidirsortedmap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-readonlybidirsortedmap.Tpo -c -o libgee_0_8_la-readonlybidirsortedmap.lo `test -f 'readonlybidirsortedmap.c' || echo '$(srcdir)/'`readonlybidirsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-readonlybidirsortedmap.Tpo $(DEPDIR)/libgee_0_8_la-readonlybidirsortedmap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readonlybidirsortedmap.c' object='libgee_0_8_la-readonlybidirsortedmap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-readonlybidirsortedmap.lo `test -f 'readonlybidirsortedmap.c' || echo '$(srcdir)/'`readonlybidirsortedmap.c
+
+libgee_0_8_la-readonlycollection.lo: readonlycollection.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-readonlycollection.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-readonlycollection.Tpo -c -o libgee_0_8_la-readonlycollection.lo `test -f 'readonlycollection.c' || echo '$(srcdir)/'`readonlycollection.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-readonlycollection.Tpo $(DEPDIR)/libgee_0_8_la-readonlycollection.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readonlycollection.c' object='libgee_0_8_la-readonlycollection.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-readonlycollection.lo `test -f 'readonlycollection.c' || echo '$(srcdir)/'`readonlycollection.c
+
+libgee_0_8_la-readonlylist.lo: readonlylist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-readonlylist.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-readonlylist.Tpo -c -o libgee_0_8_la-readonlylist.lo `test -f 'readonlylist.c' || echo '$(srcdir)/'`readonlylist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-readonlylist.Tpo $(DEPDIR)/libgee_0_8_la-readonlylist.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readonlylist.c' object='libgee_0_8_la-readonlylist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-readonlylist.lo `test -f 'readonlylist.c' || echo '$(srcdir)/'`readonlylist.c
+
+libgee_0_8_la-readonlymap.lo: readonlymap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-readonlymap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-readonlymap.Tpo -c -o libgee_0_8_la-readonlymap.lo `test -f 'readonlymap.c' || echo '$(srcdir)/'`readonlymap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-readonlymap.Tpo $(DEPDIR)/libgee_0_8_la-readonlymap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readonlymap.c' object='libgee_0_8_la-readonlymap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-readonlymap.lo `test -f 'readonlymap.c' || echo '$(srcdir)/'`readonlymap.c
+
+libgee_0_8_la-readonlymultimap.lo: readonlymultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-readonlymultimap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-readonlymultimap.Tpo -c -o libgee_0_8_la-readonlymultimap.lo `test -f 'readonlymultimap.c' || echo '$(srcdir)/'`readonlymultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-readonlymultimap.Tpo $(DEPDIR)/libgee_0_8_la-readonlymultimap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readonlymultimap.c' object='libgee_0_8_la-readonlymultimap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-readonlymultimap.lo `test -f 'readonlymultimap.c' || echo '$(srcdir)/'`readonlymultimap.c
+
+libgee_0_8_la-readonlymultiset.lo: readonlymultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-readonlymultiset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-readonlymultiset.Tpo -c -o libgee_0_8_la-readonlymultiset.lo `test -f 'readonlymultiset.c' || echo '$(srcdir)/'`readonlymultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-readonlymultiset.Tpo $(DEPDIR)/libgee_0_8_la-readonlymultiset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readonlymultiset.c' object='libgee_0_8_la-readonlymultiset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-readonlymultiset.lo `test -f 'readonlymultiset.c' || echo '$(srcdir)/'`readonlymultiset.c
+
+libgee_0_8_la-readonlyset.lo: readonlyset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-readonlyset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-readonlyset.Tpo -c -o libgee_0_8_la-readonlyset.lo `test -f 'readonlyset.c' || echo '$(srcdir)/'`readonlyset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-readonlyset.Tpo $(DEPDIR)/libgee_0_8_la-readonlyset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readonlyset.c' object='libgee_0_8_la-readonlyset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-readonlyset.lo `test -f 'readonlyset.c' || echo '$(srcdir)/'`readonlyset.c
+
+libgee_0_8_la-readonlysortedmap.lo: readonlysortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-readonlysortedmap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-readonlysortedmap.Tpo -c -o libgee_0_8_la-readonlysortedmap.lo `test -f 'readonlysortedmap.c' || echo '$(srcdir)/'`readonlysortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-readonlysortedmap.Tpo $(DEPDIR)/libgee_0_8_la-readonlysortedmap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readonlysortedmap.c' object='libgee_0_8_la-readonlysortedmap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-readonlysortedmap.lo `test -f 'readonlysortedmap.c' || echo '$(srcdir)/'`readonlysortedmap.c
+
+libgee_0_8_la-readonlysortedset.lo: readonlysortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-readonlysortedset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-readonlysortedset.Tpo -c -o libgee_0_8_la-readonlysortedset.lo `test -f 'readonlysortedset.c' || echo '$(srcdir)/'`readonlysortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-readonlysortedset.Tpo $(DEPDIR)/libgee_0_8_la-readonlysortedset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readonlysortedset.c' object='libgee_0_8_la-readonlysortedset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-readonlysortedset.lo `test -f 'readonlysortedset.c' || echo '$(srcdir)/'`readonlysortedset.c
+
+libgee_0_8_la-set.lo: set.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-set.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-set.Tpo -c -o libgee_0_8_la-set.lo `test -f 'set.c' || echo '$(srcdir)/'`set.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-set.Tpo $(DEPDIR)/libgee_0_8_la-set.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='set.c' object='libgee_0_8_la-set.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-set.lo `test -f 'set.c' || echo '$(srcdir)/'`set.c
+
+libgee_0_8_la-sortedmap.lo: sortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-sortedmap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-sortedmap.Tpo -c -o libgee_0_8_la-sortedmap.lo `test -f 'sortedmap.c' || echo '$(srcdir)/'`sortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-sortedmap.Tpo $(DEPDIR)/libgee_0_8_la-sortedmap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sortedmap.c' object='libgee_0_8_la-sortedmap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-sortedmap.lo `test -f 'sortedmap.c' || echo '$(srcdir)/'`sortedmap.c
+
+libgee_0_8_la-sortedset.lo: sortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-sortedset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-sortedset.Tpo -c -o libgee_0_8_la-sortedset.lo `test -f 'sortedset.c' || echo '$(srcdir)/'`sortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-sortedset.Tpo $(DEPDIR)/libgee_0_8_la-sortedset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sortedset.c' object='libgee_0_8_la-sortedset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-sortedset.lo `test -f 'sortedset.c' || echo '$(srcdir)/'`sortedset.c
+
+libgee_0_8_la-timsort.lo: timsort.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-timsort.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-timsort.Tpo -c -o libgee_0_8_la-timsort.lo `test -f 'timsort.c' || echo '$(srcdir)/'`timsort.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-timsort.Tpo $(DEPDIR)/libgee_0_8_la-timsort.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='timsort.c' object='libgee_0_8_la-timsort.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-timsort.lo `test -f 'timsort.c' || echo '$(srcdir)/'`timsort.c
+
+libgee_0_8_la-traversable.lo: traversable.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-traversable.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-traversable.Tpo -c -o libgee_0_8_la-traversable.lo `test -f 'traversable.c' || echo '$(srcdir)/'`traversable.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-traversable.Tpo $(DEPDIR)/libgee_0_8_la-traversable.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='traversable.c' object='libgee_0_8_la-traversable.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-traversable.lo `test -f 'traversable.c' || echo '$(srcdir)/'`traversable.c
+
+libgee_0_8_la-treemap.lo: treemap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-treemap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-treemap.Tpo -c -o libgee_0_8_la-treemap.lo `test -f 'treemap.c' || echo '$(srcdir)/'`treemap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-treemap.Tpo $(DEPDIR)/libgee_0_8_la-treemap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='treemap.c' object='libgee_0_8_la-treemap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-treemap.lo `test -f 'treemap.c' || echo '$(srcdir)/'`treemap.c
+
+libgee_0_8_la-treemultimap.lo: treemultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-treemultimap.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-treemultimap.Tpo -c -o libgee_0_8_la-treemultimap.lo `test -f 'treemultimap.c' || echo '$(srcdir)/'`treemultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-treemultimap.Tpo $(DEPDIR)/libgee_0_8_la-treemultimap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='treemultimap.c' object='libgee_0_8_la-treemultimap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-treemultimap.lo `test -f 'treemultimap.c' || echo '$(srcdir)/'`treemultimap.c
+
+libgee_0_8_la-treemultiset.lo: treemultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-treemultiset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-treemultiset.Tpo -c -o libgee_0_8_la-treemultiset.lo `test -f 'treemultiset.c' || echo '$(srcdir)/'`treemultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-treemultiset.Tpo $(DEPDIR)/libgee_0_8_la-treemultiset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='treemultiset.c' object='libgee_0_8_la-treemultiset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-treemultiset.lo `test -f 'treemultiset.c' || echo '$(srcdir)/'`treemultiset.c
+
+libgee_0_8_la-treeset.lo: treeset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-treeset.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-treeset.Tpo -c -o libgee_0_8_la-treeset.lo `test -f 'treeset.c' || echo '$(srcdir)/'`treeset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-treeset.Tpo $(DEPDIR)/libgee_0_8_la-treeset.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='treeset.c' object='libgee_0_8_la-treeset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-treeset.lo `test -f 'treeset.c' || echo '$(srcdir)/'`treeset.c
+
+libgee_0_8_la-unfolditerator.lo: unfolditerator.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgee_0_8_la-unfolditerator.lo -MD -MP -MF $(DEPDIR)/libgee_0_8_la-unfolditerator.Tpo -c -o libgee_0_8_la-unfolditerator.lo `test -f 'unfolditerator.c' || echo '$(srcdir)/'`unfolditerator.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgee_0_8_la-unfolditerator.Tpo $(DEPDIR)/libgee_0_8_la-unfolditerator.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='unfolditerator.c' object='libgee_0_8_la-unfolditerator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgee_0_8_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgee_0_8_la-unfolditerator.lo `test -f 'unfolditerator.c' || echo '$(srcdir)/'`unfolditerator.c
+$(srcdir)/assemblyinfo.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/abstractbidirlist.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/abstractbidirsortedset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/abstractbidirsortedmap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/abstractcollection.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/abstractlist.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/abstractmap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/abstractmultimap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/abstractmultiset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/abstractqueue.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/abstractset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/abstractsortedmap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/abstractsortedset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/arraylist.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/arrayqueue.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/bidiriterator.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/bidirlist.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/bidirlistiterator.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/bidirmapiterator.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/bidirsortedset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/bidirsortedmap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/collection.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/comparable.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/concurrentlist.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/concurrentset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/deque.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/functions.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/hashable.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/hashmap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/hashmultimap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/hashmultiset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/hashset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/hazardpointer.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/iterable.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/iterator.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/lazy.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/linkedlist.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/list.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/listiterator.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/map.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/mapiterator.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/multimap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/multiset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/priorityqueue.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/queue.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/readonlybidirlist.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/readonlybidirsortedset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/readonlybidirsortedmap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/readonlycollection.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/readonlylist.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/readonlymap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/readonlymultimap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/readonlymultiset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/readonlyset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/readonlysortedmap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/readonlysortedset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/set.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/sortedmap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/sortedset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/timsort.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/traversable.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/treemap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/treemultimap.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/treemultiset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/treeset.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/unfolditerator.c: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/gee.h: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/gee-0.8.vapi: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/gee-internals.h: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/gee-internals-0.8.vapi: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/Gee-0.8.gir: $(srcdir)/libgee_0_8_la_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/libgee_0_8_la_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/libgee_0_8_la_vala.stamp; \
+	fi
+$(srcdir)/libgee_0_8_la_vala.stamp: assemblyinfo.vala abstractbidirlist.vala abstractbidirsortedset.vala abstractbidirsortedmap.vala abstractcollection.vala abstractlist.vala abstractmap.vala abstractmultimap.vala abstractmultiset.vala abstractqueue.vala abstractset.vala abstractsortedmap.vala abstractsortedset.vala arraylist.vala arrayqueue.vala bidiriterator.vala bidirlist.vala bidirlistiterator.vala bidirmapiterator.vala bidirsortedset.vala bidirsortedmap.vala collection.vala comparable.vala concurrentlist.vala concurrentset.vala deque.vala functions.vala hashable.vala hashmap.vala hashmultimap.vala hashmultiset.vala hashset.vala hazardpointer.vala iterable.vala iterator.vala lazy.vala linkedlist.vala list.vala listiterator.vala map.vala mapiterator.vala multimap.vala multiset.vala priorityqueue.vala queue.vala readonlybidirlist.vala readonlybidirsortedset.vala readonlybidirsortedmap.vala readonlycollection.vala readonlylist.vala readonlymap.vala readonlymultimap.vala readonlymultiset.vala readonlyset.vala readonlysortedmap.vala readonlysortedset.vala set.vala sortedmap.vala sortedset.vala timsort.vala traversable.vala treemap.vala treemultimap.vala treemultiset.vala treeset.vala unfolditerator.vala
+	$(AM_V_at)rm -f $@ && echo stamp > $@-t
+	$(AM_V_VALAC)$(am__cd) $(srcdir) && $(VALAC) $(libgee_0_8_la_VALAFLAGS) $(VALAFLAGS) -C assemblyinfo.vala abstractbidirlist.vala abstractbidirsortedset.vala abstractbidirsortedmap.vala abstractcollection.vala abstractlist.vala abstractmap.vala abstractmultimap.vala abstractmultiset.vala abstractqueue.vala abstractset.vala abstractsortedmap.vala abstractsortedset.vala arraylist.vala arrayqueue.vala bidiriterator.vala bidirlist.vala bidirlistiterator.vala bidirmapiterator.vala bidirsortedset.vala bidirsortedmap.vala collection.vala comparable.vala concurrentlist.vala concurrentset.vala deque.vala functions.vala hashable.vala hashmap.vala hashmultimap.vala hashmultiset.vala hashset.vala hazardpointer.vala iterable.vala iterator.vala lazy.vala linkedlist.vala list.vala listiterator.vala map.vala mapiterator.vala multimap.vala multiset.vala priorityqueue.vala queue.vala readonlybidirlist.vala readonlybidirsortedset.vala readonlybidirsortedmap.vala readonlycollection.vala readonlylist.vala readonlymap.vala readonlymultimap.vala readonlymultiset.vala readonlyset.vala readonlysortedmap.vala readonlysortedset.vala set.vala sortedmap.vala sortedset.vala timsort.vala traversable.vala treemap.vala treemultimap.vala treemultiset.vala treeset.vala unfolditerator.vala
+	$(AM_V_at)mv -f $@-t $@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -723,15 +1652,13 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-local
-check: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) check-am
+check: check-am
 all-am: Makefile $(LTLIBRARIES) $(DATA) $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(vapidir)" "$(DESTDIR)$(girdir)" "$(DESTDIR)$(typelibdir)" "$(DESTDIR)$(geeincludedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) install-am
+install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -762,8 +1689,78 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
-	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+	-rm -f Gee-0.8.gir
+	-rm -f abstractbidirlist.c
+	-rm -f abstractbidirsortedmap.c
+	-rm -f abstractbidirsortedset.c
+	-rm -f abstractcollection.c
+	-rm -f abstractlist.c
+	-rm -f abstractmap.c
+	-rm -f abstractmultimap.c
+	-rm -f abstractmultiset.c
+	-rm -f abstractqueue.c
+	-rm -f abstractset.c
+	-rm -f abstractsortedmap.c
+	-rm -f abstractsortedset.c
+	-rm -f arraylist.c
+	-rm -f arrayqueue.c
+	-rm -f assemblyinfo.c
+	-rm -f bidiriterator.c
+	-rm -f bidirlist.c
+	-rm -f bidirlistiterator.c
+	-rm -f bidirmapiterator.c
+	-rm -f bidirsortedmap.c
+	-rm -f bidirsortedset.c
+	-rm -f collection.c
+	-rm -f comparable.c
+	-rm -f concurrentlist.c
+	-rm -f concurrentset.c
+	-rm -f deque.c
+	-rm -f functions.c
+	-rm -f gee-0.8.vapi
+	-rm -f gee-internals-0.8.vapi
+	-rm -f gee-internals.h
+	-rm -f gee.h
+	-rm -f hashable.c
+	-rm -f hashmap.c
+	-rm -f hashmultimap.c
+	-rm -f hashmultiset.c
+	-rm -f hashset.c
+	-rm -f hazardpointer.c
+	-rm -f iterable.c
+	-rm -f iterator.c
+	-rm -f lazy.c
+	-rm -f libgee_0_8_la_vala.stamp
+	-rm -f linkedlist.c
+	-rm -f list.c
+	-rm -f listiterator.c
+	-rm -f map.c
+	-rm -f mapiterator.c
+	-rm -f multimap.c
+	-rm -f multiset.c
+	-rm -f priorityqueue.c
+	-rm -f queue.c
+	-rm -f readonlybidirlist.c
+	-rm -f readonlybidirsortedmap.c
+	-rm -f readonlybidirsortedset.c
+	-rm -f readonlycollection.c
+	-rm -f readonlylist.c
+	-rm -f readonlymap.c
+	-rm -f readonlymultimap.c
+	-rm -f readonlymultiset.c
+	-rm -f readonlyset.c
+	-rm -f readonlysortedmap.c
+	-rm -f readonlysortedset.c
+	-rm -f set.c
+	-rm -f sortedmap.c
+	-rm -f sortedset.c
+	-rm -f timsort.c
+	-rm -f traversable.c
+	-rm -f treemap.c
+	-rm -f treemultimap.c
+	-rm -f treemultiset.c
+	-rm -f treeset.c
+	-rm -f unfolditerator.c
 clean: clean-am
 
 clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
@@ -838,7 +1835,7 @@ uninstall-am: uninstall-dist_vapiDATA uninstall-geeincludeHEADERS \
 	uninstall-girDATA uninstall-libLTLIBRARIES \
 	uninstall-typelibDATA
 
-.MAKE: all check check-am install install-am install-strip
+.MAKE: check-am install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am check-local clean \
 	clean-generic clean-libLTLIBRARIES clean-libtool ctags \
@@ -908,13 +1905,10 @@ test-report perf-report full-report:	${TEST_PROGS}
 # run make test as part of make check
 check-local: test
 	$(NULL)
+@HAVE_INTROSPECTION_TRUE@Gee-0.8.typelib: Gee-0.8.gir
+@HAVE_INTROSPECTION_TRUE@	@INTROSPECTION_COMPILER@ $(INTROSPECTION_COMPILER_ARGS) -o $@ $^
 
-Gee-1.0.gir gee-internals-1.0.vapi gee-1.0.vapi gee.vala.stamp: $(libgee_la_VALASOURCES)
-	$(VALAC) -C $(AM_VALAFLAGS) $^
-	touch $@
-
-@HAVE_INTROSPECTION_TRUE@Gee-1.0.typelib: Gee-1.0.gir
-@HAVE_INTROSPECTION_TRUE@	@INTROSPECTION_COMPILER@ -o $@ $^
+Gee-0.8.gir gee-internals-0.8.vapi gee-0.8.vapi: libgee-0.8.la
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

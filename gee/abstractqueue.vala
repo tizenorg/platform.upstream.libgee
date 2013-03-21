@@ -46,11 +46,6 @@ public abstract class Gee.AbstractQueue<G> : Gee.AbstractCollection<G>, Queue<G>
 	/**
 	 * {@inheritDoc}
 	 */
-	public abstract bool offer (G element);
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public abstract G? peek ();
 
 	/**
@@ -58,8 +53,15 @@ public abstract class Gee.AbstractQueue<G> : Gee.AbstractCollection<G>, Queue<G>
 	 */
 	public abstract G? poll ();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public abstract int drain (Collection<G> recipient, int amount = -1);
+	// Future-proofing
+	internal new virtual void reserved0() {}
+	internal new virtual void reserved1() {}
+	internal new virtual void reserved2() {}
+	internal new virtual void reserved3() {}
+	internal new virtual void reserved4() {}
+	internal new virtual void reserved5() {}
+	internal new virtual void reserved6() {}
+	internal new virtual void reserved7() {}
+	internal new virtual void reserved8() {}
+	internal new virtual void reserved9() {}
 }

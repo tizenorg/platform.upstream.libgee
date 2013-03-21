@@ -25,11 +25,12 @@
  * interface.
  */
 public class Gee.TreeMultiMap<K,V> : AbstractMultiMap<K,V> {
-	public CompareFunc key_compare_func {
+	public CompareDataFunc<K> key_compare_func {
 		get { return ((TreeMap<K, Set<V>>) _storage_map).key_compare_func; }
 	}
 
-	public CompareFunc value_compare_func { private set; get; }
+	[CCode (notify = false)]
+	public CompareDataFunc<V> value_compare_func { private set; get; }
 
 	/**
 	 * Constructs a new, empty tree multimap.
@@ -40,8 +41,8 @@ public class Gee.TreeMultiMap<K,V> : AbstractMultiMap<K,V> {
 	 * @param key_compare_func an optional key comparator function
 	 * @param value_compare_func an optional value comparator function
 	 */
-	public TreeMultiMap (CompareFunc? key_compare_func = null, CompareFunc? value_compare_func = null) {
-		base (new TreeMap<K, Set<V>> (key_compare_func, direct_equal));
+	public TreeMultiMap (owned CompareDataFunc<K>? key_compare_func = null, owned CompareDataFunc<V>? value_compare_func = null) {
+		base (new TreeMap<K, Set<V>> (key_compare_func, Functions.get_equal_func_for (typeof (Set))));
 		if (value_compare_func == null) {
 			value_compare_func = Functions.get_compare_func_for (typeof (V));
 		}
@@ -56,7 +57,7 @@ public class Gee.TreeMultiMap<K,V> : AbstractMultiMap<K,V> {
 		return new TreeMultiSet<K> (key_compare_func);
 	}
 
-	protected override EqualFunc get_value_equal_func () {
+	protected override EqualDataFunc<V> get_value_equal_func () {
 		return Functions.get_equal_func_for (typeof (V));
 	}
 }

@@ -32,13 +32,25 @@
 #include <string.h>
 
 
-#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
-#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
-#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
-#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+#define GEE_TYPE_TRAVERSABLE (gee_traversable_get_type ())
+#define GEE_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversable))
+#define GEE_IS_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_TRAVERSABLE))
+#define GEE_TRAVERSABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversableIface))
 
-typedef struct _GeeIterable GeeIterable;
-typedef struct _GeeIterableIface GeeIterableIface;
+typedef struct _GeeTraversable GeeTraversable;
+typedef struct _GeeTraversableIface GeeTraversableIface;
+
+#define GEE_TRAVERSABLE_TYPE_STREAM (gee_traversable_stream_get_type ())
+
+#define GEE_TYPE_LAZY (gee_lazy_get_type ())
+#define GEE_LAZY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LAZY, GeeLazy))
+#define GEE_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_LAZY, GeeLazyClass))
+#define GEE_IS_LAZY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LAZY))
+#define GEE_IS_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_LAZY))
+#define GEE_LAZY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_LAZY, GeeLazyClass))
+
+typedef struct _GeeLazy GeeLazy;
+typedef struct _GeeLazyClass GeeLazyClass;
 
 #define GEE_TYPE_ITERATOR (gee_iterator_get_type ())
 #define GEE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERATOR, GeeIterator))
@@ -47,6 +59,14 @@ typedef struct _GeeIterableIface GeeIterableIface;
 
 typedef struct _GeeIterator GeeIterator;
 typedef struct _GeeIteratorIface GeeIteratorIface;
+
+#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
+#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
+#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
+#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+
+typedef struct _GeeIterable GeeIterable;
+typedef struct _GeeIterableIface GeeIterableIface;
 
 #define GEE_TYPE_COLLECTION (gee_collection_get_type ())
 #define GEE_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_COLLECTION, GeeCollection))
@@ -75,14 +95,6 @@ typedef struct _GeeAbstractCollectionPrivate GeeAbstractCollectionPrivate;
 typedef struct _GeeList GeeList;
 typedef struct _GeeListIface GeeListIface;
 
-#define GEE_TYPE_BIDIR_ITERATOR (gee_bidir_iterator_get_type ())
-#define GEE_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIterator))
-#define GEE_IS_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_ITERATOR))
-#define GEE_BIDIR_ITERATOR_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIteratorIface))
-
-typedef struct _GeeBidirIterator GeeBidirIterator;
-typedef struct _GeeBidirIteratorIface GeeBidirIteratorIface;
-
 #define GEE_TYPE_LIST_ITERATOR (gee_list_iterator_get_type ())
 #define GEE_LIST_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LIST_ITERATOR, GeeListIterator))
 #define GEE_IS_LIST_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LIST_ITERATOR))
@@ -101,6 +113,41 @@ typedef struct _GeeListIteratorIface GeeListIteratorIface;
 typedef struct _GeeAbstractList GeeAbstractList;
 typedef struct _GeeAbstractListClass GeeAbstractListClass;
 typedef struct _GeeAbstractListPrivate GeeAbstractListPrivate;
+
+#define GEE_TYPE_BIDIR_LIST (gee_bidir_list_get_type ())
+#define GEE_BIDIR_LIST(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_LIST, GeeBidirList))
+#define GEE_IS_BIDIR_LIST(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_LIST))
+#define GEE_BIDIR_LIST_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_LIST, GeeBidirListIface))
+
+typedef struct _GeeBidirList GeeBidirList;
+typedef struct _GeeBidirListIface GeeBidirListIface;
+
+#define GEE_TYPE_BIDIR_ITERATOR (gee_bidir_iterator_get_type ())
+#define GEE_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIterator))
+#define GEE_IS_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_ITERATOR))
+#define GEE_BIDIR_ITERATOR_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIteratorIface))
+
+typedef struct _GeeBidirIterator GeeBidirIterator;
+typedef struct _GeeBidirIteratorIface GeeBidirIteratorIface;
+
+#define GEE_TYPE_BIDIR_LIST_ITERATOR (gee_bidir_list_iterator_get_type ())
+#define GEE_BIDIR_LIST_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_LIST_ITERATOR, GeeBidirListIterator))
+#define GEE_IS_BIDIR_LIST_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_LIST_ITERATOR))
+#define GEE_BIDIR_LIST_ITERATOR_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_LIST_ITERATOR, GeeBidirListIteratorIface))
+
+typedef struct _GeeBidirListIterator GeeBidirListIterator;
+typedef struct _GeeBidirListIteratorIface GeeBidirListIteratorIface;
+
+#define GEE_TYPE_ABSTRACT_BIDIR_LIST (gee_abstract_bidir_list_get_type ())
+#define GEE_ABSTRACT_BIDIR_LIST(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_BIDIR_LIST, GeeAbstractBidirList))
+#define GEE_ABSTRACT_BIDIR_LIST_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_BIDIR_LIST, GeeAbstractBidirListClass))
+#define GEE_IS_ABSTRACT_BIDIR_LIST(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_BIDIR_LIST))
+#define GEE_IS_ABSTRACT_BIDIR_LIST_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_BIDIR_LIST))
+#define GEE_ABSTRACT_BIDIR_LIST_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_BIDIR_LIST, GeeAbstractBidirListClass))
+
+typedef struct _GeeAbstractBidirList GeeAbstractBidirList;
+typedef struct _GeeAbstractBidirListClass GeeAbstractBidirListClass;
+typedef struct _GeeAbstractBidirListPrivate GeeAbstractBidirListPrivate;
 
 #define GEE_TYPE_ARRAY_LIST (gee_array_list_get_type ())
 #define GEE_ARRAY_LIST(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ARRAY_LIST, GeeArrayList))
@@ -126,23 +173,55 @@ typedef struct _GeeArrayListIteratorClass GeeArrayListIteratorClass;
 typedef struct _GeeArrayListIteratorPrivate GeeArrayListIteratorPrivate;
 #define _vala_assert(expr, msg) if G_LIKELY (expr) ; else g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
 
+typedef gboolean (*GeeForallFunc) (gpointer g, void* user_data);
+typedef enum  {
+	GEE_TRAVERSABLE_STREAM_YIELD,
+	GEE_TRAVERSABLE_STREAM_CONTINUE,
+	GEE_TRAVERSABLE_STREAM_END
+} GeeTraversableStream;
+
+typedef GeeTraversableStream (*GeeStreamFunc) (GeeTraversableStream state, GeeLazy* g, GeeLazy** lazy, void* user_data);
 struct _GeeIteratorIface {
 	GTypeInterface parent_iface;
 	gboolean (*next) (GeeIterator* self);
 	gboolean (*has_next) (GeeIterator* self);
-	gboolean (*first) (GeeIterator* self);
 	gpointer (*get) (GeeIterator* self);
 	void (*remove) (GeeIterator* self);
+	gboolean (*get_valid) (GeeIterator* self);
+	gboolean (*get_read_only) (GeeIterator* self);
+};
+
+typedef gpointer (*GeeFoldFunc) (gpointer g, gpointer a, void* user_data);
+typedef gpointer (*GeeMapFunc) (gpointer g, void* user_data);
+typedef gboolean (*GeePredicate) (gconstpointer g, void* user_data);
+struct _GeeTraversableIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeTraversable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeTraversable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeTraversable* self);
+	gboolean (*foreach) (GeeTraversable* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	gpointer (*fold) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*map) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+	GeeIterator* (*scan) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*filter) (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+	GeeIterator* (*chop) (GeeTraversable* self, gint offset, gint length);
+	GType (*get_element_type) (GeeTraversable* self);
 };
 
 struct _GeeIterableIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeIterable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeIterable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeIterable* self);
 	GeeIterator* (*iterator) (GeeIterable* self);
-	GType (*get_element_type) (GeeIterable* self);
 };
 
 struct _GeeCollectionIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeCollection* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeCollection* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeCollection* self);
 	gboolean (*contains) (GeeCollection* self, gconstpointer item);
 	gboolean (*add) (GeeCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeCollection* self, gconstpointer item);
@@ -154,6 +233,7 @@ struct _GeeCollectionIface {
 	gpointer* (*to_array) (GeeCollection* self, int* result_length1);
 	gint (*get_size) (GeeCollection* self);
 	gboolean (*get_is_empty) (GeeCollection* self);
+	gboolean (*get_read_only) (GeeCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeCollection* self);
 };
 
@@ -168,34 +248,35 @@ struct _GeeAbstractCollectionClass {
 	gboolean (*add) (GeeAbstractCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeAbstractCollection* self, gconstpointer item);
 	void (*clear) (GeeAbstractCollection* self);
-	gpointer* (*to_array) (GeeAbstractCollection* self, int* result_length1);
-	gboolean (*add_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*contains_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*remove_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*retain_all) (GeeAbstractCollection* self, GeeCollection* collection);
 	GeeIterator* (*iterator) (GeeAbstractCollection* self);
+	gboolean (*foreach) (GeeAbstractCollection* self, GeeForallFunc f, void* f_target);
+	void (*reserved0) (GeeAbstractCollection* self);
+	void (*reserved1) (GeeAbstractCollection* self);
+	void (*reserved2) (GeeAbstractCollection* self);
+	void (*reserved3) (GeeAbstractCollection* self);
+	void (*reserved4) (GeeAbstractCollection* self);
+	void (*reserved5) (GeeAbstractCollection* self);
+	void (*reserved6) (GeeAbstractCollection* self);
+	void (*reserved7) (GeeAbstractCollection* self);
+	void (*reserved8) (GeeAbstractCollection* self);
+	void (*reserved9) (GeeAbstractCollection* self);
 	gint (*get_size) (GeeAbstractCollection* self);
-	gboolean (*get_is_empty) (GeeAbstractCollection* self);
+	gboolean (*get_read_only) (GeeAbstractCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeAbstractCollection* self);
-};
-
-struct _GeeBidirIteratorIface {
-	GTypeInterface parent_iface;
-	gboolean (*previous) (GeeBidirIterator* self);
-	gboolean (*has_previous) (GeeBidirIterator* self);
-	gboolean (*last) (GeeBidirIterator* self);
 };
 
 struct _GeeListIteratorIface {
 	GTypeInterface parent_iface;
 	void (*set) (GeeListIterator* self, gconstpointer item);
-	void (*insert) (GeeListIterator* self, gconstpointer item);
 	void (*add) (GeeListIterator* self, gconstpointer item);
 	gint (*index) (GeeListIterator* self);
 };
 
 struct _GeeListIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeList* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeList* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeList* self);
 	GeeListIterator* (*list_iterator) (GeeList* self);
 	gpointer (*get) (GeeList* self, gint index);
 	void (*set) (GeeList* self, gint index, gconstpointer item);
@@ -206,7 +287,7 @@ struct _GeeListIface {
 	gpointer (*first) (GeeList* self);
 	gpointer (*last) (GeeList* self);
 	void (*insert_all) (GeeList* self, gint index, GeeCollection* collection);
-	void (*sort) (GeeList* self, GCompareFunc compare_func);
+	void (*sort) (GeeList* self, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
 	GeeList* (*get_read_only_view) (GeeList* self);
 };
 
@@ -224,14 +305,70 @@ struct _GeeAbstractListClass {
 	void (*insert) (GeeAbstractList* self, gint index, gconstpointer item);
 	gpointer (*remove_at) (GeeAbstractList* self, gint index);
 	GeeList* (*slice) (GeeAbstractList* self, gint start, gint stop);
-	gpointer (*first) (GeeAbstractList* self);
-	gpointer (*last) (GeeAbstractList* self);
-	void (*insert_all) (GeeAbstractList* self, gint index, GeeCollection* collection);
+	void (*reserved0) (GeeAbstractList* self);
+	void (*reserved1) (GeeAbstractList* self);
+	void (*reserved2) (GeeAbstractList* self);
+	void (*reserved3) (GeeAbstractList* self);
+	void (*reserved4) (GeeAbstractList* self);
+	void (*reserved5) (GeeAbstractList* self);
+	void (*reserved6) (GeeAbstractList* self);
+	void (*reserved7) (GeeAbstractList* self);
+	void (*reserved8) (GeeAbstractList* self);
+	void (*reserved9) (GeeAbstractList* self);
 	GeeList* (*get_read_only_view) (GeeAbstractList* self);
 };
 
-struct _GeeArrayList {
+struct _GeeBidirIteratorIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeBidirIterator* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeBidirIterator* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeBidirIterator* self);
+	gboolean (*previous) (GeeBidirIterator* self);
+	gboolean (*has_previous) (GeeBidirIterator* self);
+	gboolean (*first) (GeeBidirIterator* self);
+	gboolean (*last) (GeeBidirIterator* self);
+};
+
+struct _GeeBidirListIteratorIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeBidirListIterator* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeBidirListIterator* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeBidirListIterator* self);
+	void (*insert) (GeeBidirListIterator* self, gconstpointer item);
+};
+
+struct _GeeBidirListIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeBidirList* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeBidirList* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeBidirList* self);
+	GeeBidirListIterator* (*bidir_list_iterator) (GeeBidirList* self);
+	GeeBidirList* (*get_read_only_view) (GeeBidirList* self);
+};
+
+struct _GeeAbstractBidirList {
 	GeeAbstractList parent_instance;
+	GeeAbstractBidirListPrivate * priv;
+};
+
+struct _GeeAbstractBidirListClass {
+	GeeAbstractListClass parent_class;
+	GeeBidirListIterator* (*bidir_list_iterator) (GeeAbstractBidirList* self);
+	void (*reserved0) (GeeAbstractBidirList* self);
+	void (*reserved1) (GeeAbstractBidirList* self);
+	void (*reserved2) (GeeAbstractBidirList* self);
+	void (*reserved3) (GeeAbstractBidirList* self);
+	void (*reserved4) (GeeAbstractBidirList* self);
+	void (*reserved5) (GeeAbstractBidirList* self);
+	void (*reserved6) (GeeAbstractBidirList* self);
+	void (*reserved7) (GeeAbstractBidirList* self);
+	void (*reserved8) (GeeAbstractBidirList* self);
+	void (*reserved9) (GeeAbstractBidirList* self);
+	GeeBidirList* (*get_read_only_view) (GeeAbstractBidirList* self);
+};
+
+struct _GeeArrayList {
+	GeeAbstractBidirList parent_instance;
 	GeeArrayListPrivate * priv;
 	gpointer* _items;
 	gint _items_length1;
@@ -240,14 +377,17 @@ struct _GeeArrayList {
 };
 
 struct _GeeArrayListClass {
-	GeeAbstractListClass parent_class;
+	GeeAbstractBidirListClass parent_class;
 };
 
+typedef gboolean (*GeeEqualDataFunc) (gconstpointer a, gconstpointer b, void* user_data);
 struct _GeeArrayListPrivate {
 	GType g_type;
 	GBoxedCopyFunc g_dup_func;
 	GDestroyNotify g_destroy_func;
-	GEqualFunc _equal_func;
+	GeeEqualDataFunc _equal_func;
+	gpointer _equal_func_target;
+	GDestroyNotify _equal_func_target_destroy_notify;
 	gint _stamp;
 };
 
@@ -273,18 +413,32 @@ struct _GeeArrayListIteratorPrivate {
 
 static gpointer gee_array_list_parent_class = NULL;
 static gpointer gee_array_list_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_array_list_iterator_gee_traversable_parent_iface = NULL;
 static GeeIteratorIface* gee_array_list_iterator_gee_iterator_parent_iface = NULL;
 static GeeBidirIteratorIface* gee_array_list_iterator_gee_bidir_iterator_parent_iface = NULL;
 static GeeListIteratorIface* gee_array_list_iterator_gee_list_iterator_parent_iface = NULL;
+static GeeBidirListIteratorIface* gee_array_list_iterator_gee_bidir_list_iterator_parent_iface = NULL;
 
+GType gee_traversable_stream_get_type (void) G_GNUC_CONST;
+gpointer gee_lazy_ref (gpointer instance);
+void gee_lazy_unref (gpointer instance);
+GParamSpec* gee_param_spec_lazy (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void gee_value_set_lazy (GValue* value, gpointer v_object);
+void gee_value_take_lazy (GValue* value, gpointer v_object);
+gpointer gee_value_get_lazy (const GValue* value);
+GType gee_lazy_get_type (void) G_GNUC_CONST;
 GType gee_iterator_get_type (void) G_GNUC_CONST;
+GType gee_traversable_get_type (void) G_GNUC_CONST;
 GType gee_iterable_get_type (void) G_GNUC_CONST;
 GType gee_collection_get_type (void) G_GNUC_CONST;
 GType gee_abstract_collection_get_type (void) G_GNUC_CONST;
-GType gee_bidir_iterator_get_type (void) G_GNUC_CONST;
 GType gee_list_iterator_get_type (void) G_GNUC_CONST;
 GType gee_list_get_type (void) G_GNUC_CONST;
 GType gee_abstract_list_get_type (void) G_GNUC_CONST;
+GType gee_bidir_iterator_get_type (void) G_GNUC_CONST;
+GType gee_bidir_list_iterator_get_type (void) G_GNUC_CONST;
+GType gee_bidir_list_get_type (void) G_GNUC_CONST;
+GType gee_abstract_bidir_list_get_type (void) G_GNUC_CONST;
 GType gee_array_list_get_type (void) G_GNUC_CONST;
 #define GEE_ARRAY_LIST_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TYPE_ARRAY_LIST, GeeArrayListPrivate))
 enum  {
@@ -293,22 +447,27 @@ enum  {
 	GEE_ARRAY_LIST_G_DUP_FUNC,
 	GEE_ARRAY_LIST_G_DESTROY_FUNC,
 	GEE_ARRAY_LIST_SIZE,
-	GEE_ARRAY_LIST_EQUAL_FUNC
+	GEE_ARRAY_LIST_READ_ONLY
 };
-GeeArrayList* gee_array_list_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GEqualFunc equal_func);
-GeeArrayList* gee_array_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GEqualFunc equal_func);
-GeeAbstractList* gee_abstract_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
-GEqualFunc gee_functions_get_equal_func_for (GType t);
-static void gee_array_list_set_equal_func (GeeArrayList* self, GEqualFunc value);
+GeeArrayList* gee_array_list_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeArrayList* gee_array_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeAbstractBidirList* gee_abstract_bidir_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
+GeeEqualDataFunc gee_functions_get_equal_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+static void gee_array_list_set_equal_func (GeeArrayList* self, GeeEqualDataFunc value, gpointer value_target);
+GeeArrayList* gee_array_list_new_wrap (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gpointer* items, int items_length1, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeArrayList* gee_array_list_construct_wrap (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gpointer* items, int items_length1, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+static gpointer* _vala_array_dup1 (gpointer* self, int length, GBoxedCopyFunc g_dup_func);
+static gboolean gee_array_list_real_foreach (GeeAbstractCollection* base, GeeForallFunc f, void* f_target);
 static GeeIterator* gee_array_list_real_iterator (GeeAbstractCollection* base);
 static GeeArrayListIterator* gee_array_list_iterator_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeArrayList* list);
 static GeeArrayListIterator* gee_array_list_iterator_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeArrayList* list);
 static GType gee_array_list_iterator_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
 static GeeListIterator* gee_array_list_real_list_iterator (GeeAbstractList* base);
+static GeeBidirListIterator* gee_array_list_real_bidir_list_iterator (GeeAbstractBidirList* base);
 static gboolean gee_array_list_real_contains (GeeAbstractCollection* base, gconstpointer item);
 gint gee_abstract_list_index_of (GeeAbstractList* self, gconstpointer item);
 static gint gee_array_list_real_index_of (GeeAbstractList* base, gconstpointer item);
-GEqualFunc gee_array_list_get_equal_func (GeeArrayList* self);
+GeeEqualDataFunc gee_array_list_get_equal_func (GeeArrayList* self, gpointer* result_target);
 static gpointer gee_array_list_real_get (GeeAbstractList* base, gint index);
 static void gee_array_list_real_set (GeeAbstractList* base, gint index, gconstpointer item);
 static gboolean gee_array_list_real_add (GeeAbstractCollection* base, gconstpointer item);
@@ -322,25 +481,25 @@ static void gee_array_list_real_clear (GeeAbstractCollection* base);
 static GeeList* gee_array_list_real_slice (GeeAbstractList* base, gint start, gint stop);
 gboolean gee_abstract_collection_add (GeeAbstractCollection* self, gconstpointer item);
 gpointer gee_abstract_list_get (GeeAbstractList* self, gint index);
-static gboolean gee_array_list_real_add_all (GeeAbstractCollection* base, GeeCollection* collection);
+gboolean gee_array_list_add_all (GeeArrayList* self, GeeCollection* collection);
 gboolean gee_collection_get_is_empty (GeeCollection* self);
 gint gee_collection_get_size (GeeCollection* self);
-GeeIterator* gee_iterable_iterator (GeeIterable* self);
-gboolean gee_iterator_next (GeeIterator* self);
-gpointer gee_iterator_get (GeeIterator* self);
-void gee_array_list_sort_with_data (GeeArrayList* self, GCompareDataFunc compare, void* compare_target);
-void gee_tim_sort_sort_with_data (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeList* list, GCompareDataFunc compare_data, void* compare_data_target);
+gboolean gee_traversable_foreach (GeeTraversable* self, GeeForallFunc f, void* f_target);
+static gboolean __lambda28_ (GeeArrayList* self, gpointer item);
+static gboolean ___lambda28__gee_forall_func (gpointer g, gpointer self);
 static void gee_array_list_set_capacity (GeeArrayList* self, gint value);
 #define GEE_ARRAY_LIST_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_ARRAY_LIST_TYPE_ITERATOR, GeeArrayListIteratorPrivate))
 enum  {
 	GEE_ARRAY_LIST_ITERATOR_DUMMY_PROPERTY,
 	GEE_ARRAY_LIST_ITERATOR_G_TYPE,
 	GEE_ARRAY_LIST_ITERATOR_G_DUP_FUNC,
-	GEE_ARRAY_LIST_ITERATOR_G_DESTROY_FUNC
+	GEE_ARRAY_LIST_ITERATOR_G_DESTROY_FUNC,
+	GEE_ARRAY_LIST_ITERATOR_READ_ONLY,
+	GEE_ARRAY_LIST_ITERATOR_VALID
 };
 static gboolean gee_array_list_iterator_real_next (GeeIterator* base);
 static gboolean gee_array_list_iterator_real_has_next (GeeIterator* base);
-static gboolean gee_array_list_iterator_real_first (GeeIterator* base);
+static gboolean gee_array_list_iterator_real_first (GeeBidirIterator* base);
 gint gee_abstract_collection_get_size (GeeAbstractCollection* self);
 static gpointer gee_array_list_iterator_real_get (GeeIterator* base);
 static void gee_array_list_iterator_real_remove (GeeIterator* base);
@@ -348,14 +507,18 @@ static gboolean gee_array_list_iterator_real_previous (GeeBidirIterator* base);
 static gboolean gee_array_list_iterator_real_has_previous (GeeBidirIterator* base);
 static gboolean gee_array_list_iterator_real_last (GeeBidirIterator* base);
 static void gee_array_list_iterator_real_set (GeeListIterator* base, gconstpointer item);
-static void gee_array_list_iterator_real_insert (GeeListIterator* base, gconstpointer item);
+static void gee_array_list_iterator_real_insert (GeeBidirListIterator* base, gconstpointer item);
 void gee_abstract_list_insert (GeeAbstractList* self, gint index, gconstpointer item);
 static void gee_array_list_iterator_real_add (GeeListIterator* base, gconstpointer item);
 static gint gee_array_list_iterator_real_index (GeeListIterator* base);
+static gboolean gee_array_list_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
 static void gee_array_list_iterator_finalize (GObject* obj);
+gboolean gee_iterator_get_read_only (GeeIterator* self);
+gboolean gee_iterator_get_valid (GeeIterator* self);
 static void _vala_gee_array_list_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_array_list_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 static void gee_array_list_finalize (GObject* obj);
+gboolean gee_abstract_collection_get_read_only (GeeAbstractCollection* self);
 static void _vala_gee_array_list_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_array_list_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 static void _vala_array_destroy (gpointer array, gint array_length, GDestroyNotify destroy_func);
@@ -371,28 +534,189 @@ static void _vala_array_move (gpointer array, gsize element_size, gint src, gint
  *
  * @param equal_func an optional element equality testing function
  */
-GeeArrayList* gee_array_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GEqualFunc equal_func) {
+GeeArrayList* gee_array_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify) {
 	GeeArrayList * self = NULL;
-	GEqualFunc _tmp0_;
-	GEqualFunc _tmp2_;
-	self = (GeeArrayList*) gee_abstract_list_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
+	GeeEqualDataFunc _tmp0_;
+	void* _tmp0__target;
+	GeeEqualDataFunc _tmp4_;
+	void* _tmp4__target;
+	gpointer* _tmp5_ = NULL;
+	self = (GeeArrayList*) gee_abstract_bidir_list_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
 	self->priv->g_type = g_type;
 	self->priv->g_dup_func = g_dup_func;
 	self->priv->g_destroy_func = g_destroy_func;
 	_tmp0_ = equal_func;
+	_tmp0__target = equal_func_target;
 	if (_tmp0_ == NULL) {
-		GEqualFunc _tmp1_ = NULL;
-		_tmp1_ = gee_functions_get_equal_func_for (g_type);
-		equal_func = _tmp1_;
+		void* _tmp1_ = NULL;
+		GDestroyNotify _tmp2_ = NULL;
+		GeeEqualDataFunc _tmp3_ = NULL;
+		_tmp3_ = gee_functions_get_equal_func_for (g_type, &_tmp1_, &_tmp2_);
+		(equal_func_target_destroy_notify == NULL) ? NULL : (equal_func_target_destroy_notify (equal_func_target), NULL);
+		equal_func = NULL;
+		equal_func_target = NULL;
+		equal_func_target_destroy_notify = NULL;
+		equal_func = _tmp3_;
+		equal_func_target = _tmp1_;
+		equal_func_target_destroy_notify = _tmp2_;
 	}
-	_tmp2_ = equal_func;
-	gee_array_list_set_equal_func (self, _tmp2_);
+	_tmp4_ = equal_func;
+	_tmp4__target = equal_func_target;
+	gee_array_list_set_equal_func (self, _tmp4_, _tmp4__target);
+	_tmp5_ = g_new0 (gpointer, 4);
+	self->_items = (_vala_array_free (self->_items, self->_items_length1, (GDestroyNotify) g_destroy_func), NULL);
+	self->_items = _tmp5_;
+	self->_items_length1 = 4;
+	self->__items_size_ = self->_items_length1;
+	self->_size = 0;
+	(equal_func_target_destroy_notify == NULL) ? NULL : (equal_func_target_destroy_notify (equal_func_target), NULL);
+	equal_func = NULL;
+	equal_func_target = NULL;
+	equal_func_target_destroy_notify = NULL;
 	return self;
 }
 
 
-GeeArrayList* gee_array_list_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GEqualFunc equal_func) {
-	return gee_array_list_construct (GEE_TYPE_ARRAY_LIST, g_type, g_dup_func, g_destroy_func, equal_func);
+GeeArrayList* gee_array_list_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify) {
+	return gee_array_list_construct (GEE_TYPE_ARRAY_LIST, g_type, g_dup_func, g_destroy_func, equal_func, equal_func_target, equal_func_target_destroy_notify);
+}
+
+
+/**
+ * Constructs a new array list based on provided array.
+ *
+ * If not provided, the function parameter is requested to the
+ * {@link Functions} function factory methods.
+ *
+ * @param items initial items to be put into array
+ * @param equal_func an optional element equality testing function
+ */
+static gpointer* _vala_array_dup1 (gpointer* self, int length, GBoxedCopyFunc g_dup_func) {
+	gpointer* result;
+	int i;
+	result = g_new0 (gpointer, length);
+	for (i = 0; i < length; i++) {
+		gpointer _tmp0_;
+		_tmp0_ = ((self[i] != NULL) && (g_dup_func != NULL)) ? g_dup_func ((gpointer) self[i]) : ((gpointer) self[i]);
+		result[i] = _tmp0_;
+	}
+	return result;
+}
+
+
+GeeArrayList* gee_array_list_construct_wrap (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gpointer* items, int items_length1, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify) {
+	GeeArrayList * self = NULL;
+	GeeEqualDataFunc _tmp0_;
+	void* _tmp0__target;
+	GeeEqualDataFunc _tmp4_;
+	void* _tmp4__target;
+	gpointer* _tmp5_;
+	gint _tmp5__length1;
+	gpointer* _tmp6_;
+	gint _tmp6__length1;
+	gpointer* _tmp7_;
+	gint _tmp7__length1;
+	self = (GeeArrayList*) gee_abstract_bidir_list_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
+	self->priv->g_type = g_type;
+	self->priv->g_dup_func = g_dup_func;
+	self->priv->g_destroy_func = g_destroy_func;
+	_tmp0_ = equal_func;
+	_tmp0__target = equal_func_target;
+	if (_tmp0_ == NULL) {
+		void* _tmp1_ = NULL;
+		GDestroyNotify _tmp2_ = NULL;
+		GeeEqualDataFunc _tmp3_ = NULL;
+		_tmp3_ = gee_functions_get_equal_func_for (g_type, &_tmp1_, &_tmp2_);
+		(equal_func_target_destroy_notify == NULL) ? NULL : (equal_func_target_destroy_notify (equal_func_target), NULL);
+		equal_func = NULL;
+		equal_func_target = NULL;
+		equal_func_target_destroy_notify = NULL;
+		equal_func = _tmp3_;
+		equal_func_target = _tmp1_;
+		equal_func_target_destroy_notify = _tmp2_;
+	}
+	_tmp4_ = equal_func;
+	_tmp4__target = equal_func_target;
+	gee_array_list_set_equal_func (self, _tmp4_, _tmp4__target);
+	_tmp5_ = items;
+	_tmp5__length1 = items_length1;
+	_tmp6_ = (_tmp5_ != NULL) ? _vala_array_dup1 (_tmp5_, _tmp5__length1, g_dup_func) : ((gpointer) _tmp5_);
+	_tmp6__length1 = _tmp5__length1;
+	self->_items = (_vala_array_free (self->_items, self->_items_length1, (GDestroyNotify) g_destroy_func), NULL);
+	self->_items = _tmp6_;
+	self->_items_length1 = _tmp6__length1;
+	self->__items_size_ = self->_items_length1;
+	_tmp7_ = items;
+	_tmp7__length1 = items_length1;
+	self->_size = _tmp7__length1;
+	items = (_vala_array_free (items, items_length1, (GDestroyNotify) g_destroy_func), NULL);
+	(equal_func_target_destroy_notify == NULL) ? NULL : (equal_func_target_destroy_notify (equal_func_target), NULL);
+	equal_func = NULL;
+	equal_func_target = NULL;
+	equal_func_target_destroy_notify = NULL;
+	return self;
+}
+
+
+GeeArrayList* gee_array_list_new_wrap (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gpointer* items, int items_length1, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify) {
+	return gee_array_list_construct_wrap (GEE_TYPE_ARRAY_LIST, g_type, g_dup_func, g_destroy_func, items, items_length1, equal_func, equal_func_target, equal_func_target_destroy_notify);
+}
+
+
+/**
+ * {@inheritDoc}
+ */
+static gboolean gee_array_list_real_foreach (GeeAbstractCollection* base, GeeForallFunc f, void* f_target) {
+	GeeArrayList * self;
+	gboolean result = FALSE;
+	self = (GeeArrayList*) base;
+	{
+		gint i;
+		i = 0;
+		{
+			gboolean _tmp0_;
+			_tmp0_ = TRUE;
+			while (TRUE) {
+				gboolean _tmp1_;
+				gint _tmp3_;
+				gint _tmp4_;
+				GeeForallFunc _tmp5_;
+				void* _tmp5__target;
+				gpointer* _tmp6_;
+				gint _tmp6__length1;
+				gint _tmp7_;
+				gconstpointer _tmp8_;
+				gpointer _tmp9_;
+				gboolean _tmp10_ = FALSE;
+				_tmp1_ = _tmp0_;
+				if (!_tmp1_) {
+					gint _tmp2_;
+					_tmp2_ = i;
+					i = _tmp2_ + 1;
+				}
+				_tmp0_ = FALSE;
+				_tmp3_ = i;
+				_tmp4_ = self->_size;
+				if (!(_tmp3_ < _tmp4_)) {
+					break;
+				}
+				_tmp5_ = f;
+				_tmp5__target = f_target;
+				_tmp6_ = self->_items;
+				_tmp6__length1 = self->_items_length1;
+				_tmp7_ = i;
+				_tmp8_ = _tmp6_[_tmp7_];
+				_tmp9_ = ((_tmp8_ != NULL) && (self->priv->g_dup_func != NULL)) ? self->priv->g_dup_func ((gpointer) _tmp8_) : ((gpointer) _tmp8_);
+				_tmp10_ = _tmp5_ (_tmp9_, _tmp5__target);
+				if (!_tmp10_) {
+					result = FALSE;
+					return result;
+				}
+			}
+		}
+	}
+	result = TRUE;
+	return result;
 }
 
 
@@ -420,6 +744,20 @@ static GeeListIterator* gee_array_list_real_list_iterator (GeeAbstractList* base
 	self = (GeeArrayList*) base;
 	_tmp0_ = gee_array_list_iterator_new (self->priv->g_type, (GBoxedCopyFunc) self->priv->g_dup_func, self->priv->g_destroy_func, self);
 	result = (GeeListIterator*) _tmp0_;
+	return result;
+}
+
+
+/**
+ * {@inheritDoc}
+ */
+static GeeBidirListIterator* gee_array_list_real_bidir_list_iterator (GeeAbstractBidirList* base) {
+	GeeArrayList * self;
+	GeeBidirListIterator* result = NULL;
+	GeeArrayListIterator* _tmp0_;
+	self = (GeeArrayList*) base;
+	_tmp0_ = gee_array_list_iterator_new (self->priv->g_type, (GBoxedCopyFunc) self->priv->g_dup_func, self->priv->g_destroy_func, self);
+	result = (GeeBidirListIterator*) _tmp0_;
 	return result;
 }
 
@@ -457,8 +795,10 @@ static gint gee_array_list_real_index_of (GeeAbstractList* base, gconstpointer i
 				gboolean _tmp1_;
 				gint _tmp3_;
 				gint _tmp4_;
-				GEqualFunc _tmp5_;
-				GEqualFunc _tmp6_;
+				GeeEqualDataFunc _tmp5_;
+				void* _tmp5__target;
+				GeeEqualDataFunc _tmp6_;
+				void* _tmp6__target;
 				gpointer* _tmp7_;
 				gint _tmp7__length1;
 				gint _tmp8_;
@@ -477,14 +817,15 @@ static gint gee_array_list_real_index_of (GeeAbstractList* base, gconstpointer i
 				if (!(_tmp3_ < _tmp4_)) {
 					break;
 				}
-				_tmp5_ = gee_array_list_get_equal_func (self);
+				_tmp5_ = gee_array_list_get_equal_func (self, &_tmp5__target);
 				_tmp6_ = _tmp5_;
+				_tmp6__target = _tmp5__target;
 				_tmp7_ = self->_items;
 				_tmp7__length1 = self->_items_length1;
 				_tmp8_ = index;
 				_tmp9_ = _tmp7_[_tmp8_];
 				_tmp10_ = item;
-				_tmp11_ = _tmp6_ (_tmp9_, _tmp10_);
+				_tmp11_ = _tmp6_ (_tmp9_, _tmp10_, _tmp6__target);
 				if (_tmp11_) {
 					result = index;
 					return result;
@@ -660,8 +1001,10 @@ static gboolean gee_array_list_real_remove (GeeAbstractCollection* base, gconstp
 				gboolean _tmp1_;
 				gint _tmp3_;
 				gint _tmp4_;
-				GEqualFunc _tmp5_;
-				GEqualFunc _tmp6_;
+				GeeEqualDataFunc _tmp5_;
+				void* _tmp5__target;
+				GeeEqualDataFunc _tmp6_;
+				void* _tmp6__target;
 				gpointer* _tmp7_;
 				gint _tmp7__length1;
 				gint _tmp8_;
@@ -680,14 +1023,15 @@ static gboolean gee_array_list_real_remove (GeeAbstractCollection* base, gconstp
 				if (!(_tmp3_ < _tmp4_)) {
 					break;
 				}
-				_tmp5_ = gee_array_list_get_equal_func (self);
+				_tmp5_ = gee_array_list_get_equal_func (self, &_tmp5__target);
 				_tmp6_ = _tmp5_;
+				_tmp6__target = _tmp5__target;
 				_tmp7_ = self->_items;
 				_tmp7__length1 = self->_items_length1;
 				_tmp8_ = index;
 				_tmp9_ = _tmp7_[_tmp8_];
 				_tmp10_ = item;
-				_tmp11_ = _tmp6_ (_tmp9_, _tmp10_);
+				_tmp11_ = _tmp6_ (_tmp9_, _tmp10_, _tmp6__target);
 				if (_tmp11_) {
 					gint _tmp12_;
 					gpointer _tmp13_ = NULL;
@@ -814,8 +1158,10 @@ static GeeList* gee_array_list_real_slice (GeeAbstractList* base, gint start, gi
 	gint _tmp2_;
 	gint _tmp3_;
 	gint _tmp4_;
-	GEqualFunc _tmp5_;
-	GEqualFunc _tmp6_;
+	GeeEqualDataFunc _tmp5_;
+	void* _tmp5__target;
+	GeeEqualDataFunc _tmp6_;
+	void* _tmp6__target;
 	GeeArrayList* _tmp7_;
 	GeeArrayList* slice;
 	self = (GeeArrayList*) base;
@@ -827,9 +1173,10 @@ static GeeList* gee_array_list_real_slice (GeeAbstractList* base, gint start, gi
 	_tmp3_ = stop;
 	_tmp4_ = self->_size;
 	g_return_val_if_fail (_tmp3_ <= _tmp4_, NULL);
-	_tmp5_ = gee_array_list_get_equal_func (self);
+	_tmp5_ = gee_array_list_get_equal_func (self, &_tmp5__target);
 	_tmp6_ = _tmp5_;
-	_tmp7_ = gee_array_list_new (self->priv->g_type, (GBoxedCopyFunc) self->priv->g_dup_func, self->priv->g_destroy_func, _tmp6_);
+	_tmp6__target = _tmp5__target;
+	_tmp7_ = gee_array_list_new (self->priv->g_type, (GBoxedCopyFunc) self->priv->g_dup_func, self->priv->g_destroy_func, _tmp6_, _tmp6__target, NULL);
 	slice = _tmp7_;
 	{
 		gint _tmp8_;
@@ -876,8 +1223,37 @@ static GeeList* gee_array_list_real_slice (GeeAbstractList* base, gint start, gi
 /**
  * {@inheritDoc}
  */
-static gboolean gee_array_list_real_add_all (GeeAbstractCollection* base, GeeCollection* collection) {
-	GeeArrayList * self;
+static gboolean __lambda28_ (GeeArrayList* self, gpointer item) {
+	gboolean result = FALSE;
+	gpointer* _tmp0_;
+	gint _tmp0__length1;
+	gint _tmp1_;
+	gconstpointer _tmp2_;
+	gpointer _tmp3_;
+	gpointer _tmp4_;
+	_tmp0_ = self->_items;
+	_tmp0__length1 = self->_items_length1;
+	_tmp1_ = self->_size;
+	self->_size = _tmp1_ + 1;
+	_tmp2_ = item;
+	_tmp3_ = ((_tmp2_ != NULL) && (self->priv->g_dup_func != NULL)) ? self->priv->g_dup_func ((gpointer) _tmp2_) : ((gpointer) _tmp2_);
+	((_tmp0_[_tmp1_] == NULL) || (self->priv->g_destroy_func == NULL)) ? NULL : (_tmp0_[_tmp1_] = (self->priv->g_destroy_func (_tmp0_[_tmp1_]), NULL));
+	_tmp0_[_tmp1_] = _tmp3_;
+	_tmp4_ = _tmp0_[_tmp1_];
+	result = TRUE;
+	((item == NULL) || (self->priv->g_destroy_func == NULL)) ? NULL : (item = (self->priv->g_destroy_func (item), NULL));
+	return result;
+}
+
+
+static gboolean ___lambda28__gee_forall_func (gpointer g, gpointer self) {
+	gboolean result;
+	result = __lambda28_ (self, g);
+	return result;
+}
+
+
+gboolean gee_array_list_add_all (GeeArrayList* self, GeeCollection* collection) {
 	gboolean result = FALSE;
 	GeeCollection* _tmp0_;
 	gboolean _tmp1_;
@@ -885,8 +1261,9 @@ static gboolean gee_array_list_real_add_all (GeeAbstractCollection* base, GeeCol
 	GeeCollection* _tmp3_;
 	gint _tmp4_;
 	gint _tmp5_;
-	gint _tmp17_;
-	self = (GeeArrayList*) base;
+	GeeCollection* _tmp6_;
+	gint _tmp7_;
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (collection != NULL, FALSE);
 	_tmp0_ = collection;
 	_tmp1_ = gee_collection_get_is_empty (_tmp0_);
@@ -899,68 +1276,12 @@ static gboolean gee_array_list_real_add_all (GeeAbstractCollection* base, GeeCol
 	_tmp4_ = gee_collection_get_size (_tmp3_);
 	_tmp5_ = _tmp4_;
 	gee_array_list_grow_if_needed (self, _tmp5_);
-	{
-		GeeCollection* _tmp6_;
-		GeeIterator* _tmp7_ = NULL;
-		GeeIterator* _item_it;
-		_tmp6_ = collection;
-		_tmp7_ = gee_iterable_iterator ((GeeIterable*) _tmp6_);
-		_item_it = _tmp7_;
-		while (TRUE) {
-			GeeIterator* _tmp8_;
-			gboolean _tmp9_ = FALSE;
-			GeeIterator* _tmp10_;
-			gpointer _tmp11_ = NULL;
-			gpointer item;
-			gpointer* _tmp12_;
-			gint _tmp12__length1;
-			gint _tmp13_;
-			gconstpointer _tmp14_;
-			gpointer _tmp15_;
-			gpointer _tmp16_;
-			_tmp8_ = _item_it;
-			_tmp9_ = gee_iterator_next (_tmp8_);
-			if (!_tmp9_) {
-				break;
-			}
-			_tmp10_ = _item_it;
-			_tmp11_ = gee_iterator_get (_tmp10_);
-			item = _tmp11_;
-			_tmp12_ = self->_items;
-			_tmp12__length1 = self->_items_length1;
-			_tmp13_ = self->_size;
-			self->_size = _tmp13_ + 1;
-			_tmp14_ = item;
-			_tmp15_ = ((_tmp14_ != NULL) && (self->priv->g_dup_func != NULL)) ? self->priv->g_dup_func ((gpointer) _tmp14_) : ((gpointer) _tmp14_);
-			((_tmp12_[_tmp13_] == NULL) || (self->priv->g_destroy_func == NULL)) ? NULL : (_tmp12_[_tmp13_] = (self->priv->g_destroy_func (_tmp12_[_tmp13_]), NULL));
-			_tmp12_[_tmp13_] = _tmp15_;
-			_tmp16_ = _tmp12_[_tmp13_];
-			((item == NULL) || (self->priv->g_destroy_func == NULL)) ? NULL : (item = (self->priv->g_destroy_func (item), NULL));
-		}
-		_g_object_unref0 (_item_it);
-	}
-	_tmp17_ = self->priv->_stamp;
-	self->priv->_stamp = _tmp17_ + 1;
+	_tmp6_ = collection;
+	gee_traversable_foreach ((GeeTraversable*) _tmp6_, ___lambda28__gee_forall_func, self);
+	_tmp7_ = self->priv->_stamp;
+	self->priv->_stamp = _tmp7_ + 1;
 	result = TRUE;
 	return result;
-}
-
-
-/**
- * Sorts items by comparing with the specified compare function.
- *
- * @deprecated This method has only been added as hack and will be
- * deprecated after the next odd minor version bump (>= 0.7.x).
- *
- * @param compare_func compare function to use to compare items
- */
-void gee_array_list_sort_with_data (GeeArrayList* self, GCompareDataFunc compare, void* compare_target) {
-	GCompareDataFunc _tmp0_;
-	void* _tmp0__target;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = compare;
-	_tmp0__target = compare_target;
-	gee_tim_sort_sort_with_data (self->priv->g_type, (GBoxedCopyFunc) self->priv->g_dup_func, self->priv->g_destroy_func, (GeeList*) self, _tmp0_, _tmp0__target);
 }
 
 
@@ -1070,22 +1391,45 @@ static gint gee_array_list_real_get_size (GeeAbstractCollection* base) {
 }
 
 
-GEqualFunc gee_array_list_get_equal_func (GeeArrayList* self) {
-	GEqualFunc result;
-	GEqualFunc _tmp0_;
-	g_return_val_if_fail (self != NULL, NULL);
-	_tmp0_ = self->priv->_equal_func;
-	result = _tmp0_;
+static gboolean gee_array_list_real_get_read_only (GeeAbstractCollection* base) {
+	gboolean result;
+	GeeArrayList* self;
+	self = (GeeArrayList*) base;
+	result = FALSE;
 	return result;
 }
 
 
-static void gee_array_list_set_equal_func (GeeArrayList* self, GEqualFunc value) {
-	GEqualFunc _tmp0_;
+GeeEqualDataFunc gee_array_list_get_equal_func (GeeArrayList* self, gpointer* result_target) {
+	GeeEqualDataFunc result;
+	GeeEqualDataFunc _tmp0_;
+	void* _tmp0__target;
+	GeeEqualDataFunc _tmp1_;
+	void* _tmp1__target;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->_equal_func;
+	_tmp0__target = self->priv->_equal_func_target;
+	_tmp1_ = _tmp0_;
+	_tmp1__target = _tmp0__target;
+	*result_target = _tmp1__target;
+	result = _tmp1_;
+	return result;
+}
+
+
+static void gee_array_list_set_equal_func (GeeArrayList* self, GeeEqualDataFunc value, gpointer value_target) {
+	GeeEqualDataFunc _tmp0_;
+	void* _tmp0__target;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = value;
+	_tmp0__target = value_target;
+	(self->priv->_equal_func_target_destroy_notify == NULL) ? NULL : (self->priv->_equal_func_target_destroy_notify (self->priv->_equal_func_target), NULL);
+	self->priv->_equal_func = NULL;
+	self->priv->_equal_func_target = NULL;
+	self->priv->_equal_func_target_destroy_notify = NULL;
 	self->priv->_equal_func = _tmp0_;
-	g_object_notify ((GObject *) self, "equal-func");
+	self->priv->_equal_func_target = _tmp0__target;
+	self->priv->_equal_func_target_destroy_notify = NULL;
 }
 
 
@@ -1173,7 +1517,7 @@ static gboolean gee_array_list_iterator_real_has_next (GeeIterator* base) {
 }
 
 
-static gboolean gee_array_list_iterator_real_first (GeeIterator* base) {
+static gboolean gee_array_list_iterator_real_first (GeeBidirIterator* base) {
 	GeeArrayListIterator * self;
 	gboolean result = FALSE;
 	gint _tmp0_;
@@ -1409,7 +1753,7 @@ static void gee_array_list_iterator_real_set (GeeListIterator* base, gconstpoint
 }
 
 
-static void gee_array_list_iterator_real_insert (GeeListIterator* base, gconstpointer item) {
+static void gee_array_list_iterator_real_insert (GeeBidirListIterator* base, gconstpointer item) {
 	GeeArrayListIterator * self;
 	gint _tmp0_;
 	GeeArrayList* _tmp1_;
@@ -1513,6 +1857,124 @@ static gint gee_array_list_iterator_real_index (GeeListIterator* base) {
 }
 
 
+static gboolean gee_array_list_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeArrayListIterator * self;
+	gboolean result = FALSE;
+	gint _tmp0_;
+	GeeArrayList* _tmp1_;
+	gint _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	gint _tmp4_;
+	gboolean _tmp6_;
+	GeeArrayList* _tmp19_;
+	gint _tmp20_;
+	self = (GeeArrayListIterator*) base;
+	_tmp0_ = self->priv->_stamp;
+	_tmp1_ = self->priv->_list;
+	_tmp2_ = _tmp1_->priv->_stamp;
+	_vala_assert (_tmp0_ == _tmp2_, "_stamp == _list._stamp");
+	_tmp4_ = self->priv->_index;
+	if (_tmp4_ < 0) {
+		_tmp3_ = TRUE;
+	} else {
+		gboolean _tmp5_;
+		_tmp5_ = self->priv->_removed;
+		_tmp3_ = _tmp5_;
+	}
+	_tmp6_ = _tmp3_;
+	if (_tmp6_) {
+		gint _tmp7_;
+		_tmp7_ = self->priv->_index;
+		self->priv->_index = _tmp7_ + 1;
+	}
+	while (TRUE) {
+		gint _tmp8_;
+		GeeArrayList* _tmp9_;
+		gint _tmp10_;
+		GeeForallFunc _tmp11_;
+		void* _tmp11__target;
+		GeeArrayList* _tmp12_;
+		gpointer* _tmp13_;
+		gint _tmp13__length1;
+		gint _tmp14_;
+		gconstpointer _tmp15_;
+		gpointer _tmp16_;
+		gboolean _tmp17_ = FALSE;
+		gint _tmp18_;
+		_tmp8_ = self->priv->_index;
+		_tmp9_ = self->priv->_list;
+		_tmp10_ = _tmp9_->_size;
+		if (!(_tmp8_ < _tmp10_)) {
+			break;
+		}
+		_tmp11_ = f;
+		_tmp11__target = f_target;
+		_tmp12_ = self->priv->_list;
+		_tmp13_ = _tmp12_->_items;
+		_tmp13__length1 = _tmp12_->_items_length1;
+		_tmp14_ = self->priv->_index;
+		_tmp15_ = _tmp13_[_tmp14_];
+		_tmp16_ = ((_tmp15_ != NULL) && (self->priv->g_dup_func != NULL)) ? self->priv->g_dup_func ((gpointer) _tmp15_) : ((gpointer) _tmp15_);
+		_tmp17_ = _tmp11_ (_tmp16_, _tmp11__target);
+		if (!_tmp17_) {
+			result = FALSE;
+			return result;
+		}
+		_tmp18_ = self->priv->_index;
+		self->priv->_index = _tmp18_ + 1;
+	}
+	_tmp19_ = self->priv->_list;
+	_tmp20_ = _tmp19_->_size;
+	self->priv->_index = _tmp20_ - 1;
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean gee_array_list_iterator_real_get_read_only (GeeIterator* base) {
+	gboolean result;
+	GeeArrayListIterator* self;
+	self = (GeeArrayListIterator*) base;
+	result = FALSE;
+	return result;
+}
+
+
+static gboolean gee_array_list_iterator_real_get_valid (GeeIterator* base) {
+	gboolean result;
+	GeeArrayListIterator* self;
+	gboolean _tmp0_ = FALSE;
+	gboolean _tmp1_ = FALSE;
+	gint _tmp2_;
+	gboolean _tmp6_;
+	gboolean _tmp8_;
+	self = (GeeArrayListIterator*) base;
+	_tmp2_ = self->priv->_index;
+	if (_tmp2_ >= 0) {
+		gint _tmp3_;
+		GeeArrayList* _tmp4_;
+		gint _tmp5_;
+		_tmp3_ = self->priv->_index;
+		_tmp4_ = self->priv->_list;
+		_tmp5_ = _tmp4_->_size;
+		_tmp1_ = _tmp3_ < _tmp5_;
+	} else {
+		_tmp1_ = FALSE;
+	}
+	_tmp6_ = _tmp1_;
+	if (_tmp6_) {
+		gboolean _tmp7_;
+		_tmp7_ = self->priv->_removed;
+		_tmp0_ = !_tmp7_;
+	} else {
+		_tmp0_ = FALSE;
+	}
+	_tmp8_ = _tmp0_;
+	result = _tmp8_;
+	return result;
+}
+
+
 static void gee_array_list_iterator_class_init (GeeArrayListIteratorClass * klass) {
 	gee_array_list_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeArrayListIteratorPrivate));
@@ -1522,6 +1984,32 @@ static void gee_array_list_iterator_class_init (GeeArrayListIteratorClass * klas
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_ARRAY_LIST_ITERATOR_G_TYPE, g_param_spec_gtype ("g-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_ARRAY_LIST_ITERATOR_G_DUP_FUNC, g_param_spec_pointer ("g-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_ARRAY_LIST_ITERATOR_G_DESTROY_FUNC, g_param_spec_pointer ("g-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_ARRAY_LIST_ITERATOR_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_ARRAY_LIST_ITERATOR_VALID, g_param_spec_boolean ("valid", "valid", "valid", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static GType gee_array_list_iterator_gee_traversable_get_g_type (GeeArrayListIterator* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_array_list_iterator_gee_traversable_get_g_dup_func (GeeArrayListIterator* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_array_list_iterator_gee_traversable_get_g_destroy_func (GeeArrayListIterator* self) {
+	return self->priv->g_destroy_func;
+}
+
+
+static void gee_array_list_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_array_list_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_array_list_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_array_list_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_array_list_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_array_list_iterator_gee_traversable_get_g_destroy_func;
 }
 
 
@@ -1529,26 +2017,69 @@ static void gee_array_list_iterator_gee_iterator_interface_init (GeeIteratorIfac
 	gee_array_list_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->next = (gboolean (*)(GeeIterator*)) gee_array_list_iterator_real_next;
 	iface->has_next = (gboolean (*)(GeeIterator*)) gee_array_list_iterator_real_has_next;
-	iface->first = (gboolean (*)(GeeIterator*)) gee_array_list_iterator_real_first;
 	iface->get = (gpointer (*)(GeeIterator*)) gee_array_list_iterator_real_get;
 	iface->remove = (void (*)(GeeIterator*)) gee_array_list_iterator_real_remove;
+	iface->get_read_only = gee_array_list_iterator_real_get_read_only;
+	iface->get_valid = gee_array_list_iterator_real_get_valid;
+}
+
+
+static GType gee_array_list_iterator_gee_bidir_iterator_get_g_type (GeeArrayListIterator* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_array_list_iterator_gee_bidir_iterator_get_g_dup_func (GeeArrayListIterator* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_array_list_iterator_gee_bidir_iterator_get_g_destroy_func (GeeArrayListIterator* self) {
+	return self->priv->g_destroy_func;
 }
 
 
 static void gee_array_list_iterator_gee_bidir_iterator_interface_init (GeeBidirIteratorIface * iface) {
 	gee_array_list_iterator_gee_bidir_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->first = (gboolean (*)(GeeBidirIterator*)) gee_array_list_iterator_real_first;
 	iface->previous = (gboolean (*)(GeeBidirIterator*)) gee_array_list_iterator_real_previous;
 	iface->has_previous = (gboolean (*)(GeeBidirIterator*)) gee_array_list_iterator_real_has_previous;
 	iface->last = (gboolean (*)(GeeBidirIterator*)) gee_array_list_iterator_real_last;
+	iface->get_g_type = (GType(*)(GeeBidirIterator*)) gee_array_list_iterator_gee_bidir_iterator_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeBidirIterator*)) gee_array_list_iterator_gee_bidir_iterator_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeBidirIterator*)) gee_array_list_iterator_gee_bidir_iterator_get_g_destroy_func;
 }
 
 
 static void gee_array_list_iterator_gee_list_iterator_interface_init (GeeListIteratorIface * iface) {
 	gee_array_list_iterator_gee_list_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->set = (void (*)(GeeListIterator*, gconstpointer)) gee_array_list_iterator_real_set;
-	iface->insert = (void (*)(GeeListIterator*, gconstpointer)) gee_array_list_iterator_real_insert;
 	iface->add = (void (*)(GeeListIterator*, gconstpointer)) gee_array_list_iterator_real_add;
 	iface->index = (gint (*)(GeeListIterator*)) gee_array_list_iterator_real_index;
+}
+
+
+static GType gee_array_list_iterator_gee_bidir_list_iterator_get_g_type (GeeArrayListIterator* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_array_list_iterator_gee_bidir_list_iterator_get_g_dup_func (GeeArrayListIterator* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_array_list_iterator_gee_bidir_list_iterator_get_g_destroy_func (GeeArrayListIterator* self) {
+	return self->priv->g_destroy_func;
+}
+
+
+static void gee_array_list_iterator_gee_bidir_list_iterator_interface_init (GeeBidirListIteratorIface * iface) {
+	gee_array_list_iterator_gee_bidir_list_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->insert = (void (*)(GeeBidirListIterator*, gconstpointer)) gee_array_list_iterator_real_insert;
+	iface->get_g_type = (GType(*)(GeeBidirListIterator*)) gee_array_list_iterator_gee_bidir_list_iterator_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeBidirListIterator*)) gee_array_list_iterator_gee_bidir_list_iterator_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeBidirListIterator*)) gee_array_list_iterator_gee_bidir_list_iterator_get_g_destroy_func;
 }
 
 
@@ -1572,14 +2103,18 @@ static GType gee_array_list_iterator_get_type (void) {
 	static volatile gsize gee_array_list_iterator_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_array_list_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeArrayListIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_array_list_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeArrayListIterator), 0, (GInstanceInitFunc) gee_array_list_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_array_list_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_array_list_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_bidir_iterator_info = { (GInterfaceInitFunc) gee_array_list_iterator_gee_bidir_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_list_iterator_info = { (GInterfaceInitFunc) gee_array_list_iterator_gee_list_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		static const GInterfaceInfo gee_bidir_list_iterator_info = { (GInterfaceInitFunc) gee_array_list_iterator_gee_bidir_list_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_array_list_iterator_type_id;
 		gee_array_list_iterator_type_id = g_type_register_static (G_TYPE_OBJECT, "GeeArrayListIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_array_list_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
 		g_type_add_interface_static (gee_array_list_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
 		g_type_add_interface_static (gee_array_list_iterator_type_id, GEE_TYPE_BIDIR_ITERATOR, &gee_bidir_iterator_info);
 		g_type_add_interface_static (gee_array_list_iterator_type_id, GEE_TYPE_LIST_ITERATOR, &gee_list_iterator_info);
+		g_type_add_interface_static (gee_array_list_iterator_type_id, GEE_TYPE_BIDIR_LIST_ITERATOR, &gee_bidir_list_iterator_info);
 		g_once_init_leave (&gee_array_list_iterator_type_id__volatile, gee_array_list_iterator_type_id);
 	}
 	return gee_array_list_iterator_type_id__volatile;
@@ -1590,6 +2125,12 @@ static void _vala_gee_array_list_iterator_get_property (GObject * object, guint 
 	GeeArrayListIterator * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_ARRAY_LIST_TYPE_ITERATOR, GeeArrayListIterator);
 	switch (property_id) {
+		case GEE_ARRAY_LIST_ITERATOR_READ_ONLY:
+		g_value_set_boolean (value, gee_iterator_get_read_only ((GeeIterator*) self));
+		break;
+		case GEE_ARRAY_LIST_ITERATOR_VALID:
+		g_value_set_boolean (value, gee_iterator_get_valid ((GeeIterator*) self));
+		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
 		break;
@@ -1620,8 +2161,10 @@ static void _vala_gee_array_list_iterator_set_property (GObject * object, guint 
 static void gee_array_list_class_init (GeeArrayListClass * klass) {
 	gee_array_list_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeArrayListPrivate));
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->foreach = gee_array_list_real_foreach;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->iterator = gee_array_list_real_iterator;
 	GEE_ABSTRACT_LIST_CLASS (klass)->list_iterator = gee_array_list_real_list_iterator;
+	GEE_ABSTRACT_BIDIR_LIST_CLASS (klass)->bidir_list_iterator = gee_array_list_real_bidir_list_iterator;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->contains = gee_array_list_real_contains;
 	GEE_ABSTRACT_LIST_CLASS (klass)->index_of = gee_array_list_real_index_of;
 	GEE_ABSTRACT_LIST_CLASS (klass)->get = gee_array_list_real_get;
@@ -1632,8 +2175,8 @@ static void gee_array_list_class_init (GeeArrayListClass * klass) {
 	GEE_ABSTRACT_LIST_CLASS (klass)->remove_at = gee_array_list_real_remove_at;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->clear = gee_array_list_real_clear;
 	GEE_ABSTRACT_LIST_CLASS (klass)->slice = gee_array_list_real_slice;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->add_all = gee_array_list_real_add_all;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_array_list_real_get_size;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_array_list_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_array_list_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_array_list_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_array_list_finalize;
@@ -1645,19 +2188,14 @@ static void gee_array_list_class_init (GeeArrayListClass * klass) {
 	 */
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_ARRAY_LIST_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	/**
-	 * The elements' equality testing function.
+	 * {@inheritDoc}
 	 */
-	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_ARRAY_LIST_EQUAL_FUNC, g_param_spec_pointer ("equal-func", "equal-func", "equal-func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_ARRAY_LIST_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
 static void gee_array_list_instance_init (GeeArrayList * self) {
-	gpointer* _tmp0_ = NULL;
 	self->priv = GEE_ARRAY_LIST_GET_PRIVATE (self);
-	_tmp0_ = g_new0 (gpointer, 4);
-	self->_items = _tmp0_;
-	self->_items_length1 = 4;
-	self->__items_size_ = self->_items_length1;
 	self->priv->_stamp = 0;
 }
 
@@ -1665,6 +2203,10 @@ static void gee_array_list_instance_init (GeeArrayList * self) {
 static void gee_array_list_finalize (GObject* obj) {
 	GeeArrayList * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (obj, GEE_TYPE_ARRAY_LIST, GeeArrayList);
+	(self->priv->_equal_func_target_destroy_notify == NULL) ? NULL : (self->priv->_equal_func_target_destroy_notify (self->priv->_equal_func_target), NULL);
+	self->priv->_equal_func = NULL;
+	self->priv->_equal_func_target = NULL;
+	self->priv->_equal_func_target_destroy_notify = NULL;
 	self->_items = (_vala_array_free (self->_items, self->_items_length1, (GDestroyNotify) self->priv->g_destroy_func), NULL);
 	G_OBJECT_CLASS (gee_array_list_parent_class)->finalize (obj);
 }
@@ -1686,7 +2228,7 @@ GType gee_array_list_get_type (void) {
 	if (g_once_init_enter (&gee_array_list_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeArrayListClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_array_list_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeArrayList), 0, (GInstanceInitFunc) gee_array_list_instance_init, NULL };
 		GType gee_array_list_type_id;
-		gee_array_list_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_LIST, "GeeArrayList", &g_define_type_info, 0);
+		gee_array_list_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_BIDIR_LIST, "GeeArrayList", &g_define_type_info, 0);
 		g_once_init_leave (&gee_array_list_type_id__volatile, gee_array_list_type_id);
 	}
 	return gee_array_list_type_id__volatile;
@@ -1700,8 +2242,8 @@ static void _vala_gee_array_list_get_property (GObject * object, guint property_
 		case GEE_ARRAY_LIST_SIZE:
 		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
 		break;
-		case GEE_ARRAY_LIST_EQUAL_FUNC:
-		g_value_set_pointer (value, gee_array_list_get_equal_func (self));
+		case GEE_ARRAY_LIST_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -1714,9 +2256,6 @@ static void _vala_gee_array_list_set_property (GObject * object, guint property_
 	GeeArrayList * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TYPE_ARRAY_LIST, GeeArrayList);
 	switch (property_id) {
-		case GEE_ARRAY_LIST_EQUAL_FUNC:
-		gee_array_list_set_equal_func (self, g_value_get_pointer (value));
-		break;
 		case GEE_ARRAY_LIST_G_TYPE:
 		self->priv->g_type = g_value_get_gtype (value);
 		break;

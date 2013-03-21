@@ -40,6 +40,13 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 	public override int size {
 		get { return _nnodes; }
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public override bool read_only {
+		get { return false; }
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -89,17 +96,20 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 	/**
 	 * The keys' hash function.
 	 */
-	public HashFunc key_hash_func { private set; get; }
+	[CCode (notify = false)]
+	public HashDataFunc<K> key_hash_func { private set; get; }
 
 	/**
 	 * The keys' equality testing function.
 	 */
-	public EqualFunc key_equal_func { private set; get; }
+	[CCode (notify = false)]
+	public EqualDataFunc<K> key_equal_func { private set; get; }
 
 	/**
 	 * The values' equality testing function.
 	 */
-	public EqualFunc value_equal_func { private set; get; }
+	[CCode (notify = false)]
+	public EqualDataFunc<V> value_equal_func { private set; get; }
 
 	private int _array_size;
 	private int _nnodes;
@@ -125,7 +135,7 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 	 * @param key_equal_func an optional key equality testing function
 	 * @param value_equal_func an optional value equality testing function
 	 */
-	public HashMap (HashFunc? key_hash_func = null, EqualFunc? key_equal_func = null, EqualFunc? value_equal_func = null) {
+	public HashMap (owned HashDataFunc<K>? key_hash_func = null, owned EqualDataFunc<K>? key_equal_func = null, owned EqualDataFunc<V>? value_equal_func = null) {
 		if (key_hash_func == null) {
 			key_hash_func = Functions.get_hash_func_for (typeof (K));
 		}
@@ -236,9 +246,7 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 		if (*node != null) {
 			Node<K,V> next = (owned) (*node)->next;
 
-			if (&value != null) {
-				value = (owned) (*node)->value;
-			}
+			value = (owned) (*node)->value;
 
 			(*node)->key = null;
 			(*node)->value = null;
@@ -321,6 +329,8 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 			get { return _node.value; }
 			set { _node.value = value; }
 		}
+
+		public override bool read_only { get { return false; } }
 	}
 
 	private class KeySet<K,V> : AbstractSet<K> {
@@ -336,6 +346,10 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 
 		public override int size {
 			get { return _map.size; }
+		}
+
+		public override bool read_only {
+			get { return true; }
 		}
 
 		public override bool add (K key) {
@@ -354,15 +368,15 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 			return _map.has_key (key);
 		}
 
-		public override bool add_all (Collection<K> collection) {
+		public bool add_all (Collection<K> collection) {
 			assert_not_reached ();
 		}
 
-		public override bool remove_all (Collection<K> collection) {
+		public bool remove_all (Collection<K> collection) {
 			assert_not_reached ();
 		}
 
-		public override bool retain_all (Collection<K> collection) {
+		public bool retain_all (Collection<K> collection) {
 			assert_not_reached ();
 		}
 
@@ -381,6 +395,10 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 
 		public override int size {
 			get { return _map.size; }
+		}
+
+		public override bool read_only {
+			get { return true; }
 		}
 
 		public override bool add (V value) {
@@ -405,15 +423,15 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 			return false;
 		}
 
-		public override bool add_all (Collection<V> collection) {
+		public bool add_all (Collection<V> collection) {
 			assert_not_reached ();
 		}
 
-		public override bool remove_all (Collection<V> collection) {
+		public bool remove_all (Collection<V> collection) {
 			assert_not_reached ();
 		}
 
-		public override bool retain_all (Collection<V> collection) {
+		public bool retain_all (Collection<V> collection) {
 			assert_not_reached ();
 		}
 	}
@@ -433,6 +451,10 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 			get { return _map.size; }
 		}
 
+		public override bool read_only {
+			get { return true; }
+		}
+
 		public override bool add (Map.Entry<K, V> entry) {
 			assert_not_reached ();
 		}
@@ -449,22 +471,22 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 			return _map.has (entry.key, entry.value);
 		}
 
-		public override bool add_all (Collection<Map.Entry<K, V>> entries) {
+		public bool add_all (Collection<Map.Entry<K, V>> entries) {
 			assert_not_reached ();
 		}
 
-		public override bool remove_all (Collection<Map.Entry<K, V>> entries) {
+		public bool remove_all (Collection<Map.Entry<K, V>> entries) {
 			assert_not_reached ();
 		}
 
-		public override bool retain_all (Collection<Map.Entry<K, V>> entries) {
+		public bool retain_all (Collection<Map.Entry<K, V>> entries) {
 			assert_not_reached ();
 		}
 	}
 
 	private abstract class NodeIterator<K,V> : Object {
 		protected HashMap<K,V> _map;
-		private int _index = -1;
+		protected int _index = -1;
 		protected weak Node<K,V> _node;
 		protected weak Node<K,V> _next;
 
@@ -500,19 +522,21 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 			}
 			return (_next != null);
 		}
-
-		public bool first () {
-			assert (_stamp == _map._stamp);
-			if (_map.size == 0) {
-				return false;
+		
+		public virtual bool read_only {
+			get {
+				return true;
 			}
-			_index = -1;
-			_next = null;
-			return next ();
+		}
+		
+		public bool valid {
+			get {
+				return _node != null;
+			}
 		}
 	}
 
-	private class KeyIterator<K,V> : NodeIterator<K,V>, Iterator<K> {
+	private class KeyIterator<K,V> : NodeIterator<K,V>, Traversable<K>, Iterator<K> {
 		public KeyIterator (HashMap map) {
 			base (map);
 		}
@@ -525,6 +549,31 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 
 		public void remove () {
 			assert_not_reached ();
+		}
+
+		public bool foreach(ForallFunc<K> f) {
+			if (_node != null) {
+				if (!f(_node.key)) {
+					return false;
+				}
+				if(_next == null) {
+					_next = _node.next;
+				}
+			}
+			do {
+				while(_next != null) {
+					_node = _next;
+					if (!f(_node.key)) {
+						return false;
+					}
+					_next = _next.next;
+				}
+                                if (_index + 1 < _map._array_size) {
+					_next = _map._nodes[++_index];
+				} else {
+					return true;
+				}
+			} while(true);
 		}
 	}
 
@@ -543,7 +592,7 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 			assert (_stamp == _map._stamp);
 			assert (_node != null);
 			has_next ();
-			_map.unset (_node.key);
+			_map.unset_helper (_node.key);
 			_node = null;
 			_stamp = _map._stamp;
 		}
@@ -560,9 +609,21 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 			_map.set (_node.key, value);
 			_stamp = _map._stamp;
 		}
+		
+		public bool mutable {
+			get {
+				return true;
+			}
+		}
+		
+		public override bool read_only {
+			get {
+				return false;
+			}
+		}
 	}
 
-	private class ValueIterator<K,V> : NodeIterator<K,V>, Iterator<K> {
+	private class ValueIterator<K,V> : NodeIterator<K,V>, Traversable<V>, Iterator<V> {
 		public ValueIterator (HashMap map) {
 			base (map);
 		}
@@ -576,9 +637,34 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 		public void remove () {
 			assert_not_reached ();
 		}
+
+		public bool foreach(ForallFunc<V> f) {
+			if (_node != null) {
+				if (!f(_node.value)) {
+					return false;
+				}
+				if(_next == null) {
+					_next = _node.next;
+				}
+			}
+			do {
+				while(_next != null) {
+					_node = _next;
+					if (!f(_node.value)) {
+						return false;
+					}
+					_next = _next.next;
+				}
+                                if (_index + 1 < _map._array_size) {
+					_next = _map._nodes[++_index];
+				} else {
+					return true;
+				}
+			} while(true);
+		}
 	}
 
-	private class EntryIterator<K,V> : NodeIterator<K,V>, Iterator<Map.Entry<K,V>> {
+	private class EntryIterator<K,V> : NodeIterator<K,V>, Traversable<Map.Entry<K,V>>, Iterator<Map.Entry<K,V>> {
 		public EntryIterator (HashMap map) {
 			base (map);
 		}
@@ -591,6 +677,31 @@ public class Gee.HashMap<K,V> : Gee.AbstractMap<K,V> {
 
 		public void remove () {
 			assert_not_reached ();
+		}
+
+		public bool foreach(ForallFunc<Map.Entry<K,V>> f) {
+			if (_node != null) {
+				if (!f(Entry<K,V>.entry_for<K,V> (_node))) {
+					return false;
+				}
+				if(_next == null) {
+					_next = _node.next;
+				}
+			}
+			do {
+				while(_next != null) {
+					_node = _next;
+					if (!f(Entry<K,V>.entry_for<K,V> (_node))) {
+						return false;
+					}
+					_next = _next.next;
+				}
+                                if (_index + 1 < _map._array_size) {
+					_next = _map._nodes[++_index];
+				} else {
+					return true;
+				}
+			} while(true);
 		}
 	}
 }

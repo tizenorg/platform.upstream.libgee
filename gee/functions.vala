@@ -46,11 +46,35 @@ namespace Gee {
 		 *
 		 * @return the equality testing function corresponding to the given type.
 		 */
-		public static EqualFunc get_equal_func_for (Type t) {
+		public static EqualDataFunc get_equal_func_for (Type t) {
 			if (t == typeof (string)) {
-				return str_equal;
+				return (a, b) => {
+					if (a == b)
+						return true;
+					else if (a == null || b == null)
+						return false;
+					else
+						return str_equal ((string) a, (string) b);
+				};
+			} else if (t.is_a (typeof (Hashable))) {
+				return (a, b) => {
+					if (a == b)
+						return true;
+					else if (a == null || b == null)
+						return false;
+					else
+						return ((Hashable<Hashable>) a).equal_to ((Hashable) b);
+				};
+			} else if (t.is_a (typeof (Comparable))) {
+				return (a, b) => {					
+					if (a == b)
+						return true;
+					else if (a == null || b == null)
+						return false;
+					else
+						return ((Comparable<Comparable>) a).compare_to ((Comparable) b) == 0;};
 			} else {
-				return direct_equal;
+				return (a, b) => {return direct_equal (a, b);};
 			}
 		}
 
@@ -61,11 +85,23 @@ namespace Gee {
 		 *
 		 * @return the hash function corresponding to the given type.
 		 */
-		public static HashFunc get_hash_func_for (Type t) {
+		public static HashDataFunc get_hash_func_for (Type t) {
 			if (t == typeof (string)) {
-				return str_hash;
+				return (a) => {
+					if (a == null)
+						return (uint)0xdeadbeef;
+					else
+						return str_hash ((string) a);
+				};
+			} else if (t.is_a (typeof (Hashable))) {
+				return (a) => {
+					if (a == null)
+						return (uint)0xdeadbeef;
+					else
+						return ((Hashable) a).hash();
+				};
 			} else {
-				return direct_hash;
+				return (a) => {return direct_hash (a);};
 			}
 		}
 
@@ -76,36 +112,41 @@ namespace Gee {
 		 *
 		 * @return the comparator function corresponding to the given type.
 		 */
-		public static CompareFunc get_compare_func_for (Type t) {
+		public static CompareDataFunc get_compare_func_for (Type t) {
 			if (t == typeof (string)) {
-				return (CompareFunc) strcmp;
+				return (a, b) => {
+					if (a == b)
+						return 0;
+					else if (a == null)
+						return -1;
+					else if (b == null)
+						return 1;
+					else
+						return strcmp((string) a, (string) b);
+				};
 			} else if (t.is_a (typeof (Comparable))) {
-				return (CompareFunc) Comparable.compare_to;
+				return (a, b) => {
+					if (a == b)
+						return 0;
+					else if (a == null)
+						return -1;
+					else if (b == null)
+						return 1;
+					else
+						return ((Comparable<Comparable>) a).compare_to ((Comparable) b);
+				};
 			} else {
-				return (CompareFunc) direct_compare;
+				return (_val1, _val2) => {
+					long val1 = (long)_val1, val2 = (long)_val2;
+					if (val1 > val2) {
+						return 1;
+					} else if (val1 == val2) {
+						return 0;
+					} else {
+						return -1;
+					}
+				};
 			}
-		}
-	}
-
-	/**
-	 * Compares two arbitrary elements together.
-	 *
-	 * The comparison is done on pointers and not on values behind.
-	 *
-	 * @param _val1 the first value to compare.
-	 * @param _val2 the second value to compare.
-	 *
-	 * @return a negative value if _val1 is lesser than _val2, a positive value
-	 *         if _val1 is greater then _val2 and zero if both are equal.
-	 */
-	public static int direct_compare (void* _val1, void* _val2) {
-		long val1 = (long)_val1, val2 = (long)_val2;
-		if (val1 > val2) {
-			return 1;
-		} else if (val1 == val2) {
-			return 0;
-		} else {
-			return -1;
 		}
 	}
 }

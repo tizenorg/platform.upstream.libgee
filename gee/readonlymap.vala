@@ -31,7 +31,7 @@ using GLib;
  *
  * @see Map
  */
-internal class Gee.ReadOnlyMap<K,V> : Object, Iterable<Map.Entry<K,V>>, Map<K,V> {
+internal class Gee.ReadOnlyMap<K,V> : Object, Traversable<Map.Entry<K,V>>, Iterable<Map.Entry<K,V>>, Map<K,V> {
 
 	/**
 	 * {@inheritDoc}
@@ -45,6 +45,13 @@ internal class Gee.ReadOnlyMap<K,V> : Object, Iterable<Map.Entry<K,V>>, Map<K,V>
 	 */
 	public bool is_empty {
 		get { return _map.is_empty; }
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public bool read_only {
+		get { return true; }
 	}
 
 	/**
@@ -74,7 +81,7 @@ internal class Gee.ReadOnlyMap<K,V> : Object, Iterable<Map.Entry<K,V>>, Map<K,V>
 		}
 	}
 
-	private Map<K,V> _map;
+	protected Map<K,V> _map;
 
 	/**
 	 * Constructs a read-only map that mirrors the content of the specified map.
@@ -205,7 +212,7 @@ internal class Gee.ReadOnlyMap<K,V> : Object, Iterable<Map.Entry<K,V>>, Map<K,V>
 	 * {@inheritDoc}
 	 */
 	public Type element_type {
-		get { return typeof (Map.Entry<K,V>); }
+		get { return typeof (Map.Entry); }
 	}
 
 	/**
@@ -215,7 +222,29 @@ internal class Gee.ReadOnlyMap<K,V> : Object, Iterable<Map.Entry<K,V>>, Map<K,V>
 		return entries.iterator ();
 	}
 
-	protected class MapIterator<K,V> : Object, Gee.MapIterator<K,V> {
+	/**
+	 * {@inheritDoc}
+	 */
+	public bool foreach (ForallFunc<Map.Entry<K, V>> f) {
+		return _map.foreach (f);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Iterator<A> stream<A> (owned StreamFunc<Map.Entry<K, V>, A> f) {
+		return _map.stream<A> ((owned) f);
+	}
+
+	public Iterator<Map.Entry<K, V>> filter (owned Predicate<Map.Entry<K, V>> f) {
+		return _map.filter ((owned)f);
+	}
+
+	public Iterator<Map.Entry<K, V>> chop (int offset, int length = -1) {
+		return _map.chop (offset, length);
+	}
+
+	internal class MapIterator<K,V> : Object, Gee.MapIterator<K,V> {
 		protected Gee.MapIterator<K,V> _iter;
 
 		public MapIterator (Gee.MapIterator<K,V> iterator) {
@@ -228,10 +257,6 @@ internal class Gee.ReadOnlyMap<K,V> : Object, Iterable<Map.Entry<K,V>>, Map<K,V>
 
 		public bool has_next () {
 			return _iter.has_next ();
-		}
-
-		public bool first () {
-			return _iter.first ();
 		}
 
 		public K get_key () {
@@ -248,6 +273,24 @@ internal class Gee.ReadOnlyMap<K,V> : Object, Iterable<Map.Entry<K,V>>, Map<K,V>
 
 		public void unset () {
 			assert_not_reached ();
+		}
+		
+		public bool read_only {
+			get {
+				return true;
+			}
+		}
+		
+		public bool mutable {
+			get {
+				return false;
+			}
+		}
+		
+		public bool valid {
+			get {
+				return _iter.valid;
+			}
 		}
 	}
 }

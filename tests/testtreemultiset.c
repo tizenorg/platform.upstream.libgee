@@ -74,7 +74,6 @@ typedef struct _TreeMultiSetTests TreeMultiSetTests;
 typedef struct _TreeMultiSetTestsClass TreeMultiSetTestsClass;
 typedef struct _TreeMultiSetTestsPrivate TreeMultiSetTestsPrivate;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
-#define _vala_assert(expr, msg) if G_LIKELY (expr) ; else g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
 
 struct _GeeTestCase {
 	GObject parent_instance;
@@ -115,7 +114,6 @@ struct _TreeMultiSetTestsClass {
 	MultiSetTestsClass parent_class;
 };
 
-typedef void (*GeeTestCaseTestMethod) (void* user_data);
 
 static gpointer tree_multi_set_tests_parent_class = NULL;
 
@@ -129,22 +127,13 @@ enum  {
 TreeMultiSetTests* tree_multi_set_tests_new (void);
 TreeMultiSetTests* tree_multi_set_tests_construct (GType object_type);
 MultiSetTests* multi_set_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
-static void tree_multi_set_tests_test_selected_functions (TreeMultiSetTests* self);
-static void _tree_multi_set_tests_test_selected_functions_gee_test_case_test_method (gpointer self);
 static void tree_multi_set_tests_real_set_up (GeeTestCase* base);
 static void tree_multi_set_tests_real_tear_down (GeeTestCase* base);
-
-
-static void _tree_multi_set_tests_test_selected_functions_gee_test_case_test_method (gpointer self) {
-	tree_multi_set_tests_test_selected_functions (self);
-}
 
 
 TreeMultiSetTests* tree_multi_set_tests_construct (GType object_type) {
 	TreeMultiSetTests * self = NULL;
 	self = (TreeMultiSetTests*) multi_set_tests_construct (object_type, "TreeMultiSet");
-	gee_test_case_add_test ((GeeTestCase*) self, "[TreeMultiSet] selected functions", _tree_multi_set_tests_test_selected_functions_gee_test_case_test_method, self);
 	return self;
 }
 
@@ -158,7 +147,7 @@ static void tree_multi_set_tests_real_set_up (GeeTestCase* base) {
 	TreeMultiSetTests * self;
 	GeeTreeMultiSet* _tmp0_;
 	self = (TreeMultiSetTests*) base;
-	_tmp0_ = gee_tree_multi_set_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp0_ = gee_tree_multi_set_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	_g_object_unref0 (((CollectionTests*) self)->test_collection);
 	((CollectionTests*) self)->test_collection = (GeeCollection*) _tmp0_;
 }
@@ -169,31 +158,6 @@ static void tree_multi_set_tests_real_tear_down (GeeTestCase* base) {
 	self = (TreeMultiSetTests*) base;
 	_g_object_unref0 (((CollectionTests*) self)->test_collection);
 	((CollectionTests*) self)->test_collection = NULL;
-}
-
-
-static gpointer _g_object_ref0 (gpointer self) {
-	return self ? g_object_ref (self) : NULL;
-}
-
-
-static void tree_multi_set_tests_test_selected_functions (TreeMultiSetTests* self) {
-	GeeCollection* _tmp0_;
-	GeeTreeMultiSet* _tmp1_;
-	GeeTreeMultiSet* test_multi_set;
-	GCompareFunc _tmp2_;
-	GCompareFunc _tmp3_;
-	GCompareFunc _tmp4_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((CollectionTests*) self)->test_collection;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_TREE_MULTI_SET) ? ((GeeTreeMultiSet*) _tmp0_) : NULL);
-	test_multi_set = _tmp1_;
-	_vala_assert (test_multi_set != NULL, "test_multi_set != null");
-	_tmp2_ = gee_tree_multi_set_get_compare_func (test_multi_set);
-	_tmp3_ = _tmp2_;
-	_tmp4_ = g_strcmp0;
-	_vala_assert (_tmp3_ == ((GCompareFunc) _tmp4_), "test_multi_set.compare_func == (CompareFunc) strcmp");
-	_g_object_unref0 (test_multi_set);
 }
 
 

@@ -150,7 +150,7 @@ enum  {
 LinkedListAsDequeTests* linked_list_as_deque_tests_new (void);
 LinkedListAsDequeTests* linked_list_as_deque_tests_construct (GType object_type);
 DequeTests* deque_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 static void linked_list_as_deque_tests_test_selected_functions (LinkedListAsDequeTests* self);
 static void _linked_list_as_deque_tests_test_selected_functions_gee_test_case_test_method (gpointer self);
 static void linked_list_as_deque_tests_real_set_up (GeeTestCase* base);
@@ -165,7 +165,7 @@ static void _linked_list_as_deque_tests_test_selected_functions_gee_test_case_te
 LinkedListAsDequeTests* linked_list_as_deque_tests_construct (GType object_type) {
 	LinkedListAsDequeTests * self = NULL;
 	self = (LinkedListAsDequeTests*) deque_tests_construct (object_type, "LinkedList as Deque");
-	gee_test_case_add_test ((GeeTestCase*) self, "[LinkedList] selected functions", _linked_list_as_deque_tests_test_selected_functions_gee_test_case_test_method, self);
+	gee_test_case_add_test ((GeeTestCase*) self, "[LinkedList] selected functions", _linked_list_as_deque_tests_test_selected_functions_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 
@@ -179,7 +179,7 @@ static void linked_list_as_deque_tests_real_set_up (GeeTestCase* base) {
 	LinkedListAsDequeTests * self;
 	GeeLinkedList* _tmp0_;
 	self = (LinkedListAsDequeTests*) base;
-	_tmp0_ = gee_linked_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp0_ = gee_linked_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	_g_object_unref0 (((CollectionTests*) self)->test_collection);
 	((CollectionTests*) self)->test_collection = (GeeCollection*) _tmp0_;
 }
@@ -202,18 +202,11 @@ static void linked_list_as_deque_tests_test_selected_functions (LinkedListAsDequ
 	GeeCollection* _tmp0_;
 	GeeLinkedList* _tmp1_;
 	GeeLinkedList* test_list;
-	GEqualFunc _tmp2_;
-	GEqualFunc _tmp3_;
-	GEqualFunc _tmp4_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = ((CollectionTests*) self)->test_collection;
 	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_LINKED_LIST) ? ((GeeLinkedList*) _tmp0_) : NULL);
 	test_list = _tmp1_;
 	_vala_assert (test_list != NULL, "test_list != null");
-	_tmp2_ = gee_linked_list_get_equal_func (test_list);
-	_tmp3_ = _tmp2_;
-	_tmp4_ = g_str_equal;
-	_vala_assert (_tmp3_ == _tmp4_, "test_list.equal_func == str_equal");
 	_g_object_unref0 (test_list);
 }
 

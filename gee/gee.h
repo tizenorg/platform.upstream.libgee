@@ -10,13 +10,25 @@
 G_BEGIN_DECLS
 
 
-#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
-#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
-#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
-#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+#define GEE_TYPE_TRAVERSABLE (gee_traversable_get_type ())
+#define GEE_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversable))
+#define GEE_IS_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_TRAVERSABLE))
+#define GEE_TRAVERSABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversableIface))
 
-typedef struct _GeeIterable GeeIterable;
-typedef struct _GeeIterableIface GeeIterableIface;
+typedef struct _GeeTraversable GeeTraversable;
+typedef struct _GeeTraversableIface GeeTraversableIface;
+
+#define GEE_TRAVERSABLE_TYPE_STREAM (gee_traversable_stream_get_type ())
+
+#define GEE_TYPE_LAZY (gee_lazy_get_type ())
+#define GEE_LAZY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LAZY, GeeLazy))
+#define GEE_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_LAZY, GeeLazyClass))
+#define GEE_IS_LAZY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LAZY))
+#define GEE_IS_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_LAZY))
+#define GEE_LAZY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_LAZY, GeeLazyClass))
+
+typedef struct _GeeLazy GeeLazy;
+typedef struct _GeeLazyClass GeeLazyClass;
 
 #define GEE_TYPE_ITERATOR (gee_iterator_get_type ())
 #define GEE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERATOR, GeeIterator))
@@ -25,6 +37,14 @@ typedef struct _GeeIterableIface GeeIterableIface;
 
 typedef struct _GeeIterator GeeIterator;
 typedef struct _GeeIteratorIface GeeIteratorIface;
+
+#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
+#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
+#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
+#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+
+typedef struct _GeeIterable GeeIterable;
+typedef struct _GeeIterableIface GeeIterableIface;
 
 #define GEE_TYPE_COLLECTION (gee_collection_get_type ())
 #define GEE_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_COLLECTION, GeeCollection))
@@ -53,14 +73,6 @@ typedef struct _GeeAbstractCollectionPrivate GeeAbstractCollectionPrivate;
 typedef struct _GeeList GeeList;
 typedef struct _GeeListIface GeeListIface;
 
-#define GEE_TYPE_BIDIR_ITERATOR (gee_bidir_iterator_get_type ())
-#define GEE_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIterator))
-#define GEE_IS_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_ITERATOR))
-#define GEE_BIDIR_ITERATOR_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIteratorIface))
-
-typedef struct _GeeBidirIterator GeeBidirIterator;
-typedef struct _GeeBidirIteratorIface GeeBidirIteratorIface;
-
 #define GEE_TYPE_LIST_ITERATOR (gee_list_iterator_get_type ())
 #define GEE_LIST_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LIST_ITERATOR, GeeListIterator))
 #define GEE_IS_LIST_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LIST_ITERATOR))
@@ -80,6 +92,98 @@ typedef struct _GeeAbstractList GeeAbstractList;
 typedef struct _GeeAbstractListClass GeeAbstractListClass;
 typedef struct _GeeAbstractListPrivate GeeAbstractListPrivate;
 
+#define GEE_TYPE_BIDIR_LIST (gee_bidir_list_get_type ())
+#define GEE_BIDIR_LIST(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_LIST, GeeBidirList))
+#define GEE_IS_BIDIR_LIST(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_LIST))
+#define GEE_BIDIR_LIST_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_LIST, GeeBidirListIface))
+
+typedef struct _GeeBidirList GeeBidirList;
+typedef struct _GeeBidirListIface GeeBidirListIface;
+
+#define GEE_TYPE_BIDIR_ITERATOR (gee_bidir_iterator_get_type ())
+#define GEE_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIterator))
+#define GEE_IS_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_ITERATOR))
+#define GEE_BIDIR_ITERATOR_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIteratorIface))
+
+typedef struct _GeeBidirIterator GeeBidirIterator;
+typedef struct _GeeBidirIteratorIface GeeBidirIteratorIface;
+
+#define GEE_TYPE_BIDIR_LIST_ITERATOR (gee_bidir_list_iterator_get_type ())
+#define GEE_BIDIR_LIST_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_LIST_ITERATOR, GeeBidirListIterator))
+#define GEE_IS_BIDIR_LIST_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_LIST_ITERATOR))
+#define GEE_BIDIR_LIST_ITERATOR_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_LIST_ITERATOR, GeeBidirListIteratorIface))
+
+typedef struct _GeeBidirListIterator GeeBidirListIterator;
+typedef struct _GeeBidirListIteratorIface GeeBidirListIteratorIface;
+
+#define GEE_TYPE_ABSTRACT_BIDIR_LIST (gee_abstract_bidir_list_get_type ())
+#define GEE_ABSTRACT_BIDIR_LIST(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_BIDIR_LIST, GeeAbstractBidirList))
+#define GEE_ABSTRACT_BIDIR_LIST_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_BIDIR_LIST, GeeAbstractBidirListClass))
+#define GEE_IS_ABSTRACT_BIDIR_LIST(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_BIDIR_LIST))
+#define GEE_IS_ABSTRACT_BIDIR_LIST_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_BIDIR_LIST))
+#define GEE_ABSTRACT_BIDIR_LIST_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_BIDIR_LIST, GeeAbstractBidirListClass))
+
+typedef struct _GeeAbstractBidirList GeeAbstractBidirList;
+typedef struct _GeeAbstractBidirListClass GeeAbstractBidirListClass;
+typedef struct _GeeAbstractBidirListPrivate GeeAbstractBidirListPrivate;
+
+#define GEE_TYPE_SET (gee_set_get_type ())
+#define GEE_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_SET, GeeSet))
+#define GEE_IS_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_SET))
+#define GEE_SET_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_SET, GeeSetIface))
+
+typedef struct _GeeSet GeeSet;
+typedef struct _GeeSetIface GeeSetIface;
+
+#define GEE_TYPE_ABSTRACT_SET (gee_abstract_set_get_type ())
+#define GEE_ABSTRACT_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_SET, GeeAbstractSet))
+#define GEE_ABSTRACT_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_SET, GeeAbstractSetClass))
+#define GEE_IS_ABSTRACT_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_SET))
+#define GEE_IS_ABSTRACT_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_SET))
+#define GEE_ABSTRACT_SET_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_SET, GeeAbstractSetClass))
+
+typedef struct _GeeAbstractSet GeeAbstractSet;
+typedef struct _GeeAbstractSetClass GeeAbstractSetClass;
+typedef struct _GeeAbstractSetPrivate GeeAbstractSetPrivate;
+
+#define GEE_TYPE_SORTED_SET (gee_sorted_set_get_type ())
+#define GEE_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_SORTED_SET, GeeSortedSet))
+#define GEE_IS_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_SORTED_SET))
+#define GEE_SORTED_SET_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_SORTED_SET, GeeSortedSetIface))
+
+typedef struct _GeeSortedSet GeeSortedSet;
+typedef struct _GeeSortedSetIface GeeSortedSetIface;
+
+#define GEE_TYPE_ABSTRACT_SORTED_SET (gee_abstract_sorted_set_get_type ())
+#define GEE_ABSTRACT_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_SORTED_SET, GeeAbstractSortedSet))
+#define GEE_ABSTRACT_SORTED_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_SORTED_SET, GeeAbstractSortedSetClass))
+#define GEE_IS_ABSTRACT_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_SORTED_SET))
+#define GEE_IS_ABSTRACT_SORTED_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_SORTED_SET))
+#define GEE_ABSTRACT_SORTED_SET_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_SORTED_SET, GeeAbstractSortedSetClass))
+
+typedef struct _GeeAbstractSortedSet GeeAbstractSortedSet;
+typedef struct _GeeAbstractSortedSetClass GeeAbstractSortedSetClass;
+typedef struct _GeeAbstractSortedSetPrivate GeeAbstractSortedSetPrivate;
+
+#define GEE_TYPE_BIDIR_SORTED_SET (gee_bidir_sorted_set_get_type ())
+#define GEE_BIDIR_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_SORTED_SET, GeeBidirSortedSet))
+#define GEE_IS_BIDIR_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_SORTED_SET))
+#define GEE_BIDIR_SORTED_SET_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_SORTED_SET, GeeBidirSortedSetIface))
+
+typedef struct _GeeBidirSortedSet GeeBidirSortedSet;
+typedef struct _GeeBidirSortedSetIface GeeBidirSortedSetIface;
+
+#define GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET (gee_abstract_bidir_sorted_set_get_type ())
+#define GEE_ABSTRACT_BIDIR_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, GeeAbstractBidirSortedSet))
+#define GEE_ABSTRACT_BIDIR_SORTED_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, GeeAbstractBidirSortedSetClass))
+#define GEE_IS_ABSTRACT_BIDIR_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET))
+#define GEE_IS_ABSTRACT_BIDIR_SORTED_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET))
+#define GEE_ABSTRACT_BIDIR_SORTED_SET_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, GeeAbstractBidirSortedSetClass))
+
+typedef struct _GeeAbstractBidirSortedSet GeeAbstractBidirSortedSet;
+typedef struct _GeeAbstractBidirSortedSetClass GeeAbstractBidirSortedSetClass;
+typedef struct _GeeAbstractBidirSortedSetPrivate GeeAbstractBidirSortedSetPrivate;
+
 #define GEE_TYPE_MAP (gee_map_get_type ())
 #define GEE_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_MAP, GeeMap))
 #define GEE_IS_MAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_MAP))
@@ -95,14 +199,6 @@ typedef struct _GeeMapIface GeeMapIface;
 
 typedef struct _GeeMapIterator GeeMapIterator;
 typedef struct _GeeMapIteratorIface GeeMapIteratorIface;
-
-#define GEE_TYPE_SET (gee_set_get_type ())
-#define GEE_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_SET, GeeSet))
-#define GEE_IS_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_SET))
-#define GEE_SET_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_SET, GeeSetIface))
-
-typedef struct _GeeSet GeeSet;
-typedef struct _GeeSetIface GeeSetIface;
 
 #define GEE_MAP_TYPE_ENTRY (gee_map_entry_get_type ())
 #define GEE_MAP_ENTRY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_MAP_TYPE_ENTRY, GeeMapEntry))
@@ -124,6 +220,52 @@ typedef struct _GeeMapEntryClass GeeMapEntryClass;
 typedef struct _GeeAbstractMap GeeAbstractMap;
 typedef struct _GeeAbstractMapClass GeeAbstractMapClass;
 typedef struct _GeeAbstractMapPrivate GeeAbstractMapPrivate;
+
+#define GEE_TYPE_SORTED_MAP (gee_sorted_map_get_type ())
+#define GEE_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_SORTED_MAP, GeeSortedMap))
+#define GEE_IS_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_SORTED_MAP))
+#define GEE_SORTED_MAP_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_SORTED_MAP, GeeSortedMapIface))
+
+typedef struct _GeeSortedMap GeeSortedMap;
+typedef struct _GeeSortedMapIface GeeSortedMapIface;
+
+#define GEE_TYPE_ABSTRACT_SORTED_MAP (gee_abstract_sorted_map_get_type ())
+#define GEE_ABSTRACT_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_SORTED_MAP, GeeAbstractSortedMap))
+#define GEE_ABSTRACT_SORTED_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_SORTED_MAP, GeeAbstractSortedMapClass))
+#define GEE_IS_ABSTRACT_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_SORTED_MAP))
+#define GEE_IS_ABSTRACT_SORTED_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_SORTED_MAP))
+#define GEE_ABSTRACT_SORTED_MAP_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_SORTED_MAP, GeeAbstractSortedMapClass))
+
+typedef struct _GeeAbstractSortedMap GeeAbstractSortedMap;
+typedef struct _GeeAbstractSortedMapClass GeeAbstractSortedMapClass;
+typedef struct _GeeAbstractSortedMapPrivate GeeAbstractSortedMapPrivate;
+
+#define GEE_TYPE_BIDIR_SORTED_MAP (gee_bidir_sorted_map_get_type ())
+#define GEE_BIDIR_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_SORTED_MAP, GeeBidirSortedMap))
+#define GEE_IS_BIDIR_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_SORTED_MAP))
+#define GEE_BIDIR_SORTED_MAP_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_SORTED_MAP, GeeBidirSortedMapIface))
+
+typedef struct _GeeBidirSortedMap GeeBidirSortedMap;
+typedef struct _GeeBidirSortedMapIface GeeBidirSortedMapIface;
+
+#define GEE_TYPE_BIDIR_MAP_ITERATOR (gee_bidir_map_iterator_get_type ())
+#define GEE_BIDIR_MAP_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_MAP_ITERATOR, GeeBidirMapIterator))
+#define GEE_IS_BIDIR_MAP_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_MAP_ITERATOR))
+#define GEE_BIDIR_MAP_ITERATOR_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_MAP_ITERATOR, GeeBidirMapIteratorIface))
+
+typedef struct _GeeBidirMapIterator GeeBidirMapIterator;
+typedef struct _GeeBidirMapIteratorIface GeeBidirMapIteratorIface;
+
+#define GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP (gee_abstract_bidir_sorted_map_get_type ())
+#define GEE_ABSTRACT_BIDIR_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP, GeeAbstractBidirSortedMap))
+#define GEE_ABSTRACT_BIDIR_SORTED_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP, GeeAbstractBidirSortedMapClass))
+#define GEE_IS_ABSTRACT_BIDIR_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP))
+#define GEE_IS_ABSTRACT_BIDIR_SORTED_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP))
+#define GEE_ABSTRACT_BIDIR_SORTED_MAP_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP, GeeAbstractBidirSortedMapClass))
+
+typedef struct _GeeAbstractBidirSortedMap GeeAbstractBidirSortedMap;
+typedef struct _GeeAbstractBidirSortedMapClass GeeAbstractBidirSortedMapClass;
+typedef struct _GeeAbstractBidirSortedMapPrivate GeeAbstractBidirSortedMapPrivate;
 
 #define GEE_TYPE_MULTI_MAP (gee_multi_map_get_type ())
 #define GEE_MULTI_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_MULTI_MAP, GeeMultiMap))
@@ -182,17 +324,6 @@ typedef struct _GeeAbstractQueue GeeAbstractQueue;
 typedef struct _GeeAbstractQueueClass GeeAbstractQueueClass;
 typedef struct _GeeAbstractQueuePrivate GeeAbstractQueuePrivate;
 
-#define GEE_TYPE_ABSTRACT_SET (gee_abstract_set_get_type ())
-#define GEE_ABSTRACT_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_SET, GeeAbstractSet))
-#define GEE_ABSTRACT_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_SET, GeeAbstractSetClass))
-#define GEE_IS_ABSTRACT_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_SET))
-#define GEE_IS_ABSTRACT_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_SET))
-#define GEE_ABSTRACT_SET_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_SET, GeeAbstractSetClass))
-
-typedef struct _GeeAbstractSet GeeAbstractSet;
-typedef struct _GeeAbstractSetClass GeeAbstractSetClass;
-typedef struct _GeeAbstractSetPrivate GeeAbstractSetPrivate;
-
 #define GEE_TYPE_ARRAY_LIST (gee_array_list_get_type ())
 #define GEE_ARRAY_LIST(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ARRAY_LIST, GeeArrayList))
 #define GEE_ARRAY_LIST_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ARRAY_LIST, GeeArrayListClass))
@@ -204,6 +335,25 @@ typedef struct _GeeArrayList GeeArrayList;
 typedef struct _GeeArrayListClass GeeArrayListClass;
 typedef struct _GeeArrayListPrivate GeeArrayListPrivate;
 
+#define GEE_TYPE_DEQUE (gee_deque_get_type ())
+#define GEE_DEQUE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_DEQUE, GeeDeque))
+#define GEE_IS_DEQUE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_DEQUE))
+#define GEE_DEQUE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_DEQUE, GeeDequeIface))
+
+typedef struct _GeeDeque GeeDeque;
+typedef struct _GeeDequeIface GeeDequeIface;
+
+#define GEE_TYPE_ARRAY_QUEUE (gee_array_queue_get_type ())
+#define GEE_ARRAY_QUEUE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ARRAY_QUEUE, GeeArrayQueue))
+#define GEE_ARRAY_QUEUE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ARRAY_QUEUE, GeeArrayQueueClass))
+#define GEE_IS_ARRAY_QUEUE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ARRAY_QUEUE))
+#define GEE_IS_ARRAY_QUEUE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ARRAY_QUEUE))
+#define GEE_ARRAY_QUEUE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ARRAY_QUEUE, GeeArrayQueueClass))
+
+typedef struct _GeeArrayQueue GeeArrayQueue;
+typedef struct _GeeArrayQueueClass GeeArrayQueueClass;
+typedef struct _GeeArrayQueuePrivate GeeArrayQueuePrivate;
+
 #define GEE_TYPE_COMPARABLE (gee_comparable_get_type ())
 #define GEE_COMPARABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_COMPARABLE, GeeComparable))
 #define GEE_IS_COMPARABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_COMPARABLE))
@@ -212,13 +362,37 @@ typedef struct _GeeArrayListPrivate GeeArrayListPrivate;
 typedef struct _GeeComparable GeeComparable;
 typedef struct _GeeComparableIface GeeComparableIface;
 
-#define GEE_TYPE_DEQUE (gee_deque_get_type ())
-#define GEE_DEQUE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_DEQUE, GeeDeque))
-#define GEE_IS_DEQUE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_DEQUE))
-#define GEE_DEQUE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_DEQUE, GeeDequeIface))
+#define GEE_TYPE_CONCURRENT_LIST (gee_concurrent_list_get_type ())
+#define GEE_CONCURRENT_LIST(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_CONCURRENT_LIST, GeeConcurrentList))
+#define GEE_CONCURRENT_LIST_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_CONCURRENT_LIST, GeeConcurrentListClass))
+#define GEE_IS_CONCURRENT_LIST(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_CONCURRENT_LIST))
+#define GEE_IS_CONCURRENT_LIST_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_CONCURRENT_LIST))
+#define GEE_CONCURRENT_LIST_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_CONCURRENT_LIST, GeeConcurrentListClass))
 
-typedef struct _GeeDeque GeeDeque;
-typedef struct _GeeDequeIface GeeDequeIface;
+typedef struct _GeeConcurrentList GeeConcurrentList;
+typedef struct _GeeConcurrentListClass GeeConcurrentListClass;
+typedef struct _GeeConcurrentListPrivate GeeConcurrentListPrivate;
+
+#define GEE_TYPE_CONCURRENT_SET (gee_concurrent_set_get_type ())
+#define GEE_CONCURRENT_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_CONCURRENT_SET, GeeConcurrentSet))
+#define GEE_CONCURRENT_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_CONCURRENT_SET, GeeConcurrentSetClass))
+#define GEE_IS_CONCURRENT_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_CONCURRENT_SET))
+#define GEE_IS_CONCURRENT_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_CONCURRENT_SET))
+#define GEE_CONCURRENT_SET_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_CONCURRENT_SET, GeeConcurrentSetClass))
+
+typedef struct _GeeConcurrentSet GeeConcurrentSet;
+typedef struct _GeeConcurrentSetClass GeeConcurrentSetClass;
+typedef struct _GeeConcurrentSetPrivate GeeConcurrentSetPrivate;
+
+#define GEE_CONCURRENT_SET_TYPE_RANGE_TYPE (gee_concurrent_set_range_type_get_type ())
+
+#define GEE_TYPE_HASHABLE (gee_hashable_get_type ())
+#define GEE_HASHABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_HASHABLE, GeeHashable))
+#define GEE_IS_HASHABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_HASHABLE))
+#define GEE_HASHABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_HASHABLE, GeeHashableIface))
+
+typedef struct _GeeHashable GeeHashable;
+typedef struct _GeeHashableIface GeeHashableIface;
 
 #define GEE_TYPE_HASH_MAP (gee_hash_map_get_type ())
 #define GEE_HASH_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_HASH_MAP, GeeHashMap))
@@ -263,6 +437,15 @@ typedef struct _GeeHashMultiSetPrivate GeeHashMultiSetPrivate;
 typedef struct _GeeHashSet GeeHashSet;
 typedef struct _GeeHashSetClass GeeHashSetClass;
 typedef struct _GeeHashSetPrivate GeeHashSetPrivate;
+typedef struct _GeeHazardPointer GeeHazardPointer;
+typedef struct _GeeHazardPointerNode GeeHazardPointerNode;
+
+#define GEE_HAZARD_POINTER_TYPE_POLICY (gee_hazard_pointer_policy_get_type ())
+
+#define GEE_HAZARD_POINTER_TYPE_RELEASE_POLICY (gee_hazard_pointer_release_policy_get_type ())
+typedef struct _GeeHazardPointerContext GeeHazardPointerContext;
+typedef struct _GeeHazardPointerFreeNode GeeHazardPointerFreeNode;
+typedef struct _GeeLazyPrivate GeeLazyPrivate;
 
 #define GEE_TYPE_LINKED_LIST (gee_linked_list_get_type ())
 #define GEE_LINKED_LIST(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LINKED_LIST, GeeLinkedList))
@@ -286,14 +469,6 @@ typedef struct _GeeMapEntryPrivate GeeMapEntryPrivate;
 typedef struct _GeePriorityQueue GeePriorityQueue;
 typedef struct _GeePriorityQueueClass GeePriorityQueueClass;
 typedef struct _GeePriorityQueuePrivate GeePriorityQueuePrivate;
-
-#define GEE_TYPE_SORTED_SET (gee_sorted_set_get_type ())
-#define GEE_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_SORTED_SET, GeeSortedSet))
-#define GEE_IS_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_SORTED_SET))
-#define GEE_SORTED_SET_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_SORTED_SET, GeeSortedSetIface))
-
-typedef struct _GeeSortedSet GeeSortedSet;
-typedef struct _GeeSortedSetIface GeeSortedSetIface;
 
 #define GEE_TYPE_TREE_MAP (gee_tree_map_get_type ())
 #define GEE_TREE_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TREE_MAP, GeeTreeMap))
@@ -339,23 +514,55 @@ typedef struct _GeeTreeSet GeeTreeSet;
 typedef struct _GeeTreeSetClass GeeTreeSetClass;
 typedef struct _GeeTreeSetPrivate GeeTreeSetPrivate;
 
+typedef gboolean (*GeeForallFunc) (gpointer g, void* user_data);
+typedef enum  {
+	GEE_TRAVERSABLE_STREAM_YIELD,
+	GEE_TRAVERSABLE_STREAM_CONTINUE,
+	GEE_TRAVERSABLE_STREAM_END
+} GeeTraversableStream;
+
+typedef GeeTraversableStream (*GeeStreamFunc) (GeeTraversableStream state, GeeLazy* g, GeeLazy** lazy, void* user_data);
 struct _GeeIteratorIface {
 	GTypeInterface parent_iface;
 	gboolean (*next) (GeeIterator* self);
 	gboolean (*has_next) (GeeIterator* self);
-	gboolean (*first) (GeeIterator* self);
 	gpointer (*get) (GeeIterator* self);
 	void (*remove) (GeeIterator* self);
+	gboolean (*get_valid) (GeeIterator* self);
+	gboolean (*get_read_only) (GeeIterator* self);
+};
+
+typedef gpointer (*GeeFoldFunc) (gpointer g, gpointer a, void* user_data);
+typedef gpointer (*GeeMapFunc) (gpointer g, void* user_data);
+typedef gboolean (*GeePredicate) (gconstpointer g, void* user_data);
+struct _GeeTraversableIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeTraversable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeTraversable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeTraversable* self);
+	gboolean (*foreach) (GeeTraversable* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	gpointer (*fold) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*map) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+	GeeIterator* (*scan) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*filter) (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+	GeeIterator* (*chop) (GeeTraversable* self, gint offset, gint length);
+	GType (*get_element_type) (GeeTraversable* self);
 };
 
 struct _GeeIterableIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeIterable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeIterable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeIterable* self);
 	GeeIterator* (*iterator) (GeeIterable* self);
-	GType (*get_element_type) (GeeIterable* self);
 };
 
 struct _GeeCollectionIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeCollection* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeCollection* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeCollection* self);
 	gboolean (*contains) (GeeCollection* self, gconstpointer item);
 	gboolean (*add) (GeeCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeCollection* self, gconstpointer item);
@@ -367,6 +574,7 @@ struct _GeeCollectionIface {
 	gpointer* (*to_array) (GeeCollection* self, int* result_length1);
 	gint (*get_size) (GeeCollection* self);
 	gboolean (*get_is_empty) (GeeCollection* self);
+	gboolean (*get_read_only) (GeeCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeCollection* self);
 };
 
@@ -381,34 +589,35 @@ struct _GeeAbstractCollectionClass {
 	gboolean (*add) (GeeAbstractCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeAbstractCollection* self, gconstpointer item);
 	void (*clear) (GeeAbstractCollection* self);
-	gpointer* (*to_array) (GeeAbstractCollection* self, int* result_length1);
-	gboolean (*add_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*contains_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*remove_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*retain_all) (GeeAbstractCollection* self, GeeCollection* collection);
 	GeeIterator* (*iterator) (GeeAbstractCollection* self);
+	gboolean (*foreach) (GeeAbstractCollection* self, GeeForallFunc f, void* f_target);
+	void (*reserved0) (GeeAbstractCollection* self);
+	void (*reserved1) (GeeAbstractCollection* self);
+	void (*reserved2) (GeeAbstractCollection* self);
+	void (*reserved3) (GeeAbstractCollection* self);
+	void (*reserved4) (GeeAbstractCollection* self);
+	void (*reserved5) (GeeAbstractCollection* self);
+	void (*reserved6) (GeeAbstractCollection* self);
+	void (*reserved7) (GeeAbstractCollection* self);
+	void (*reserved8) (GeeAbstractCollection* self);
+	void (*reserved9) (GeeAbstractCollection* self);
 	gint (*get_size) (GeeAbstractCollection* self);
-	gboolean (*get_is_empty) (GeeAbstractCollection* self);
+	gboolean (*get_read_only) (GeeAbstractCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeAbstractCollection* self);
-};
-
-struct _GeeBidirIteratorIface {
-	GTypeInterface parent_iface;
-	gboolean (*previous) (GeeBidirIterator* self);
-	gboolean (*has_previous) (GeeBidirIterator* self);
-	gboolean (*last) (GeeBidirIterator* self);
 };
 
 struct _GeeListIteratorIface {
 	GTypeInterface parent_iface;
 	void (*set) (GeeListIterator* self, gconstpointer item);
-	void (*insert) (GeeListIterator* self, gconstpointer item);
 	void (*add) (GeeListIterator* self, gconstpointer item);
 	gint (*index) (GeeListIterator* self);
 };
 
 struct _GeeListIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeList* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeList* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeList* self);
 	GeeListIterator* (*list_iterator) (GeeList* self);
 	gpointer (*get) (GeeList* self, gint index);
 	void (*set) (GeeList* self, gint index, gconstpointer item);
@@ -419,7 +628,7 @@ struct _GeeListIface {
 	gpointer (*first) (GeeList* self);
 	gpointer (*last) (GeeList* self);
 	void (*insert_all) (GeeList* self, gint index, GeeCollection* collection);
-	void (*sort) (GeeList* self, GCompareFunc compare_func);
+	void (*sort) (GeeList* self, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
 	GeeList* (*get_read_only_view) (GeeList* self);
 };
 
@@ -437,52 +646,222 @@ struct _GeeAbstractListClass {
 	void (*insert) (GeeAbstractList* self, gint index, gconstpointer item);
 	gpointer (*remove_at) (GeeAbstractList* self, gint index);
 	GeeList* (*slice) (GeeAbstractList* self, gint start, gint stop);
-	gpointer (*first) (GeeAbstractList* self);
-	gpointer (*last) (GeeAbstractList* self);
-	void (*insert_all) (GeeAbstractList* self, gint index, GeeCollection* collection);
+	void (*reserved0) (GeeAbstractList* self);
+	void (*reserved1) (GeeAbstractList* self);
+	void (*reserved2) (GeeAbstractList* self);
+	void (*reserved3) (GeeAbstractList* self);
+	void (*reserved4) (GeeAbstractList* self);
+	void (*reserved5) (GeeAbstractList* self);
+	void (*reserved6) (GeeAbstractList* self);
+	void (*reserved7) (GeeAbstractList* self);
+	void (*reserved8) (GeeAbstractList* self);
+	void (*reserved9) (GeeAbstractList* self);
 	GeeList* (*get_read_only_view) (GeeAbstractList* self);
 };
 
-struct _GeeMapIteratorIface {
+struct _GeeBidirIteratorIface {
 	GTypeInterface parent_iface;
-	gboolean (*next) (GeeMapIterator* self);
-	gboolean (*has_next) (GeeMapIterator* self);
-	gboolean (*first) (GeeMapIterator* self);
-	gpointer (*get_key) (GeeMapIterator* self);
-	gpointer (*get_value) (GeeMapIterator* self);
-	void (*set_value) (GeeMapIterator* self, gconstpointer value);
-	void (*unset) (GeeMapIterator* self);
+	GType (*get_g_type) (GeeBidirIterator* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeBidirIterator* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeBidirIterator* self);
+	gboolean (*previous) (GeeBidirIterator* self);
+	gboolean (*has_previous) (GeeBidirIterator* self);
+	gboolean (*first) (GeeBidirIterator* self);
+	gboolean (*last) (GeeBidirIterator* self);
+};
+
+struct _GeeBidirListIteratorIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeBidirListIterator* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeBidirListIterator* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeBidirListIterator* self);
+	void (*insert) (GeeBidirListIterator* self, gconstpointer item);
+};
+
+struct _GeeBidirListIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeBidirList* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeBidirList* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeBidirList* self);
+	GeeBidirListIterator* (*bidir_list_iterator) (GeeBidirList* self);
+	GeeBidirList* (*get_read_only_view) (GeeBidirList* self);
+};
+
+struct _GeeAbstractBidirList {
+	GeeAbstractList parent_instance;
+	GeeAbstractBidirListPrivate * priv;
+};
+
+struct _GeeAbstractBidirListClass {
+	GeeAbstractListClass parent_class;
+	GeeBidirListIterator* (*bidir_list_iterator) (GeeAbstractBidirList* self);
+	void (*reserved0) (GeeAbstractBidirList* self);
+	void (*reserved1) (GeeAbstractBidirList* self);
+	void (*reserved2) (GeeAbstractBidirList* self);
+	void (*reserved3) (GeeAbstractBidirList* self);
+	void (*reserved4) (GeeAbstractBidirList* self);
+	void (*reserved5) (GeeAbstractBidirList* self);
+	void (*reserved6) (GeeAbstractBidirList* self);
+	void (*reserved7) (GeeAbstractBidirList* self);
+	void (*reserved8) (GeeAbstractBidirList* self);
+	void (*reserved9) (GeeAbstractBidirList* self);
+	GeeBidirList* (*get_read_only_view) (GeeAbstractBidirList* self);
 };
 
 struct _GeeSetIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeSet* self);
 	GeeSet* (*get_read_only_view) (GeeSet* self);
+};
+
+struct _GeeAbstractSet {
+	GeeAbstractCollection parent_instance;
+	GeeAbstractSetPrivate * priv;
+};
+
+struct _GeeAbstractSetClass {
+	GeeAbstractCollectionClass parent_class;
+	void (*reserved0) (GeeAbstractSet* self);
+	void (*reserved1) (GeeAbstractSet* self);
+	void (*reserved2) (GeeAbstractSet* self);
+	void (*reserved3) (GeeAbstractSet* self);
+	void (*reserved4) (GeeAbstractSet* self);
+	void (*reserved5) (GeeAbstractSet* self);
+	void (*reserved6) (GeeAbstractSet* self);
+	void (*reserved7) (GeeAbstractSet* self);
+	void (*reserved8) (GeeAbstractSet* self);
+	void (*reserved9) (GeeAbstractSet* self);
+	GeeSet* (*get_read_only_view) (GeeAbstractSet* self);
+};
+
+struct _GeeSortedSetIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeSortedSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeSortedSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeSortedSet* self);
+	gpointer (*first) (GeeSortedSet* self);
+	gpointer (*last) (GeeSortedSet* self);
+	GeeIterator* (*iterator_at) (GeeSortedSet* self, gconstpointer element);
+	gpointer (*lower) (GeeSortedSet* self, gconstpointer element);
+	gpointer (*higher) (GeeSortedSet* self, gconstpointer element);
+	gpointer (*floor) (GeeSortedSet* self, gconstpointer element);
+	gpointer (*ceil) (GeeSortedSet* self, gconstpointer element);
+	GeeSortedSet* (*head_set) (GeeSortedSet* self, gconstpointer before);
+	GeeSortedSet* (*tail_set) (GeeSortedSet* self, gconstpointer after);
+	GeeSortedSet* (*sub_set) (GeeSortedSet* self, gconstpointer from, gconstpointer to);
+	GeeSortedSet* (*get_read_only_view) (GeeSortedSet* self);
+};
+
+struct _GeeAbstractSortedSet {
+	GeeAbstractSet parent_instance;
+	GeeAbstractSortedSetPrivate * priv;
+};
+
+struct _GeeAbstractSortedSetClass {
+	GeeAbstractSetClass parent_class;
+	gpointer (*first) (GeeAbstractSortedSet* self);
+	gpointer (*last) (GeeAbstractSortedSet* self);
+	GeeIterator* (*iterator_at) (GeeAbstractSortedSet* self, gconstpointer element);
+	gpointer (*lower) (GeeAbstractSortedSet* self, gconstpointer element);
+	gpointer (*higher) (GeeAbstractSortedSet* self, gconstpointer element);
+	gpointer (*floor) (GeeAbstractSortedSet* self, gconstpointer element);
+	gpointer (*ceil) (GeeAbstractSortedSet* self, gconstpointer element);
+	GeeSortedSet* (*head_set) (GeeAbstractSortedSet* self, gconstpointer before);
+	GeeSortedSet* (*tail_set) (GeeAbstractSortedSet* self, gconstpointer after);
+	GeeSortedSet* (*sub_set) (GeeAbstractSortedSet* self, gconstpointer from, gconstpointer to);
+	void (*reserved0) (GeeAbstractSortedSet* self);
+	void (*reserved1) (GeeAbstractSortedSet* self);
+	void (*reserved2) (GeeAbstractSortedSet* self);
+	void (*reserved3) (GeeAbstractSortedSet* self);
+	void (*reserved4) (GeeAbstractSortedSet* self);
+	void (*reserved5) (GeeAbstractSortedSet* self);
+	void (*reserved6) (GeeAbstractSortedSet* self);
+	void (*reserved7) (GeeAbstractSortedSet* self);
+	void (*reserved8) (GeeAbstractSortedSet* self);
+	void (*reserved9) (GeeAbstractSortedSet* self);
+	GeeSortedSet* (*get_read_only_view) (GeeAbstractSortedSet* self);
+};
+
+struct _GeeBidirSortedSetIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeBidirSortedSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeBidirSortedSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeBidirSortedSet* self);
+	GeeBidirIterator* (*bidir_iterator) (GeeBidirSortedSet* self);
+	GeeBidirSortedSet* (*get_read_only_view) (GeeBidirSortedSet* self);
+};
+
+struct _GeeAbstractBidirSortedSet {
+	GeeAbstractSortedSet parent_instance;
+	GeeAbstractBidirSortedSetPrivate * priv;
+};
+
+struct _GeeAbstractBidirSortedSetClass {
+	GeeAbstractSortedSetClass parent_class;
+	GeeBidirIterator* (*bidir_iterator) (GeeAbstractBidirSortedSet* self);
+	void (*reserved0) (GeeAbstractBidirSortedSet* self);
+	void (*reserved1) (GeeAbstractBidirSortedSet* self);
+	void (*reserved2) (GeeAbstractBidirSortedSet* self);
+	void (*reserved3) (GeeAbstractBidirSortedSet* self);
+	void (*reserved4) (GeeAbstractBidirSortedSet* self);
+	void (*reserved5) (GeeAbstractBidirSortedSet* self);
+	void (*reserved6) (GeeAbstractBidirSortedSet* self);
+	void (*reserved7) (GeeAbstractBidirSortedSet* self);
+	void (*reserved8) (GeeAbstractBidirSortedSet* self);
+	void (*reserved9) (GeeAbstractBidirSortedSet* self);
+	GeeBidirSortedSet* (*get_read_only_view) (GeeAbstractBidirSortedSet* self);
+};
+
+typedef gpointer (*GeeFoldMapFunc) (gconstpointer k, gconstpointer v, gpointer a, void* user_data);
+typedef gboolean (*GeeForallMapFunc) (gconstpointer k, gconstpointer v, void* user_data);
+struct _GeeMapIteratorIface {
+	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeMapIterator* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeMapIterator* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeMapIterator* self);
+	GType (*get_v_type) (GeeMapIterator* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeMapIterator* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeMapIterator* self);
+	gboolean (*next) (GeeMapIterator* self);
+	gboolean (*has_next) (GeeMapIterator* self);
+	gpointer (*get_key) (GeeMapIterator* self);
+	gpointer (*get_value) (GeeMapIterator* self);
+	void (*set_value) (GeeMapIterator* self, gconstpointer value);
+	void (*unset) (GeeMapIterator* self);
+	gpointer (*fold) (GeeMapIterator* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldMapFunc f, void* f_target, gpointer seed);
+	gboolean (*foreach) (GeeMapIterator* self, GeeForallMapFunc f, void* f_target);
+	gboolean (*get_valid) (GeeMapIterator* self);
+	gboolean (*get_mutable) (GeeMapIterator* self);
+	gboolean (*get_read_only) (GeeMapIterator* self);
 };
 
 struct _GeeMapIface {
 	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeMap* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeMap* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeMap* self);
+	GType (*get_v_type) (GeeMap* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeMap* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeMap* self);
 	gboolean (*has_key) (GeeMap* self, gconstpointer key);
-	gboolean (*contains) (GeeMap* self, gconstpointer key);
 	gboolean (*has) (GeeMap* self, gconstpointer key, gconstpointer value);
 	gpointer (*get) (GeeMap* self, gconstpointer key);
 	void (*set) (GeeMap* self, gconstpointer key, gconstpointer value);
 	gboolean (*unset) (GeeMap* self, gconstpointer key, gpointer* value);
-	gboolean (*remove) (GeeMap* self, gconstpointer key, gpointer* value);
 	void (*clear) (GeeMap* self);
 	GeeMapIterator* (*map_iterator) (GeeMap* self);
 	void (*set_all) (GeeMap* self, GeeMap* map);
 	gboolean (*unset_all) (GeeMap* self, GeeMap* map);
-	gboolean (*remove_all) (GeeMap* self, GeeMap* map);
 	gboolean (*has_all) (GeeMap* self, GeeMap* map);
-	gboolean (*contains_all) (GeeMap* self, GeeMap* map);
 	gint (*get_size) (GeeMap* self);
 	gboolean (*get_is_empty) (GeeMap* self);
+	gboolean (*get_read_only) (GeeMap* self);
 	GeeSet* (*get_keys) (GeeMap* self);
 	GeeCollection* (*get_values) (GeeMap* self);
 	GeeSet* (*get_entries) (GeeMap* self);
 	GeeMap* (*get_read_only_view) (GeeMap* self);
-	GType (*get_key_type) (GeeMap* self);
-	GType (*get_value_type) (GeeMap* self);
 };
 
 struct _GeeAbstractMap {
@@ -499,24 +878,124 @@ struct _GeeAbstractMapClass {
 	gboolean (*unset) (GeeAbstractMap* self, gconstpointer key, gpointer* value);
 	GeeMapIterator* (*map_iterator) (GeeAbstractMap* self);
 	void (*clear) (GeeAbstractMap* self);
-	void (*set_all) (GeeAbstractMap* self, GeeMap* map);
-	gboolean (*unset_all) (GeeAbstractMap* self, GeeMap* map);
-	gboolean (*has_all) (GeeAbstractMap* self, GeeMap* map);
+	gboolean (*foreach) (GeeAbstractMap* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeAbstractMap* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	void (*reserved0) (GeeAbstractMap* self);
+	void (*reserved1) (GeeAbstractMap* self);
+	void (*reserved2) (GeeAbstractMap* self);
+	void (*reserved3) (GeeAbstractMap* self);
+	void (*reserved4) (GeeAbstractMap* self);
+	void (*reserved5) (GeeAbstractMap* self);
+	void (*reserved6) (GeeAbstractMap* self);
+	void (*reserved7) (GeeAbstractMap* self);
+	void (*reserved8) (GeeAbstractMap* self);
+	void (*reserved9) (GeeAbstractMap* self);
 	gint (*get_size) (GeeAbstractMap* self);
-	gboolean (*get_is_empty) (GeeAbstractMap* self);
+	gboolean (*get_read_only) (GeeAbstractMap* self);
 	GeeSet* (*get_keys) (GeeAbstractMap* self);
 	GeeCollection* (*get_values) (GeeAbstractMap* self);
 	GeeSet* (*get_entries) (GeeAbstractMap* self);
 	GeeMap* (*get_read_only_view) (GeeAbstractMap* self);
 };
 
+struct _GeeSortedMapIface {
+	GTypeInterface parent_iface;
+	GeeSortedMap* (*head_map) (GeeSortedMap* self, gconstpointer before);
+	GeeSortedMap* (*tail_map) (GeeSortedMap* self, gconstpointer after);
+	GeeSortedMap* (*sub_map) (GeeSortedMap* self, gconstpointer before, gconstpointer after);
+	GeeSortedSet* (*get_ascending_keys) (GeeSortedMap* self);
+	GeeSortedSet* (*get_ascending_entries) (GeeSortedMap* self);
+	GeeSortedMap* (*get_read_only_view) (GeeSortedMap* self);
+};
+
+struct _GeeAbstractSortedMap {
+	GeeAbstractMap parent_instance;
+	GeeAbstractSortedMapPrivate * priv;
+};
+
+struct _GeeAbstractSortedMapClass {
+	GeeAbstractMapClass parent_class;
+	GeeSortedMap* (*head_map) (GeeAbstractSortedMap* self, gconstpointer before);
+	GeeSortedMap* (*tail_map) (GeeAbstractSortedMap* self, gconstpointer after);
+	GeeSortedMap* (*sub_map) (GeeAbstractSortedMap* self, gconstpointer before, gconstpointer after);
+	void (*reserved0) (GeeAbstractSortedMap* self);
+	void (*reserved1) (GeeAbstractSortedMap* self);
+	void (*reserved2) (GeeAbstractSortedMap* self);
+	void (*reserved3) (GeeAbstractSortedMap* self);
+	void (*reserved4) (GeeAbstractSortedMap* self);
+	void (*reserved5) (GeeAbstractSortedMap* self);
+	void (*reserved6) (GeeAbstractSortedMap* self);
+	void (*reserved7) (GeeAbstractSortedMap* self);
+	void (*reserved8) (GeeAbstractSortedMap* self);
+	void (*reserved9) (GeeAbstractSortedMap* self);
+	GeeSortedSet* (*get_ascending_keys) (GeeAbstractSortedMap* self);
+	GeeSortedSet* (*get_ascending_entries) (GeeAbstractSortedMap* self);
+};
+
+struct _GeeBidirMapIteratorIface {
+	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeBidirMapIterator* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeBidirMapIterator* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeBidirMapIterator* self);
+	GType (*get_v_type) (GeeBidirMapIterator* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeBidirMapIterator* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeBidirMapIterator* self);
+	gboolean (*previous) (GeeBidirMapIterator* self);
+	gboolean (*has_previous) (GeeBidirMapIterator* self);
+	gboolean (*first) (GeeBidirMapIterator* self);
+	gboolean (*last) (GeeBidirMapIterator* self);
+};
+
+struct _GeeBidirSortedMapIface {
+	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeBidirSortedMap* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeBidirSortedMap* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeBidirSortedMap* self);
+	GType (*get_v_type) (GeeBidirSortedMap* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeBidirSortedMap* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeBidirSortedMap* self);
+	GeeBidirMapIterator* (*bidir_map_iterator) (GeeBidirSortedMap* self);
+	GeeBidirSortedMap* (*get_read_only_view) (GeeBidirSortedMap* self);
+};
+
+struct _GeeAbstractBidirSortedMap {
+	GeeAbstractSortedMap parent_instance;
+	GeeAbstractBidirSortedMapPrivate * priv;
+};
+
+struct _GeeAbstractBidirSortedMapClass {
+	GeeAbstractSortedMapClass parent_class;
+	GeeBidirMapIterator* (*bidir_map_iterator) (GeeAbstractBidirSortedMap* self);
+	void (*reserved0) (GeeAbstractBidirSortedMap* self);
+	void (*reserved1) (GeeAbstractBidirSortedMap* self);
+	void (*reserved2) (GeeAbstractBidirSortedMap* self);
+	void (*reserved3) (GeeAbstractBidirSortedMap* self);
+	void (*reserved4) (GeeAbstractBidirSortedMap* self);
+	void (*reserved5) (GeeAbstractBidirSortedMap* self);
+	void (*reserved6) (GeeAbstractBidirSortedMap* self);
+	void (*reserved7) (GeeAbstractBidirSortedMap* self);
+	void (*reserved8) (GeeAbstractBidirSortedMap* self);
+	void (*reserved9) (GeeAbstractBidirSortedMap* self);
+	GeeBidirSortedMap* (*get_read_only_view) (GeeAbstractBidirSortedMap* self);
+};
+
 struct _GeeMultiSetIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeMultiSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeMultiSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeMultiSet* self);
 	gint (*count) (GeeMultiSet* self, gconstpointer item);
+	GeeMultiSet* (*get_read_only_view) (GeeMultiSet* self);
 };
 
 struct _GeeMultiMapIface {
 	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeMultiMap* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeMultiMap* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeMultiMap* self);
+	GType (*get_v_type) (GeeMultiMap* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeMultiMap* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeMultiMap* self);
 	GeeSet* (*get_keys) (GeeMultiMap* self);
 	GeeMultiSet* (*get_all_keys) (GeeMultiMap* self);
 	GeeCollection* (*get_values) (GeeMultiMap* self);
@@ -526,9 +1005,13 @@ struct _GeeMultiMapIface {
 	gboolean (*remove) (GeeMultiMap* self, gconstpointer key, gconstpointer value);
 	gboolean (*remove_all) (GeeMultiMap* self, gconstpointer key);
 	void (*clear) (GeeMultiMap* self);
+	GeeMapIterator* (*map_iterator) (GeeMultiMap* self);
 	gint (*get_size) (GeeMultiMap* self);
+	gboolean (*get_read_only) (GeeMultiMap* self);
+	GeeMultiMap* (*get_read_only_view) (GeeMultiMap* self);
 };
 
+typedef gboolean (*GeeEqualDataFunc) (gconstpointer a, gconstpointer b, void* user_data);
 struct _GeeAbstractMultiMap {
 	GObject parent_instance;
 	GeeAbstractMultiMapPrivate * priv;
@@ -539,7 +1022,17 @@ struct _GeeAbstractMultiMapClass {
 	GObjectClass parent_class;
 	GeeCollection* (*create_value_storage) (GeeAbstractMultiMap* self);
 	GeeMultiSet* (*create_multi_key_set) (GeeAbstractMultiMap* self);
-	GEqualFunc (*get_value_equal_func) (GeeAbstractMultiMap* self);
+	GeeEqualDataFunc (*get_value_equal_func) (GeeAbstractMultiMap* self, void** result_target, GDestroyNotify* result_target_destroy_notify);
+	void (*reserved0) (GeeAbstractMultiMap* self);
+	void (*reserved1) (GeeAbstractMultiMap* self);
+	void (*reserved2) (GeeAbstractMultiMap* self);
+	void (*reserved3) (GeeAbstractMultiMap* self);
+	void (*reserved4) (GeeAbstractMultiMap* self);
+	void (*reserved5) (GeeAbstractMultiMap* self);
+	void (*reserved6) (GeeAbstractMultiMap* self);
+	void (*reserved7) (GeeAbstractMultiMap* self);
+	void (*reserved8) (GeeAbstractMultiMap* self);
+	GeeMultiMap* (*get_read_only_view) (GeeAbstractMultiMap* self);
 };
 
 struct _GeeAbstractMultiSet {
@@ -550,10 +1043,23 @@ struct _GeeAbstractMultiSet {
 
 struct _GeeAbstractMultiSetClass {
 	GeeAbstractCollectionClass parent_class;
+	void (*reserved0) (GeeAbstractMultiSet* self);
+	void (*reserved1) (GeeAbstractMultiSet* self);
+	void (*reserved2) (GeeAbstractMultiSet* self);
+	void (*reserved3) (GeeAbstractMultiSet* self);
+	void (*reserved4) (GeeAbstractMultiSet* self);
+	void (*reserved5) (GeeAbstractMultiSet* self);
+	void (*reserved6) (GeeAbstractMultiSet* self);
+	void (*reserved7) (GeeAbstractMultiSet* self);
+	void (*reserved8) (GeeAbstractMultiSet* self);
+	GeeMultiSet* (*get_read_only_view) (GeeAbstractMultiSet* self);
 };
 
 struct _GeeQueueIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeQueue* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeQueue* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeQueue* self);
 	gboolean (*offer) (GeeQueue* self, gconstpointer element);
 	gpointer (*peek) (GeeQueue* self);
 	gpointer (*poll) (GeeQueue* self);
@@ -570,27 +1076,25 @@ struct _GeeAbstractQueue {
 
 struct _GeeAbstractQueueClass {
 	GeeAbstractCollectionClass parent_class;
-	gboolean (*offer) (GeeAbstractQueue* self, gconstpointer element);
 	gpointer (*peek) (GeeAbstractQueue* self);
 	gpointer (*poll) (GeeAbstractQueue* self);
-	gint (*drain) (GeeAbstractQueue* self, GeeCollection* recipient, gint amount);
+	void (*reserved0) (GeeAbstractQueue* self);
+	void (*reserved1) (GeeAbstractQueue* self);
+	void (*reserved2) (GeeAbstractQueue* self);
+	void (*reserved3) (GeeAbstractQueue* self);
+	void (*reserved4) (GeeAbstractQueue* self);
+	void (*reserved5) (GeeAbstractQueue* self);
+	void (*reserved6) (GeeAbstractQueue* self);
+	void (*reserved7) (GeeAbstractQueue* self);
+	void (*reserved8) (GeeAbstractQueue* self);
+	void (*reserved9) (GeeAbstractQueue* self);
 	gint (*get_capacity) (GeeAbstractQueue* self);
 	gint (*get_remaining_capacity) (GeeAbstractQueue* self);
 	gboolean (*get_is_full) (GeeAbstractQueue* self);
 };
 
-struct _GeeAbstractSet {
-	GeeAbstractCollection parent_instance;
-	GeeAbstractSetPrivate * priv;
-};
-
-struct _GeeAbstractSetClass {
-	GeeAbstractCollectionClass parent_class;
-	GeeSet* (*get_read_only_view) (GeeAbstractSet* self);
-};
-
 struct _GeeArrayList {
-	GeeAbstractList parent_instance;
+	GeeAbstractBidirList parent_instance;
 	GeeArrayListPrivate * priv;
 	gpointer* _items;
 	gint _items_length1;
@@ -599,16 +1103,14 @@ struct _GeeArrayList {
 };
 
 struct _GeeArrayListClass {
-	GeeAbstractListClass parent_class;
-};
-
-struct _GeeComparableIface {
-	GTypeInterface parent_iface;
-	gint (*compare_to) (GeeComparable* self, gconstpointer object);
+	GeeAbstractBidirListClass parent_class;
 };
 
 struct _GeeDequeIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeDeque* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeDeque* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeDeque* self);
 	gboolean (*offer_head) (GeeDeque* self, gconstpointer element);
 	gpointer (*peek_head) (GeeDeque* self);
 	gpointer (*poll_head) (GeeDeque* self);
@@ -617,6 +1119,52 @@ struct _GeeDequeIface {
 	gpointer (*peek_tail) (GeeDeque* self);
 	gpointer (*poll_tail) (GeeDeque* self);
 	gint (*drain_tail) (GeeDeque* self, GeeCollection* recipient, gint amount);
+};
+
+struct _GeeArrayQueue {
+	GeeAbstractQueue parent_instance;
+	GeeArrayQueuePrivate * priv;
+};
+
+struct _GeeArrayQueueClass {
+	GeeAbstractQueueClass parent_class;
+};
+
+struct _GeeComparableIface {
+	GTypeInterface parent_iface;
+	gint (*compare_to) (GeeComparable* self, gconstpointer object);
+};
+
+struct _GeeConcurrentList {
+	GeeAbstractList parent_instance;
+	GeeConcurrentListPrivate * priv;
+};
+
+struct _GeeConcurrentListClass {
+	GeeAbstractListClass parent_class;
+};
+
+struct _GeeConcurrentSet {
+	GeeAbstractSortedSet parent_instance;
+	GeeConcurrentSetPrivate * priv;
+};
+
+struct _GeeConcurrentSetClass {
+	GeeAbstractSortedSetClass parent_class;
+};
+
+typedef enum  {
+	GEE_CONCURRENT_SET_RANGE_TYPE_HEAD,
+	GEE_CONCURRENT_SET_RANGE_TYPE_TAIL,
+	GEE_CONCURRENT_SET_RANGE_TYPE_BOUNDED,
+	GEE_CONCURRENT_SET_RANGE_TYPE_EMPTY
+} GeeConcurrentSetRangeType;
+
+typedef guint (*GeeHashDataFunc) (gconstpointer v, void* user_data);
+struct _GeeHashableIface {
+	GTypeInterface parent_iface;
+	guint (*hash) (GeeHashable* self);
+	gboolean (*equal_to) (GeeHashable* self, gconstpointer object);
 };
 
 struct _GeeHashMap {
@@ -655,13 +1203,51 @@ struct _GeeHashSetClass {
 	GeeAbstractSetClass parent_class;
 };
 
+struct _GeeHazardPointer {
+	GeeHazardPointerNode* _node;
+};
+
+typedef enum  {
+	GEE_HAZARD_POINTER_POLICY_DEFAULT,
+	GEE_HAZARD_POINTER_POLICY_THREAD_EXIT,
+	GEE_HAZARD_POINTER_POLICY_TRY_FREE,
+	GEE_HAZARD_POINTER_POLICY_FREE,
+	GEE_HAZARD_POINTER_POLICY_TRY_RELEASE,
+	GEE_HAZARD_POINTER_POLICY_RELEASE
+} GeeHazardPointerPolicy;
+
+typedef enum  {
+	GEE_HAZARD_POINTER_RELEASE_POLICY_HELPER_THREAD,
+	GEE_HAZARD_POINTER_RELEASE_POLICY_MAIN_LOOP
+} GeeHazardPointerReleasePolicy;
+
+typedef void (*GeeHazardPointerDestroyNotify) (void* ptr, void* user_data);
+struct _GeeHazardPointerContext {
+	GeeHazardPointerContext* _parent;
+	GeeArrayList* _to_free;
+	GeeHazardPointerPolicy* _policy;
+};
+
+typedef GeeLazy* (*GeeUnfoldFunc) (void* user_data);
+typedef gpointer (*GeeLazyFunc) (void* user_data);
+struct _GeeLazy {
+	GTypeInstance parent_instance;
+	volatile int ref_count;
+	GeeLazyPrivate * priv;
+};
+
+struct _GeeLazyClass {
+	GTypeClass parent_class;
+	void (*finalize) (GeeLazy *self);
+};
+
 struct _GeeLinkedList {
-	GeeAbstractList parent_instance;
+	GeeAbstractBidirList parent_instance;
 	GeeLinkedListPrivate * priv;
 };
 
 struct _GeeLinkedListClass {
-	GeeAbstractListClass parent_class;
+	GeeAbstractBidirListClass parent_class;
 };
 
 struct _GeeMapEntry {
@@ -674,6 +1260,7 @@ struct _GeeMapEntryClass {
 	gconstpointer (*get_key) (GeeMapEntry* self);
 	gconstpointer (*get_value) (GeeMapEntry* self);
 	void (*set_value) (GeeMapEntry* self, gconstpointer value);
+	gboolean (*get_read_only) (GeeMapEntry* self);
 };
 
 struct _GeePriorityQueue {
@@ -685,28 +1272,13 @@ struct _GeePriorityQueueClass {
 	GeeAbstractQueueClass parent_class;
 };
 
-struct _GeeSortedSetIface {
-	GTypeInterface parent_iface;
-	gpointer (*first) (GeeSortedSet* self);
-	gpointer (*last) (GeeSortedSet* self);
-	GeeBidirIterator* (*bidir_iterator) (GeeSortedSet* self);
-	GeeBidirIterator* (*iterator_at) (GeeSortedSet* self, gconstpointer element);
-	gpointer (*lower) (GeeSortedSet* self, gconstpointer element);
-	gpointer (*higher) (GeeSortedSet* self, gconstpointer element);
-	gpointer (*floor) (GeeSortedSet* self, gconstpointer element);
-	gpointer (*ceil) (GeeSortedSet* self, gconstpointer element);
-	GeeSortedSet* (*head_set) (GeeSortedSet* self, gconstpointer before);
-	GeeSortedSet* (*tail_set) (GeeSortedSet* self, gconstpointer after);
-	GeeSortedSet* (*sub_set) (GeeSortedSet* self, gconstpointer from, gconstpointer to);
-};
-
 struct _GeeTreeMap {
-	GeeAbstractMap parent_instance;
+	GeeAbstractBidirSortedMap parent_instance;
 	GeeTreeMapPrivate * priv;
 };
 
 struct _GeeTreeMapClass {
-	GeeAbstractMapClass parent_class;
+	GeeAbstractBidirSortedMapClass parent_class;
 };
 
 struct _GeeTreeMultiMap {
@@ -728,37 +1300,69 @@ struct _GeeTreeMultiSetClass {
 };
 
 struct _GeeTreeSet {
-	GeeAbstractSet parent_instance;
+	GeeAbstractBidirSortedSet parent_instance;
 	GeeTreeSetPrivate * priv;
 };
 
 struct _GeeTreeSetClass {
-	GeeAbstractSetClass parent_class;
+	GeeAbstractBidirSortedSetClass parent_class;
 };
 
 
+GType gee_traversable_stream_get_type (void) G_GNUC_CONST;
+gpointer gee_lazy_ref (gpointer instance);
+void gee_lazy_unref (gpointer instance);
+GParamSpec* gee_param_spec_lazy (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void gee_value_set_lazy (GValue* value, gpointer v_object);
+void gee_value_take_lazy (GValue* value, gpointer v_object);
+gpointer gee_value_get_lazy (const GValue* value);
+GType gee_lazy_get_type (void) G_GNUC_CONST;
 GType gee_iterator_get_type (void) G_GNUC_CONST;
+GType gee_traversable_get_type (void) G_GNUC_CONST;
 GType gee_iterable_get_type (void) G_GNUC_CONST;
 GType gee_collection_get_type (void) G_GNUC_CONST;
 GType gee_abstract_collection_get_type (void) G_GNUC_CONST;
+GType gee_list_iterator_get_type (void) G_GNUC_CONST;
+GType gee_list_get_type (void) G_GNUC_CONST;
+GType gee_abstract_list_get_type (void) G_GNUC_CONST;
+GType gee_bidir_iterator_get_type (void) G_GNUC_CONST;
+GType gee_bidir_list_iterator_get_type (void) G_GNUC_CONST;
+GType gee_bidir_list_get_type (void) G_GNUC_CONST;
+GType gee_abstract_bidir_list_get_type (void) G_GNUC_CONST;
+GeeBidirListIterator* gee_abstract_bidir_list_bidir_list_iterator (GeeAbstractBidirList* self);
+GeeAbstractBidirList* gee_abstract_bidir_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
+GeeBidirList* gee_abstract_bidir_list_get_read_only_view (GeeAbstractBidirList* self);
+GType gee_set_get_type (void) G_GNUC_CONST;
+GType gee_abstract_set_get_type (void) G_GNUC_CONST;
+GType gee_sorted_set_get_type (void) G_GNUC_CONST;
+GType gee_abstract_sorted_set_get_type (void) G_GNUC_CONST;
+GType gee_bidir_sorted_set_get_type (void) G_GNUC_CONST;
+GType gee_abstract_bidir_sorted_set_get_type (void) G_GNUC_CONST;
+GeeBidirIterator* gee_abstract_bidir_sorted_set_bidir_iterator (GeeAbstractBidirSortedSet* self);
+GeeAbstractBidirSortedSet* gee_abstract_bidir_sorted_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
+GeeBidirSortedSet* gee_abstract_bidir_sorted_set_get_read_only_view (GeeAbstractBidirSortedSet* self);
+GType gee_map_iterator_get_type (void) G_GNUC_CONST;
+GType gee_map_entry_get_type (void) G_GNUC_CONST;
+GType gee_map_get_type (void) G_GNUC_CONST;
+GType gee_abstract_map_get_type (void) G_GNUC_CONST;
+GType gee_sorted_map_get_type (void) G_GNUC_CONST;
+GType gee_abstract_sorted_map_get_type (void) G_GNUC_CONST;
+GType gee_bidir_map_iterator_get_type (void) G_GNUC_CONST;
+GType gee_bidir_sorted_map_get_type (void) G_GNUC_CONST;
+GType gee_abstract_bidir_sorted_map_get_type (void) G_GNUC_CONST;
+GeeBidirMapIterator* gee_abstract_bidir_sorted_map_bidir_map_iterator (GeeAbstractBidirSortedMap* self);
+GeeAbstractBidirSortedMap* gee_abstract_bidir_sorted_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func);
+GeeBidirSortedMap* gee_abstract_bidir_sorted_map_get_read_only_view (GeeAbstractBidirSortedMap* self);
 gboolean gee_abstract_collection_contains (GeeAbstractCollection* self, gconstpointer item);
 gboolean gee_abstract_collection_add (GeeAbstractCollection* self, gconstpointer item);
 gboolean gee_abstract_collection_remove (GeeAbstractCollection* self, gconstpointer item);
 void gee_abstract_collection_clear (GeeAbstractCollection* self);
-gpointer* gee_abstract_collection_to_array (GeeAbstractCollection* self, int* result_length1);
-gboolean gee_abstract_collection_add_all (GeeAbstractCollection* self, GeeCollection* collection);
-gboolean gee_abstract_collection_contains_all (GeeAbstractCollection* self, GeeCollection* collection);
-gboolean gee_abstract_collection_remove_all (GeeAbstractCollection* self, GeeCollection* collection);
-gboolean gee_abstract_collection_retain_all (GeeAbstractCollection* self, GeeCollection* collection);
 GeeIterator* gee_abstract_collection_iterator (GeeAbstractCollection* self);
+gboolean gee_abstract_collection_foreach (GeeAbstractCollection* self, GeeForallFunc f, void* f_target);
 GeeAbstractCollection* gee_abstract_collection_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
 gint gee_abstract_collection_get_size (GeeAbstractCollection* self);
-gboolean gee_abstract_collection_get_is_empty (GeeAbstractCollection* self);
+gboolean gee_abstract_collection_get_read_only (GeeAbstractCollection* self);
 GeeCollection* gee_abstract_collection_get_read_only_view (GeeAbstractCollection* self);
-GType gee_bidir_iterator_get_type (void) G_GNUC_CONST;
-GType gee_list_iterator_get_type (void) G_GNUC_CONST;
-GType gee_list_get_type (void) G_GNUC_CONST;
-GType gee_abstract_list_get_type (void) G_GNUC_CONST;
 GeeListIterator* gee_abstract_list_list_iterator (GeeAbstractList* self);
 gpointer gee_abstract_list_get (GeeAbstractList* self, gint index);
 void gee_abstract_list_set (GeeAbstractList* self, gint index, gconstpointer item);
@@ -766,16 +1370,8 @@ gint gee_abstract_list_index_of (GeeAbstractList* self, gconstpointer item);
 void gee_abstract_list_insert (GeeAbstractList* self, gint index, gconstpointer item);
 gpointer gee_abstract_list_remove_at (GeeAbstractList* self, gint index);
 GeeList* gee_abstract_list_slice (GeeAbstractList* self, gint start, gint stop);
-gpointer gee_abstract_list_first (GeeAbstractList* self);
-gpointer gee_abstract_list_last (GeeAbstractList* self);
-void gee_abstract_list_insert_all (GeeAbstractList* self, gint index, GeeCollection* collection);
 GeeAbstractList* gee_abstract_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
 GeeList* gee_abstract_list_get_read_only_view (GeeAbstractList* self);
-GType gee_map_iterator_get_type (void) G_GNUC_CONST;
-GType gee_set_get_type (void) G_GNUC_CONST;
-GType gee_map_entry_get_type (void) G_GNUC_CONST;
-GType gee_map_get_type (void) G_GNUC_CONST;
-GType gee_abstract_map_get_type (void) G_GNUC_CONST;
 gboolean gee_abstract_map_has_key (GeeAbstractMap* self, gconstpointer key);
 gboolean gee_abstract_map_has (GeeAbstractMap* self, gconstpointer key, gconstpointer value);
 gpointer gee_abstract_map_get (GeeAbstractMap* self, gconstpointer key);
@@ -783,12 +1379,11 @@ void gee_abstract_map_set (GeeAbstractMap* self, gconstpointer key, gconstpointe
 gboolean gee_abstract_map_unset (GeeAbstractMap* self, gconstpointer key, gpointer* value);
 GeeMapIterator* gee_abstract_map_map_iterator (GeeAbstractMap* self);
 void gee_abstract_map_clear (GeeAbstractMap* self);
-void gee_abstract_map_set_all (GeeAbstractMap* self, GeeMap* map);
-gboolean gee_abstract_map_unset_all (GeeAbstractMap* self, GeeMap* map);
-gboolean gee_abstract_map_has_all (GeeAbstractMap* self, GeeMap* map);
+gboolean gee_abstract_map_foreach (GeeAbstractMap* self, GeeForallFunc f, void* f_target);
+GeeIterator* gee_abstract_map_stream (GeeAbstractMap* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
 GeeAbstractMap* gee_abstract_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func);
 gint gee_abstract_map_get_size (GeeAbstractMap* self);
-gboolean gee_abstract_map_get_is_empty (GeeAbstractMap* self);
+gboolean gee_abstract_map_get_read_only (GeeAbstractMap* self);
 GeeSet* gee_abstract_map_get_keys (GeeAbstractMap* self);
 GeeCollection* gee_abstract_map_get_values (GeeAbstractMap* self);
 GeeSet* gee_abstract_map_get_entries (GeeAbstractMap* self);
@@ -799,30 +1394,69 @@ GType gee_abstract_multi_map_get_type (void) G_GNUC_CONST;
 GeeAbstractMultiMap* gee_abstract_multi_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeMap* storage_map);
 GeeCollection* gee_abstract_multi_map_create_value_storage (GeeAbstractMultiMap* self);
 GeeMultiSet* gee_abstract_multi_map_create_multi_key_set (GeeAbstractMultiMap* self);
-GEqualFunc gee_abstract_multi_map_get_value_equal_func (GeeAbstractMultiMap* self);
+GeeEqualDataFunc gee_abstract_multi_map_get_value_equal_func (GeeAbstractMultiMap* self, void** result_target, GDestroyNotify* result_target_destroy_notify);
+GeeMultiMap* gee_abstract_multi_map_get_read_only_view (GeeAbstractMultiMap* self);
 GType gee_abstract_multi_set_get_type (void) G_GNUC_CONST;
 GeeAbstractMultiSet* gee_abstract_multi_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeMap* storage_map);
+GeeMultiSet* gee_abstract_multi_set_get_read_only_view (GeeAbstractMultiSet* self);
 GType gee_queue_get_type (void) G_GNUC_CONST;
 GType gee_abstract_queue_get_type (void) G_GNUC_CONST;
-gboolean gee_abstract_queue_offer (GeeAbstractQueue* self, gconstpointer element);
 gpointer gee_abstract_queue_peek (GeeAbstractQueue* self);
 gpointer gee_abstract_queue_poll (GeeAbstractQueue* self);
-gint gee_abstract_queue_drain (GeeAbstractQueue* self, GeeCollection* recipient, gint amount);
 GeeAbstractQueue* gee_abstract_queue_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
 gint gee_abstract_queue_get_capacity (GeeAbstractQueue* self);
 gint gee_abstract_queue_get_remaining_capacity (GeeAbstractQueue* self);
 gboolean gee_abstract_queue_get_is_full (GeeAbstractQueue* self);
-GType gee_abstract_set_get_type (void) G_GNUC_CONST;
 GeeAbstractSet* gee_abstract_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
 GeeSet* gee_abstract_set_get_read_only_view (GeeAbstractSet* self);
+GeeSortedMap* gee_abstract_sorted_map_head_map (GeeAbstractSortedMap* self, gconstpointer before);
+GeeSortedMap* gee_abstract_sorted_map_tail_map (GeeAbstractSortedMap* self, gconstpointer after);
+GeeSortedMap* gee_abstract_sorted_map_sub_map (GeeAbstractSortedMap* self, gconstpointer before, gconstpointer after);
+GeeAbstractSortedMap* gee_abstract_sorted_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func);
+GeeSortedSet* gee_abstract_sorted_map_get_ascending_keys (GeeAbstractSortedMap* self);
+GeeSortedSet* gee_abstract_sorted_map_get_ascending_entries (GeeAbstractSortedMap* self);
+gpointer gee_abstract_sorted_set_first (GeeAbstractSortedSet* self);
+gpointer gee_abstract_sorted_set_last (GeeAbstractSortedSet* self);
+GeeIterator* gee_abstract_sorted_set_iterator_at (GeeAbstractSortedSet* self, gconstpointer element);
+gpointer gee_abstract_sorted_set_lower (GeeAbstractSortedSet* self, gconstpointer element);
+gpointer gee_abstract_sorted_set_higher (GeeAbstractSortedSet* self, gconstpointer element);
+gpointer gee_abstract_sorted_set_floor (GeeAbstractSortedSet* self, gconstpointer element);
+gpointer gee_abstract_sorted_set_ceil (GeeAbstractSortedSet* self, gconstpointer element);
+GeeSortedSet* gee_abstract_sorted_set_head_set (GeeAbstractSortedSet* self, gconstpointer before);
+GeeSortedSet* gee_abstract_sorted_set_tail_set (GeeAbstractSortedSet* self, gconstpointer after);
+GeeSortedSet* gee_abstract_sorted_set_sub_set (GeeAbstractSortedSet* self, gconstpointer from, gconstpointer to);
+GeeAbstractSortedSet* gee_abstract_sorted_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
+GeeSortedSet* gee_abstract_sorted_set_get_read_only_view (GeeAbstractSortedSet* self);
 GType gee_array_list_get_type (void) G_GNUC_CONST;
-GeeArrayList* gee_array_list_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GEqualFunc equal_func);
-GeeArrayList* gee_array_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GEqualFunc equal_func);
-void gee_array_list_sort_with_data (GeeArrayList* self, GCompareDataFunc compare, void* compare_target);
-GEqualFunc gee_array_list_get_equal_func (GeeArrayList* self);
+GeeArrayList* gee_array_list_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeArrayList* gee_array_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeArrayList* gee_array_list_new_wrap (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gpointer* items, int items_length1, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeArrayList* gee_array_list_construct_wrap (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gpointer* items, int items_length1, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+gboolean gee_array_list_add_all (GeeArrayList* self, GeeCollection* collection);
+GeeEqualDataFunc gee_array_list_get_equal_func (GeeArrayList* self, gpointer* result_target);
+GType gee_deque_get_type (void) G_GNUC_CONST;
+GType gee_array_queue_get_type (void) G_GNUC_CONST;
+GeeArrayQueue* gee_array_queue_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeArrayQueue* gee_array_queue_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeEqualDataFunc gee_array_queue_get_equal_func (GeeArrayQueue* self, gpointer* result_target);
+gboolean gee_array_queue_get_is_empty (GeeArrayQueue* self);
 gboolean gee_bidir_iterator_previous (GeeBidirIterator* self);
 gboolean gee_bidir_iterator_has_previous (GeeBidirIterator* self);
+gboolean gee_bidir_iterator_first (GeeBidirIterator* self);
 gboolean gee_bidir_iterator_last (GeeBidirIterator* self);
+GeeBidirListIterator* gee_bidir_list_bidir_list_iterator (GeeBidirList* self);
+GeeBidirList* gee_bidir_list_get_read_only_view (GeeBidirList* self);
+void gee_bidir_list_iterator_insert (GeeBidirListIterator* self, gconstpointer item);
+gboolean gee_bidir_map_iterator_previous (GeeBidirMapIterator* self);
+gboolean gee_bidir_map_iterator_has_previous (GeeBidirMapIterator* self);
+gboolean gee_bidir_map_iterator_first (GeeBidirMapIterator* self);
+gboolean gee_bidir_map_iterator_last (GeeBidirMapIterator* self);
+GeeBidirIterator* gee_bidir_sorted_set_bidir_iterator (GeeBidirSortedSet* self);
+GeeBidirSortedSet* gee_bidir_sorted_set_empty (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
+GeeBidirSortedSet* gee_bidir_sorted_set_get_read_only_view (GeeBidirSortedSet* self);
+GeeBidirMapIterator* gee_bidir_sorted_map_bidir_map_iterator (GeeBidirSortedMap* self);
+GeeBidirSortedMap* gee_bidir_sorted_map_empty (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func);
+GeeBidirSortedMap* gee_bidir_sorted_map_get_read_only_view (GeeBidirSortedMap* self);
 gboolean gee_collection_contains (GeeCollection* self, gconstpointer item);
 gboolean gee_collection_add (GeeCollection* self, gconstpointer item);
 gboolean gee_collection_remove (GeeCollection* self, gconstpointer item);
@@ -832,13 +1466,25 @@ gboolean gee_collection_contains_all (GeeCollection* self, GeeCollection* collec
 gboolean gee_collection_remove_all (GeeCollection* self, GeeCollection* collection);
 gboolean gee_collection_retain_all (GeeCollection* self, GeeCollection* collection);
 gpointer* gee_collection_to_array (GeeCollection* self, int* result_length1);
+gboolean gee_collection_add_all_array (GeeCollection* self, gpointer* array, int array_length1);
+gboolean gee_collection_contains_all_array (GeeCollection* self, gpointer* array, int array_length1);
+gboolean gee_collection_remove_all_array (GeeCollection* self, gpointer* array, int array_length1);
 GeeCollection* gee_collection_empty (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
 gint gee_collection_get_size (GeeCollection* self);
 gboolean gee_collection_get_is_empty (GeeCollection* self);
+gboolean gee_collection_get_read_only (GeeCollection* self);
 GeeCollection* gee_collection_get_read_only_view (GeeCollection* self);
 GType gee_comparable_get_type (void) G_GNUC_CONST;
 gint gee_comparable_compare_to (GeeComparable* self, gconstpointer object);
-GType gee_deque_get_type (void) G_GNUC_CONST;
+GType gee_concurrent_list_get_type (void) G_GNUC_CONST;
+GeeConcurrentList* gee_concurrent_list_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeConcurrentList* gee_concurrent_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeEqualDataFunc gee_concurrent_list_get_equal_func (GeeConcurrentList* self, gpointer* result_target);
+gboolean gee_concurrent_list_get_is_empty (GeeConcurrentList* self);
+GType gee_concurrent_set_get_type (void) G_GNUC_CONST;
+GType gee_concurrent_set_range_type_get_type (void) G_GNUC_CONST;
+GeeConcurrentSet* gee_concurrent_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
+GeeConcurrentSet* gee_concurrent_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
 gboolean gee_deque_offer_head (GeeDeque* self, gconstpointer element);
 gpointer gee_deque_peek_head (GeeDeque* self);
 gpointer gee_deque_poll_head (GeeDeque* self);
@@ -847,44 +1493,86 @@ gboolean gee_deque_offer_tail (GeeDeque* self, gconstpointer element);
 gpointer gee_deque_peek_tail (GeeDeque* self);
 gpointer gee_deque_poll_tail (GeeDeque* self);
 gint gee_deque_drain_tail (GeeDeque* self, GeeCollection* recipient, gint amount);
-GEqualFunc gee_functions_get_equal_func_for (GType t);
-GHashFunc gee_functions_get_hash_func_for (GType t);
-GCompareFunc gee_functions_get_compare_func_for (GType t);
-gint gee_direct_compare (void* _val1, void* _val2);
+GeeEqualDataFunc gee_functions_get_equal_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+GeeHashDataFunc gee_functions_get_hash_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+GCompareDataFunc gee_functions_get_compare_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+GType gee_hashable_get_type (void) G_GNUC_CONST;
+guint gee_hashable_hash (GeeHashable* self);
+gboolean gee_hashable_equal_to (GeeHashable* self, gconstpointer object);
 GType gee_hash_map_get_type (void) G_GNUC_CONST;
-GeeHashMap* gee_hash_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GHashFunc key_hash_func, GEqualFunc key_equal_func, GEqualFunc value_equal_func);
-GeeHashMap* gee_hash_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GHashFunc key_hash_func, GEqualFunc key_equal_func, GEqualFunc value_equal_func);
-GHashFunc gee_hash_map_get_key_hash_func (GeeHashMap* self);
-GEqualFunc gee_hash_map_get_key_equal_func (GeeHashMap* self);
-GEqualFunc gee_hash_map_get_value_equal_func (GeeHashMap* self);
+GeeHashMap* gee_hash_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashDataFunc key_hash_func, void* key_hash_func_target, GDestroyNotify key_hash_func_target_destroy_notify, GeeEqualDataFunc key_equal_func, void* key_equal_func_target, GDestroyNotify key_equal_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
+GeeHashMap* gee_hash_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashDataFunc key_hash_func, void* key_hash_func_target, GDestroyNotify key_hash_func_target_destroy_notify, GeeEqualDataFunc key_equal_func, void* key_equal_func_target, GDestroyNotify key_equal_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
+GeeHashDataFunc gee_hash_map_get_key_hash_func (GeeHashMap* self, gpointer* result_target);
+GeeEqualDataFunc gee_hash_map_get_key_equal_func (GeeHashMap* self, gpointer* result_target);
+GeeEqualDataFunc gee_hash_map_get_value_equal_func (GeeHashMap* self, gpointer* result_target);
 GType gee_hash_multi_map_get_type (void) G_GNUC_CONST;
-GeeHashMultiMap* gee_hash_multi_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GHashFunc key_hash_func, GEqualFunc key_equal_func, GHashFunc value_hash_func, GEqualFunc value_equal_func);
-GeeHashMultiMap* gee_hash_multi_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GHashFunc key_hash_func, GEqualFunc key_equal_func, GHashFunc value_hash_func, GEqualFunc value_equal_func);
-GHashFunc gee_hash_multi_map_get_key_hash_func (GeeHashMultiMap* self);
-GEqualFunc gee_hash_multi_map_get_key_equal_func (GeeHashMultiMap* self);
-GHashFunc gee_hash_multi_map_get_value_hash_func (GeeHashMultiMap* self);
-GEqualFunc gee_hash_multi_map_get_value_equal_func (GeeHashMultiMap* self);
+GeeHashMultiMap* gee_hash_multi_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashDataFunc key_hash_func, void* key_hash_func_target, GDestroyNotify key_hash_func_target_destroy_notify, GeeEqualDataFunc key_equal_func, void* key_equal_func_target, GDestroyNotify key_equal_func_target_destroy_notify, GeeHashDataFunc value_hash_func, void* value_hash_func_target, GDestroyNotify value_hash_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
+GeeHashMultiMap* gee_hash_multi_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashDataFunc key_hash_func, void* key_hash_func_target, GDestroyNotify key_hash_func_target_destroy_notify, GeeEqualDataFunc key_equal_func, void* key_equal_func_target, GDestroyNotify key_equal_func_target_destroy_notify, GeeHashDataFunc value_hash_func, void* value_hash_func_target, GDestroyNotify value_hash_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
+GeeHashDataFunc gee_hash_multi_map_get_key_hash_func (GeeHashMultiMap* self, gpointer* result_target);
+GeeEqualDataFunc gee_hash_multi_map_get_key_equal_func (GeeHashMultiMap* self, gpointer* result_target);
+GeeHashDataFunc gee_hash_multi_map_get_value_hash_func (GeeHashMultiMap* self, gpointer* result_target);
+GeeEqualDataFunc gee_hash_multi_map_get_value_equal_func (GeeHashMultiMap* self, gpointer* result_target);
 GType gee_hash_multi_set_get_type (void) G_GNUC_CONST;
-GeeHashMultiSet* gee_hash_multi_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GHashFunc hash_func, GEqualFunc equal_func);
-GeeHashMultiSet* gee_hash_multi_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GHashFunc hash_func, GEqualFunc equal_func);
-GHashFunc gee_hash_multi_set_get_hash_func (GeeHashMultiSet* self);
-GEqualFunc gee_hash_multi_set_get_equal_func (GeeHashMultiSet* self);
+GeeHashMultiSet* gee_hash_multi_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeHashDataFunc hash_func, void* hash_func_target, GeeEqualDataFunc equal_func, void* equal_func_target);
+GeeHashMultiSet* gee_hash_multi_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeHashDataFunc hash_func, void* hash_func_target, GeeEqualDataFunc equal_func, void* equal_func_target);
+GeeHashDataFunc gee_hash_multi_set_get_hash_func (GeeHashMultiSet* self, gpointer* result_target);
+GeeEqualDataFunc gee_hash_multi_set_get_equal_func (GeeHashMultiSet* self, gpointer* result_target);
 GType gee_hash_set_get_type (void) G_GNUC_CONST;
-GeeHashSet* gee_hash_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GHashFunc hash_func, GEqualFunc equal_func);
-GeeHashSet* gee_hash_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GHashFunc hash_func, GEqualFunc equal_func);
-GHashFunc gee_hash_set_get_hash_func (GeeHashSet* self);
-GEqualFunc gee_hash_set_get_equal_func (GeeHashSet* self);
+GeeHashSet* gee_hash_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeHashDataFunc hash_func, void* hash_func_target, GDestroyNotify hash_func_target_destroy_notify, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeHashSet* gee_hash_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeHashDataFunc hash_func, void* hash_func_target, GDestroyNotify hash_func_target_destroy_notify, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeHashDataFunc gee_hash_set_get_hash_func (GeeHashSet* self, gpointer* result_target);
+GeeEqualDataFunc gee_hash_set_get_equal_func (GeeHashSet* self, gpointer* result_target);
+void gee_hazard_pointer_free (GeeHazardPointer* self);
+void gee_hazard_pointer_node_free (GeeHazardPointerNode* self);
+GType gee_hazard_pointer_policy_get_type (void) G_GNUC_CONST;
+gboolean gee_hazard_pointer_policy_is_concrete (GeeHazardPointerPolicy self);
+gboolean gee_hazard_pointer_policy_is_blocking (GeeHazardPointerPolicy self);
+gboolean gee_hazard_pointer_policy_is_safe (GeeHazardPointerPolicy self);
+GeeHazardPointerPolicy gee_hazard_pointer_policy_to_concrete (GeeHazardPointerPolicy self);
+GType gee_hazard_pointer_release_policy_get_type (void) G_GNUC_CONST;
+GeeHazardPointer* gee_hazard_pointer_new (gconstpointer* ptr);
+GeeHazardPointer* gee_hazard_pointer_new (gconstpointer* ptr);
+GeeHazardPointer* gee_hazard_pointer_get_hazard_pointer (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gconstpointer** aptr, gsize mask, gsize* mask_out);
+gpointer gee_hazard_pointer_get_pointer (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gconstpointer** aptr, gsize mask, gsize* mask_out);
+GeeHazardPointer* gee_hazard_pointer_exchange_hazard_pointer (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gconstpointer** aptr, gpointer new_ptr, gsize mask, gsize new_mask, gsize* old_mask);
+void gee_hazard_pointer_set_pointer (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gconstpointer** aptr, gpointer new_ptr, gsize mask, gsize new_mask);
+gpointer gee_hazard_pointer_exchange_pointer (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gconstpointer** aptr, gpointer new_ptr, gsize mask, gsize new_mask, gsize* old_mask);
+gboolean gee_hazard_pointer_compare_and_exchange_pointer (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gconstpointer** aptr, gconstpointer old_ptr, gpointer _new_ptr, gsize mask, gsize old_mask, gsize new_mask);
+gconstpointer gee_hazard_pointer_get (GeeHazardPointer* self, gboolean other_thread);
+void gee_hazard_pointer_release (GeeHazardPointer* self, GeeHazardPointerDestroyNotify notify, void* notify_target, GDestroyNotify notify_target_destroy_notify);
+void gee_hazard_pointer_set_default_policy (GeeHazardPointerPolicy policy);
+void gee_hazard_pointer_set_thread_exit_policy (GeeHazardPointerPolicy policy);
+gboolean gee_hazard_pointer_set_release_policy (GeeHazardPointerReleasePolicy policy);
+void gee_hazard_pointer_context_free (GeeHazardPointerContext* self);
+void gee_hazard_pointer_free_node_free (GeeHazardPointerFreeNode* self);
+GeeHazardPointerContext* gee_hazard_pointer_context_new (GeeHazardPointerPolicy* policy);
+GeeHazardPointerContext* gee_hazard_pointer_context_new (GeeHazardPointerPolicy* policy);
+void gee_hazard_pointer_context_try_free (GeeHazardPointerContext* self);
+void gee_hazard_pointer_context_free_all (GeeHazardPointerContext* self);
+void gee_hazard_pointer_context_try_release (GeeHazardPointerContext* self);
+void gee_hazard_pointer_context_release (GeeHazardPointerContext* self);
 GeeIterator* gee_iterable_iterator (GeeIterable* self);
-GType gee_iterable_get_element_type (GeeIterable* self);
 gboolean gee_iterator_next (GeeIterator* self);
 gboolean gee_iterator_has_next (GeeIterator* self);
-gboolean gee_iterator_first (GeeIterator* self);
 gpointer gee_iterator_get (GeeIterator* self);
 void gee_iterator_remove (GeeIterator* self);
+GeeIterator* gee_iterator_unfold (GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeUnfoldFunc f, void* f_target, GDestroyNotify f_target_destroy_notify, GeeLazy* current);
+GeeIterator* gee_iterator_concat (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeIterator* iters);
+gboolean gee_iterator_get_valid (GeeIterator* self);
+gboolean gee_iterator_get_read_only (GeeIterator* self);
+GeeLazy* gee_lazy_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeLazyFunc func, void* func_target, GDestroyNotify func_target_destroy_notify);
+GeeLazy* gee_lazy_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeLazyFunc func, void* func_target, GDestroyNotify func_target_destroy_notify);
+GeeLazy* gee_lazy_new_from_value (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gconstpointer item);
+GeeLazy* gee_lazy_construct_from_value (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gconstpointer item);
+void gee_lazy_eval (GeeLazy* self);
+gpointer gee_lazy_get (GeeLazy* self);
+gconstpointer gee_lazy_get_value (GeeLazy* self);
 GType gee_linked_list_get_type (void) G_GNUC_CONST;
-GeeLinkedList* gee_linked_list_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GEqualFunc equal_func);
-GeeLinkedList* gee_linked_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GEqualFunc equal_func);
-GEqualFunc gee_linked_list_get_equal_func (GeeLinkedList* self);
+GeeLinkedList* gee_linked_list_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeLinkedList* gee_linked_list_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+gpointer gee_linked_list_first (GeeLinkedList* self);
+gpointer gee_linked_list_last (GeeLinkedList* self);
+GeeEqualDataFunc gee_linked_list_get_equal_func (GeeLinkedList* self, gpointer* result_target);
 GeeListIterator* gee_list_list_iterator (GeeList* self);
 gpointer gee_list_get (GeeList* self, gint index);
 void gee_list_set (GeeList* self, gint index, gconstpointer item);
@@ -895,11 +1583,10 @@ GeeList* gee_list_slice (GeeList* self, gint start, gint stop);
 gpointer gee_list_first (GeeList* self);
 gpointer gee_list_last (GeeList* self);
 void gee_list_insert_all (GeeList* self, gint index, GeeCollection* collection);
-void gee_list_sort (GeeList* self, GCompareFunc compare_func);
+void gee_list_sort (GeeList* self, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
 GeeList* gee_list_empty (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
 GeeList* gee_list_get_read_only_view (GeeList* self);
 void gee_list_iterator_set (GeeListIterator* self, gconstpointer item);
-void gee_list_iterator_insert (GeeListIterator* self, gconstpointer item);
 void gee_list_iterator_add (GeeListIterator* self, gconstpointer item);
 gint gee_list_iterator_index (GeeListIterator* self);
 gboolean gee_map_has_key (GeeMap* self, gconstpointer key);
@@ -919,6 +1606,7 @@ gboolean gee_map_contains_all (GeeMap* self, GeeMap* map) G_GNUC_DEPRECATED;
 GeeMap* gee_map_empty (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func);
 gint gee_map_get_size (GeeMap* self);
 gboolean gee_map_get_is_empty (GeeMap* self);
+gboolean gee_map_get_read_only (GeeMap* self);
 GeeSet* gee_map_get_keys (GeeMap* self);
 GeeCollection* gee_map_get_values (GeeMap* self);
 GeeSet* gee_map_get_entries (GeeMap* self);
@@ -929,13 +1617,18 @@ GeeMapEntry* gee_map_entry_construct (GType object_type, GType k_type, GBoxedCop
 gconstpointer gee_map_entry_get_key (GeeMapEntry* self);
 gconstpointer gee_map_entry_get_value (GeeMapEntry* self);
 void gee_map_entry_set_value (GeeMapEntry* self, gconstpointer value);
+gboolean gee_map_entry_get_read_only (GeeMapEntry* self);
 gboolean gee_map_iterator_next (GeeMapIterator* self);
 gboolean gee_map_iterator_has_next (GeeMapIterator* self);
-gboolean gee_map_iterator_first (GeeMapIterator* self);
 gpointer gee_map_iterator_get_key (GeeMapIterator* self);
 gpointer gee_map_iterator_get_value (GeeMapIterator* self);
 void gee_map_iterator_set_value (GeeMapIterator* self, gconstpointer value);
 void gee_map_iterator_unset (GeeMapIterator* self);
+gpointer gee_map_iterator_fold (GeeMapIterator* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldMapFunc f, void* f_target, gpointer seed);
+gboolean gee_map_iterator_foreach (GeeMapIterator* self, GeeForallMapFunc f, void* f_target);
+gboolean gee_map_iterator_get_valid (GeeMapIterator* self);
+gboolean gee_map_iterator_get_mutable (GeeMapIterator* self);
+gboolean gee_map_iterator_get_read_only (GeeMapIterator* self);
 GeeSet* gee_multi_map_get_keys (GeeMultiMap* self);
 GeeMultiSet* gee_multi_map_get_all_keys (GeeMultiMap* self);
 GeeCollection* gee_multi_map_get_values (GeeMultiMap* self);
@@ -945,12 +1638,21 @@ void gee_multi_map_set (GeeMultiMap* self, gconstpointer key, gconstpointer valu
 gboolean gee_multi_map_remove (GeeMultiMap* self, gconstpointer key, gconstpointer value);
 gboolean gee_multi_map_remove_all (GeeMultiMap* self, gconstpointer key);
 void gee_multi_map_clear (GeeMultiMap* self);
+GeeMapIterator* gee_multi_map_map_iterator (GeeMultiMap* self);
 gint gee_multi_map_get_size (GeeMultiMap* self);
+gboolean gee_multi_map_get_read_only (GeeMultiMap* self);
+GType gee_multi_map_get_key_type (GeeMultiMap* self);
+GType gee_multi_map_get_value_type (GeeMultiMap* self);
+GeeMultiMap* gee_multi_map_get_read_only_view (GeeMultiMap* self);
 gint gee_multi_set_count (GeeMultiSet* self, gconstpointer item);
+GeeSet* gee_multi_set_empty (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
+GeeMultiSet* gee_multi_set_get_read_only_view (GeeMultiSet* self);
 GType gee_priority_queue_get_type (void) G_GNUC_CONST;
-GeePriorityQueue* gee_priority_queue_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func);
-GeePriorityQueue* gee_priority_queue_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func);
-GCompareFunc gee_priority_queue_get_compare_func (GeePriorityQueue* self);
+GeePriorityQueue* gee_priority_queue_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
+GeePriorityQueue* gee_priority_queue_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
+gboolean gee_priority_queue_offer (GeePriorityQueue* self, gconstpointer element);
+gint gee_priority_queue_drain (GeePriorityQueue* self, GeeCollection* recipient, gint amount);
+GCompareDataFunc gee_priority_queue_get_compare_func (GeePriorityQueue* self, gpointer* result_target);
 gboolean gee_queue_offer (GeeQueue* self, gconstpointer element);
 gpointer gee_queue_peek (GeeQueue* self);
 gpointer gee_queue_poll (GeeQueue* self);
@@ -961,11 +1663,16 @@ gint gee_queue_get_remaining_capacity (GeeQueue* self);
 gboolean gee_queue_get_is_full (GeeQueue* self);
 GeeSet* gee_set_empty (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
 GeeSet* gee_set_get_read_only_view (GeeSet* self);
-GType gee_sorted_set_get_type (void) G_GNUC_CONST;
+GeeSortedMap* gee_sorted_map_head_map (GeeSortedMap* self, gconstpointer before);
+GeeSortedMap* gee_sorted_map_tail_map (GeeSortedMap* self, gconstpointer after);
+GeeSortedMap* gee_sorted_map_sub_map (GeeSortedMap* self, gconstpointer before, gconstpointer after);
+GeeMap* gee_sorted_map_empty (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func);
+GeeSortedSet* gee_sorted_map_get_ascending_keys (GeeSortedMap* self);
+GeeSortedSet* gee_sorted_map_get_ascending_entries (GeeSortedMap* self);
+GeeSortedMap* gee_sorted_map_get_read_only_view (GeeSortedMap* self);
 gpointer gee_sorted_set_first (GeeSortedSet* self);
 gpointer gee_sorted_set_last (GeeSortedSet* self);
-GeeBidirIterator* gee_sorted_set_bidir_iterator (GeeSortedSet* self);
-GeeBidirIterator* gee_sorted_set_iterator_at (GeeSortedSet* self, gconstpointer element);
+GeeIterator* gee_sorted_set_iterator_at (GeeSortedSet* self, gconstpointer element);
 gpointer gee_sorted_set_lower (GeeSortedSet* self, gconstpointer element);
 gpointer gee_sorted_set_higher (GeeSortedSet* self, gconstpointer element);
 gpointer gee_sorted_set_floor (GeeSortedSet* self, gconstpointer element);
@@ -973,24 +1680,34 @@ gpointer gee_sorted_set_ceil (GeeSortedSet* self, gconstpointer element);
 GeeSortedSet* gee_sorted_set_head_set (GeeSortedSet* self, gconstpointer before);
 GeeSortedSet* gee_sorted_set_tail_set (GeeSortedSet* self, gconstpointer after);
 GeeSortedSet* gee_sorted_set_sub_set (GeeSortedSet* self, gconstpointer from, gconstpointer to);
+GeeSortedSet* gee_sorted_set_empty (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
+GeeSortedSet* gee_sorted_set_get_read_only_view (GeeSortedSet* self);
+gboolean gee_traversable_foreach (GeeTraversable* self, GeeForallFunc f, void* f_target);
+GeeIterator* gee_traversable_stream (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+gpointer gee_traversable_fold (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+GeeIterator* gee_traversable_map (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+GeeIterator* gee_traversable_scan (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+GeeIterator* gee_traversable_filter (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+GeeIterator* gee_traversable_chop (GeeTraversable* self, gint offset, gint length);
+GType gee_traversable_get_element_type (GeeTraversable* self);
 GType gee_tree_map_get_type (void) G_GNUC_CONST;
-GeeTreeMap* gee_tree_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareFunc key_compare_func, GEqualFunc value_equal_func);
-GeeTreeMap* gee_tree_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareFunc key_compare_func, GEqualFunc value_equal_func);
-GCompareFunc gee_tree_map_get_key_compare_func (GeeTreeMap* self);
-GEqualFunc gee_tree_map_get_value_equal_func (GeeTreeMap* self);
+GeeTreeMap* gee_tree_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareDataFunc key_compare_func, void* key_compare_func_target, GDestroyNotify key_compare_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
+GeeTreeMap* gee_tree_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareDataFunc key_compare_func, void* key_compare_func_target, GDestroyNotify key_compare_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
+GCompareDataFunc gee_tree_map_get_key_compare_func (GeeTreeMap* self, gpointer* result_target);
+GeeEqualDataFunc gee_tree_map_get_value_equal_func (GeeTreeMap* self, gpointer* result_target);
 GType gee_tree_multi_map_get_type (void) G_GNUC_CONST;
-GeeTreeMultiMap* gee_tree_multi_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareFunc key_compare_func, GCompareFunc value_compare_func);
-GeeTreeMultiMap* gee_tree_multi_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareFunc key_compare_func, GCompareFunc value_compare_func);
-GCompareFunc gee_tree_multi_map_get_key_compare_func (GeeTreeMultiMap* self);
-GCompareFunc gee_tree_multi_map_get_value_compare_func (GeeTreeMultiMap* self);
+GeeTreeMultiMap* gee_tree_multi_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareDataFunc key_compare_func, void* key_compare_func_target, GDestroyNotify key_compare_func_target_destroy_notify, GCompareDataFunc value_compare_func, void* value_compare_func_target, GDestroyNotify value_compare_func_target_destroy_notify);
+GeeTreeMultiMap* gee_tree_multi_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareDataFunc key_compare_func, void* key_compare_func_target, GDestroyNotify key_compare_func_target_destroy_notify, GCompareDataFunc value_compare_func, void* value_compare_func_target, GDestroyNotify value_compare_func_target_destroy_notify);
+GCompareDataFunc gee_tree_multi_map_get_key_compare_func (GeeTreeMultiMap* self, gpointer* result_target);
+GCompareDataFunc gee_tree_multi_map_get_value_compare_func (GeeTreeMultiMap* self, gpointer* result_target);
 GType gee_tree_multi_set_get_type (void) G_GNUC_CONST;
-GeeTreeMultiSet* gee_tree_multi_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func);
-GeeTreeMultiSet* gee_tree_multi_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func);
-GCompareFunc gee_tree_multi_set_get_compare_func (GeeTreeMultiSet* self);
+GeeTreeMultiSet* gee_tree_multi_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
+GeeTreeMultiSet* gee_tree_multi_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
+GCompareDataFunc gee_tree_multi_set_get_compare_func (GeeTreeMultiSet* self, gpointer* result_target);
 GType gee_tree_set_get_type (void) G_GNUC_CONST;
-GeeTreeSet* gee_tree_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func);
-GeeTreeSet* gee_tree_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func);
-GCompareFunc gee_tree_set_get_compare_func (GeeTreeSet* self);
+GeeTreeSet* gee_tree_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
+GeeTreeSet* gee_tree_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
+GCompareDataFunc gee_tree_set_get_compare_func (GeeTreeSet* self, gpointer* result_target);
 
 
 G_END_DECLS

@@ -32,6 +32,10 @@ public abstract class Gee.AbstractMultiSet<G> : AbstractCollection<G>, MultiSet<
 		get { return _nitems; }
 	}
 
+	public override bool read_only {
+		get { return false; }
+	}
+
 	protected Map<G, int> _storage_map;
 	private int _nitems = 0;
 
@@ -88,7 +92,31 @@ public abstract class Gee.AbstractMultiSet<G> : AbstractCollection<G>, MultiSet<
 		_nitems = 0;
 	}
 
-	private class Iterator<G> : Object, Gee.Iterator<G> {
+	private weak MultiSet<G> _read_only_view;
+	public virtual new MultiSet<G> read_only_view {
+		owned get {
+			MultiSet<G> instance = _read_only_view;
+			if (_read_only_view == null) {
+				instance = new ReadOnlyMultiSet<G> (this);
+				_read_only_view = instance;
+				instance.add_weak_pointer ((void**) (&_read_only_view));
+			}
+			return instance;
+		}
+	}
+
+	// Future-proofing
+	internal new virtual void reserved0() {}
+	internal new virtual void reserved1() {}
+	internal new virtual void reserved2() {}
+	internal new virtual void reserved3() {}
+	internal new virtual void reserved4() {}
+	internal new virtual void reserved5() {}
+	internal new virtual void reserved6() {}
+	internal new virtual void reserved7() {}
+	internal new virtual void reserved8() {}
+
+	private class Iterator<G> : Object, Traversable<G>, Gee.Iterator<G> {
 		private AbstractMultiSet<G> _set;
 
 		private MapIterator<G, int> _iter;
@@ -118,17 +146,6 @@ public abstract class Gee.AbstractMultiSet<G> : AbstractCollection<G>, MultiSet<
 			return _pending > 0 || _iter.has_next ();
 		}
 
-		public bool first () {
-			if (_set._nitems == 0) {
-				return false;
-			}
-			_pending = 0;
-			if (_iter.first ()) {
-				_pending = _iter.get_value () - 1;
-			}
-			return true;
-		}
-
 		public new G get () {
 			assert (! _removed);
 			return _iter.get_key ();
@@ -142,6 +159,46 @@ public abstract class Gee.AbstractMultiSet<G> : AbstractCollection<G>, MultiSet<
 			}
 			_set._nitems--;
 			_removed = true;
+		}
+		
+		public bool read_only {
+			get {
+				return false;
+			}
+		}
+		
+		public bool valid {
+			get {
+				return ! _removed && _iter.valid;
+			}
+		}
+
+		public bool foreach (ForallFunc<G> f) {
+			if (_iter.valid) {
+				if (!_removed) {
+					if (!f(_iter.get_key())) {
+						return false;
+					}
+				}
+				for(int i = _pending - 1; i >= 0; --i) {
+					if (!f(_iter.get_key())) {
+						_pending = i;
+						return false;
+					}
+				}
+			}
+			while(_iter.next()) {
+				for(int i = _iter.get_value() - 1; i >= 0; --i) {
+					if (!f(_iter.get_key())) {
+						_removed = false;
+						_pending = i;
+						return false;
+					}
+				}
+			}
+			_removed = false;
+			_pending = 0;
+			return true;
 		}
 	}
 }

@@ -54,7 +54,18 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/Makefile.decl
+	$(top_srcdir)/Makefile.decl testarraylist.c testarrayqueue.c \
+	testbidirlist.c testbidirsortedmap.c testbidirsortedset.c \
+	testcase.c testcollection.c testconcurrentlist.c \
+	testconcurrentset.c testdata.c testdeque.c testfunctions.c \
+	testhashmap.c testhashmultimap.c testhashmultiset.c \
+	testhashset.c testlinkedlist.c testlinkedlistasdeque.c \
+	testlist.c testmain.c testmap.c testmultimap.c testmultiset.c \
+	testpriorityqueue.c testqueue.c testreadonlybidirlist.c \
+	testreadonlycollection.c testreadonlylist.c testreadonlymap.c \
+	testreadonlyset.c tests_vala.stamp testset.c testsortedmap.c \
+	testsortedset.c testtreemap.c testtreemultimap.c \
+	testtreemultiset.c testtreeset.c
 noinst_PROGRAMS = $(am__EXEEXT_1)
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -71,24 +82,32 @@ CONFIG_CLEAN_VPATH_FILES =
 am__EXEEXT_1 = tests$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am__objects_1 =
-am__objects_2 = testarraylist.$(OBJEXT) testcase.$(OBJEXT) \
-	testcollection.$(OBJEXT) testcomparable.$(OBJEXT) \
-	testdeque.$(OBJEXT) testhashmap.$(OBJEXT) \
-	testhashmultimap.$(OBJEXT) testhashmultiset.$(OBJEXT) \
-	testhashset.$(OBJEXT) testlinkedlist.$(OBJEXT) \
-	testlinkedlistasdeque.$(OBJEXT) testlist.$(OBJEXT) \
-	testmain.$(OBJEXT) testmap.$(OBJEXT) testmultimap.$(OBJEXT) \
-	testmultiset.$(OBJEXT) testpriorityqueue.$(OBJEXT) \
-	testqueue.$(OBJEXT) testreadonlycollection.$(OBJEXT) \
-	testreadonlylist.$(OBJEXT) testreadonlymap.$(OBJEXT) \
-	testreadonlyset.$(OBJEXT) testset.$(OBJEXT) \
-	testsortedset.$(OBJEXT) testtreemap.$(OBJEXT) \
-	testtreemultimap.$(OBJEXT) testtreemultiset.$(OBJEXT) \
-	testtreeset.$(OBJEXT) $(am__objects_1)
-am_tests_OBJECTS = $(am__objects_2)
+am_tests_OBJECTS = tests-testarraylist.$(OBJEXT) \
+	tests-testarrayqueue.$(OBJEXT) tests-testbidirlist.$(OBJEXT) \
+	tests-testbidirsortedset.$(OBJEXT) \
+	tests-testbidirsortedmap.$(OBJEXT) tests-testcase.$(OBJEXT) \
+	tests-testcollection.$(OBJEXT) \
+	tests-testconcurrentlist.$(OBJEXT) \
+	tests-testconcurrentset.$(OBJEXT) tests-testdata.$(OBJEXT) \
+	tests-testdeque.$(OBJEXT) tests-testfunctions.$(OBJEXT) \
+	tests-testhashmap.$(OBJEXT) tests-testhashmultimap.$(OBJEXT) \
+	tests-testhashmultiset.$(OBJEXT) tests-testhashset.$(OBJEXT) \
+	tests-testlinkedlist.$(OBJEXT) \
+	tests-testlinkedlistasdeque.$(OBJEXT) tests-testlist.$(OBJEXT) \
+	tests-testmain.$(OBJEXT) tests-testmap.$(OBJEXT) \
+	tests-testmultimap.$(OBJEXT) tests-testmultiset.$(OBJEXT) \
+	tests-testpriorityqueue.$(OBJEXT) tests-testqueue.$(OBJEXT) \
+	tests-testreadonlybidirlist.$(OBJEXT) \
+	tests-testreadonlycollection.$(OBJEXT) \
+	tests-testreadonlylist.$(OBJEXT) \
+	tests-testreadonlymap.$(OBJEXT) \
+	tests-testreadonlyset.$(OBJEXT) tests-testset.$(OBJEXT) \
+	tests-testsortedset.$(OBJEXT) tests-testsortedmap.$(OBJEXT) \
+	tests-testtreemap.$(OBJEXT) tests-testtreemultimap.$(OBJEXT) \
+	tests-testtreemultiset.$(OBJEXT) tests-testtreeset.$(OBJEXT) \
+	$(am__objects_1)
 tests_OBJECTS = $(am_tests_OBJECTS)
 am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) ../gee/libgee.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -115,6 +134,13 @@ LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD  " $@;
+VALACOMPILE = $(VALAC) $(AM_VALAFLAGS) $(VALAFLAGS)
+LTVALACOMPILE = $(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(VALAC) $(AM_VALAFLAGS) \
+	$(VALAFLAGS)
+AM_V_VALAC = $(am__v_VALAC_@AM_V@)
+am__v_VALAC_ = $(am__v_VALAC_@AM_DEFAULT_V@)
+am__v_VALAC_0 = @echo "  VALAC " $@;
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN   " $@;
@@ -267,22 +293,24 @@ GTESTER = gtester
 GTESTER_REPORT = gtester-report
 
 # initialize variables for unconditional += appending
-EXTRA_DIST = $(tests_VALASOURCES)
+EXTRA_DIST = 
 TEST_PROGS = tests
-NULL = 
-AM_CPPFLAGS = \
-	-I$(top_srcdir)/gee \
-	$(GLIB_CFLAGS) \
-	$(NULL)
 
-progs_ldadd = $(GLIB_LIBS) ../gee/libgee.la
-BUILT_SOURCES = tests.vala.stamp
-tests_VALASOURCES = \
+# useful constants
+NULL = 
+tests_SOURCES = \
        testarraylist.vala \
+       testarrayqueue.vala \
+       testbidirlist.vala \
+       testbidirsortedset.vala \
+       testbidirsortedmap.vala \
        testcase.vala \
        testcollection.vala \
-       testcomparable.vala \
+       testconcurrentlist.vala \
+       testconcurrentset.vala \
+       testdata.vala \
        testdeque.vala \
+       testfunctions.vala \
        testhashmap.vala \
        testhashmultimap.vala \
        testhashmultiset.vala \
@@ -296,28 +324,41 @@ tests_VALASOURCES = \
        testmultiset.vala \
        testpriorityqueue.vala \
        testqueue.vala \
+       testreadonlybidirlist.vala \
        testreadonlycollection.vala \
        testreadonlylist.vala \
        testreadonlymap.vala \
        testreadonlyset.vala \
        testset.vala \
        testsortedset.vala \
+       testsortedmap.vala \
        testtreemap.vala \
        testtreemultimap.vala \
        testtreemultiset.vala \
        testtreeset.vala \
        $(NULL)
 
-tests_DEPENDENCIES = $(top_srcdir)/gee/gee-1.0.vapi
-tests_SOURCES = tests.vala.stamp $(tests_VALASOURCES:.vala=.c)
-tests_LDADD = $(progs_ldadd)
-MAINTAINERCLEANFILES = \
-	$(tests_VALASOURCES:.vala=.c) \
-	tests.vala.stamp \
+tests_DEPENDENCIES = \
+	$(top_srcdir)/gee/gee-0.8.vapi \
 	$(NULL)
 
-all: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) all-am
+tests_VALAFLAGS = \
+	--basedir $(top_srcdir) \
+	--vapidir $(top_srcdir)/gee \
+	--pkg gee-0.8 --pkg posix \
+	$(VALAFLAGS) \
+	$(NULL)
+
+tests_CPPFLAGS = \
+	-I$(top_srcdir)/gee \
+	$(GLIB_CFLAGS) \
+	$(NULL)
+
+tests_LDADD = \
+	$(GLIB_LIBS) ../gee/libgee-0.8.la \
+	$(NULL)
+
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -371,34 +412,43 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testarraylist.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testcase.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testcollection.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testcomparable.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testdeque.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testhashmap.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testhashmultimap.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testhashmultiset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testhashset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testlinkedlist.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testlinkedlistasdeque.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testlist.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testmain.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testmap.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testmultimap.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testmultiset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testpriorityqueue.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testqueue.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testreadonlycollection.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testreadonlylist.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testreadonlymap.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testreadonlyset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testsortedset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testtreemap.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testtreemultimap.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testtreemultiset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testtreeset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testarraylist.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testarrayqueue.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testbidirlist.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testbidirsortedmap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testbidirsortedset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testcase.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testcollection.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testconcurrentlist.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testconcurrentset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testdata.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testdeque.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testfunctions.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testhashmap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testhashmultimap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testhashmultiset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testhashset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testlinkedlist.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testlinkedlistasdeque.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testlist.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testmain.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testmap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testmultimap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testmultiset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testpriorityqueue.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testqueue.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testreadonlybidirlist.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testreadonlycollection.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testreadonlylist.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testreadonlymap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testreadonlyset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testsortedmap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testsortedset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testtreemap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testtreemultimap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testtreemultiset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tests-testtreeset.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -420,6 +470,713 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+tests-testarraylist.o: testarraylist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testarraylist.o -MD -MP -MF $(DEPDIR)/tests-testarraylist.Tpo -c -o tests-testarraylist.o `test -f 'testarraylist.c' || echo '$(srcdir)/'`testarraylist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testarraylist.Tpo $(DEPDIR)/tests-testarraylist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testarraylist.c' object='tests-testarraylist.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testarraylist.o `test -f 'testarraylist.c' || echo '$(srcdir)/'`testarraylist.c
+
+tests-testarraylist.obj: testarraylist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testarraylist.obj -MD -MP -MF $(DEPDIR)/tests-testarraylist.Tpo -c -o tests-testarraylist.obj `if test -f 'testarraylist.c'; then $(CYGPATH_W) 'testarraylist.c'; else $(CYGPATH_W) '$(srcdir)/testarraylist.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testarraylist.Tpo $(DEPDIR)/tests-testarraylist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testarraylist.c' object='tests-testarraylist.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testarraylist.obj `if test -f 'testarraylist.c'; then $(CYGPATH_W) 'testarraylist.c'; else $(CYGPATH_W) '$(srcdir)/testarraylist.c'; fi`
+
+tests-testarrayqueue.o: testarrayqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testarrayqueue.o -MD -MP -MF $(DEPDIR)/tests-testarrayqueue.Tpo -c -o tests-testarrayqueue.o `test -f 'testarrayqueue.c' || echo '$(srcdir)/'`testarrayqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testarrayqueue.Tpo $(DEPDIR)/tests-testarrayqueue.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testarrayqueue.c' object='tests-testarrayqueue.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testarrayqueue.o `test -f 'testarrayqueue.c' || echo '$(srcdir)/'`testarrayqueue.c
+
+tests-testarrayqueue.obj: testarrayqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testarrayqueue.obj -MD -MP -MF $(DEPDIR)/tests-testarrayqueue.Tpo -c -o tests-testarrayqueue.obj `if test -f 'testarrayqueue.c'; then $(CYGPATH_W) 'testarrayqueue.c'; else $(CYGPATH_W) '$(srcdir)/testarrayqueue.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testarrayqueue.Tpo $(DEPDIR)/tests-testarrayqueue.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testarrayqueue.c' object='tests-testarrayqueue.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testarrayqueue.obj `if test -f 'testarrayqueue.c'; then $(CYGPATH_W) 'testarrayqueue.c'; else $(CYGPATH_W) '$(srcdir)/testarrayqueue.c'; fi`
+
+tests-testbidirlist.o: testbidirlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testbidirlist.o -MD -MP -MF $(DEPDIR)/tests-testbidirlist.Tpo -c -o tests-testbidirlist.o `test -f 'testbidirlist.c' || echo '$(srcdir)/'`testbidirlist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testbidirlist.Tpo $(DEPDIR)/tests-testbidirlist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testbidirlist.c' object='tests-testbidirlist.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testbidirlist.o `test -f 'testbidirlist.c' || echo '$(srcdir)/'`testbidirlist.c
+
+tests-testbidirlist.obj: testbidirlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testbidirlist.obj -MD -MP -MF $(DEPDIR)/tests-testbidirlist.Tpo -c -o tests-testbidirlist.obj `if test -f 'testbidirlist.c'; then $(CYGPATH_W) 'testbidirlist.c'; else $(CYGPATH_W) '$(srcdir)/testbidirlist.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testbidirlist.Tpo $(DEPDIR)/tests-testbidirlist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testbidirlist.c' object='tests-testbidirlist.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testbidirlist.obj `if test -f 'testbidirlist.c'; then $(CYGPATH_W) 'testbidirlist.c'; else $(CYGPATH_W) '$(srcdir)/testbidirlist.c'; fi`
+
+tests-testbidirsortedset.o: testbidirsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testbidirsortedset.o -MD -MP -MF $(DEPDIR)/tests-testbidirsortedset.Tpo -c -o tests-testbidirsortedset.o `test -f 'testbidirsortedset.c' || echo '$(srcdir)/'`testbidirsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testbidirsortedset.Tpo $(DEPDIR)/tests-testbidirsortedset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testbidirsortedset.c' object='tests-testbidirsortedset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testbidirsortedset.o `test -f 'testbidirsortedset.c' || echo '$(srcdir)/'`testbidirsortedset.c
+
+tests-testbidirsortedset.obj: testbidirsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testbidirsortedset.obj -MD -MP -MF $(DEPDIR)/tests-testbidirsortedset.Tpo -c -o tests-testbidirsortedset.obj `if test -f 'testbidirsortedset.c'; then $(CYGPATH_W) 'testbidirsortedset.c'; else $(CYGPATH_W) '$(srcdir)/testbidirsortedset.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testbidirsortedset.Tpo $(DEPDIR)/tests-testbidirsortedset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testbidirsortedset.c' object='tests-testbidirsortedset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testbidirsortedset.obj `if test -f 'testbidirsortedset.c'; then $(CYGPATH_W) 'testbidirsortedset.c'; else $(CYGPATH_W) '$(srcdir)/testbidirsortedset.c'; fi`
+
+tests-testbidirsortedmap.o: testbidirsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testbidirsortedmap.o -MD -MP -MF $(DEPDIR)/tests-testbidirsortedmap.Tpo -c -o tests-testbidirsortedmap.o `test -f 'testbidirsortedmap.c' || echo '$(srcdir)/'`testbidirsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testbidirsortedmap.Tpo $(DEPDIR)/tests-testbidirsortedmap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testbidirsortedmap.c' object='tests-testbidirsortedmap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testbidirsortedmap.o `test -f 'testbidirsortedmap.c' || echo '$(srcdir)/'`testbidirsortedmap.c
+
+tests-testbidirsortedmap.obj: testbidirsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testbidirsortedmap.obj -MD -MP -MF $(DEPDIR)/tests-testbidirsortedmap.Tpo -c -o tests-testbidirsortedmap.obj `if test -f 'testbidirsortedmap.c'; then $(CYGPATH_W) 'testbidirsortedmap.c'; else $(CYGPATH_W) '$(srcdir)/testbidirsortedmap.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testbidirsortedmap.Tpo $(DEPDIR)/tests-testbidirsortedmap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testbidirsortedmap.c' object='tests-testbidirsortedmap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testbidirsortedmap.obj `if test -f 'testbidirsortedmap.c'; then $(CYGPATH_W) 'testbidirsortedmap.c'; else $(CYGPATH_W) '$(srcdir)/testbidirsortedmap.c'; fi`
+
+tests-testcase.o: testcase.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testcase.o -MD -MP -MF $(DEPDIR)/tests-testcase.Tpo -c -o tests-testcase.o `test -f 'testcase.c' || echo '$(srcdir)/'`testcase.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testcase.Tpo $(DEPDIR)/tests-testcase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testcase.c' object='tests-testcase.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testcase.o `test -f 'testcase.c' || echo '$(srcdir)/'`testcase.c
+
+tests-testcase.obj: testcase.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testcase.obj -MD -MP -MF $(DEPDIR)/tests-testcase.Tpo -c -o tests-testcase.obj `if test -f 'testcase.c'; then $(CYGPATH_W) 'testcase.c'; else $(CYGPATH_W) '$(srcdir)/testcase.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testcase.Tpo $(DEPDIR)/tests-testcase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testcase.c' object='tests-testcase.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testcase.obj `if test -f 'testcase.c'; then $(CYGPATH_W) 'testcase.c'; else $(CYGPATH_W) '$(srcdir)/testcase.c'; fi`
+
+tests-testcollection.o: testcollection.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testcollection.o -MD -MP -MF $(DEPDIR)/tests-testcollection.Tpo -c -o tests-testcollection.o `test -f 'testcollection.c' || echo '$(srcdir)/'`testcollection.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testcollection.Tpo $(DEPDIR)/tests-testcollection.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testcollection.c' object='tests-testcollection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testcollection.o `test -f 'testcollection.c' || echo '$(srcdir)/'`testcollection.c
+
+tests-testcollection.obj: testcollection.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testcollection.obj -MD -MP -MF $(DEPDIR)/tests-testcollection.Tpo -c -o tests-testcollection.obj `if test -f 'testcollection.c'; then $(CYGPATH_W) 'testcollection.c'; else $(CYGPATH_W) '$(srcdir)/testcollection.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testcollection.Tpo $(DEPDIR)/tests-testcollection.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testcollection.c' object='tests-testcollection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testcollection.obj `if test -f 'testcollection.c'; then $(CYGPATH_W) 'testcollection.c'; else $(CYGPATH_W) '$(srcdir)/testcollection.c'; fi`
+
+tests-testconcurrentlist.o: testconcurrentlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testconcurrentlist.o -MD -MP -MF $(DEPDIR)/tests-testconcurrentlist.Tpo -c -o tests-testconcurrentlist.o `test -f 'testconcurrentlist.c' || echo '$(srcdir)/'`testconcurrentlist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testconcurrentlist.Tpo $(DEPDIR)/tests-testconcurrentlist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testconcurrentlist.c' object='tests-testconcurrentlist.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testconcurrentlist.o `test -f 'testconcurrentlist.c' || echo '$(srcdir)/'`testconcurrentlist.c
+
+tests-testconcurrentlist.obj: testconcurrentlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testconcurrentlist.obj -MD -MP -MF $(DEPDIR)/tests-testconcurrentlist.Tpo -c -o tests-testconcurrentlist.obj `if test -f 'testconcurrentlist.c'; then $(CYGPATH_W) 'testconcurrentlist.c'; else $(CYGPATH_W) '$(srcdir)/testconcurrentlist.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testconcurrentlist.Tpo $(DEPDIR)/tests-testconcurrentlist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testconcurrentlist.c' object='tests-testconcurrentlist.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testconcurrentlist.obj `if test -f 'testconcurrentlist.c'; then $(CYGPATH_W) 'testconcurrentlist.c'; else $(CYGPATH_W) '$(srcdir)/testconcurrentlist.c'; fi`
+
+tests-testconcurrentset.o: testconcurrentset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testconcurrentset.o -MD -MP -MF $(DEPDIR)/tests-testconcurrentset.Tpo -c -o tests-testconcurrentset.o `test -f 'testconcurrentset.c' || echo '$(srcdir)/'`testconcurrentset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testconcurrentset.Tpo $(DEPDIR)/tests-testconcurrentset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testconcurrentset.c' object='tests-testconcurrentset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testconcurrentset.o `test -f 'testconcurrentset.c' || echo '$(srcdir)/'`testconcurrentset.c
+
+tests-testconcurrentset.obj: testconcurrentset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testconcurrentset.obj -MD -MP -MF $(DEPDIR)/tests-testconcurrentset.Tpo -c -o tests-testconcurrentset.obj `if test -f 'testconcurrentset.c'; then $(CYGPATH_W) 'testconcurrentset.c'; else $(CYGPATH_W) '$(srcdir)/testconcurrentset.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testconcurrentset.Tpo $(DEPDIR)/tests-testconcurrentset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testconcurrentset.c' object='tests-testconcurrentset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testconcurrentset.obj `if test -f 'testconcurrentset.c'; then $(CYGPATH_W) 'testconcurrentset.c'; else $(CYGPATH_W) '$(srcdir)/testconcurrentset.c'; fi`
+
+tests-testdata.o: testdata.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testdata.o -MD -MP -MF $(DEPDIR)/tests-testdata.Tpo -c -o tests-testdata.o `test -f 'testdata.c' || echo '$(srcdir)/'`testdata.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testdata.Tpo $(DEPDIR)/tests-testdata.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testdata.c' object='tests-testdata.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testdata.o `test -f 'testdata.c' || echo '$(srcdir)/'`testdata.c
+
+tests-testdata.obj: testdata.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testdata.obj -MD -MP -MF $(DEPDIR)/tests-testdata.Tpo -c -o tests-testdata.obj `if test -f 'testdata.c'; then $(CYGPATH_W) 'testdata.c'; else $(CYGPATH_W) '$(srcdir)/testdata.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testdata.Tpo $(DEPDIR)/tests-testdata.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testdata.c' object='tests-testdata.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testdata.obj `if test -f 'testdata.c'; then $(CYGPATH_W) 'testdata.c'; else $(CYGPATH_W) '$(srcdir)/testdata.c'; fi`
+
+tests-testdeque.o: testdeque.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testdeque.o -MD -MP -MF $(DEPDIR)/tests-testdeque.Tpo -c -o tests-testdeque.o `test -f 'testdeque.c' || echo '$(srcdir)/'`testdeque.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testdeque.Tpo $(DEPDIR)/tests-testdeque.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testdeque.c' object='tests-testdeque.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testdeque.o `test -f 'testdeque.c' || echo '$(srcdir)/'`testdeque.c
+
+tests-testdeque.obj: testdeque.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testdeque.obj -MD -MP -MF $(DEPDIR)/tests-testdeque.Tpo -c -o tests-testdeque.obj `if test -f 'testdeque.c'; then $(CYGPATH_W) 'testdeque.c'; else $(CYGPATH_W) '$(srcdir)/testdeque.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testdeque.Tpo $(DEPDIR)/tests-testdeque.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testdeque.c' object='tests-testdeque.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testdeque.obj `if test -f 'testdeque.c'; then $(CYGPATH_W) 'testdeque.c'; else $(CYGPATH_W) '$(srcdir)/testdeque.c'; fi`
+
+tests-testfunctions.o: testfunctions.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testfunctions.o -MD -MP -MF $(DEPDIR)/tests-testfunctions.Tpo -c -o tests-testfunctions.o `test -f 'testfunctions.c' || echo '$(srcdir)/'`testfunctions.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testfunctions.Tpo $(DEPDIR)/tests-testfunctions.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testfunctions.c' object='tests-testfunctions.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testfunctions.o `test -f 'testfunctions.c' || echo '$(srcdir)/'`testfunctions.c
+
+tests-testfunctions.obj: testfunctions.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testfunctions.obj -MD -MP -MF $(DEPDIR)/tests-testfunctions.Tpo -c -o tests-testfunctions.obj `if test -f 'testfunctions.c'; then $(CYGPATH_W) 'testfunctions.c'; else $(CYGPATH_W) '$(srcdir)/testfunctions.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testfunctions.Tpo $(DEPDIR)/tests-testfunctions.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testfunctions.c' object='tests-testfunctions.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testfunctions.obj `if test -f 'testfunctions.c'; then $(CYGPATH_W) 'testfunctions.c'; else $(CYGPATH_W) '$(srcdir)/testfunctions.c'; fi`
+
+tests-testhashmap.o: testhashmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testhashmap.o -MD -MP -MF $(DEPDIR)/tests-testhashmap.Tpo -c -o tests-testhashmap.o `test -f 'testhashmap.c' || echo '$(srcdir)/'`testhashmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testhashmap.Tpo $(DEPDIR)/tests-testhashmap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testhashmap.c' object='tests-testhashmap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testhashmap.o `test -f 'testhashmap.c' || echo '$(srcdir)/'`testhashmap.c
+
+tests-testhashmap.obj: testhashmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testhashmap.obj -MD -MP -MF $(DEPDIR)/tests-testhashmap.Tpo -c -o tests-testhashmap.obj `if test -f 'testhashmap.c'; then $(CYGPATH_W) 'testhashmap.c'; else $(CYGPATH_W) '$(srcdir)/testhashmap.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testhashmap.Tpo $(DEPDIR)/tests-testhashmap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testhashmap.c' object='tests-testhashmap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testhashmap.obj `if test -f 'testhashmap.c'; then $(CYGPATH_W) 'testhashmap.c'; else $(CYGPATH_W) '$(srcdir)/testhashmap.c'; fi`
+
+tests-testhashmultimap.o: testhashmultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testhashmultimap.o -MD -MP -MF $(DEPDIR)/tests-testhashmultimap.Tpo -c -o tests-testhashmultimap.o `test -f 'testhashmultimap.c' || echo '$(srcdir)/'`testhashmultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testhashmultimap.Tpo $(DEPDIR)/tests-testhashmultimap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testhashmultimap.c' object='tests-testhashmultimap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testhashmultimap.o `test -f 'testhashmultimap.c' || echo '$(srcdir)/'`testhashmultimap.c
+
+tests-testhashmultimap.obj: testhashmultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testhashmultimap.obj -MD -MP -MF $(DEPDIR)/tests-testhashmultimap.Tpo -c -o tests-testhashmultimap.obj `if test -f 'testhashmultimap.c'; then $(CYGPATH_W) 'testhashmultimap.c'; else $(CYGPATH_W) '$(srcdir)/testhashmultimap.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testhashmultimap.Tpo $(DEPDIR)/tests-testhashmultimap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testhashmultimap.c' object='tests-testhashmultimap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testhashmultimap.obj `if test -f 'testhashmultimap.c'; then $(CYGPATH_W) 'testhashmultimap.c'; else $(CYGPATH_W) '$(srcdir)/testhashmultimap.c'; fi`
+
+tests-testhashmultiset.o: testhashmultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testhashmultiset.o -MD -MP -MF $(DEPDIR)/tests-testhashmultiset.Tpo -c -o tests-testhashmultiset.o `test -f 'testhashmultiset.c' || echo '$(srcdir)/'`testhashmultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testhashmultiset.Tpo $(DEPDIR)/tests-testhashmultiset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testhashmultiset.c' object='tests-testhashmultiset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testhashmultiset.o `test -f 'testhashmultiset.c' || echo '$(srcdir)/'`testhashmultiset.c
+
+tests-testhashmultiset.obj: testhashmultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testhashmultiset.obj -MD -MP -MF $(DEPDIR)/tests-testhashmultiset.Tpo -c -o tests-testhashmultiset.obj `if test -f 'testhashmultiset.c'; then $(CYGPATH_W) 'testhashmultiset.c'; else $(CYGPATH_W) '$(srcdir)/testhashmultiset.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testhashmultiset.Tpo $(DEPDIR)/tests-testhashmultiset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testhashmultiset.c' object='tests-testhashmultiset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testhashmultiset.obj `if test -f 'testhashmultiset.c'; then $(CYGPATH_W) 'testhashmultiset.c'; else $(CYGPATH_W) '$(srcdir)/testhashmultiset.c'; fi`
+
+tests-testhashset.o: testhashset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testhashset.o -MD -MP -MF $(DEPDIR)/tests-testhashset.Tpo -c -o tests-testhashset.o `test -f 'testhashset.c' || echo '$(srcdir)/'`testhashset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testhashset.Tpo $(DEPDIR)/tests-testhashset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testhashset.c' object='tests-testhashset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testhashset.o `test -f 'testhashset.c' || echo '$(srcdir)/'`testhashset.c
+
+tests-testhashset.obj: testhashset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testhashset.obj -MD -MP -MF $(DEPDIR)/tests-testhashset.Tpo -c -o tests-testhashset.obj `if test -f 'testhashset.c'; then $(CYGPATH_W) 'testhashset.c'; else $(CYGPATH_W) '$(srcdir)/testhashset.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testhashset.Tpo $(DEPDIR)/tests-testhashset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testhashset.c' object='tests-testhashset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testhashset.obj `if test -f 'testhashset.c'; then $(CYGPATH_W) 'testhashset.c'; else $(CYGPATH_W) '$(srcdir)/testhashset.c'; fi`
+
+tests-testlinkedlist.o: testlinkedlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testlinkedlist.o -MD -MP -MF $(DEPDIR)/tests-testlinkedlist.Tpo -c -o tests-testlinkedlist.o `test -f 'testlinkedlist.c' || echo '$(srcdir)/'`testlinkedlist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testlinkedlist.Tpo $(DEPDIR)/tests-testlinkedlist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testlinkedlist.c' object='tests-testlinkedlist.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testlinkedlist.o `test -f 'testlinkedlist.c' || echo '$(srcdir)/'`testlinkedlist.c
+
+tests-testlinkedlist.obj: testlinkedlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testlinkedlist.obj -MD -MP -MF $(DEPDIR)/tests-testlinkedlist.Tpo -c -o tests-testlinkedlist.obj `if test -f 'testlinkedlist.c'; then $(CYGPATH_W) 'testlinkedlist.c'; else $(CYGPATH_W) '$(srcdir)/testlinkedlist.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testlinkedlist.Tpo $(DEPDIR)/tests-testlinkedlist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testlinkedlist.c' object='tests-testlinkedlist.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testlinkedlist.obj `if test -f 'testlinkedlist.c'; then $(CYGPATH_W) 'testlinkedlist.c'; else $(CYGPATH_W) '$(srcdir)/testlinkedlist.c'; fi`
+
+tests-testlinkedlistasdeque.o: testlinkedlistasdeque.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testlinkedlistasdeque.o -MD -MP -MF $(DEPDIR)/tests-testlinkedlistasdeque.Tpo -c -o tests-testlinkedlistasdeque.o `test -f 'testlinkedlistasdeque.c' || echo '$(srcdir)/'`testlinkedlistasdeque.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testlinkedlistasdeque.Tpo $(DEPDIR)/tests-testlinkedlistasdeque.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testlinkedlistasdeque.c' object='tests-testlinkedlistasdeque.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testlinkedlistasdeque.o `test -f 'testlinkedlistasdeque.c' || echo '$(srcdir)/'`testlinkedlistasdeque.c
+
+tests-testlinkedlistasdeque.obj: testlinkedlistasdeque.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testlinkedlistasdeque.obj -MD -MP -MF $(DEPDIR)/tests-testlinkedlistasdeque.Tpo -c -o tests-testlinkedlistasdeque.obj `if test -f 'testlinkedlistasdeque.c'; then $(CYGPATH_W) 'testlinkedlistasdeque.c'; else $(CYGPATH_W) '$(srcdir)/testlinkedlistasdeque.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testlinkedlistasdeque.Tpo $(DEPDIR)/tests-testlinkedlistasdeque.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testlinkedlistasdeque.c' object='tests-testlinkedlistasdeque.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testlinkedlistasdeque.obj `if test -f 'testlinkedlistasdeque.c'; then $(CYGPATH_W) 'testlinkedlistasdeque.c'; else $(CYGPATH_W) '$(srcdir)/testlinkedlistasdeque.c'; fi`
+
+tests-testlist.o: testlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testlist.o -MD -MP -MF $(DEPDIR)/tests-testlist.Tpo -c -o tests-testlist.o `test -f 'testlist.c' || echo '$(srcdir)/'`testlist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testlist.Tpo $(DEPDIR)/tests-testlist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testlist.c' object='tests-testlist.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testlist.o `test -f 'testlist.c' || echo '$(srcdir)/'`testlist.c
+
+tests-testlist.obj: testlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testlist.obj -MD -MP -MF $(DEPDIR)/tests-testlist.Tpo -c -o tests-testlist.obj `if test -f 'testlist.c'; then $(CYGPATH_W) 'testlist.c'; else $(CYGPATH_W) '$(srcdir)/testlist.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testlist.Tpo $(DEPDIR)/tests-testlist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testlist.c' object='tests-testlist.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testlist.obj `if test -f 'testlist.c'; then $(CYGPATH_W) 'testlist.c'; else $(CYGPATH_W) '$(srcdir)/testlist.c'; fi`
+
+tests-testmain.o: testmain.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testmain.o -MD -MP -MF $(DEPDIR)/tests-testmain.Tpo -c -o tests-testmain.o `test -f 'testmain.c' || echo '$(srcdir)/'`testmain.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testmain.Tpo $(DEPDIR)/tests-testmain.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testmain.c' object='tests-testmain.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testmain.o `test -f 'testmain.c' || echo '$(srcdir)/'`testmain.c
+
+tests-testmain.obj: testmain.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testmain.obj -MD -MP -MF $(DEPDIR)/tests-testmain.Tpo -c -o tests-testmain.obj `if test -f 'testmain.c'; then $(CYGPATH_W) 'testmain.c'; else $(CYGPATH_W) '$(srcdir)/testmain.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testmain.Tpo $(DEPDIR)/tests-testmain.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testmain.c' object='tests-testmain.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testmain.obj `if test -f 'testmain.c'; then $(CYGPATH_W) 'testmain.c'; else $(CYGPATH_W) '$(srcdir)/testmain.c'; fi`
+
+tests-testmap.o: testmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testmap.o -MD -MP -MF $(DEPDIR)/tests-testmap.Tpo -c -o tests-testmap.o `test -f 'testmap.c' || echo '$(srcdir)/'`testmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testmap.Tpo $(DEPDIR)/tests-testmap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testmap.c' object='tests-testmap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testmap.o `test -f 'testmap.c' || echo '$(srcdir)/'`testmap.c
+
+tests-testmap.obj: testmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testmap.obj -MD -MP -MF $(DEPDIR)/tests-testmap.Tpo -c -o tests-testmap.obj `if test -f 'testmap.c'; then $(CYGPATH_W) 'testmap.c'; else $(CYGPATH_W) '$(srcdir)/testmap.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testmap.Tpo $(DEPDIR)/tests-testmap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testmap.c' object='tests-testmap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testmap.obj `if test -f 'testmap.c'; then $(CYGPATH_W) 'testmap.c'; else $(CYGPATH_W) '$(srcdir)/testmap.c'; fi`
+
+tests-testmultimap.o: testmultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testmultimap.o -MD -MP -MF $(DEPDIR)/tests-testmultimap.Tpo -c -o tests-testmultimap.o `test -f 'testmultimap.c' || echo '$(srcdir)/'`testmultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testmultimap.Tpo $(DEPDIR)/tests-testmultimap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testmultimap.c' object='tests-testmultimap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testmultimap.o `test -f 'testmultimap.c' || echo '$(srcdir)/'`testmultimap.c
+
+tests-testmultimap.obj: testmultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testmultimap.obj -MD -MP -MF $(DEPDIR)/tests-testmultimap.Tpo -c -o tests-testmultimap.obj `if test -f 'testmultimap.c'; then $(CYGPATH_W) 'testmultimap.c'; else $(CYGPATH_W) '$(srcdir)/testmultimap.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testmultimap.Tpo $(DEPDIR)/tests-testmultimap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testmultimap.c' object='tests-testmultimap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testmultimap.obj `if test -f 'testmultimap.c'; then $(CYGPATH_W) 'testmultimap.c'; else $(CYGPATH_W) '$(srcdir)/testmultimap.c'; fi`
+
+tests-testmultiset.o: testmultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testmultiset.o -MD -MP -MF $(DEPDIR)/tests-testmultiset.Tpo -c -o tests-testmultiset.o `test -f 'testmultiset.c' || echo '$(srcdir)/'`testmultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testmultiset.Tpo $(DEPDIR)/tests-testmultiset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testmultiset.c' object='tests-testmultiset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testmultiset.o `test -f 'testmultiset.c' || echo '$(srcdir)/'`testmultiset.c
+
+tests-testmultiset.obj: testmultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testmultiset.obj -MD -MP -MF $(DEPDIR)/tests-testmultiset.Tpo -c -o tests-testmultiset.obj `if test -f 'testmultiset.c'; then $(CYGPATH_W) 'testmultiset.c'; else $(CYGPATH_W) '$(srcdir)/testmultiset.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testmultiset.Tpo $(DEPDIR)/tests-testmultiset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testmultiset.c' object='tests-testmultiset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testmultiset.obj `if test -f 'testmultiset.c'; then $(CYGPATH_W) 'testmultiset.c'; else $(CYGPATH_W) '$(srcdir)/testmultiset.c'; fi`
+
+tests-testpriorityqueue.o: testpriorityqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testpriorityqueue.o -MD -MP -MF $(DEPDIR)/tests-testpriorityqueue.Tpo -c -o tests-testpriorityqueue.o `test -f 'testpriorityqueue.c' || echo '$(srcdir)/'`testpriorityqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testpriorityqueue.Tpo $(DEPDIR)/tests-testpriorityqueue.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testpriorityqueue.c' object='tests-testpriorityqueue.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testpriorityqueue.o `test -f 'testpriorityqueue.c' || echo '$(srcdir)/'`testpriorityqueue.c
+
+tests-testpriorityqueue.obj: testpriorityqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testpriorityqueue.obj -MD -MP -MF $(DEPDIR)/tests-testpriorityqueue.Tpo -c -o tests-testpriorityqueue.obj `if test -f 'testpriorityqueue.c'; then $(CYGPATH_W) 'testpriorityqueue.c'; else $(CYGPATH_W) '$(srcdir)/testpriorityqueue.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testpriorityqueue.Tpo $(DEPDIR)/tests-testpriorityqueue.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testpriorityqueue.c' object='tests-testpriorityqueue.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testpriorityqueue.obj `if test -f 'testpriorityqueue.c'; then $(CYGPATH_W) 'testpriorityqueue.c'; else $(CYGPATH_W) '$(srcdir)/testpriorityqueue.c'; fi`
+
+tests-testqueue.o: testqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testqueue.o -MD -MP -MF $(DEPDIR)/tests-testqueue.Tpo -c -o tests-testqueue.o `test -f 'testqueue.c' || echo '$(srcdir)/'`testqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testqueue.Tpo $(DEPDIR)/tests-testqueue.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testqueue.c' object='tests-testqueue.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testqueue.o `test -f 'testqueue.c' || echo '$(srcdir)/'`testqueue.c
+
+tests-testqueue.obj: testqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testqueue.obj -MD -MP -MF $(DEPDIR)/tests-testqueue.Tpo -c -o tests-testqueue.obj `if test -f 'testqueue.c'; then $(CYGPATH_W) 'testqueue.c'; else $(CYGPATH_W) '$(srcdir)/testqueue.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testqueue.Tpo $(DEPDIR)/tests-testqueue.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testqueue.c' object='tests-testqueue.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testqueue.obj `if test -f 'testqueue.c'; then $(CYGPATH_W) 'testqueue.c'; else $(CYGPATH_W) '$(srcdir)/testqueue.c'; fi`
+
+tests-testreadonlybidirlist.o: testreadonlybidirlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testreadonlybidirlist.o -MD -MP -MF $(DEPDIR)/tests-testreadonlybidirlist.Tpo -c -o tests-testreadonlybidirlist.o `test -f 'testreadonlybidirlist.c' || echo '$(srcdir)/'`testreadonlybidirlist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testreadonlybidirlist.Tpo $(DEPDIR)/tests-testreadonlybidirlist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testreadonlybidirlist.c' object='tests-testreadonlybidirlist.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testreadonlybidirlist.o `test -f 'testreadonlybidirlist.c' || echo '$(srcdir)/'`testreadonlybidirlist.c
+
+tests-testreadonlybidirlist.obj: testreadonlybidirlist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testreadonlybidirlist.obj -MD -MP -MF $(DEPDIR)/tests-testreadonlybidirlist.Tpo -c -o tests-testreadonlybidirlist.obj `if test -f 'testreadonlybidirlist.c'; then $(CYGPATH_W) 'testreadonlybidirlist.c'; else $(CYGPATH_W) '$(srcdir)/testreadonlybidirlist.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testreadonlybidirlist.Tpo $(DEPDIR)/tests-testreadonlybidirlist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testreadonlybidirlist.c' object='tests-testreadonlybidirlist.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testreadonlybidirlist.obj `if test -f 'testreadonlybidirlist.c'; then $(CYGPATH_W) 'testreadonlybidirlist.c'; else $(CYGPATH_W) '$(srcdir)/testreadonlybidirlist.c'; fi`
+
+tests-testreadonlycollection.o: testreadonlycollection.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testreadonlycollection.o -MD -MP -MF $(DEPDIR)/tests-testreadonlycollection.Tpo -c -o tests-testreadonlycollection.o `test -f 'testreadonlycollection.c' || echo '$(srcdir)/'`testreadonlycollection.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testreadonlycollection.Tpo $(DEPDIR)/tests-testreadonlycollection.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testreadonlycollection.c' object='tests-testreadonlycollection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testreadonlycollection.o `test -f 'testreadonlycollection.c' || echo '$(srcdir)/'`testreadonlycollection.c
+
+tests-testreadonlycollection.obj: testreadonlycollection.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testreadonlycollection.obj -MD -MP -MF $(DEPDIR)/tests-testreadonlycollection.Tpo -c -o tests-testreadonlycollection.obj `if test -f 'testreadonlycollection.c'; then $(CYGPATH_W) 'testreadonlycollection.c'; else $(CYGPATH_W) '$(srcdir)/testreadonlycollection.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testreadonlycollection.Tpo $(DEPDIR)/tests-testreadonlycollection.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testreadonlycollection.c' object='tests-testreadonlycollection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testreadonlycollection.obj `if test -f 'testreadonlycollection.c'; then $(CYGPATH_W) 'testreadonlycollection.c'; else $(CYGPATH_W) '$(srcdir)/testreadonlycollection.c'; fi`
+
+tests-testreadonlylist.o: testreadonlylist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testreadonlylist.o -MD -MP -MF $(DEPDIR)/tests-testreadonlylist.Tpo -c -o tests-testreadonlylist.o `test -f 'testreadonlylist.c' || echo '$(srcdir)/'`testreadonlylist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testreadonlylist.Tpo $(DEPDIR)/tests-testreadonlylist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testreadonlylist.c' object='tests-testreadonlylist.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testreadonlylist.o `test -f 'testreadonlylist.c' || echo '$(srcdir)/'`testreadonlylist.c
+
+tests-testreadonlylist.obj: testreadonlylist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testreadonlylist.obj -MD -MP -MF $(DEPDIR)/tests-testreadonlylist.Tpo -c -o tests-testreadonlylist.obj `if test -f 'testreadonlylist.c'; then $(CYGPATH_W) 'testreadonlylist.c'; else $(CYGPATH_W) '$(srcdir)/testreadonlylist.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testreadonlylist.Tpo $(DEPDIR)/tests-testreadonlylist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testreadonlylist.c' object='tests-testreadonlylist.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testreadonlylist.obj `if test -f 'testreadonlylist.c'; then $(CYGPATH_W) 'testreadonlylist.c'; else $(CYGPATH_W) '$(srcdir)/testreadonlylist.c'; fi`
+
+tests-testreadonlymap.o: testreadonlymap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testreadonlymap.o -MD -MP -MF $(DEPDIR)/tests-testreadonlymap.Tpo -c -o tests-testreadonlymap.o `test -f 'testreadonlymap.c' || echo '$(srcdir)/'`testreadonlymap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testreadonlymap.Tpo $(DEPDIR)/tests-testreadonlymap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testreadonlymap.c' object='tests-testreadonlymap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testreadonlymap.o `test -f 'testreadonlymap.c' || echo '$(srcdir)/'`testreadonlymap.c
+
+tests-testreadonlymap.obj: testreadonlymap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testreadonlymap.obj -MD -MP -MF $(DEPDIR)/tests-testreadonlymap.Tpo -c -o tests-testreadonlymap.obj `if test -f 'testreadonlymap.c'; then $(CYGPATH_W) 'testreadonlymap.c'; else $(CYGPATH_W) '$(srcdir)/testreadonlymap.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testreadonlymap.Tpo $(DEPDIR)/tests-testreadonlymap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testreadonlymap.c' object='tests-testreadonlymap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testreadonlymap.obj `if test -f 'testreadonlymap.c'; then $(CYGPATH_W) 'testreadonlymap.c'; else $(CYGPATH_W) '$(srcdir)/testreadonlymap.c'; fi`
+
+tests-testreadonlyset.o: testreadonlyset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testreadonlyset.o -MD -MP -MF $(DEPDIR)/tests-testreadonlyset.Tpo -c -o tests-testreadonlyset.o `test -f 'testreadonlyset.c' || echo '$(srcdir)/'`testreadonlyset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testreadonlyset.Tpo $(DEPDIR)/tests-testreadonlyset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testreadonlyset.c' object='tests-testreadonlyset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testreadonlyset.o `test -f 'testreadonlyset.c' || echo '$(srcdir)/'`testreadonlyset.c
+
+tests-testreadonlyset.obj: testreadonlyset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testreadonlyset.obj -MD -MP -MF $(DEPDIR)/tests-testreadonlyset.Tpo -c -o tests-testreadonlyset.obj `if test -f 'testreadonlyset.c'; then $(CYGPATH_W) 'testreadonlyset.c'; else $(CYGPATH_W) '$(srcdir)/testreadonlyset.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testreadonlyset.Tpo $(DEPDIR)/tests-testreadonlyset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testreadonlyset.c' object='tests-testreadonlyset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testreadonlyset.obj `if test -f 'testreadonlyset.c'; then $(CYGPATH_W) 'testreadonlyset.c'; else $(CYGPATH_W) '$(srcdir)/testreadonlyset.c'; fi`
+
+tests-testset.o: testset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testset.o -MD -MP -MF $(DEPDIR)/tests-testset.Tpo -c -o tests-testset.o `test -f 'testset.c' || echo '$(srcdir)/'`testset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testset.Tpo $(DEPDIR)/tests-testset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testset.c' object='tests-testset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testset.o `test -f 'testset.c' || echo '$(srcdir)/'`testset.c
+
+tests-testset.obj: testset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testset.obj -MD -MP -MF $(DEPDIR)/tests-testset.Tpo -c -o tests-testset.obj `if test -f 'testset.c'; then $(CYGPATH_W) 'testset.c'; else $(CYGPATH_W) '$(srcdir)/testset.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testset.Tpo $(DEPDIR)/tests-testset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testset.c' object='tests-testset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testset.obj `if test -f 'testset.c'; then $(CYGPATH_W) 'testset.c'; else $(CYGPATH_W) '$(srcdir)/testset.c'; fi`
+
+tests-testsortedset.o: testsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testsortedset.o -MD -MP -MF $(DEPDIR)/tests-testsortedset.Tpo -c -o tests-testsortedset.o `test -f 'testsortedset.c' || echo '$(srcdir)/'`testsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testsortedset.Tpo $(DEPDIR)/tests-testsortedset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsortedset.c' object='tests-testsortedset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testsortedset.o `test -f 'testsortedset.c' || echo '$(srcdir)/'`testsortedset.c
+
+tests-testsortedset.obj: testsortedset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testsortedset.obj -MD -MP -MF $(DEPDIR)/tests-testsortedset.Tpo -c -o tests-testsortedset.obj `if test -f 'testsortedset.c'; then $(CYGPATH_W) 'testsortedset.c'; else $(CYGPATH_W) '$(srcdir)/testsortedset.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testsortedset.Tpo $(DEPDIR)/tests-testsortedset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsortedset.c' object='tests-testsortedset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testsortedset.obj `if test -f 'testsortedset.c'; then $(CYGPATH_W) 'testsortedset.c'; else $(CYGPATH_W) '$(srcdir)/testsortedset.c'; fi`
+
+tests-testsortedmap.o: testsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testsortedmap.o -MD -MP -MF $(DEPDIR)/tests-testsortedmap.Tpo -c -o tests-testsortedmap.o `test -f 'testsortedmap.c' || echo '$(srcdir)/'`testsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testsortedmap.Tpo $(DEPDIR)/tests-testsortedmap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsortedmap.c' object='tests-testsortedmap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testsortedmap.o `test -f 'testsortedmap.c' || echo '$(srcdir)/'`testsortedmap.c
+
+tests-testsortedmap.obj: testsortedmap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testsortedmap.obj -MD -MP -MF $(DEPDIR)/tests-testsortedmap.Tpo -c -o tests-testsortedmap.obj `if test -f 'testsortedmap.c'; then $(CYGPATH_W) 'testsortedmap.c'; else $(CYGPATH_W) '$(srcdir)/testsortedmap.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testsortedmap.Tpo $(DEPDIR)/tests-testsortedmap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsortedmap.c' object='tests-testsortedmap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testsortedmap.obj `if test -f 'testsortedmap.c'; then $(CYGPATH_W) 'testsortedmap.c'; else $(CYGPATH_W) '$(srcdir)/testsortedmap.c'; fi`
+
+tests-testtreemap.o: testtreemap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testtreemap.o -MD -MP -MF $(DEPDIR)/tests-testtreemap.Tpo -c -o tests-testtreemap.o `test -f 'testtreemap.c' || echo '$(srcdir)/'`testtreemap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testtreemap.Tpo $(DEPDIR)/tests-testtreemap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testtreemap.c' object='tests-testtreemap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testtreemap.o `test -f 'testtreemap.c' || echo '$(srcdir)/'`testtreemap.c
+
+tests-testtreemap.obj: testtreemap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testtreemap.obj -MD -MP -MF $(DEPDIR)/tests-testtreemap.Tpo -c -o tests-testtreemap.obj `if test -f 'testtreemap.c'; then $(CYGPATH_W) 'testtreemap.c'; else $(CYGPATH_W) '$(srcdir)/testtreemap.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testtreemap.Tpo $(DEPDIR)/tests-testtreemap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testtreemap.c' object='tests-testtreemap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testtreemap.obj `if test -f 'testtreemap.c'; then $(CYGPATH_W) 'testtreemap.c'; else $(CYGPATH_W) '$(srcdir)/testtreemap.c'; fi`
+
+tests-testtreemultimap.o: testtreemultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testtreemultimap.o -MD -MP -MF $(DEPDIR)/tests-testtreemultimap.Tpo -c -o tests-testtreemultimap.o `test -f 'testtreemultimap.c' || echo '$(srcdir)/'`testtreemultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testtreemultimap.Tpo $(DEPDIR)/tests-testtreemultimap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testtreemultimap.c' object='tests-testtreemultimap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testtreemultimap.o `test -f 'testtreemultimap.c' || echo '$(srcdir)/'`testtreemultimap.c
+
+tests-testtreemultimap.obj: testtreemultimap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testtreemultimap.obj -MD -MP -MF $(DEPDIR)/tests-testtreemultimap.Tpo -c -o tests-testtreemultimap.obj `if test -f 'testtreemultimap.c'; then $(CYGPATH_W) 'testtreemultimap.c'; else $(CYGPATH_W) '$(srcdir)/testtreemultimap.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testtreemultimap.Tpo $(DEPDIR)/tests-testtreemultimap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testtreemultimap.c' object='tests-testtreemultimap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testtreemultimap.obj `if test -f 'testtreemultimap.c'; then $(CYGPATH_W) 'testtreemultimap.c'; else $(CYGPATH_W) '$(srcdir)/testtreemultimap.c'; fi`
+
+tests-testtreemultiset.o: testtreemultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testtreemultiset.o -MD -MP -MF $(DEPDIR)/tests-testtreemultiset.Tpo -c -o tests-testtreemultiset.o `test -f 'testtreemultiset.c' || echo '$(srcdir)/'`testtreemultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testtreemultiset.Tpo $(DEPDIR)/tests-testtreemultiset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testtreemultiset.c' object='tests-testtreemultiset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testtreemultiset.o `test -f 'testtreemultiset.c' || echo '$(srcdir)/'`testtreemultiset.c
+
+tests-testtreemultiset.obj: testtreemultiset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testtreemultiset.obj -MD -MP -MF $(DEPDIR)/tests-testtreemultiset.Tpo -c -o tests-testtreemultiset.obj `if test -f 'testtreemultiset.c'; then $(CYGPATH_W) 'testtreemultiset.c'; else $(CYGPATH_W) '$(srcdir)/testtreemultiset.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testtreemultiset.Tpo $(DEPDIR)/tests-testtreemultiset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testtreemultiset.c' object='tests-testtreemultiset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testtreemultiset.obj `if test -f 'testtreemultiset.c'; then $(CYGPATH_W) 'testtreemultiset.c'; else $(CYGPATH_W) '$(srcdir)/testtreemultiset.c'; fi`
+
+tests-testtreeset.o: testtreeset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testtreeset.o -MD -MP -MF $(DEPDIR)/tests-testtreeset.Tpo -c -o tests-testtreeset.o `test -f 'testtreeset.c' || echo '$(srcdir)/'`testtreeset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testtreeset.Tpo $(DEPDIR)/tests-testtreeset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testtreeset.c' object='tests-testtreeset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testtreeset.o `test -f 'testtreeset.c' || echo '$(srcdir)/'`testtreeset.c
+
+tests-testtreeset.obj: testtreeset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tests-testtreeset.obj -MD -MP -MF $(DEPDIR)/tests-testtreeset.Tpo -c -o tests-testtreeset.obj `if test -f 'testtreeset.c'; then $(CYGPATH_W) 'testtreeset.c'; else $(CYGPATH_W) '$(srcdir)/testtreeset.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tests-testtreeset.Tpo $(DEPDIR)/tests-testtreeset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testtreeset.c' object='tests-testtreeset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tests-testtreeset.obj `if test -f 'testtreeset.c'; then $(CYGPATH_W) 'testtreeset.c'; else $(CYGPATH_W) '$(srcdir)/testtreeset.c'; fi`
+$(srcdir)/testarraylist.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testarrayqueue.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testbidirlist.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testbidirsortedset.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testbidirsortedmap.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testcase.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testcollection.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testconcurrentlist.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testconcurrentset.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testdata.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testdeque.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testfunctions.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testhashmap.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testhashmultimap.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testhashmultiset.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testhashset.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testlinkedlist.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testlinkedlistasdeque.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testlist.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testmain.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testmap.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testmultimap.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testmultiset.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testpriorityqueue.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testqueue.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testreadonlybidirlist.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testreadonlycollection.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testreadonlylist.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testreadonlymap.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testreadonlyset.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testset.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testsortedset.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testsortedmap.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testtreemap.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testtreemultimap.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testtreemultiset.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/testtreeset.c: $(srcdir)/tests_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/tests_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/tests_vala.stamp; \
+	fi
+$(srcdir)/tests_vala.stamp: testarraylist.vala testarrayqueue.vala testbidirlist.vala testbidirsortedset.vala testbidirsortedmap.vala testcase.vala testcollection.vala testconcurrentlist.vala testconcurrentset.vala testdata.vala testdeque.vala testfunctions.vala testhashmap.vala testhashmultimap.vala testhashmultiset.vala testhashset.vala testlinkedlist.vala testlinkedlistasdeque.vala testlist.vala testmain.vala testmap.vala testmultimap.vala testmultiset.vala testpriorityqueue.vala testqueue.vala testreadonlybidirlist.vala testreadonlycollection.vala testreadonlylist.vala testreadonlymap.vala testreadonlyset.vala testset.vala testsortedset.vala testsortedmap.vala testtreemap.vala testtreemultimap.vala testtreemultiset.vala testtreeset.vala
+	$(AM_V_at)rm -f $@ && echo stamp > $@-t
+	$(AM_V_VALAC)$(am__cd) $(srcdir) && $(VALAC) $(tests_VALAFLAGS) $(VALAFLAGS) -C testarraylist.vala testarrayqueue.vala testbidirlist.vala testbidirsortedset.vala testbidirsortedmap.vala testcase.vala testcollection.vala testconcurrentlist.vala testconcurrentset.vala testdata.vala testdeque.vala testfunctions.vala testhashmap.vala testhashmultimap.vala testhashmultiset.vala testhashset.vala testlinkedlist.vala testlinkedlistasdeque.vala testlist.vala testmain.vala testmap.vala testmultimap.vala testmultiset.vala testpriorityqueue.vala testqueue.vala testreadonlybidirlist.vala testreadonlycollection.vala testreadonlylist.vala testreadonlymap.vala testreadonlyset.vala testset.vala testsortedset.vala testsortedmap.vala testtreemap.vala testtreemultimap.vala testtreemultiset.vala testtreeset.vala
+	$(AM_V_at)mv -f $@-t $@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -511,12 +1268,10 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-local
-check: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) check-am
+check: check-am
 all-am: Makefile $(PROGRAMS)
 installdirs:
-install: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) install-am
+install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -546,8 +1301,44 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
-	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+	-rm -f testarraylist.c
+	-rm -f testarrayqueue.c
+	-rm -f testbidirlist.c
+	-rm -f testbidirsortedmap.c
+	-rm -f testbidirsortedset.c
+	-rm -f testcase.c
+	-rm -f testcollection.c
+	-rm -f testconcurrentlist.c
+	-rm -f testconcurrentset.c
+	-rm -f testdata.c
+	-rm -f testdeque.c
+	-rm -f testfunctions.c
+	-rm -f testhashmap.c
+	-rm -f testhashmultimap.c
+	-rm -f testhashmultiset.c
+	-rm -f testhashset.c
+	-rm -f testlinkedlist.c
+	-rm -f testlinkedlistasdeque.c
+	-rm -f testlist.c
+	-rm -f testmain.c
+	-rm -f testmap.c
+	-rm -f testmultimap.c
+	-rm -f testmultiset.c
+	-rm -f testpriorityqueue.c
+	-rm -f testqueue.c
+	-rm -f testreadonlybidirlist.c
+	-rm -f testreadonlycollection.c
+	-rm -f testreadonlylist.c
+	-rm -f testreadonlymap.c
+	-rm -f testreadonlyset.c
+	-rm -f tests_vala.stamp
+	-rm -f testset.c
+	-rm -f testsortedmap.c
+	-rm -f testsortedset.c
+	-rm -f testtreemap.c
+	-rm -f testtreemultimap.c
+	-rm -f testtreemultiset.c
+	-rm -f testtreeset.c
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-local clean-noinstPROGRAMS \
@@ -619,7 +1410,7 @@ ps-am:
 
 uninstall-am:
 
-.MAKE: all check check-am install install-am install-strip
+.MAKE: check-am install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am check-local clean \
 	clean-generic clean-libtool clean-local clean-noinstPROGRAMS \
@@ -684,9 +1475,6 @@ test-report perf-report full-report:	${TEST_PROGS}
 .PHONY: test test-report perf-report full-report
 # run make test as part of make check
 check-local: test
-tests.vala.stamp: $(tests_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir $(top_srcdir)/gee --pkg gee-1.0 --pkg posix $^
-	touch $@
 
 coverage-reset:
 	lcov --base-directory=@top_srcdir@ --directory @top_srcdir@/gee --zerocounters

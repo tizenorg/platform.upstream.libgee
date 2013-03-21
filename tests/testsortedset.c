@@ -74,20 +74,20 @@ typedef struct _SortedSetTests SortedSetTests;
 typedef struct _SortedSetTestsClass SortedSetTestsClass;
 typedef struct _SortedSetTestsPrivate SortedSetTestsPrivate;
 
-#define SORTED_SET_TESTS_SUB_SET_TYPE_TYPE (sorted_set_tests_sub_set_type_get_type ())
+#define SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TYPE (sorted_set_tests_sub_set_tests_type_get_type ())
 
-#define SORTED_SET_TESTS_TYPE_SUB_SET (sorted_set_tests_sub_set_get_type ())
-#define SORTED_SET_TESTS_SUB_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), SORTED_SET_TESTS_TYPE_SUB_SET, SortedSetTestsSubSet))
-#define SORTED_SET_TESTS_SUB_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), SORTED_SET_TESTS_TYPE_SUB_SET, SortedSetTestsSubSetClass))
-#define SORTED_SET_TESTS_IS_SUB_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), SORTED_SET_TESTS_TYPE_SUB_SET))
-#define SORTED_SET_TESTS_IS_SUB_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), SORTED_SET_TESTS_TYPE_SUB_SET))
-#define SORTED_SET_TESTS_SUB_SET_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), SORTED_SET_TESTS_TYPE_SUB_SET, SortedSetTestsSubSetClass))
+#define SORTED_SET_TESTS_TYPE_SUB_SET_TESTS (sorted_set_tests_sub_set_tests_get_type ())
+#define SORTED_SET_TESTS_SUB_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), SORTED_SET_TESTS_TYPE_SUB_SET_TESTS, SortedSetTestsSubSetTests))
+#define SORTED_SET_TESTS_SUB_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), SORTED_SET_TESTS_TYPE_SUB_SET_TESTS, SortedSetTestsSubSetTestsClass))
+#define SORTED_SET_TESTS_IS_SUB_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), SORTED_SET_TESTS_TYPE_SUB_SET_TESTS))
+#define SORTED_SET_TESTS_IS_SUB_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), SORTED_SET_TESTS_TYPE_SUB_SET_TESTS))
+#define SORTED_SET_TESTS_SUB_SET_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), SORTED_SET_TESTS_TYPE_SUB_SET_TESTS, SortedSetTestsSubSetTestsClass))
 
-typedef struct _SortedSetTestsSubSet SortedSetTestsSubSet;
-typedef struct _SortedSetTestsSubSetClass SortedSetTestsSubSetClass;
+typedef struct _SortedSetTestsSubSetTests SortedSetTestsSubSetTests;
+typedef struct _SortedSetTestsSubSetTestsClass SortedSetTestsSubSetTestsClass;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 #define _g_free0(var) (var = (g_free (var), NULL))
-typedef struct _SortedSetTestsSubSetPrivate SortedSetTestsSubSetPrivate;
+typedef struct _SortedSetTestsSubSetTestsPrivate SortedSetTestsSubSetTestsPrivate;
 #define _vala_assert(expr, msg) if G_LIKELY (expr) ; else g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
 
 struct _GeeTestCase {
@@ -130,44 +130,50 @@ struct _SortedSetTestsClass {
 	SetTestsClass parent_class;
 };
 
-typedef void (*GeeTestCaseTestMethod) (void* user_data);
-typedef enum  {
-	SORTED_SET_TESTS_SUB_SET_TYPE_HEAD,
-	SORTED_SET_TESTS_SUB_SET_TYPE_TAIL,
-	SORTED_SET_TESTS_SUB_SET_TYPE_SUB,
-	SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY
-} SortedSetTestsSubSetType;
-
-struct _SortedSetTestsSubSet {
-	GeeTestCase parent_instance;
-	SortedSetTestsSubSetPrivate * priv;
+struct _SortedSetTestsPrivate {
+	gboolean strict;
 };
 
-struct _SortedSetTestsSubSetClass {
+typedef void (*GeeTestCaseTestMethod) (void* user_data);
+typedef enum  {
+	SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD,
+	SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL,
+	SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB,
+	SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY
+} SortedSetTestsSubSetTestsType;
+
+struct _SortedSetTestsSubSetTests {
+	GeeTestCase parent_instance;
+	SortedSetTestsSubSetTestsPrivate * priv;
+};
+
+struct _SortedSetTestsSubSetTestsClass {
 	GeeTestCaseClass parent_class;
 };
 
-struct _SortedSetTestsSubSetPrivate {
+struct _SortedSetTestsSubSetTestsPrivate {
 	GeeSortedSet* master;
 	GeeSortedSet* subset;
 	SortedSetTests* test;
-	SortedSetTestsSubSetType type;
+	SortedSetTestsSubSetTestsType type;
+	gboolean strict;
 };
 
 
 static gpointer sorted_set_tests_parent_class = NULL;
-static gpointer sorted_set_tests_sub_set_parent_class = NULL;
+static gpointer sorted_set_tests_sub_set_tests_parent_class = NULL;
 
 GType gee_test_case_get_type (void) G_GNUC_CONST;
 GType collection_tests_get_type (void) G_GNUC_CONST;
 GType set_tests_get_type (void) G_GNUC_CONST;
 GType sorted_set_tests_get_type (void) G_GNUC_CONST;
+#define SORTED_SET_TESTS_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_SORTED_SET_TESTS, SortedSetTestsPrivate))
 enum  {
 	SORTED_SET_TESTS_DUMMY_PROPERTY
 };
-SortedSetTests* sorted_set_tests_construct (GType object_type, const gchar* name);
+SortedSetTests* sorted_set_tests_construct (GType object_type, const gchar* name, gboolean strict);
 SetTests* set_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 void sorted_set_tests_test_first (SortedSetTests* self);
 static void _sorted_set_tests_test_first_gee_test_case_test_method (gpointer self);
 void sorted_set_tests_test_last (SortedSetTests* self);
@@ -184,54 +190,49 @@ void sorted_set_tests_test_floor (SortedSetTests* self);
 static void _sorted_set_tests_test_floor_gee_test_case_test_method (gpointer self);
 void sorted_set_tests_test_ceil (SortedSetTests* self);
 static void _sorted_set_tests_test_ceil_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_test_bidir_iterator_can_go_backward (SortedSetTests* self);
-static void _sorted_set_tests_test_bidir_iterator_can_go_backward_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_test_mutable_bidir_iterator (SortedSetTests* self);
-static void _sorted_set_tests_test_mutable_bidir_iterator_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_test_bidir_iterator_last (SortedSetTests* self);
-static void _sorted_set_tests_test_bidir_iterator_last_gee_test_case_test_method (gpointer self);
 GTestSuite* gee_test_case_get_suite (GeeTestCase* self);
-GType sorted_set_tests_sub_set_type_get_type (void) G_GNUC_CONST;
-SortedSetTestsSubSet* sorted_set_tests_sub_set_new (SortedSetTests* test, SortedSetTestsSubSetType type);
-SortedSetTestsSubSet* sorted_set_tests_sub_set_construct (GType object_type, SortedSetTests* test, SortedSetTestsSubSetType type);
-GType sorted_set_tests_sub_set_get_type (void) G_GNUC_CONST;
-#define SORTED_SET_TESTS_SUB_SET_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), SORTED_SET_TESTS_TYPE_SUB_SET, SortedSetTestsSubSetPrivate))
+GType sorted_set_tests_sub_set_tests_type_get_type (void) G_GNUC_CONST;
+SortedSetTestsSubSetTests* sorted_set_tests_sub_set_tests_new (SortedSetTests* test, SortedSetTestsSubSetTestsType type, gboolean strict);
+SortedSetTestsSubSetTests* sorted_set_tests_sub_set_tests_construct (GType object_type, SortedSetTests* test, SortedSetTestsSubSetTestsType type, gboolean strict);
+GType sorted_set_tests_sub_set_tests_get_type (void) G_GNUC_CONST;
+#define SORTED_SET_TESTS_SUB_SET_TESTS_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), SORTED_SET_TESTS_TYPE_SUB_SET_TESTS, SortedSetTestsSubSetTestsPrivate))
 enum  {
-	SORTED_SET_TESTS_SUB_SET_DUMMY_PROPERTY
+	SORTED_SET_TESTS_SUB_SET_TESTS_DUMMY_PROPERTY
 };
-const gchar* sorted_set_tests_sub_set_type_to_string (SortedSetTestsSubSetType self);
+const gchar* sorted_set_tests_sub_set_tests_type_to_string (SortedSetTestsSubSetTestsType self);
 GeeTestCase* gee_test_case_construct (GType object_type, const gchar* name);
-void sorted_set_tests_sub_set_test_size (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_size_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_sub_set_test_contains (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_contains_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_sub_set_test_add (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_add_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_sub_set_test_remove (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_remove_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_sub_set_test_iterator (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_iterator_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_sub_set_test_clear (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_clear_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_sub_set_test_iterator_at (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_iterator_at_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_sub_set_test_lower (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_lower_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_sub_set_test_higher (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_higher_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_sub_set_test_ceil (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_ceil_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_sub_set_test_floor (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_floor_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_sub_set_test_subsets (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_subsets_gee_test_case_test_method (gpointer self);
-void sorted_set_tests_sub_set_test_boundaries (SortedSetTestsSubSet* self);
-static void _sorted_set_tests_sub_set_test_boundaries_gee_test_case_test_method (gpointer self);
-static void sorted_set_tests_sub_set_real_set_up (GeeTestCase* base);
+void sorted_set_tests_sub_set_tests_test_size (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_size_gee_test_case_test_method (gpointer self);
+void sorted_set_tests_sub_set_tests_test_contains (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_contains_gee_test_case_test_method (gpointer self);
+void sorted_set_tests_sub_set_tests_test_add (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_add_gee_test_case_test_method (gpointer self);
+void sorted_set_tests_sub_set_tests_test_remove (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_remove_gee_test_case_test_method (gpointer self);
+void sorted_set_tests_sub_set_tests_test_iterator (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_iterator_gee_test_case_test_method (gpointer self);
+void sorted_set_tests_sub_set_tests_test_clear (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_clear_gee_test_case_test_method (gpointer self);
+void sorted_set_tests_sub_set_tests_test_iterator_at (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_iterator_at_gee_test_case_test_method (gpointer self);
+void sorted_set_tests_sub_set_tests_test_lower (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_lower_gee_test_case_test_method (gpointer self);
+void sorted_set_tests_sub_set_tests_test_higher (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_higher_gee_test_case_test_method (gpointer self);
+void sorted_set_tests_sub_set_tests_test_ceil (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_ceil_gee_test_case_test_method (gpointer self);
+void sorted_set_tests_sub_set_tests_test_floor (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_floor_gee_test_case_test_method (gpointer self);
+void sorted_set_tests_sub_set_tests_test_subsets (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_subsets_gee_test_case_test_method (gpointer self);
+void sorted_set_tests_sub_set_tests_test_boundaries (SortedSetTestsSubSetTests* self);
+static void _sorted_set_tests_sub_set_tests_test_boundaries_gee_test_case_test_method (gpointer self);
+static void sorted_set_tests_sub_set_tests_real_set_up (GeeTestCase* base);
 void gee_test_case_set_up (GeeTestCase* self);
-static void sorted_set_tests_sub_set_real_tear_down (GeeTestCase* base);
+static void sorted_set_tests_sub_set_tests_real_tear_down (GeeTestCase* base);
 void gee_test_case_tear_down (GeeTestCase* self);
-static void sorted_set_tests_sub_set_finalize (GObject* obj);
+static void sorted_set_tests_sub_set_tests_finalize (GObject* obj);
+static void sorted_set_tests_finalize (GObject* obj);
 static void _vala_array_destroy (gpointer array, gint array_length, GDestroyNotify destroy_func);
 static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify destroy_func);
 
@@ -276,78 +277,71 @@ static void _sorted_set_tests_test_ceil_gee_test_case_test_method (gpointer self
 }
 
 
-static void _sorted_set_tests_test_bidir_iterator_can_go_backward_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_test_bidir_iterator_can_go_backward (self);
-}
-
-
-static void _sorted_set_tests_test_mutable_bidir_iterator_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_test_mutable_bidir_iterator (self);
-}
-
-
-static void _sorted_set_tests_test_bidir_iterator_last_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_test_bidir_iterator_last (self);
-}
-
-
-SortedSetTests* sorted_set_tests_construct (GType object_type, const gchar* name) {
+SortedSetTests* sorted_set_tests_construct (GType object_type, const gchar* name, gboolean strict) {
 	SortedSetTests * self = NULL;
 	const gchar* _tmp0_;
-	GTestSuite* _tmp1_ = NULL;
-	SortedSetTestsSubSet* _tmp2_;
-	SortedSetTestsSubSet* _tmp3_;
-	GTestSuite* _tmp4_ = NULL;
-	GTestSuite* _tmp5_ = NULL;
-	SortedSetTestsSubSet* _tmp6_;
-	SortedSetTestsSubSet* _tmp7_;
-	GTestSuite* _tmp8_ = NULL;
-	GTestSuite* _tmp9_ = NULL;
-	SortedSetTestsSubSet* _tmp10_;
-	SortedSetTestsSubSet* _tmp11_;
+	gboolean _tmp1_;
+	GTestSuite* _tmp2_ = NULL;
+	gboolean _tmp3_;
+	SortedSetTestsSubSetTests* _tmp4_;
+	SortedSetTestsSubSetTests* _tmp5_;
+	GTestSuite* _tmp6_ = NULL;
+	GTestSuite* _tmp7_ = NULL;
+	gboolean _tmp8_;
+	SortedSetTestsSubSetTests* _tmp9_;
+	SortedSetTestsSubSetTests* _tmp10_;
+	GTestSuite* _tmp11_ = NULL;
 	GTestSuite* _tmp12_ = NULL;
-	GTestSuite* _tmp13_ = NULL;
-	SortedSetTestsSubSet* _tmp14_;
-	SortedSetTestsSubSet* _tmp15_;
+	gboolean _tmp13_;
+	SortedSetTestsSubSetTests* _tmp14_;
+	SortedSetTestsSubSetTests* _tmp15_;
 	GTestSuite* _tmp16_ = NULL;
+	GTestSuite* _tmp17_ = NULL;
+	gboolean _tmp18_;
+	SortedSetTestsSubSetTests* _tmp19_;
+	SortedSetTestsSubSetTests* _tmp20_;
+	GTestSuite* _tmp21_ = NULL;
 	g_return_val_if_fail (name != NULL, NULL);
 	_tmp0_ = name;
 	self = (SortedSetTests*) set_tests_construct (object_type, _tmp0_);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] first", _sorted_set_tests_test_first_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] last", _sorted_set_tests_test_last_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] ordering", _sorted_set_tests_test_ordering_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] iterator at", _sorted_set_tests_test_iterator_at_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] lower", _sorted_set_tests_test_lower_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] higher", _sorted_set_tests_test_higher_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] floor", _sorted_set_tests_test_floor_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] ceil", _sorted_set_tests_test_ceil_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] bi-directional iterators can go backward", _sorted_set_tests_test_bidir_iterator_can_go_backward_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] bi-directional iterators are mutable", _sorted_set_tests_test_mutable_bidir_iterator_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] bi-directional iterators can to end", _sorted_set_tests_test_bidir_iterator_last_gee_test_case_test_method, self);
-	_tmp1_ = gee_test_case_get_suite ((GeeTestCase*) self);
-	_tmp2_ = sorted_set_tests_sub_set_new (self, SORTED_SET_TESTS_SUB_SET_TYPE_HEAD);
-	_tmp3_ = _tmp2_;
-	_tmp4_ = gee_test_case_get_suite ((GeeTestCase*) _tmp3_);
-	g_test_suite_add_suite (_tmp1_, _tmp4_);
-	_g_object_unref0 (_tmp3_);
-	_tmp5_ = gee_test_case_get_suite ((GeeTestCase*) self);
-	_tmp6_ = sorted_set_tests_sub_set_new (self, SORTED_SET_TESTS_SUB_SET_TYPE_TAIL);
-	_tmp7_ = _tmp6_;
-	_tmp8_ = gee_test_case_get_suite ((GeeTestCase*) _tmp7_);
-	g_test_suite_add_suite (_tmp5_, _tmp8_);
-	_g_object_unref0 (_tmp7_);
-	_tmp9_ = gee_test_case_get_suite ((GeeTestCase*) self);
-	_tmp10_ = sorted_set_tests_sub_set_new (self, SORTED_SET_TESTS_SUB_SET_TYPE_SUB);
-	_tmp11_ = _tmp10_;
-	_tmp12_ = gee_test_case_get_suite ((GeeTestCase*) _tmp11_);
-	g_test_suite_add_suite (_tmp9_, _tmp12_);
-	_g_object_unref0 (_tmp11_);
-	_tmp13_ = gee_test_case_get_suite ((GeeTestCase*) self);
-	_tmp14_ = sorted_set_tests_sub_set_new (self, SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY);
+	_tmp1_ = strict;
+	self->priv->strict = _tmp1_;
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] first", _sorted_set_tests_test_first_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] last", _sorted_set_tests_test_last_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] ordering", _sorted_set_tests_test_ordering_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] iterator at", _sorted_set_tests_test_iterator_at_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] lower", _sorted_set_tests_test_lower_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] higher", _sorted_set_tests_test_higher_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] floor", _sorted_set_tests_test_floor_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] ceil", _sorted_set_tests_test_ceil_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	_tmp2_ = gee_test_case_get_suite ((GeeTestCase*) self);
+	_tmp3_ = strict;
+	_tmp4_ = sorted_set_tests_sub_set_tests_new (self, SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD, _tmp3_);
+	_tmp5_ = _tmp4_;
+	_tmp6_ = gee_test_case_get_suite ((GeeTestCase*) _tmp5_);
+	g_test_suite_add_suite (_tmp2_, _tmp6_);
+	_g_object_unref0 (_tmp5_);
+	_tmp7_ = gee_test_case_get_suite ((GeeTestCase*) self);
+	_tmp8_ = strict;
+	_tmp9_ = sorted_set_tests_sub_set_tests_new (self, SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL, _tmp8_);
+	_tmp10_ = _tmp9_;
+	_tmp11_ = gee_test_case_get_suite ((GeeTestCase*) _tmp10_);
+	g_test_suite_add_suite (_tmp7_, _tmp11_);
+	_g_object_unref0 (_tmp10_);
+	_tmp12_ = gee_test_case_get_suite ((GeeTestCase*) self);
+	_tmp13_ = strict;
+	_tmp14_ = sorted_set_tests_sub_set_tests_new (self, SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB, _tmp13_);
 	_tmp15_ = _tmp14_;
 	_tmp16_ = gee_test_case_get_suite ((GeeTestCase*) _tmp15_);
-	g_test_suite_add_suite (_tmp13_, _tmp16_);
+	g_test_suite_add_suite (_tmp12_, _tmp16_);
 	_g_object_unref0 (_tmp15_);
+	_tmp17_ = gee_test_case_get_suite ((GeeTestCase*) self);
+	_tmp18_ = strict;
+	_tmp19_ = sorted_set_tests_sub_set_tests_new (self, SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY, _tmp18_);
+	_tmp20_ = _tmp19_;
+	_tmp21_ = gee_test_case_get_suite ((GeeTestCase*) _tmp20_);
+	g_test_suite_add_suite (_tmp17_, _tmp21_);
+	_g_object_unref0 (_tmp20_);
 	return self;
 }
 
@@ -502,61 +496,65 @@ void sorted_set_tests_test_first (SortedSetTests* self) {
 	GeeCollection* _tmp0_;
 	GeeSortedSet* _tmp1_;
 	GeeSortedSet* test_set;
-	gboolean _tmp2_ = FALSE;
-	GeeSortedSet* _tmp6_;
-	gboolean _tmp7_ = FALSE;
-	GeeSortedSet* _tmp8_;
-	gboolean _tmp9_ = FALSE;
-	GeeSortedSet* _tmp10_;
-	gboolean _tmp11_ = FALSE;
-	GeeSortedSet* _tmp12_;
-	gboolean _tmp13_ = FALSE;
-	GeeSortedSet* _tmp14_;
-	gboolean _tmp15_ = FALSE;
-	GeeSortedSet* _tmp16_;
-	gboolean _tmp17_ = FALSE;
-	GeeSortedSet* _tmp18_;
-	gpointer _tmp19_ = NULL;
-	gchar* _tmp20_;
+	gboolean _tmp2_;
+	GeeSortedSet* _tmp7_;
+	gboolean _tmp8_ = FALSE;
+	GeeSortedSet* _tmp9_;
+	gboolean _tmp10_ = FALSE;
+	GeeSortedSet* _tmp11_;
+	gboolean _tmp12_ = FALSE;
+	GeeSortedSet* _tmp13_;
+	gboolean _tmp14_ = FALSE;
+	GeeSortedSet* _tmp15_;
+	gboolean _tmp16_ = FALSE;
+	GeeSortedSet* _tmp17_;
+	gboolean _tmp18_ = FALSE;
+	GeeSortedSet* _tmp19_;
+	gpointer _tmp20_ = NULL;
+	gchar* _tmp21_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = ((CollectionTests*) self)->test_collection;
 	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_SORTED_SET) ? ((GeeSortedSet*) _tmp0_) : NULL);
 	test_set = _tmp1_;
-	_tmp2_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
+	_tmp2_ = self->priv->strict;
 	if (_tmp2_) {
-		GeeSortedSet* _tmp3_;
-		gpointer _tmp4_ = NULL;
-		gchar* _tmp5_;
-		_tmp3_ = test_set;
-		_tmp4_ = gee_sorted_set_first (_tmp3_);
-		_tmp5_ = (gchar*) _tmp4_;
-		_g_free0 (_tmp5_);
-		exit (0);
+		gboolean _tmp3_ = FALSE;
+		_tmp3_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
+		if (_tmp3_) {
+			GeeSortedSet* _tmp4_;
+			gpointer _tmp5_ = NULL;
+			gchar* _tmp6_;
+			_tmp4_ = test_set;
+			_tmp5_ = gee_sorted_set_first (_tmp4_);
+			_tmp6_ = (gchar*) _tmp5_;
+			_g_free0 (_tmp6_);
+			exit (0);
+		}
+		g_test_trap_assert_failed ();
 	}
-	g_test_trap_assert_failed ();
-	_tmp6_ = test_set;
-	_tmp7_ = gee_collection_add ((GeeCollection*) _tmp6_, "one");
-	_vala_assert (_tmp7_, "test_set.add (\"one\")");
-	_tmp8_ = test_set;
-	_tmp9_ = gee_collection_add ((GeeCollection*) _tmp8_, "two");
-	_vala_assert (_tmp9_, "test_set.add (\"two\")");
-	_tmp10_ = test_set;
-	_tmp11_ = gee_collection_add ((GeeCollection*) _tmp10_, "three");
-	_vala_assert (_tmp11_, "test_set.add (\"three\")");
-	_tmp12_ = test_set;
-	_tmp13_ = gee_collection_add ((GeeCollection*) _tmp12_, "four");
-	_vala_assert (_tmp13_, "test_set.add (\"four\")");
-	_tmp14_ = test_set;
-	_tmp15_ = gee_collection_add ((GeeCollection*) _tmp14_, "five");
-	_vala_assert (_tmp15_, "test_set.add (\"five\")");
-	_tmp16_ = test_set;
-	_tmp17_ = gee_collection_add ((GeeCollection*) _tmp16_, "six");
-	_vala_assert (_tmp17_, "test_set.add (\"six\")");
-	_tmp18_ = test_set;
-	_tmp19_ = gee_sorted_set_first (_tmp18_);
-	_tmp20_ = (gchar*) _tmp19_;
-	_vala_assert (g_strcmp0 (_tmp20_, "five") == 0, "test_set.first () == \"five\"");
-	_g_free0 (_tmp20_);
+	_tmp7_ = test_set;
+	_tmp8_ = gee_collection_add ((GeeCollection*) _tmp7_, "one");
+	_vala_assert (_tmp8_, "test_set.add (\"one\")");
+	_tmp9_ = test_set;
+	_tmp10_ = gee_collection_add ((GeeCollection*) _tmp9_, "two");
+	_vala_assert (_tmp10_, "test_set.add (\"two\")");
+	_tmp11_ = test_set;
+	_tmp12_ = gee_collection_add ((GeeCollection*) _tmp11_, "three");
+	_vala_assert (_tmp12_, "test_set.add (\"three\")");
+	_tmp13_ = test_set;
+	_tmp14_ = gee_collection_add ((GeeCollection*) _tmp13_, "four");
+	_vala_assert (_tmp14_, "test_set.add (\"four\")");
+	_tmp15_ = test_set;
+	_tmp16_ = gee_collection_add ((GeeCollection*) _tmp15_, "five");
+	_vala_assert (_tmp16_, "test_set.add (\"five\")");
+	_tmp17_ = test_set;
+	_tmp18_ = gee_collection_add ((GeeCollection*) _tmp17_, "six");
+	_vala_assert (_tmp18_, "test_set.add (\"six\")");
+	_tmp19_ = test_set;
+	_tmp20_ = gee_sorted_set_first (_tmp19_);
+	_tmp21_ = (gchar*) _tmp20_;
+	_vala_assert (g_strcmp0 (_tmp21_, "five") == 0, "test_set.first () == \"five\"");
+	_g_free0 (_tmp21_);
 	_g_object_unref0 (test_set);
 }
 
@@ -565,61 +563,65 @@ void sorted_set_tests_test_last (SortedSetTests* self) {
 	GeeCollection* _tmp0_;
 	GeeSortedSet* _tmp1_;
 	GeeSortedSet* test_set;
-	gboolean _tmp2_ = FALSE;
-	GeeSortedSet* _tmp6_;
-	gboolean _tmp7_ = FALSE;
-	GeeSortedSet* _tmp8_;
-	gboolean _tmp9_ = FALSE;
-	GeeSortedSet* _tmp10_;
-	gboolean _tmp11_ = FALSE;
-	GeeSortedSet* _tmp12_;
-	gboolean _tmp13_ = FALSE;
-	GeeSortedSet* _tmp14_;
-	gboolean _tmp15_ = FALSE;
-	GeeSortedSet* _tmp16_;
-	gboolean _tmp17_ = FALSE;
-	GeeSortedSet* _tmp18_;
-	gpointer _tmp19_ = NULL;
-	gchar* _tmp20_;
+	gboolean _tmp2_;
+	GeeSortedSet* _tmp7_;
+	gboolean _tmp8_ = FALSE;
+	GeeSortedSet* _tmp9_;
+	gboolean _tmp10_ = FALSE;
+	GeeSortedSet* _tmp11_;
+	gboolean _tmp12_ = FALSE;
+	GeeSortedSet* _tmp13_;
+	gboolean _tmp14_ = FALSE;
+	GeeSortedSet* _tmp15_;
+	gboolean _tmp16_ = FALSE;
+	GeeSortedSet* _tmp17_;
+	gboolean _tmp18_ = FALSE;
+	GeeSortedSet* _tmp19_;
+	gpointer _tmp20_ = NULL;
+	gchar* _tmp21_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = ((CollectionTests*) self)->test_collection;
 	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_SORTED_SET) ? ((GeeSortedSet*) _tmp0_) : NULL);
 	test_set = _tmp1_;
-	_tmp2_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
+	_tmp2_ = self->priv->strict;
 	if (_tmp2_) {
-		GeeSortedSet* _tmp3_;
-		gpointer _tmp4_ = NULL;
-		gchar* _tmp5_;
-		_tmp3_ = test_set;
-		_tmp4_ = gee_sorted_set_last (_tmp3_);
-		_tmp5_ = (gchar*) _tmp4_;
-		_g_free0 (_tmp5_);
-		exit (0);
+		gboolean _tmp3_ = FALSE;
+		_tmp3_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
+		if (_tmp3_) {
+			GeeSortedSet* _tmp4_;
+			gpointer _tmp5_ = NULL;
+			gchar* _tmp6_;
+			_tmp4_ = test_set;
+			_tmp5_ = gee_sorted_set_last (_tmp4_);
+			_tmp6_ = (gchar*) _tmp5_;
+			_g_free0 (_tmp6_);
+			exit (0);
+		}
+		g_test_trap_assert_failed ();
 	}
-	g_test_trap_assert_failed ();
-	_tmp6_ = test_set;
-	_tmp7_ = gee_collection_add ((GeeCollection*) _tmp6_, "one");
-	_vala_assert (_tmp7_, "test_set.add (\"one\")");
-	_tmp8_ = test_set;
-	_tmp9_ = gee_collection_add ((GeeCollection*) _tmp8_, "two");
-	_vala_assert (_tmp9_, "test_set.add (\"two\")");
-	_tmp10_ = test_set;
-	_tmp11_ = gee_collection_add ((GeeCollection*) _tmp10_, "three");
-	_vala_assert (_tmp11_, "test_set.add (\"three\")");
-	_tmp12_ = test_set;
-	_tmp13_ = gee_collection_add ((GeeCollection*) _tmp12_, "four");
-	_vala_assert (_tmp13_, "test_set.add (\"four\")");
-	_tmp14_ = test_set;
-	_tmp15_ = gee_collection_add ((GeeCollection*) _tmp14_, "five");
-	_vala_assert (_tmp15_, "test_set.add (\"five\")");
-	_tmp16_ = test_set;
-	_tmp17_ = gee_collection_add ((GeeCollection*) _tmp16_, "six");
-	_vala_assert (_tmp17_, "test_set.add (\"six\")");
-	_tmp18_ = test_set;
-	_tmp19_ = gee_sorted_set_last (_tmp18_);
-	_tmp20_ = (gchar*) _tmp19_;
-	_vala_assert (g_strcmp0 (_tmp20_, "two") == 0, "test_set.last () == \"two\"");
-	_g_free0 (_tmp20_);
+	_tmp7_ = test_set;
+	_tmp8_ = gee_collection_add ((GeeCollection*) _tmp7_, "one");
+	_vala_assert (_tmp8_, "test_set.add (\"one\")");
+	_tmp9_ = test_set;
+	_tmp10_ = gee_collection_add ((GeeCollection*) _tmp9_, "two");
+	_vala_assert (_tmp10_, "test_set.add (\"two\")");
+	_tmp11_ = test_set;
+	_tmp12_ = gee_collection_add ((GeeCollection*) _tmp11_, "three");
+	_vala_assert (_tmp12_, "test_set.add (\"three\")");
+	_tmp13_ = test_set;
+	_tmp14_ = gee_collection_add ((GeeCollection*) _tmp13_, "four");
+	_vala_assert (_tmp14_, "test_set.add (\"four\")");
+	_tmp15_ = test_set;
+	_tmp16_ = gee_collection_add ((GeeCollection*) _tmp15_, "five");
+	_vala_assert (_tmp16_, "test_set.add (\"five\")");
+	_tmp17_ = test_set;
+	_tmp18_ = gee_collection_add ((GeeCollection*) _tmp17_, "six");
+	_vala_assert (_tmp18_, "test_set.add (\"six\")");
+	_tmp19_ = test_set;
+	_tmp20_ = gee_sorted_set_last (_tmp19_);
+	_tmp21_ = (gchar*) _tmp20_;
+	_vala_assert (g_strcmp0 (_tmp21_, "two") == 0, "test_set.last () == \"two\"");
+	_g_free0 (_tmp21_);
 	_g_object_unref0 (test_set);
 }
 
@@ -631,24 +633,24 @@ void sorted_set_tests_test_iterator_at (SortedSetTests* self) {
 	gboolean _tmp2_ = FALSE;
 	gboolean _tmp3_ = FALSE;
 	gboolean _tmp4_ = FALSE;
-	GeeBidirIterator* _tmp5_ = NULL;
-	GeeBidirIterator* iter;
-	GeeBidirIterator* _tmp6_;
-	GeeBidirIterator* _tmp7_;
+	GeeIterator* _tmp5_ = NULL;
+	GeeIterator* iter;
+	GeeIterator* _tmp6_;
+	GeeIterator* _tmp7_;
 	gpointer _tmp8_ = NULL;
 	gchar* _tmp9_;
-	GeeBidirIterator* _tmp10_ = NULL;
-	GeeBidirIterator* _tmp11_;
-	GeeBidirIterator* _tmp12_;
+	GeeIterator* _tmp10_ = NULL;
+	GeeIterator* _tmp11_;
+	GeeIterator* _tmp12_;
 	gpointer _tmp13_ = NULL;
 	gchar* _tmp14_;
-	GeeBidirIterator* _tmp15_ = NULL;
-	GeeBidirIterator* _tmp16_;
-	GeeBidirIterator* _tmp17_;
+	GeeIterator* _tmp15_ = NULL;
+	GeeIterator* _tmp16_;
+	GeeIterator* _tmp17_;
 	gpointer _tmp18_ = NULL;
 	gchar* _tmp19_;
-	GeeBidirIterator* _tmp20_ = NULL;
-	GeeBidirIterator* _tmp21_;
+	GeeIterator* _tmp20_ = NULL;
+	GeeIterator* _tmp21_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = ((CollectionTests*) self)->test_collection;
 	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_SORTED_SET) ? ((GeeSortedSet*) _tmp0_) : NULL);
@@ -664,7 +666,7 @@ void sorted_set_tests_test_iterator_at (SortedSetTests* self) {
 	_tmp6_ = iter;
 	_vala_assert (_tmp6_ != NULL, "iter != null");
 	_tmp7_ = iter;
-	_tmp8_ = gee_iterator_get ((GeeIterator*) _tmp7_);
+	_tmp8_ = gee_iterator_get (_tmp7_);
 	_tmp9_ = (gchar*) _tmp8_;
 	_vala_assert (g_strcmp0 (_tmp9_, "one") == 0, "iter.get () == \"one\"");
 	_g_free0 (_tmp9_);
@@ -674,7 +676,7 @@ void sorted_set_tests_test_iterator_at (SortedSetTests* self) {
 	_tmp11_ = iter;
 	_vala_assert (_tmp11_ != NULL, "iter != null");
 	_tmp12_ = iter;
-	_tmp13_ = gee_iterator_get ((GeeIterator*) _tmp12_);
+	_tmp13_ = gee_iterator_get (_tmp12_);
 	_tmp14_ = (gchar*) _tmp13_;
 	_vala_assert (g_strcmp0 (_tmp14_, "two") == 0, "iter.get () == \"two\"");
 	_g_free0 (_tmp14_);
@@ -684,7 +686,7 @@ void sorted_set_tests_test_iterator_at (SortedSetTests* self) {
 	_tmp16_ = iter;
 	_vala_assert (_tmp16_ != NULL, "iter != null");
 	_tmp17_ = iter;
-	_tmp18_ = gee_iterator_get ((GeeIterator*) _tmp17_);
+	_tmp18_ = gee_iterator_get (_tmp17_);
 	_tmp19_ = (gchar*) _tmp18_;
 	_vala_assert (g_strcmp0 (_tmp19_, "three") == 0, "iter.get () == \"three\"");
 	_g_free0 (_tmp19_);
@@ -1082,491 +1084,25 @@ void sorted_set_tests_test_ceil (SortedSetTests* self) {
 }
 
 
-void sorted_set_tests_test_bidir_iterator_can_go_backward (SortedSetTests* self) {
-	GeeCollection* _tmp0_;
-	GeeSortedSet* _tmp1_;
-	GeeSortedSet* test_set;
-	GeeBidirIterator* _tmp2_ = NULL;
-	GeeBidirIterator* iterator;
-	GeeBidirIterator* _tmp3_;
-	gboolean _tmp4_ = FALSE;
-	gboolean _tmp5_ = FALSE;
-	gboolean _tmp6_ = FALSE;
-	gboolean _tmp7_ = FALSE;
-	gboolean _tmp8_ = FALSE;
-	gboolean _tmp9_ = FALSE;
-	gboolean _tmp10_ = FALSE;
-	GeeBidirIterator* _tmp11_ = NULL;
-	GeeBidirIterator* _tmp12_;
-	gboolean _tmp13_ = FALSE;
-	GeeBidirIterator* _tmp14_;
-	gpointer _tmp15_ = NULL;
-	gchar* _tmp16_;
-	GeeBidirIterator* _tmp17_;
-	gboolean _tmp18_ = FALSE;
-	GeeBidirIterator* _tmp19_;
-	gboolean _tmp20_ = FALSE;
-	GeeBidirIterator* _tmp21_;
-	gpointer _tmp22_ = NULL;
-	gchar* _tmp23_;
-	GeeBidirIterator* _tmp24_;
-	gboolean _tmp25_ = FALSE;
-	GeeBidirIterator* _tmp26_;
-	gboolean _tmp27_ = FALSE;
-	GeeBidirIterator* _tmp28_;
-	gpointer _tmp29_ = NULL;
-	gchar* _tmp30_;
-	GeeBidirIterator* _tmp31_;
-	gboolean _tmp32_ = FALSE;
-	GeeBidirIterator* _tmp33_;
-	gboolean _tmp34_ = FALSE;
-	GeeBidirIterator* _tmp35_;
-	gpointer _tmp36_ = NULL;
-	gchar* _tmp37_;
-	GeeBidirIterator* _tmp38_;
-	gboolean _tmp39_ = FALSE;
-	GeeBidirIterator* _tmp40_;
-	gboolean _tmp41_ = FALSE;
-	GeeBidirIterator* _tmp42_;
-	gpointer _tmp43_ = NULL;
-	gchar* _tmp44_;
-	GeeBidirIterator* _tmp45_;
-	gboolean _tmp46_ = FALSE;
-	GeeBidirIterator* _tmp47_;
-	gboolean _tmp48_ = FALSE;
-	GeeBidirIterator* _tmp49_;
-	gpointer _tmp50_ = NULL;
-	gchar* _tmp51_;
-	GeeBidirIterator* _tmp52_;
-	gboolean _tmp53_ = FALSE;
-	GeeBidirIterator* _tmp54_;
-	gboolean _tmp55_ = FALSE;
-	GeeBidirIterator* _tmp56_;
-	gboolean _tmp57_ = FALSE;
-	GeeBidirIterator* _tmp58_;
-	gpointer _tmp59_ = NULL;
-	gchar* _tmp60_;
-	GeeBidirIterator* _tmp61_;
-	gboolean _tmp62_ = FALSE;
-	GeeBidirIterator* _tmp63_;
-	gpointer _tmp64_ = NULL;
-	gchar* _tmp65_;
-	GeeBidirIterator* _tmp66_;
-	gboolean _tmp67_ = FALSE;
-	GeeBidirIterator* _tmp68_;
-	gpointer _tmp69_ = NULL;
-	gchar* _tmp70_;
-	GeeBidirIterator* _tmp71_;
-	gboolean _tmp72_ = FALSE;
-	GeeBidirIterator* _tmp73_;
-	gpointer _tmp74_ = NULL;
-	gchar* _tmp75_;
-	GeeBidirIterator* _tmp76_;
-	gboolean _tmp77_ = FALSE;
-	GeeBidirIterator* _tmp78_;
-	gpointer _tmp79_ = NULL;
-	gchar* _tmp80_;
-	GeeBidirIterator* _tmp81_;
-	gboolean _tmp82_ = FALSE;
-	GeeBidirIterator* _tmp83_;
-	gpointer _tmp84_ = NULL;
-	gchar* _tmp85_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((CollectionTests*) self)->test_collection;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_SORTED_SET) ? ((GeeSortedSet*) _tmp0_) : NULL);
-	test_set = _tmp1_;
-	_tmp2_ = gee_sorted_set_bidir_iterator (test_set);
-	iterator = _tmp2_;
-	_tmp3_ = iterator;
-	_tmp4_ = gee_bidir_iterator_has_previous (_tmp3_);
-	_vala_assert (!_tmp4_, "!iterator.has_previous ()");
-	_tmp5_ = gee_collection_add ((GeeCollection*) test_set, "one");
-	_vala_assert (_tmp5_, "test_set.add (\"one\")");
-	_tmp6_ = gee_collection_add ((GeeCollection*) test_set, "two");
-	_vala_assert (_tmp6_, "test_set.add (\"two\")");
-	_tmp7_ = gee_collection_add ((GeeCollection*) test_set, "three");
-	_vala_assert (_tmp7_, "test_set.add (\"three\")");
-	_tmp8_ = gee_collection_add ((GeeCollection*) test_set, "four");
-	_vala_assert (_tmp8_, "test_set.add (\"four\")");
-	_tmp9_ = gee_collection_add ((GeeCollection*) test_set, "five");
-	_vala_assert (_tmp9_, "test_set.add (\"five\")");
-	_tmp10_ = gee_collection_add ((GeeCollection*) test_set, "six");
-	_vala_assert (_tmp10_, "test_set.add (\"six\")");
-	_tmp11_ = gee_sorted_set_bidir_iterator (test_set);
-	_g_object_unref0 (iterator);
-	iterator = _tmp11_;
-	_tmp12_ = iterator;
-	_tmp13_ = gee_iterator_next ((GeeIterator*) _tmp12_);
-	_vala_assert (_tmp13_, "iterator.next ()");
-	_tmp14_ = iterator;
-	_tmp15_ = gee_iterator_get ((GeeIterator*) _tmp14_);
-	_tmp16_ = (gchar*) _tmp15_;
-	_vala_assert (g_strcmp0 (_tmp16_, "five") == 0, "iterator.get () == \"five\"");
-	_g_free0 (_tmp16_);
-	_tmp17_ = iterator;
-	_tmp18_ = gee_bidir_iterator_has_previous (_tmp17_);
-	_vala_assert (!_tmp18_, "!iterator.has_previous ()");
-	_tmp19_ = iterator;
-	_tmp20_ = gee_iterator_next ((GeeIterator*) _tmp19_);
-	_vala_assert (_tmp20_, "iterator.next ()");
-	_tmp21_ = iterator;
-	_tmp22_ = gee_iterator_get ((GeeIterator*) _tmp21_);
-	_tmp23_ = (gchar*) _tmp22_;
-	_vala_assert (g_strcmp0 (_tmp23_, "four") == 0, "iterator.get () == \"four\"");
-	_g_free0 (_tmp23_);
-	_tmp24_ = iterator;
-	_tmp25_ = gee_bidir_iterator_has_previous (_tmp24_);
-	_vala_assert (_tmp25_, "iterator.has_previous ()");
-	_tmp26_ = iterator;
-	_tmp27_ = gee_iterator_next ((GeeIterator*) _tmp26_);
-	_vala_assert (_tmp27_, "iterator.next ()");
-	_tmp28_ = iterator;
-	_tmp29_ = gee_iterator_get ((GeeIterator*) _tmp28_);
-	_tmp30_ = (gchar*) _tmp29_;
-	_vala_assert (g_strcmp0 (_tmp30_, "one") == 0, "iterator.get () == \"one\"");
-	_g_free0 (_tmp30_);
-	_tmp31_ = iterator;
-	_tmp32_ = gee_bidir_iterator_has_previous (_tmp31_);
-	_vala_assert (_tmp32_, "iterator.has_previous ()");
-	_tmp33_ = iterator;
-	_tmp34_ = gee_iterator_next ((GeeIterator*) _tmp33_);
-	_vala_assert (_tmp34_, "iterator.next ()");
-	_tmp35_ = iterator;
-	_tmp36_ = gee_iterator_get ((GeeIterator*) _tmp35_);
-	_tmp37_ = (gchar*) _tmp36_;
-	_vala_assert (g_strcmp0 (_tmp37_, "six") == 0, "iterator.get () == \"six\"");
-	_g_free0 (_tmp37_);
-	_tmp38_ = iterator;
-	_tmp39_ = gee_bidir_iterator_has_previous (_tmp38_);
-	_vala_assert (_tmp39_, "iterator.has_previous ()");
-	_tmp40_ = iterator;
-	_tmp41_ = gee_iterator_next ((GeeIterator*) _tmp40_);
-	_vala_assert (_tmp41_, "iterator.next ()");
-	_tmp42_ = iterator;
-	_tmp43_ = gee_iterator_get ((GeeIterator*) _tmp42_);
-	_tmp44_ = (gchar*) _tmp43_;
-	_vala_assert (g_strcmp0 (_tmp44_, "three") == 0, "iterator.get () == \"three\"");
-	_g_free0 (_tmp44_);
-	_tmp45_ = iterator;
-	_tmp46_ = gee_bidir_iterator_has_previous (_tmp45_);
-	_vala_assert (_tmp46_, "iterator.has_previous ()");
-	_tmp47_ = iterator;
-	_tmp48_ = gee_iterator_next ((GeeIterator*) _tmp47_);
-	_vala_assert (_tmp48_, "iterator.next ()");
-	_tmp49_ = iterator;
-	_tmp50_ = gee_iterator_get ((GeeIterator*) _tmp49_);
-	_tmp51_ = (gchar*) _tmp50_;
-	_vala_assert (g_strcmp0 (_tmp51_, "two") == 0, "iterator.get () == \"two\"");
-	_g_free0 (_tmp51_);
-	_tmp52_ = iterator;
-	_tmp53_ = gee_bidir_iterator_has_previous (_tmp52_);
-	_vala_assert (_tmp53_, "iterator.has_previous ()");
-	_tmp54_ = iterator;
-	_tmp55_ = gee_iterator_next ((GeeIterator*) _tmp54_);
-	_vala_assert (!_tmp55_, "!iterator.next ()");
-	_tmp56_ = iterator;
-	_tmp57_ = gee_bidir_iterator_previous (_tmp56_);
-	_vala_assert (_tmp57_, "iterator.previous ()");
-	_tmp58_ = iterator;
-	_tmp59_ = gee_iterator_get ((GeeIterator*) _tmp58_);
-	_tmp60_ = (gchar*) _tmp59_;
-	_vala_assert (g_strcmp0 (_tmp60_, "three") == 0, "iterator.get () == \"three\"");
-	_g_free0 (_tmp60_);
-	_tmp61_ = iterator;
-	_tmp62_ = gee_bidir_iterator_previous (_tmp61_);
-	_vala_assert (_tmp62_, "iterator.previous ()");
-	_tmp63_ = iterator;
-	_tmp64_ = gee_iterator_get ((GeeIterator*) _tmp63_);
-	_tmp65_ = (gchar*) _tmp64_;
-	_vala_assert (g_strcmp0 (_tmp65_, "six") == 0, "iterator.get () == \"six\"");
-	_g_free0 (_tmp65_);
-	_tmp66_ = iterator;
-	_tmp67_ = gee_bidir_iterator_previous (_tmp66_);
-	_vala_assert (_tmp67_, "iterator.previous ()");
-	_tmp68_ = iterator;
-	_tmp69_ = gee_iterator_get ((GeeIterator*) _tmp68_);
-	_tmp70_ = (gchar*) _tmp69_;
-	_vala_assert (g_strcmp0 (_tmp70_, "one") == 0, "iterator.get () == \"one\"");
-	_g_free0 (_tmp70_);
-	_tmp71_ = iterator;
-	_tmp72_ = gee_bidir_iterator_previous (_tmp71_);
-	_vala_assert (_tmp72_, "iterator.previous ()");
-	_tmp73_ = iterator;
-	_tmp74_ = gee_iterator_get ((GeeIterator*) _tmp73_);
-	_tmp75_ = (gchar*) _tmp74_;
-	_vala_assert (g_strcmp0 (_tmp75_, "four") == 0, "iterator.get () == \"four\"");
-	_g_free0 (_tmp75_);
-	_tmp76_ = iterator;
-	_tmp77_ = gee_bidir_iterator_previous (_tmp76_);
-	_vala_assert (_tmp77_, "iterator.previous ()");
-	_tmp78_ = iterator;
-	_tmp79_ = gee_iterator_get ((GeeIterator*) _tmp78_);
-	_tmp80_ = (gchar*) _tmp79_;
-	_vala_assert (g_strcmp0 (_tmp80_, "five") == 0, "iterator.get () == \"five\"");
-	_g_free0 (_tmp80_);
-	_tmp81_ = iterator;
-	_tmp82_ = gee_bidir_iterator_previous (_tmp81_);
-	_vala_assert (!_tmp82_, "!iterator.previous ()");
-	_tmp83_ = iterator;
-	_tmp84_ = gee_iterator_get ((GeeIterator*) _tmp83_);
-	_tmp85_ = (gchar*) _tmp84_;
-	_vala_assert (g_strcmp0 (_tmp85_, "five") == 0, "iterator.get () == \"five\"");
-	_g_free0 (_tmp85_);
-	_g_object_unref0 (iterator);
-	_g_object_unref0 (test_set);
-}
-
-
-void sorted_set_tests_test_bidir_iterator_last (SortedSetTests* self) {
-	GeeCollection* _tmp0_;
-	GeeSortedSet* _tmp1_;
-	GeeSortedSet* test_set;
-	GeeBidirIterator* _tmp2_ = NULL;
-	GeeBidirIterator* iterator;
-	GeeBidirIterator* _tmp3_;
-	gboolean _tmp4_ = FALSE;
-	gboolean _tmp5_ = FALSE;
-	gboolean _tmp6_ = FALSE;
-	gboolean _tmp7_ = FALSE;
-	gboolean _tmp8_ = FALSE;
-	gboolean _tmp9_ = FALSE;
-	gboolean _tmp10_ = FALSE;
-	GeeBidirIterator* _tmp11_ = NULL;
-	GeeBidirIterator* _tmp12_;
-	gboolean _tmp13_ = FALSE;
-	GeeBidirIterator* _tmp14_;
-	gpointer _tmp15_ = NULL;
-	gchar* _tmp16_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((CollectionTests*) self)->test_collection;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_SORTED_SET) ? ((GeeSortedSet*) _tmp0_) : NULL);
-	test_set = _tmp1_;
-	_tmp2_ = gee_sorted_set_bidir_iterator (test_set);
-	iterator = _tmp2_;
-	_tmp3_ = iterator;
-	_tmp4_ = gee_bidir_iterator_last (_tmp3_);
-	_vala_assert (!_tmp4_, "!iterator.last ()");
-	_tmp5_ = gee_collection_add ((GeeCollection*) test_set, "one");
-	_vala_assert (_tmp5_, "test_set.add (\"one\")");
-	_tmp6_ = gee_collection_add ((GeeCollection*) test_set, "two");
-	_vala_assert (_tmp6_, "test_set.add (\"two\")");
-	_tmp7_ = gee_collection_add ((GeeCollection*) test_set, "three");
-	_vala_assert (_tmp7_, "test_set.add (\"three\")");
-	_tmp8_ = gee_collection_add ((GeeCollection*) test_set, "four");
-	_vala_assert (_tmp8_, "test_set.add (\"four\")");
-	_tmp9_ = gee_collection_add ((GeeCollection*) test_set, "five");
-	_vala_assert (_tmp9_, "test_set.add (\"five\")");
-	_tmp10_ = gee_collection_add ((GeeCollection*) test_set, "six");
-	_vala_assert (_tmp10_, "test_set.add (\"six\")");
-	_tmp11_ = gee_sorted_set_bidir_iterator (test_set);
-	_g_object_unref0 (iterator);
-	iterator = _tmp11_;
-	_tmp12_ = iterator;
-	_tmp13_ = gee_bidir_iterator_last (_tmp12_);
-	_vala_assert (_tmp13_, "iterator.last ()");
-	_tmp14_ = iterator;
-	_tmp15_ = gee_iterator_get ((GeeIterator*) _tmp14_);
-	_tmp16_ = (gchar*) _tmp15_;
-	_vala_assert (g_strcmp0 (_tmp16_, "two") == 0, "iterator.get () == \"two\"");
-	_g_free0 (_tmp16_);
-	_g_object_unref0 (iterator);
-	_g_object_unref0 (test_set);
-}
-
-
-void sorted_set_tests_test_mutable_bidir_iterator (SortedSetTests* self) {
-	GeeCollection* _tmp0_;
-	GeeSortedSet* _tmp1_;
-	GeeSortedSet* test_set;
-	GeeSortedSet* _tmp2_;
-	GeeBidirIterator* _tmp3_ = NULL;
-	GeeBidirIterator* iterator;
-	GeeBidirIterator* _tmp4_;
-	gboolean _tmp5_ = FALSE;
-	GeeSortedSet* _tmp6_;
-	gboolean _tmp7_ = FALSE;
-	GeeSortedSet* _tmp8_;
-	gboolean _tmp9_ = FALSE;
-	GeeSortedSet* _tmp10_;
-	gboolean _tmp11_ = FALSE;
-	GeeSortedSet* _tmp12_;
-	gboolean _tmp13_ = FALSE;
-	GeeSortedSet* _tmp14_;
-	gboolean _tmp15_ = FALSE;
-	GeeSortedSet* _tmp16_;
-	gboolean _tmp17_ = FALSE;
-	GeeSortedSet* _tmp18_;
-	GeeBidirIterator* _tmp19_ = NULL;
-	gboolean _tmp20_ = FALSE;
-	GeeBidirIterator* _tmp22_;
-	gboolean _tmp23_ = FALSE;
-	GeeBidirIterator* _tmp24_;
-	gpointer _tmp25_ = NULL;
-	gchar* _tmp26_;
-	GeeBidirIterator* _tmp27_;
-	GeeSortedSet* _tmp28_;
-	gboolean _tmp29_ = FALSE;
-	GeeBidirIterator* _tmp30_;
-	gboolean _tmp31_ = FALSE;
-	GeeBidirIterator* _tmp32_;
-	gboolean _tmp33_ = FALSE;
-	gboolean _tmp34_ = FALSE;
-	GeeBidirIterator* _tmp38_;
-	gboolean _tmp39_ = FALSE;
-	GeeBidirIterator* _tmp40_;
-	gboolean _tmp41_ = FALSE;
-	GeeBidirIterator* _tmp42_;
-	gpointer _tmp43_ = NULL;
-	gchar* _tmp44_;
-	GeeBidirIterator* _tmp45_;
-	gboolean _tmp46_ = FALSE;
-	GeeBidirIterator* _tmp47_;
-	gpointer _tmp48_ = NULL;
-	gchar* _tmp49_;
-	GeeBidirIterator* _tmp50_;
-	GeeSortedSet* _tmp51_;
-	gboolean _tmp52_ = FALSE;
-	GeeBidirIterator* _tmp53_;
-	gboolean _tmp54_ = FALSE;
-	GeeBidirIterator* _tmp55_;
-	gboolean _tmp56_ = FALSE;
-	GeeBidirIterator* _tmp57_;
-	gboolean _tmp58_ = FALSE;
-	GeeBidirIterator* _tmp59_;
-	gpointer _tmp60_ = NULL;
-	gchar* _tmp61_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((CollectionTests*) self)->test_collection;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_SORTED_SET) ? ((GeeSortedSet*) _tmp0_) : NULL);
-	test_set = _tmp1_;
-	_tmp2_ = test_set;
-	_tmp3_ = gee_sorted_set_bidir_iterator (_tmp2_);
-	iterator = _tmp3_;
-	_tmp4_ = iterator;
-	_tmp5_ = gee_bidir_iterator_has_previous (_tmp4_);
-	_vala_assert (!_tmp5_, "!iterator.has_previous ()");
-	_tmp6_ = test_set;
-	_tmp7_ = gee_collection_add ((GeeCollection*) _tmp6_, "one");
-	_vala_assert (_tmp7_, "test_set.add (\"one\")");
-	_tmp8_ = test_set;
-	_tmp9_ = gee_collection_add ((GeeCollection*) _tmp8_, "two");
-	_vala_assert (_tmp9_, "test_set.add (\"two\")");
-	_tmp10_ = test_set;
-	_tmp11_ = gee_collection_add ((GeeCollection*) _tmp10_, "three");
-	_vala_assert (_tmp11_, "test_set.add (\"three\")");
-	_tmp12_ = test_set;
-	_tmp13_ = gee_collection_add ((GeeCollection*) _tmp12_, "four");
-	_vala_assert (_tmp13_, "test_set.add (\"four\")");
-	_tmp14_ = test_set;
-	_tmp15_ = gee_collection_add ((GeeCollection*) _tmp14_, "five");
-	_vala_assert (_tmp15_, "test_set.add (\"five\")");
-	_tmp16_ = test_set;
-	_tmp17_ = gee_collection_add ((GeeCollection*) _tmp16_, "six");
-	_vala_assert (_tmp17_, "test_set.add (\"six\")");
-	_tmp18_ = test_set;
-	_tmp19_ = gee_sorted_set_bidir_iterator (_tmp18_);
-	_g_object_unref0 (iterator);
-	iterator = _tmp19_;
-	_tmp20_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
-	if (_tmp20_) {
-		GeeBidirIterator* _tmp21_;
-		_tmp21_ = iterator;
-		gee_iterator_remove ((GeeIterator*) _tmp21_);
-		exit (0);
-	}
-	g_test_trap_assert_failed ();
-	_tmp22_ = iterator;
-	_tmp23_ = gee_iterator_next ((GeeIterator*) _tmp22_);
-	_vala_assert (_tmp23_, "iterator.next ()");
-	_tmp24_ = iterator;
-	_tmp25_ = gee_iterator_get ((GeeIterator*) _tmp24_);
-	_tmp26_ = (gchar*) _tmp25_;
-	_vala_assert (g_strcmp0 (_tmp26_, "five") == 0, "iterator.get () == \"five\"");
-	_g_free0 (_tmp26_);
-	_tmp27_ = iterator;
-	gee_iterator_remove ((GeeIterator*) _tmp27_);
-	_tmp28_ = test_set;
-	_tmp29_ = gee_collection_contains ((GeeCollection*) _tmp28_, "five");
-	_vala_assert (!_tmp29_, "!test_set.contains (\"five\")");
-	_tmp30_ = iterator;
-	_tmp31_ = gee_iterator_has_next ((GeeIterator*) _tmp30_);
-	_vala_assert (_tmp31_, "iterator.has_next ()");
-	_tmp32_ = iterator;
-	_tmp33_ = gee_bidir_iterator_has_previous (_tmp32_);
-	_vala_assert (!_tmp33_, "!iterator.has_previous ()");
-	_tmp34_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
-	if (_tmp34_) {
-		GeeBidirIterator* _tmp35_;
-		gpointer _tmp36_ = NULL;
-		gchar* _tmp37_;
-		_tmp35_ = iterator;
-		_tmp36_ = gee_iterator_get ((GeeIterator*) _tmp35_);
-		_tmp37_ = (gchar*) _tmp36_;
-		_g_free0 (_tmp37_);
-		exit (0);
-	}
-	_tmp38_ = iterator;
-	_tmp39_ = gee_bidir_iterator_previous (_tmp38_);
-	_vala_assert (!_tmp39_, "!iterator.previous ()");
-	_tmp40_ = iterator;
-	_tmp41_ = gee_iterator_next ((GeeIterator*) _tmp40_);
-	_vala_assert (_tmp41_, "iterator.next ()");
-	_tmp42_ = iterator;
-	_tmp43_ = gee_iterator_get ((GeeIterator*) _tmp42_);
-	_tmp44_ = (gchar*) _tmp43_;
-	_vala_assert (g_strcmp0 (_tmp44_, "four") == 0, "iterator.get () == \"four\"");
-	_g_free0 (_tmp44_);
-	_tmp45_ = iterator;
-	_tmp46_ = gee_iterator_next ((GeeIterator*) _tmp45_);
-	_vala_assert (_tmp46_, "iterator.next ()");
-	_tmp47_ = iterator;
-	_tmp48_ = gee_iterator_get ((GeeIterator*) _tmp47_);
-	_tmp49_ = (gchar*) _tmp48_;
-	_vala_assert (g_strcmp0 (_tmp49_, "one") == 0, "iterator.get () == \"one\"");
-	_g_free0 (_tmp49_);
-	_tmp50_ = iterator;
-	gee_iterator_remove ((GeeIterator*) _tmp50_);
-	_tmp51_ = test_set;
-	_tmp52_ = gee_collection_contains ((GeeCollection*) _tmp51_, "one");
-	_vala_assert (!_tmp52_, "!test_set.contains (\"one\")");
-	_tmp53_ = iterator;
-	_tmp54_ = gee_iterator_has_next ((GeeIterator*) _tmp53_);
-	_vala_assert (_tmp54_, "iterator.has_next ()");
-	_tmp55_ = iterator;
-	_tmp56_ = gee_bidir_iterator_has_previous (_tmp55_);
-	_vala_assert (_tmp56_, "iterator.has_previous ()");
-	_tmp57_ = iterator;
-	_tmp58_ = gee_bidir_iterator_previous (_tmp57_);
-	_vala_assert (_tmp58_, "iterator.previous ()");
-	_tmp59_ = iterator;
-	_tmp60_ = gee_iterator_get ((GeeIterator*) _tmp59_);
-	_tmp61_ = (gchar*) _tmp60_;
-	_vala_assert (g_strcmp0 (_tmp61_, "four") == 0, "iterator.get () == \"four\"");
-	_g_free0 (_tmp61_);
-	_g_object_unref0 (iterator);
-	_g_object_unref0 (test_set);
-}
-
-
-const gchar* sorted_set_tests_sub_set_type_to_string (SortedSetTestsSubSetType self) {
+const gchar* sorted_set_tests_sub_set_tests_type_to_string (SortedSetTestsSubSetTestsType self) {
 	const gchar* result = NULL;
 	switch (self) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			result = "Head";
 			return result;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			result = "Tail";
 			return result;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			result = "Range";
 			return result;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			result = "Empty";
 			return result;
@@ -1579,98 +1115,99 @@ const gchar* sorted_set_tests_sub_set_type_to_string (SortedSetTestsSubSetType s
 }
 
 
-GType sorted_set_tests_sub_set_type_get_type (void) {
-	static volatile gsize sorted_set_tests_sub_set_type_type_id__volatile = 0;
-	if (g_once_init_enter (&sorted_set_tests_sub_set_type_type_id__volatile)) {
-		static const GEnumValue values[] = {{SORTED_SET_TESTS_SUB_SET_TYPE_HEAD, "SORTED_SET_TESTS_SUB_SET_TYPE_HEAD", "head"}, {SORTED_SET_TESTS_SUB_SET_TYPE_TAIL, "SORTED_SET_TESTS_SUB_SET_TYPE_TAIL", "tail"}, {SORTED_SET_TESTS_SUB_SET_TYPE_SUB, "SORTED_SET_TESTS_SUB_SET_TYPE_SUB", "sub"}, {SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY, "SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY", "empty"}, {0, NULL, NULL}};
-		GType sorted_set_tests_sub_set_type_type_id;
-		sorted_set_tests_sub_set_type_type_id = g_enum_register_static ("SortedSetTestsSubSetType", values);
-		g_once_init_leave (&sorted_set_tests_sub_set_type_type_id__volatile, sorted_set_tests_sub_set_type_type_id);
+GType sorted_set_tests_sub_set_tests_type_get_type (void) {
+	static volatile gsize sorted_set_tests_sub_set_tests_type_type_id__volatile = 0;
+	if (g_once_init_enter (&sorted_set_tests_sub_set_tests_type_type_id__volatile)) {
+		static const GEnumValue values[] = {{SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD, "SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD", "head"}, {SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL, "SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL", "tail"}, {SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB, "SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB", "sub"}, {SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY, "SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY", "empty"}, {0, NULL, NULL}};
+		GType sorted_set_tests_sub_set_tests_type_type_id;
+		sorted_set_tests_sub_set_tests_type_type_id = g_enum_register_static ("SortedSetTestsSubSetTestsType", values);
+		g_once_init_leave (&sorted_set_tests_sub_set_tests_type_type_id__volatile, sorted_set_tests_sub_set_tests_type_type_id);
 	}
-	return sorted_set_tests_sub_set_type_type_id__volatile;
+	return sorted_set_tests_sub_set_tests_type_type_id__volatile;
 }
 
 
-static void _sorted_set_tests_sub_set_test_size_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_size (self);
+static void _sorted_set_tests_sub_set_tests_test_size_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_size (self);
 }
 
 
-static void _sorted_set_tests_sub_set_test_contains_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_contains (self);
+static void _sorted_set_tests_sub_set_tests_test_contains_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_contains (self);
 }
 
 
-static void _sorted_set_tests_sub_set_test_add_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_add (self);
+static void _sorted_set_tests_sub_set_tests_test_add_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_add (self);
 }
 
 
-static void _sorted_set_tests_sub_set_test_remove_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_remove (self);
+static void _sorted_set_tests_sub_set_tests_test_remove_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_remove (self);
 }
 
 
-static void _sorted_set_tests_sub_set_test_iterator_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_iterator (self);
+static void _sorted_set_tests_sub_set_tests_test_iterator_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_iterator (self);
 }
 
 
-static void _sorted_set_tests_sub_set_test_clear_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_clear (self);
+static void _sorted_set_tests_sub_set_tests_test_clear_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_clear (self);
 }
 
 
-static void _sorted_set_tests_sub_set_test_iterator_at_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_iterator_at (self);
+static void _sorted_set_tests_sub_set_tests_test_iterator_at_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_iterator_at (self);
 }
 
 
-static void _sorted_set_tests_sub_set_test_lower_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_lower (self);
+static void _sorted_set_tests_sub_set_tests_test_lower_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_lower (self);
 }
 
 
-static void _sorted_set_tests_sub_set_test_higher_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_higher (self);
+static void _sorted_set_tests_sub_set_tests_test_higher_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_higher (self);
 }
 
 
-static void _sorted_set_tests_sub_set_test_ceil_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_ceil (self);
+static void _sorted_set_tests_sub_set_tests_test_ceil_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_ceil (self);
 }
 
 
-static void _sorted_set_tests_sub_set_test_floor_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_floor (self);
+static void _sorted_set_tests_sub_set_tests_test_floor_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_floor (self);
 }
 
 
-static void _sorted_set_tests_sub_set_test_subsets_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_subsets (self);
+static void _sorted_set_tests_sub_set_tests_test_subsets_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_subsets (self);
 }
 
 
-static void _sorted_set_tests_sub_set_test_boundaries_gee_test_case_test_method (gpointer self) {
-	sorted_set_tests_sub_set_test_boundaries (self);
+static void _sorted_set_tests_sub_set_tests_test_boundaries_gee_test_case_test_method (gpointer self) {
+	sorted_set_tests_sub_set_tests_test_boundaries (self);
 }
 
 
-SortedSetTestsSubSet* sorted_set_tests_sub_set_construct (GType object_type, SortedSetTests* test, SortedSetTestsSubSetType type) {
-	SortedSetTestsSubSet * self = NULL;
-	SortedSetTestsSubSetType _tmp0_;
+SortedSetTestsSubSetTests* sorted_set_tests_sub_set_tests_construct (GType object_type, SortedSetTests* test, SortedSetTestsSubSetTestsType type, gboolean strict) {
+	SortedSetTestsSubSetTests * self = NULL;
+	SortedSetTestsSubSetTestsType _tmp0_;
 	const gchar* _tmp1_ = NULL;
 	gchar* _tmp2_ = NULL;
 	gchar* _tmp3_;
 	SortedSetTests* _tmp4_;
 	SortedSetTests* _tmp5_;
-	SortedSetTestsSubSetType _tmp6_;
+	SortedSetTestsSubSetTestsType _tmp6_;
+	gboolean _tmp7_;
 	g_return_val_if_fail (test != NULL, NULL);
 	_tmp0_ = type;
-	_tmp1_ = sorted_set_tests_sub_set_type_to_string (_tmp0_);
+	_tmp1_ = sorted_set_tests_sub_set_tests_type_to_string (_tmp0_);
 	_tmp2_ = g_strdup_printf ("%s Subset", _tmp1_);
 	_tmp3_ = _tmp2_;
-	self = (SortedSetTestsSubSet*) gee_test_case_construct (object_type, _tmp3_);
+	self = (SortedSetTestsSubSetTests*) gee_test_case_construct (object_type, _tmp3_);
 	_g_free0 (_tmp3_);
 	_tmp4_ = test;
 	_tmp5_ = _g_object_ref0 (_tmp4_);
@@ -1678,36 +1215,38 @@ SortedSetTestsSubSet* sorted_set_tests_sub_set_construct (GType object_type, Sor
 	self->priv->test = _tmp5_;
 	_tmp6_ = type;
 	self->priv->type = _tmp6_;
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] size", _sorted_set_tests_sub_set_test_size_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] contains", _sorted_set_tests_sub_set_test_contains_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] add", _sorted_set_tests_sub_set_test_add_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] remove", _sorted_set_tests_sub_set_test_remove_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] iterator", _sorted_set_tests_sub_set_test_iterator_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] clear", _sorted_set_tests_sub_set_test_clear_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] iterator at", _sorted_set_tests_sub_set_test_iterator_at_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] lower", _sorted_set_tests_sub_set_test_lower_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] higher", _sorted_set_tests_sub_set_test_higher_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] ceil", _sorted_set_tests_sub_set_test_ceil_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] floor", _sorted_set_tests_sub_set_test_floor_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] subsets", _sorted_set_tests_sub_set_test_subsets_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] boundaries", _sorted_set_tests_sub_set_test_boundaries_gee_test_case_test_method, self);
+	_tmp7_ = strict;
+	self->priv->strict = _tmp7_;
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] size", _sorted_set_tests_sub_set_tests_test_size_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] contains", _sorted_set_tests_sub_set_tests_test_contains_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] add", _sorted_set_tests_sub_set_tests_test_add_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] remove", _sorted_set_tests_sub_set_tests_test_remove_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] iterator", _sorted_set_tests_sub_set_tests_test_iterator_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] clear", _sorted_set_tests_sub_set_tests_test_clear_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] iterator at", _sorted_set_tests_sub_set_tests_test_iterator_at_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] lower", _sorted_set_tests_sub_set_tests_test_lower_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] higher", _sorted_set_tests_sub_set_tests_test_higher_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] ceil", _sorted_set_tests_sub_set_tests_test_ceil_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] floor", _sorted_set_tests_sub_set_tests_test_floor_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] subsets", _sorted_set_tests_sub_set_tests_test_subsets_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[SortedSet] boundaries", _sorted_set_tests_sub_set_tests_test_boundaries_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 
 
-SortedSetTestsSubSet* sorted_set_tests_sub_set_new (SortedSetTests* test, SortedSetTestsSubSetType type) {
-	return sorted_set_tests_sub_set_construct (SORTED_SET_TESTS_TYPE_SUB_SET, test, type);
+SortedSetTestsSubSetTests* sorted_set_tests_sub_set_tests_new (SortedSetTests* test, SortedSetTestsSubSetTestsType type, gboolean strict) {
+	return sorted_set_tests_sub_set_tests_construct (SORTED_SET_TESTS_TYPE_SUB_SET_TESTS, test, type, strict);
 }
 
 
-static void sorted_set_tests_sub_set_real_set_up (GeeTestCase* base) {
-	SortedSetTestsSubSet * self;
+static void sorted_set_tests_sub_set_tests_real_set_up (GeeTestCase* base) {
+	SortedSetTestsSubSetTests * self;
 	SortedSetTests* _tmp0_;
 	SortedSetTests* _tmp1_;
 	GeeCollection* _tmp2_;
 	GeeSortedSet* _tmp3_;
-	SortedSetTestsSubSetType _tmp4_;
-	self = (SortedSetTestsSubSet*) base;
+	SortedSetTestsSubSetTestsType _tmp4_;
+	self = (SortedSetTestsSubSetTests*) base;
 	_tmp0_ = self->priv->test;
 	gee_test_case_set_up ((GeeTestCase*) _tmp0_);
 	_tmp1_ = self->priv->test;
@@ -1717,7 +1256,7 @@ static void sorted_set_tests_sub_set_real_set_up (GeeTestCase* base) {
 	self->priv->master = _tmp3_;
 	_tmp4_ = self->priv->type;
 	switch (_tmp4_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			GeeSortedSet* _tmp5_;
 			GeeSortedSet* _tmp6_ = NULL;
@@ -1727,7 +1266,7 @@ static void sorted_set_tests_sub_set_real_set_up (GeeTestCase* base) {
 			self->priv->subset = _tmp6_;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			GeeSortedSet* _tmp7_;
 			GeeSortedSet* _tmp8_ = NULL;
@@ -1737,7 +1276,7 @@ static void sorted_set_tests_sub_set_real_set_up (GeeTestCase* base) {
 			self->priv->subset = _tmp8_;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			GeeSortedSet* _tmp9_;
 			GeeSortedSet* _tmp10_ = NULL;
@@ -1747,7 +1286,7 @@ static void sorted_set_tests_sub_set_real_set_up (GeeTestCase* base) {
 			self->priv->subset = _tmp10_;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			GeeSortedSet* _tmp11_;
 			GeeSortedSet* _tmp12_ = NULL;
@@ -1765,16 +1304,16 @@ static void sorted_set_tests_sub_set_real_set_up (GeeTestCase* base) {
 }
 
 
-static void sorted_set_tests_sub_set_real_tear_down (GeeTestCase* base) {
-	SortedSetTestsSubSet * self;
+static void sorted_set_tests_sub_set_tests_real_tear_down (GeeTestCase* base) {
+	SortedSetTestsSubSetTests * self;
 	SortedSetTests* _tmp0_;
-	self = (SortedSetTestsSubSet*) base;
+	self = (SortedSetTestsSubSetTests*) base;
 	_tmp0_ = self->priv->test;
 	gee_test_case_tear_down ((GeeTestCase*) _tmp0_);
 }
 
 
-void sorted_set_tests_sub_set_test_size (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_size (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_;
 	gboolean _tmp2_;
@@ -1796,7 +1335,7 @@ void sorted_set_tests_sub_set_test_size (SortedSetTestsSubSet* self) {
 	GeeSortedSet* _tmp18_;
 	gint _tmp19_;
 	gint _tmp20_;
-	SortedSetTestsSubSetType _tmp21_;
+	SortedSetTestsSubSetTestsType _tmp21_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->priv->subset;
 	_tmp1_ = gee_collection_get_is_empty ((GeeCollection*) _tmp0_);
@@ -1830,7 +1369,7 @@ void sorted_set_tests_sub_set_test_size (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp20_ == 6, "master.size == 6");
 	_tmp21_ = self->priv->type;
 	switch (_tmp21_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			GeeSortedSet* _tmp22_;
 			gboolean _tmp23_;
@@ -1848,7 +1387,7 @@ void sorted_set_tests_sub_set_test_size (SortedSetTestsSubSet* self) {
 			_vala_assert (_tmp27_ == 2, "subset.size == 2");
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			GeeSortedSet* _tmp28_;
 			gboolean _tmp29_;
@@ -1866,7 +1405,7 @@ void sorted_set_tests_sub_set_test_size (SortedSetTestsSubSet* self) {
 			_vala_assert (_tmp33_ == 3, "subset.size == 3");
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			GeeSortedSet* _tmp34_;
 			gboolean _tmp35_;
@@ -1884,7 +1423,7 @@ void sorted_set_tests_sub_set_test_size (SortedSetTestsSubSet* self) {
 			_vala_assert (_tmp39_ == 3, "subset.size == 3");
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			GeeSortedSet* _tmp40_;
 			gboolean _tmp41_;
@@ -1910,7 +1449,7 @@ void sorted_set_tests_sub_set_test_size (SortedSetTestsSubSet* self) {
 }
 
 
-void sorted_set_tests_sub_set_test_contains (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_contains (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_ = FALSE;
 	GeeSortedSet* _tmp2_;
@@ -1932,7 +1471,7 @@ void sorted_set_tests_sub_set_test_contains (SortedSetTestsSubSet* self) {
 	gchar** not_contains = NULL;
 	gint not_contains_length1 = 0;
 	gint _not_contains_size_ = 0;
-	SortedSetTestsSubSetType _tmp15_;
+	SortedSetTestsSubSetTestsType _tmp15_;
 	gchar** _tmp48_;
 	gint _tmp48__length1;
 	gchar** _tmp53_;
@@ -1962,7 +1501,7 @@ void sorted_set_tests_sub_set_test_contains (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp14_ == 6, "master.size == 6");
 	_tmp15_ = self->priv->type;
 	switch (_tmp15_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			gchar* _tmp16_;
 			gchar* _tmp17_;
@@ -1996,7 +1535,7 @@ void sorted_set_tests_sub_set_test_contains (SortedSetTestsSubSet* self) {
 			_not_contains_size_ = not_contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			gchar* _tmp24_;
 			gchar* _tmp25_;
@@ -2030,7 +1569,7 @@ void sorted_set_tests_sub_set_test_contains (SortedSetTestsSubSet* self) {
 			_not_contains_size_ = not_contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			gchar* _tmp32_;
 			gchar* _tmp33_;
@@ -2064,7 +1603,7 @@ void sorted_set_tests_sub_set_test_contains (SortedSetTestsSubSet* self) {
 			_not_contains_size_ = not_contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			gchar** _tmp40_ = NULL;
 			gchar* _tmp41_;
@@ -2160,7 +1699,7 @@ void sorted_set_tests_sub_set_test_contains (SortedSetTestsSubSet* self) {
 }
 
 
-void sorted_set_tests_sub_set_test_add (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_add (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_ = FALSE;
 	GeeSortedSet* _tmp2_;
@@ -2182,7 +1721,7 @@ void sorted_set_tests_sub_set_test_add (SortedSetTestsSubSet* self) {
 	gchar** fail = NULL;
 	gint fail_length1 = 0;
 	gint _fail_size_ = 0;
-	SortedSetTestsSubSetType _tmp15_;
+	SortedSetTestsSubSetTestsType _tmp15_;
 	gchar** _tmp40_;
 	gint _tmp40__length1;
 	gchar** _tmp51_;
@@ -2217,7 +1756,7 @@ void sorted_set_tests_sub_set_test_add (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp14_ == 6, "master.size == 6");
 	_tmp15_ = self->priv->type;
 	switch (_tmp15_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			gchar* _tmp16_;
 			gchar* _tmp17_;
@@ -2245,7 +1784,7 @@ void sorted_set_tests_sub_set_test_add (SortedSetTestsSubSet* self) {
 			_fail_size_ = fail_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			gchar* _tmp22_;
 			gchar* _tmp23_;
@@ -2273,7 +1812,7 @@ void sorted_set_tests_sub_set_test_add (SortedSetTestsSubSet* self) {
 			_fail_size_ = fail_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			gchar* _tmp28_;
 			gchar* _tmp29_;
@@ -2301,7 +1840,7 @@ void sorted_set_tests_sub_set_test_add (SortedSetTestsSubSet* self) {
 			_fail_size_ = fail_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			gchar** _tmp34_ = NULL;
 			gchar* _tmp35_;
@@ -2425,7 +1964,7 @@ void sorted_set_tests_sub_set_test_add (SortedSetTestsSubSet* self) {
 }
 
 
-void sorted_set_tests_sub_set_test_remove (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_remove (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_ = FALSE;
 	GeeSortedSet* _tmp2_;
@@ -2447,7 +1986,7 @@ void sorted_set_tests_sub_set_test_remove (SortedSetTestsSubSet* self) {
 	gchar** not_contains = NULL;
 	gint not_contains_length1 = 0;
 	gint _not_contains_size_ = 0;
-	SortedSetTestsSubSetType _tmp15_;
+	SortedSetTestsSubSetTestsType _tmp15_;
 	gchar** _tmp48_;
 	gint _tmp48__length1;
 	gchar** _tmp56_;
@@ -2482,7 +2021,7 @@ void sorted_set_tests_sub_set_test_remove (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp14_ == 6, "master.size == 6");
 	_tmp15_ = self->priv->type;
 	switch (_tmp15_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			gchar* _tmp16_;
 			gchar* _tmp17_;
@@ -2516,7 +2055,7 @@ void sorted_set_tests_sub_set_test_remove (SortedSetTestsSubSet* self) {
 			_not_contains_size_ = not_contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			gchar* _tmp24_;
 			gchar* _tmp25_;
@@ -2550,7 +2089,7 @@ void sorted_set_tests_sub_set_test_remove (SortedSetTestsSubSet* self) {
 			_not_contains_size_ = not_contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			gchar* _tmp32_;
 			gchar* _tmp33_;
@@ -2584,7 +2123,7 @@ void sorted_set_tests_sub_set_test_remove (SortedSetTestsSubSet* self) {
 			_not_contains_size_ = not_contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			gchar** _tmp40_ = NULL;
 			gchar* _tmp41_;
@@ -2700,7 +2239,7 @@ void sorted_set_tests_sub_set_test_remove (SortedSetTestsSubSet* self) {
 }
 
 
-void sorted_set_tests_sub_set_test_iterator (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_iterator (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_ = FALSE;
 	GeeSortedSet* _tmp2_;
@@ -2719,15 +2258,15 @@ void sorted_set_tests_sub_set_test_iterator (SortedSetTestsSubSet* self) {
 	gchar** contains = NULL;
 	gint contains_length1 = 0;
 	gint _contains_size_ = 0;
-	SortedSetTestsSubSetType _tmp15_;
+	SortedSetTestsSubSetTestsType _tmp15_;
 	guint i;
 	guint _tmp38_;
 	gchar** _tmp39_;
 	gint _tmp39__length1;
 	GeeSortedSet* _tmp40_;
-	GeeBidirIterator* _tmp41_ = NULL;
-	GeeBidirIterator* iter;
-	SortedSetTestsSubSetType _tmp42_;
+	GeeIterator* _tmp41_ = NULL;
+	GeeIterator* iter;
+	SortedSetTestsSubSetTestsType _tmp42_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->priv->master;
 	_tmp1_ = gee_collection_add ((GeeCollection*) _tmp0_, "one");
@@ -2753,7 +2292,7 @@ void sorted_set_tests_sub_set_test_iterator (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp14_ == 6, "master.size == 6");
 	_tmp15_ = self->priv->type;
 	switch (_tmp15_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			gchar* _tmp16_;
 			gchar* _tmp17_;
@@ -2769,7 +2308,7 @@ void sorted_set_tests_sub_set_test_iterator (SortedSetTestsSubSet* self) {
 			_contains_size_ = contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			gchar* _tmp19_;
 			gchar* _tmp20_;
@@ -2788,7 +2327,7 @@ void sorted_set_tests_sub_set_test_iterator (SortedSetTestsSubSet* self) {
 			_contains_size_ = contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			gchar* _tmp23_;
 			gchar* _tmp24_;
@@ -2807,7 +2346,7 @@ void sorted_set_tests_sub_set_test_iterator (SortedSetTestsSubSet* self) {
 			_contains_size_ = contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			gchar** _tmp27_ = NULL;
 			_tmp27_ = g_new0 (gchar*, 0 + 1);
@@ -2865,135 +2404,65 @@ void sorted_set_tests_sub_set_test_iterator (SortedSetTestsSubSet* self) {
 	_tmp39__length1 = contains_length1;
 	_vala_assert (_tmp38_ == ((guint) _tmp39__length1), "i == contains.length");
 	_tmp40_ = self->priv->subset;
-	_tmp41_ = gee_sorted_set_bidir_iterator (_tmp40_);
+	_tmp41_ = gee_iterable_iterator ((GeeIterable*) _tmp40_);
 	iter = _tmp41_;
 	_tmp42_ = self->priv->type;
-	if (_tmp42_ != SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY) {
-		GeeBidirIterator* _tmp43_;
+	if (_tmp42_ != SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY) {
+		GeeIterator* _tmp43_;
 		gboolean _tmp44_ = FALSE;
-		GeeBidirIterator* _tmp45_;
-		gpointer _tmp46_ = NULL;
-		gchar* _tmp47_;
-		gchar** _tmp48_;
-		gint _tmp48__length1;
-		gchar** _tmp49_;
-		gint _tmp49__length1;
-		const gchar* _tmp50_;
-		GeeBidirIterator* _tmp51_;
-		gboolean _tmp52_ = FALSE;
-		GeeBidirIterator* _tmp53_;
-		gpointer _tmp54_ = NULL;
-		gchar* _tmp55_;
-		gchar** _tmp56_;
-		gint _tmp56__length1;
-		const gchar* _tmp57_;
-		GeeBidirIterator* _tmp58_;
-		gboolean _tmp59_ = FALSE;
-		GeeBidirIterator* _tmp60_;
-		gboolean _tmp61_ = FALSE;
-		GeeBidirIterator* _tmp62_;
-		gpointer _tmp63_ = NULL;
-		gchar* _tmp64_;
-		gchar** _tmp65_;
-		gint _tmp65__length1;
-		const gchar* _tmp66_;
-		GeeBidirIterator* _tmp67_;
-		gboolean _tmp68_ = FALSE;
-		GeeBidirIterator* _tmp69_;
-		GeeBidirIterator* _tmp70_;
-		gboolean _tmp71_ = FALSE;
-		SortedSetTestsSubSetType _tmp72_;
-		GeeBidirIterator* _tmp77_;
-		gboolean _tmp78_ = FALSE;
-		GeeBidirIterator* _tmp79_;
-		gpointer _tmp80_ = NULL;
-		gchar* _tmp81_;
-		gchar** _tmp82_;
-		gint _tmp82__length1;
-		const gchar* _tmp83_;
+		GeeIterator* _tmp45_;
+		gboolean _tmp46_ = FALSE;
+		GeeIterator* _tmp47_;
+		gpointer _tmp48_ = NULL;
+		gchar* _tmp49_;
+		gchar** _tmp50_;
+		gint _tmp50__length1;
+		const gchar* _tmp51_;
+		GeeIterator* _tmp52_;
+		gboolean _tmp53_ = FALSE;
+		GeeIterator* _tmp54_;
+		gboolean _tmp55_ = FALSE;
+		GeeIterator* _tmp56_;
+		gpointer _tmp57_ = NULL;
+		gchar* _tmp58_;
+		gchar** _tmp59_;
+		gint _tmp59__length1;
+		const gchar* _tmp60_;
 		_tmp43_ = iter;
-		_tmp44_ = gee_bidir_iterator_last (_tmp43_);
-		_vala_assert (_tmp44_, "iter.last ()");
+		_tmp44_ = gee_iterator_has_next (_tmp43_);
+		_vala_assert (_tmp44_, "iter.has_next ()");
 		_tmp45_ = iter;
-		_tmp46_ = gee_iterator_get ((GeeIterator*) _tmp45_);
-		_tmp47_ = (gchar*) _tmp46_;
-		_tmp48_ = contains;
-		_tmp48__length1 = contains_length1;
-		_tmp49_ = contains;
-		_tmp49__length1 = contains_length1;
-		_tmp50_ = _tmp48_[_tmp49__length1 - 1];
-		_vala_assert (g_strcmp0 (_tmp47_, _tmp50_) == 0, "iter.get () == contains[contains.length - 1]");
-		_g_free0 (_tmp47_);
-		_tmp51_ = iter;
-		_tmp52_ = gee_iterator_first ((GeeIterator*) _tmp51_);
-		_vala_assert (_tmp52_, "iter.first ()");
-		_tmp53_ = iter;
-		_tmp54_ = gee_iterator_get ((GeeIterator*) _tmp53_);
-		_tmp55_ = (gchar*) _tmp54_;
-		_tmp56_ = contains;
-		_tmp56__length1 = contains_length1;
-		_tmp57_ = _tmp56_[0];
-		_vala_assert (g_strcmp0 (_tmp55_, _tmp57_) == 0, "iter.get () == contains[0]");
-		_g_free0 (_tmp55_);
-		_tmp58_ = iter;
-		_tmp59_ = gee_iterator_has_next ((GeeIterator*) _tmp58_);
-		_vala_assert (_tmp59_, "iter.has_next ()");
-		_tmp60_ = iter;
-		_tmp61_ = gee_iterator_next ((GeeIterator*) _tmp60_);
-		_vala_assert (_tmp61_, "iter.next ()");
-		_tmp62_ = iter;
-		_tmp63_ = gee_iterator_get ((GeeIterator*) _tmp62_);
-		_tmp64_ = (gchar*) _tmp63_;
-		_tmp65_ = contains;
-		_tmp65__length1 = contains_length1;
-		_tmp66_ = _tmp65_[1];
-		_vala_assert (g_strcmp0 (_tmp64_, _tmp66_) == 0, "iter.get () == contains[1]");
-		_g_free0 (_tmp64_);
-		_tmp67_ = iter;
-		_tmp68_ = gee_bidir_iterator_has_previous (_tmp67_);
-		_vala_assert (_tmp68_, "iter.has_previous ()");
-		_tmp69_ = iter;
-		gee_iterator_remove ((GeeIterator*) _tmp69_);
-		_tmp70_ = iter;
-		_tmp71_ = gee_bidir_iterator_has_previous (_tmp70_);
-		_vala_assert (_tmp71_, "iter.has_previous ()");
-		_tmp72_ = self->priv->type;
-		if (_tmp72_ != SORTED_SET_TESTS_SUB_SET_TYPE_HEAD) {
-			GeeBidirIterator* _tmp73_;
-			gboolean _tmp74_ = FALSE;
-			_tmp73_ = iter;
-			_tmp74_ = gee_iterator_has_next ((GeeIterator*) _tmp73_);
-			_vala_assert (_tmp74_, "iter.has_next ()");
-		} else {
-			GeeBidirIterator* _tmp75_;
-			gboolean _tmp76_ = FALSE;
-			_tmp75_ = iter;
-			_tmp76_ = gee_iterator_has_next ((GeeIterator*) _tmp75_);
-			_vala_assert (!_tmp76_, "!iter.has_next ()");
-		}
-		_tmp77_ = iter;
-		_tmp78_ = gee_bidir_iterator_previous (_tmp77_);
-		_vala_assert (_tmp78_, "iter.previous ()");
-		_tmp79_ = iter;
-		_tmp80_ = gee_iterator_get ((GeeIterator*) _tmp79_);
-		_tmp81_ = (gchar*) _tmp80_;
-		_tmp82_ = contains;
-		_tmp82__length1 = contains_length1;
-		_tmp83_ = _tmp82_[0];
-		_vala_assert (g_strcmp0 (_tmp81_, _tmp83_) == 0, "iter.get () == contains[0]");
-		_g_free0 (_tmp81_);
+		_tmp46_ = gee_iterator_next (_tmp45_);
+		_vala_assert (_tmp46_, "iter.next ()");
+		_tmp47_ = iter;
+		_tmp48_ = gee_iterator_get (_tmp47_);
+		_tmp49_ = (gchar*) _tmp48_;
+		_tmp50_ = contains;
+		_tmp50__length1 = contains_length1;
+		_tmp51_ = _tmp50_[0];
+		_vala_assert (g_strcmp0 (_tmp49_, _tmp51_) == 0, "iter.get () == contains[0]");
+		_g_free0 (_tmp49_);
+		_tmp52_ = iter;
+		_tmp53_ = gee_iterator_has_next (_tmp52_);
+		_vala_assert (_tmp53_, "iter.has_next ()");
+		_tmp54_ = iter;
+		_tmp55_ = gee_iterator_next (_tmp54_);
+		_vala_assert (_tmp55_, "iter.next ()");
+		_tmp56_ = iter;
+		_tmp57_ = gee_iterator_get (_tmp56_);
+		_tmp58_ = (gchar*) _tmp57_;
+		_tmp59_ = contains;
+		_tmp59__length1 = contains_length1;
+		_tmp60_ = _tmp59_[1];
+		_vala_assert (g_strcmp0 (_tmp58_, _tmp60_) == 0, "iter.get () == contains[1]");
+		_g_free0 (_tmp58_);
 	} else {
-		GeeBidirIterator* _tmp84_;
-		gboolean _tmp85_ = FALSE;
-		gboolean _tmp86_ = FALSE;
-		_tmp84_ = iter;
-		_tmp85_ = gee_iterator_first ((GeeIterator*) _tmp84_);
-		_vala_assert (!_tmp85_, "!iter.first ()");
-		_tmp86_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
-		if (_tmp86_) {
-			GeeBidirIterator* _tmp87_;
-			_tmp87_ = iter;
-			gee_iterator_remove ((GeeIterator*) _tmp87_);
+		gboolean _tmp61_ = FALSE;
+		_tmp61_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
+		if (_tmp61_) {
+			GeeIterator* _tmp62_;
+			_tmp62_ = iter;
+			gee_iterator_remove (_tmp62_);
 			exit (0);
 		}
 		g_test_trap_assert_failed ();
@@ -3003,7 +2472,7 @@ void sorted_set_tests_sub_set_test_iterator (SortedSetTestsSubSet* self) {
 }
 
 
-void sorted_set_tests_sub_set_test_clear (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_clear (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_ = FALSE;
 	GeeSortedSet* _tmp2_;
@@ -3025,7 +2494,7 @@ void sorted_set_tests_sub_set_test_clear (SortedSetTestsSubSet* self) {
 	gchar** not_contains = NULL;
 	gint not_contains_length1 = 0;
 	gint _not_contains_size_ = 0;
-	SortedSetTestsSubSetType _tmp15_;
+	SortedSetTestsSubSetTestsType _tmp15_;
 	GeeSortedSet* _tmp48_;
 	gchar** _tmp49_;
 	gint _tmp49__length1;
@@ -3056,7 +2525,7 @@ void sorted_set_tests_sub_set_test_clear (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp14_ == 6, "master.size == 6");
 	_tmp15_ = self->priv->type;
 	switch (_tmp15_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			gchar* _tmp16_;
 			gchar* _tmp17_;
@@ -3090,7 +2559,7 @@ void sorted_set_tests_sub_set_test_clear (SortedSetTestsSubSet* self) {
 			_not_contains_size_ = not_contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			gchar* _tmp24_;
 			gchar* _tmp25_;
@@ -3124,7 +2593,7 @@ void sorted_set_tests_sub_set_test_clear (SortedSetTestsSubSet* self) {
 			_not_contains_size_ = not_contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			gchar* _tmp32_;
 			gchar* _tmp33_;
@@ -3158,7 +2627,7 @@ void sorted_set_tests_sub_set_test_clear (SortedSetTestsSubSet* self) {
 			_not_contains_size_ = not_contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			gchar** _tmp40_ = NULL;
 			gchar* _tmp41_;
@@ -3256,7 +2725,7 @@ void sorted_set_tests_sub_set_test_clear (SortedSetTestsSubSet* self) {
 }
 
 
-void sorted_set_tests_sub_set_test_boundaries (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_boundaries (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_ = FALSE;
 	GeeSortedSet* _tmp2_;
@@ -3272,7 +2741,7 @@ void sorted_set_tests_sub_set_test_boundaries (SortedSetTestsSubSet* self) {
 	GeeSortedSet* _tmp12_;
 	gint _tmp13_;
 	gint _tmp14_;
-	SortedSetTestsSubSetType _tmp15_;
+	SortedSetTestsSubSetTestsType _tmp15_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->priv->master;
 	_tmp1_ = gee_collection_add ((GeeCollection*) _tmp0_, "one");
@@ -3298,7 +2767,7 @@ void sorted_set_tests_sub_set_test_boundaries (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp14_ == 6, "master.size == 6");
 	_tmp15_ = self->priv->type;
 	switch (_tmp15_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			GeeSortedSet* _tmp16_;
 			gpointer _tmp17_ = NULL;
@@ -3318,7 +2787,7 @@ void sorted_set_tests_sub_set_test_boundaries (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp21_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			GeeSortedSet* _tmp22_;
 			gpointer _tmp23_ = NULL;
@@ -3338,7 +2807,7 @@ void sorted_set_tests_sub_set_test_boundaries (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp27_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			GeeSortedSet* _tmp28_;
 			gpointer _tmp29_ = NULL;
@@ -3358,34 +2827,38 @@ void sorted_set_tests_sub_set_test_boundaries (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp33_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
-			gboolean _tmp34_ = FALSE;
-			gboolean _tmp38_ = FALSE;
-			_tmp34_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
+			gboolean _tmp34_;
+			_tmp34_ = self->priv->strict;
 			if (_tmp34_) {
-				GeeSortedSet* _tmp35_;
-				gpointer _tmp36_ = NULL;
-				gchar* _tmp37_;
-				_tmp35_ = self->priv->subset;
-				_tmp36_ = gee_sorted_set_first (_tmp35_);
-				_tmp37_ = (gchar*) _tmp36_;
-				_g_free0 (_tmp37_);
-				exit (0);
+				gboolean _tmp35_ = FALSE;
+				gboolean _tmp39_ = FALSE;
+				_tmp35_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
+				if (_tmp35_) {
+					GeeSortedSet* _tmp36_;
+					gpointer _tmp37_ = NULL;
+					gchar* _tmp38_;
+					_tmp36_ = self->priv->subset;
+					_tmp37_ = gee_sorted_set_first (_tmp36_);
+					_tmp38_ = (gchar*) _tmp37_;
+					_g_free0 (_tmp38_);
+					exit (0);
+				}
+				g_test_trap_assert_failed ();
+				_tmp39_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
+				if (_tmp39_) {
+					GeeSortedSet* _tmp40_;
+					gpointer _tmp41_ = NULL;
+					gchar* _tmp42_;
+					_tmp40_ = self->priv->subset;
+					_tmp41_ = gee_sorted_set_last (_tmp40_);
+					_tmp42_ = (gchar*) _tmp41_;
+					_g_free0 (_tmp42_);
+					exit (0);
+				}
+				g_test_trap_assert_failed ();
 			}
-			g_test_trap_assert_failed ();
-			_tmp38_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
-			if (_tmp38_) {
-				GeeSortedSet* _tmp39_;
-				gpointer _tmp40_ = NULL;
-				gchar* _tmp41_;
-				_tmp39_ = self->priv->subset;
-				_tmp40_ = gee_sorted_set_last (_tmp39_);
-				_tmp41_ = (gchar*) _tmp40_;
-				_g_free0 (_tmp41_);
-				exit (0);
-			}
-			g_test_trap_assert_failed ();
 			break;
 		}
 		default:
@@ -3396,7 +2869,7 @@ void sorted_set_tests_sub_set_test_boundaries (SortedSetTestsSubSet* self) {
 }
 
 
-void sorted_set_tests_sub_set_test_iterator_at (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_iterator_at (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_ = FALSE;
 	GeeSortedSet* _tmp2_;
@@ -3418,7 +2891,7 @@ void sorted_set_tests_sub_set_test_iterator_at (SortedSetTestsSubSet* self) {
 	gchar** not_contains = NULL;
 	gint not_contains_length1 = 0;
 	gint _not_contains_size_ = 0;
-	SortedSetTestsSubSetType _tmp15_;
+	SortedSetTestsSubSetTestsType _tmp15_;
 	gchar** _tmp48_;
 	gint _tmp48__length1;
 	gchar** _tmp58_;
@@ -3448,7 +2921,7 @@ void sorted_set_tests_sub_set_test_iterator_at (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp14_ == 6, "master.size == 6");
 	_tmp15_ = self->priv->type;
 	switch (_tmp15_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			gchar* _tmp16_;
 			gchar* _tmp17_;
@@ -3482,7 +2955,7 @@ void sorted_set_tests_sub_set_test_iterator_at (SortedSetTestsSubSet* self) {
 			_not_contains_size_ = not_contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			gchar* _tmp24_;
 			gchar* _tmp25_;
@@ -3516,7 +2989,7 @@ void sorted_set_tests_sub_set_test_iterator_at (SortedSetTestsSubSet* self) {
 			_not_contains_size_ = not_contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			gchar* _tmp32_;
 			gchar* _tmp33_;
@@ -3550,7 +3023,7 @@ void sorted_set_tests_sub_set_test_iterator_at (SortedSetTestsSubSet* self) {
 			_not_contains_size_ = not_contains_length1;
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			gchar** _tmp40_ = NULL;
 			gchar* _tmp41_;
@@ -3606,10 +3079,10 @@ void sorted_set_tests_sub_set_test_iterator_at (SortedSetTestsSubSet* self) {
 			{
 				GeeSortedSet* _tmp50_;
 				const gchar* _tmp51_;
-				GeeBidirIterator* _tmp52_ = NULL;
-				GeeBidirIterator* iter;
-				GeeBidirIterator* _tmp53_;
-				GeeBidirIterator* _tmp54_;
+				GeeIterator* _tmp52_ = NULL;
+				GeeIterator* iter;
+				GeeIterator* _tmp53_;
+				GeeIterator* _tmp54_;
 				gpointer _tmp55_ = NULL;
 				gchar* _tmp56_;
 				const gchar* _tmp57_;
@@ -3620,7 +3093,7 @@ void sorted_set_tests_sub_set_test_iterator_at (SortedSetTestsSubSet* self) {
 				_tmp53_ = iter;
 				_vala_assert (_tmp53_ != NULL, "iter != null");
 				_tmp54_ = iter;
-				_tmp55_ = gee_iterator_get ((GeeIterator*) _tmp54_);
+				_tmp55_ = gee_iterator_get (_tmp54_);
 				_tmp56_ = (gchar*) _tmp55_;
 				_tmp57_ = s;
 				_vala_assert (g_strcmp0 (_tmp56_, _tmp57_) == 0, "iter.get () == s");
@@ -3647,9 +3120,9 @@ void sorted_set_tests_sub_set_test_iterator_at (SortedSetTestsSubSet* self) {
 			{
 				GeeSortedSet* _tmp60_;
 				const gchar* _tmp61_;
-				GeeBidirIterator* _tmp62_ = NULL;
-				GeeBidirIterator* iter;
-				GeeBidirIterator* _tmp63_;
+				GeeIterator* _tmp62_ = NULL;
+				GeeIterator* iter;
+				GeeIterator* _tmp63_;
 				_tmp60_ = self->priv->subset;
 				_tmp61_ = s;
 				_tmp62_ = gee_sorted_set_iterator_at (_tmp60_, _tmp61_);
@@ -3666,7 +3139,7 @@ void sorted_set_tests_sub_set_test_iterator_at (SortedSetTestsSubSet* self) {
 }
 
 
-void sorted_set_tests_sub_set_test_lower (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_lower (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_ = FALSE;
 	GeeSortedSet* _tmp2_;
@@ -3682,7 +3155,7 @@ void sorted_set_tests_sub_set_test_lower (SortedSetTestsSubSet* self) {
 	GeeSortedSet* _tmp12_;
 	gint _tmp13_;
 	gint _tmp14_;
-	SortedSetTestsSubSetType _tmp15_;
+	SortedSetTestsSubSetTestsType _tmp15_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->priv->master;
 	_tmp1_ = gee_collection_add ((GeeCollection*) _tmp0_, "one");
@@ -3708,7 +3181,7 @@ void sorted_set_tests_sub_set_test_lower (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp14_ == 6, "master.size == 6");
 	_tmp15_ = self->priv->type;
 	switch (_tmp15_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			GeeSortedSet* _tmp16_;
 			gpointer _tmp17_ = NULL;
@@ -3744,7 +3217,7 @@ void sorted_set_tests_sub_set_test_lower (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp27_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			GeeSortedSet* _tmp28_;
 			gpointer _tmp29_ = NULL;
@@ -3788,7 +3261,7 @@ void sorted_set_tests_sub_set_test_lower (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp42_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			GeeSortedSet* _tmp43_;
 			gpointer _tmp44_ = NULL;
@@ -3832,7 +3305,7 @@ void sorted_set_tests_sub_set_test_lower (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp57_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			GeeSortedSet* _tmp58_;
 			gpointer _tmp59_ = NULL;
@@ -3852,7 +3325,7 @@ void sorted_set_tests_sub_set_test_lower (SortedSetTestsSubSet* self) {
 }
 
 
-void sorted_set_tests_sub_set_test_higher (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_higher (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_ = FALSE;
 	GeeSortedSet* _tmp2_;
@@ -3868,7 +3341,7 @@ void sorted_set_tests_sub_set_test_higher (SortedSetTestsSubSet* self) {
 	GeeSortedSet* _tmp12_;
 	gint _tmp13_;
 	gint _tmp14_;
-	SortedSetTestsSubSetType _tmp15_;
+	SortedSetTestsSubSetTestsType _tmp15_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->priv->master;
 	_tmp1_ = gee_collection_add ((GeeCollection*) _tmp0_, "one");
@@ -3894,7 +3367,7 @@ void sorted_set_tests_sub_set_test_higher (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp14_ == 6, "master.size == 6");
 	_tmp15_ = self->priv->type;
 	switch (_tmp15_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			GeeSortedSet* _tmp16_;
 			gpointer _tmp17_ = NULL;
@@ -3930,7 +3403,7 @@ void sorted_set_tests_sub_set_test_higher (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp27_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			GeeSortedSet* _tmp28_;
 			gpointer _tmp29_ = NULL;
@@ -3974,7 +3447,7 @@ void sorted_set_tests_sub_set_test_higher (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp42_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			GeeSortedSet* _tmp43_;
 			gpointer _tmp44_ = NULL;
@@ -4018,7 +3491,7 @@ void sorted_set_tests_sub_set_test_higher (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp57_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			GeeSortedSet* _tmp58_;
 			gpointer _tmp59_ = NULL;
@@ -4038,7 +3511,7 @@ void sorted_set_tests_sub_set_test_higher (SortedSetTestsSubSet* self) {
 }
 
 
-void sorted_set_tests_sub_set_test_floor (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_floor (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_ = FALSE;
 	GeeSortedSet* _tmp2_;
@@ -4054,7 +3527,7 @@ void sorted_set_tests_sub_set_test_floor (SortedSetTestsSubSet* self) {
 	GeeSortedSet* _tmp12_;
 	gint _tmp13_;
 	gint _tmp14_;
-	SortedSetTestsSubSetType _tmp15_;
+	SortedSetTestsSubSetTestsType _tmp15_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->priv->master;
 	_tmp1_ = gee_collection_add ((GeeCollection*) _tmp0_, "one");
@@ -4080,7 +3553,7 @@ void sorted_set_tests_sub_set_test_floor (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp14_ == 6, "master.size == 6");
 	_tmp15_ = self->priv->type;
 	switch (_tmp15_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			GeeSortedSet* _tmp16_;
 			gpointer _tmp17_ = NULL;
@@ -4116,7 +3589,7 @@ void sorted_set_tests_sub_set_test_floor (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp27_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			GeeSortedSet* _tmp28_;
 			gpointer _tmp29_ = NULL;
@@ -4160,7 +3633,7 @@ void sorted_set_tests_sub_set_test_floor (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp42_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			GeeSortedSet* _tmp43_;
 			gpointer _tmp44_ = NULL;
@@ -4204,7 +3677,7 @@ void sorted_set_tests_sub_set_test_floor (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp57_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			GeeSortedSet* _tmp58_;
 			gpointer _tmp59_ = NULL;
@@ -4224,7 +3697,7 @@ void sorted_set_tests_sub_set_test_floor (SortedSetTestsSubSet* self) {
 }
 
 
-void sorted_set_tests_sub_set_test_ceil (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_ceil (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_ = FALSE;
 	GeeSortedSet* _tmp2_;
@@ -4240,7 +3713,7 @@ void sorted_set_tests_sub_set_test_ceil (SortedSetTestsSubSet* self) {
 	GeeSortedSet* _tmp12_;
 	gint _tmp13_;
 	gint _tmp14_;
-	SortedSetTestsSubSetType _tmp15_;
+	SortedSetTestsSubSetTestsType _tmp15_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->priv->master;
 	_tmp1_ = gee_collection_add ((GeeCollection*) _tmp0_, "one");
@@ -4266,7 +3739,7 @@ void sorted_set_tests_sub_set_test_ceil (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp14_ == 6, "master.size == 6");
 	_tmp15_ = self->priv->type;
 	switch (_tmp15_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			GeeSortedSet* _tmp16_;
 			gpointer _tmp17_ = NULL;
@@ -4302,7 +3775,7 @@ void sorted_set_tests_sub_set_test_ceil (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp27_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			GeeSortedSet* _tmp28_;
 			gpointer _tmp29_ = NULL;
@@ -4346,7 +3819,7 @@ void sorted_set_tests_sub_set_test_ceil (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp42_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			GeeSortedSet* _tmp43_;
 			gpointer _tmp44_ = NULL;
@@ -4390,7 +3863,7 @@ void sorted_set_tests_sub_set_test_ceil (SortedSetTestsSubSet* self) {
 			_g_free0 (_tmp57_);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			GeeSortedSet* _tmp58_;
 			gpointer _tmp59_ = NULL;
@@ -4410,7 +3883,7 @@ void sorted_set_tests_sub_set_test_ceil (SortedSetTestsSubSet* self) {
 }
 
 
-void sorted_set_tests_sub_set_test_subsets (SortedSetTestsSubSet* self) {
+void sorted_set_tests_sub_set_tests_test_subsets (SortedSetTestsSubSetTests* self) {
 	GeeSortedSet* _tmp0_;
 	gboolean _tmp1_ = FALSE;
 	GeeSortedSet* _tmp2_;
@@ -4426,7 +3899,7 @@ void sorted_set_tests_sub_set_test_subsets (SortedSetTestsSubSet* self) {
 	GeeSortedSet* _tmp12_;
 	gint _tmp13_;
 	gint _tmp14_;
-	SortedSetTestsSubSetType _tmp15_;
+	SortedSetTestsSubSetTestsType _tmp15_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->priv->master;
 	_tmp1_ = gee_collection_add ((GeeCollection*) _tmp0_, "one");
@@ -4452,7 +3925,7 @@ void sorted_set_tests_sub_set_test_subsets (SortedSetTestsSubSet* self) {
 	_vala_assert (_tmp14_ == 6, "master.size == 6");
 	_tmp15_ = self->priv->type;
 	switch (_tmp15_) {
-		case SORTED_SET_TESTS_SUB_SET_TYPE_HEAD:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_HEAD:
 		{
 			GeeSortedSet* _tmp16_;
 			GeeSortedSet* _tmp17_ = NULL;
@@ -4509,7 +3982,7 @@ void sorted_set_tests_sub_set_test_subsets (SortedSetTestsSubSet* self) {
 			_g_object_unref0 (subsubset);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_TAIL:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_TAIL:
 		{
 			GeeSortedSet* _tmp36_;
 			GeeSortedSet* _tmp37_ = NULL;
@@ -4553,7 +4026,7 @@ void sorted_set_tests_sub_set_test_subsets (SortedSetTestsSubSet* self) {
 			_g_object_unref0 (subsubset);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_SUB:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_SUB:
 		{
 			GeeSortedSet* _tmp51_;
 			GeeSortedSet* _tmp52_ = NULL;
@@ -4610,7 +4083,7 @@ void sorted_set_tests_sub_set_test_subsets (SortedSetTestsSubSet* self) {
 			_g_object_unref0 (subsubset);
 			break;
 		}
-		case SORTED_SET_TESTS_SUB_SET_TYPE_EMPTY:
+		case SORTED_SET_TESTS_SUB_SET_TESTS_TYPE_EMPTY:
 		{
 			GeeSortedSet* _tmp71_;
 			GeeSortedSet* _tmp72_ = NULL;
@@ -4662,48 +4135,58 @@ void sorted_set_tests_sub_set_test_subsets (SortedSetTestsSubSet* self) {
 }
 
 
-static void sorted_set_tests_sub_set_class_init (SortedSetTestsSubSetClass * klass) {
-	sorted_set_tests_sub_set_parent_class = g_type_class_peek_parent (klass);
-	g_type_class_add_private (klass, sizeof (SortedSetTestsSubSetPrivate));
-	GEE_TEST_CASE_CLASS (klass)->set_up = sorted_set_tests_sub_set_real_set_up;
-	GEE_TEST_CASE_CLASS (klass)->tear_down = sorted_set_tests_sub_set_real_tear_down;
-	G_OBJECT_CLASS (klass)->finalize = sorted_set_tests_sub_set_finalize;
+static void sorted_set_tests_sub_set_tests_class_init (SortedSetTestsSubSetTestsClass * klass) {
+	sorted_set_tests_sub_set_tests_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (SortedSetTestsSubSetTestsPrivate));
+	GEE_TEST_CASE_CLASS (klass)->set_up = sorted_set_tests_sub_set_tests_real_set_up;
+	GEE_TEST_CASE_CLASS (klass)->tear_down = sorted_set_tests_sub_set_tests_real_tear_down;
+	G_OBJECT_CLASS (klass)->finalize = sorted_set_tests_sub_set_tests_finalize;
 }
 
 
-static void sorted_set_tests_sub_set_instance_init (SortedSetTestsSubSet * self) {
-	self->priv = SORTED_SET_TESTS_SUB_SET_GET_PRIVATE (self);
+static void sorted_set_tests_sub_set_tests_instance_init (SortedSetTestsSubSetTests * self) {
+	self->priv = SORTED_SET_TESTS_SUB_SET_TESTS_GET_PRIVATE (self);
 }
 
 
-static void sorted_set_tests_sub_set_finalize (GObject* obj) {
-	SortedSetTestsSubSet * self;
-	self = G_TYPE_CHECK_INSTANCE_CAST (obj, SORTED_SET_TESTS_TYPE_SUB_SET, SortedSetTestsSubSet);
+static void sorted_set_tests_sub_set_tests_finalize (GObject* obj) {
+	SortedSetTestsSubSetTests * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (obj, SORTED_SET_TESTS_TYPE_SUB_SET_TESTS, SortedSetTestsSubSetTests);
 	_g_object_unref0 (self->priv->master);
 	_g_object_unref0 (self->priv->subset);
 	_g_object_unref0 (self->priv->test);
-	G_OBJECT_CLASS (sorted_set_tests_sub_set_parent_class)->finalize (obj);
+	G_OBJECT_CLASS (sorted_set_tests_sub_set_tests_parent_class)->finalize (obj);
 }
 
 
-GType sorted_set_tests_sub_set_get_type (void) {
-	static volatile gsize sorted_set_tests_sub_set_type_id__volatile = 0;
-	if (g_once_init_enter (&sorted_set_tests_sub_set_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (SortedSetTestsSubSetClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) sorted_set_tests_sub_set_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (SortedSetTestsSubSet), 0, (GInstanceInitFunc) sorted_set_tests_sub_set_instance_init, NULL };
-		GType sorted_set_tests_sub_set_type_id;
-		sorted_set_tests_sub_set_type_id = g_type_register_static (GEE_TYPE_TEST_CASE, "SortedSetTestsSubSet", &g_define_type_info, 0);
-		g_once_init_leave (&sorted_set_tests_sub_set_type_id__volatile, sorted_set_tests_sub_set_type_id);
+GType sorted_set_tests_sub_set_tests_get_type (void) {
+	static volatile gsize sorted_set_tests_sub_set_tests_type_id__volatile = 0;
+	if (g_once_init_enter (&sorted_set_tests_sub_set_tests_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (SortedSetTestsSubSetTestsClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) sorted_set_tests_sub_set_tests_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (SortedSetTestsSubSetTests), 0, (GInstanceInitFunc) sorted_set_tests_sub_set_tests_instance_init, NULL };
+		GType sorted_set_tests_sub_set_tests_type_id;
+		sorted_set_tests_sub_set_tests_type_id = g_type_register_static (GEE_TYPE_TEST_CASE, "SortedSetTestsSubSetTests", &g_define_type_info, 0);
+		g_once_init_leave (&sorted_set_tests_sub_set_tests_type_id__volatile, sorted_set_tests_sub_set_tests_type_id);
 	}
-	return sorted_set_tests_sub_set_type_id__volatile;
+	return sorted_set_tests_sub_set_tests_type_id__volatile;
 }
 
 
 static void sorted_set_tests_class_init (SortedSetTestsClass * klass) {
 	sorted_set_tests_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (SortedSetTestsPrivate));
+	G_OBJECT_CLASS (klass)->finalize = sorted_set_tests_finalize;
 }
 
 
 static void sorted_set_tests_instance_init (SortedSetTests * self) {
+	self->priv = SORTED_SET_TESTS_GET_PRIVATE (self);
+}
+
+
+static void sorted_set_tests_finalize (GObject* obj) {
+	SortedSetTests * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (obj, TYPE_SORTED_SET_TESTS, SortedSetTests);
+	G_OBJECT_CLASS (sorted_set_tests_parent_class)->finalize (obj);
 }
 
 

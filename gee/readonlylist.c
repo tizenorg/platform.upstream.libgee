@@ -27,13 +27,25 @@
 #include <glib-object.h>
 
 
-#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
-#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
-#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
-#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+#define GEE_TYPE_TRAVERSABLE (gee_traversable_get_type ())
+#define GEE_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversable))
+#define GEE_IS_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_TRAVERSABLE))
+#define GEE_TRAVERSABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversableIface))
 
-typedef struct _GeeIterable GeeIterable;
-typedef struct _GeeIterableIface GeeIterableIface;
+typedef struct _GeeTraversable GeeTraversable;
+typedef struct _GeeTraversableIface GeeTraversableIface;
+
+#define GEE_TRAVERSABLE_TYPE_STREAM (gee_traversable_stream_get_type ())
+
+#define GEE_TYPE_LAZY (gee_lazy_get_type ())
+#define GEE_LAZY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LAZY, GeeLazy))
+#define GEE_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_LAZY, GeeLazyClass))
+#define GEE_IS_LAZY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LAZY))
+#define GEE_IS_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_LAZY))
+#define GEE_LAZY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_LAZY, GeeLazyClass))
+
+typedef struct _GeeLazy GeeLazy;
+typedef struct _GeeLazyClass GeeLazyClass;
 
 #define GEE_TYPE_ITERATOR (gee_iterator_get_type ())
 #define GEE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERATOR, GeeIterator))
@@ -42,6 +54,14 @@ typedef struct _GeeIterableIface GeeIterableIface;
 
 typedef struct _GeeIterator GeeIterator;
 typedef struct _GeeIteratorIface GeeIteratorIface;
+
+#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
+#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
+#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
+#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+
+typedef struct _GeeIterable GeeIterable;
+typedef struct _GeeIterableIface GeeIterableIface;
 
 #define GEE_TYPE_COLLECTION (gee_collection_get_type ())
 #define GEE_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_COLLECTION, GeeCollection))
@@ -69,14 +89,6 @@ typedef struct _GeeReadOnlyCollectionPrivate GeeReadOnlyCollectionPrivate;
 
 typedef struct _GeeList GeeList;
 typedef struct _GeeListIface GeeListIface;
-
-#define GEE_TYPE_BIDIR_ITERATOR (gee_bidir_iterator_get_type ())
-#define GEE_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIterator))
-#define GEE_IS_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_ITERATOR))
-#define GEE_BIDIR_ITERATOR_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIteratorIface))
-
-typedef struct _GeeBidirIterator GeeBidirIterator;
-typedef struct _GeeBidirIteratorIface GeeBidirIteratorIface;
 
 #define GEE_TYPE_LIST_ITERATOR (gee_list_iterator_get_type ())
 #define GEE_LIST_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LIST_ITERATOR, GeeListIterator))
@@ -120,23 +132,55 @@ typedef struct _GeeReadOnlyListIteratorClass GeeReadOnlyListIteratorClass;
 typedef struct _GeeReadOnlyCollectionIteratorPrivate GeeReadOnlyCollectionIteratorPrivate;
 typedef struct _GeeReadOnlyListIteratorPrivate GeeReadOnlyListIteratorPrivate;
 
+typedef gboolean (*GeeForallFunc) (gpointer g, void* user_data);
+typedef enum  {
+	GEE_TRAVERSABLE_STREAM_YIELD,
+	GEE_TRAVERSABLE_STREAM_CONTINUE,
+	GEE_TRAVERSABLE_STREAM_END
+} GeeTraversableStream;
+
+typedef GeeTraversableStream (*GeeStreamFunc) (GeeTraversableStream state, GeeLazy* g, GeeLazy** lazy, void* user_data);
 struct _GeeIteratorIface {
 	GTypeInterface parent_iface;
 	gboolean (*next) (GeeIterator* self);
 	gboolean (*has_next) (GeeIterator* self);
-	gboolean (*first) (GeeIterator* self);
 	gpointer (*get) (GeeIterator* self);
 	void (*remove) (GeeIterator* self);
+	gboolean (*get_valid) (GeeIterator* self);
+	gboolean (*get_read_only) (GeeIterator* self);
+};
+
+typedef gpointer (*GeeFoldFunc) (gpointer g, gpointer a, void* user_data);
+typedef gpointer (*GeeMapFunc) (gpointer g, void* user_data);
+typedef gboolean (*GeePredicate) (gconstpointer g, void* user_data);
+struct _GeeTraversableIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeTraversable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeTraversable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeTraversable* self);
+	gboolean (*foreach) (GeeTraversable* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	gpointer (*fold) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*map) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+	GeeIterator* (*scan) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*filter) (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+	GeeIterator* (*chop) (GeeTraversable* self, gint offset, gint length);
+	GType (*get_element_type) (GeeTraversable* self);
 };
 
 struct _GeeIterableIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeIterable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeIterable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeIterable* self);
 	GeeIterator* (*iterator) (GeeIterable* self);
-	GType (*get_element_type) (GeeIterable* self);
 };
 
 struct _GeeCollectionIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeCollection* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeCollection* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeCollection* self);
 	gboolean (*contains) (GeeCollection* self, gconstpointer item);
 	gboolean (*add) (GeeCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeCollection* self, gconstpointer item);
@@ -148,6 +192,7 @@ struct _GeeCollectionIface {
 	gpointer* (*to_array) (GeeCollection* self, int* result_length1);
 	gint (*get_size) (GeeCollection* self);
 	gboolean (*get_is_empty) (GeeCollection* self);
+	gboolean (*get_read_only) (GeeCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeCollection* self);
 };
 
@@ -162,23 +207,18 @@ struct _GeeReadOnlyCollectionClass {
 	GeeCollection* (*get_read_only_view) (GeeReadOnlyCollection* self);
 };
 
-struct _GeeBidirIteratorIface {
-	GTypeInterface parent_iface;
-	gboolean (*previous) (GeeBidirIterator* self);
-	gboolean (*has_previous) (GeeBidirIterator* self);
-	gboolean (*last) (GeeBidirIterator* self);
-};
-
 struct _GeeListIteratorIface {
 	GTypeInterface parent_iface;
 	void (*set) (GeeListIterator* self, gconstpointer item);
-	void (*insert) (GeeListIterator* self, gconstpointer item);
 	void (*add) (GeeListIterator* self, gconstpointer item);
 	gint (*index) (GeeListIterator* self);
 };
 
 struct _GeeListIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeList* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeList* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeList* self);
 	GeeListIterator* (*list_iterator) (GeeList* self);
 	gpointer (*get) (GeeList* self, gint index);
 	void (*set) (GeeList* self, gint index, gconstpointer item);
@@ -189,7 +229,7 @@ struct _GeeListIface {
 	gpointer (*first) (GeeList* self);
 	gpointer (*last) (GeeList* self);
 	void (*insert_all) (GeeList* self, gint index, GeeCollection* collection);
-	void (*sort) (GeeList* self, GCompareFunc compare_func);
+	void (*sort) (GeeList* self, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
 	GeeList* (*get_read_only_view) (GeeList* self);
 };
 
@@ -237,15 +277,22 @@ struct _GeeReadOnlyListIteratorPrivate {
 
 static gpointer gee_read_only_list_parent_class = NULL;
 static gpointer gee_read_only_list_iterator_parent_class = NULL;
-static GeeBidirIteratorIface* gee_read_only_list_iterator_gee_bidir_iterator_parent_iface = NULL;
 static GeeListIteratorIface* gee_read_only_list_iterator_gee_list_iterator_parent_iface = NULL;
 static GeeListIface* gee_read_only_list_gee_list_parent_iface = NULL;
 
+GType gee_traversable_stream_get_type (void) G_GNUC_CONST;
+gpointer gee_lazy_ref (gpointer instance);
+void gee_lazy_unref (gpointer instance);
+GParamSpec* gee_param_spec_lazy (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void gee_value_set_lazy (GValue* value, gpointer v_object);
+void gee_value_take_lazy (GValue* value, gpointer v_object);
+gpointer gee_value_get_lazy (const GValue* value);
+GType gee_lazy_get_type (void) G_GNUC_CONST;
 GType gee_iterator_get_type (void) G_GNUC_CONST;
+GType gee_traversable_get_type (void) G_GNUC_CONST;
 GType gee_iterable_get_type (void) G_GNUC_CONST;
 GType gee_collection_get_type (void) G_GNUC_CONST;
 GType gee_read_only_collection_get_type (void) G_GNUC_CONST;
-GType gee_bidir_iterator_get_type (void) G_GNUC_CONST;
 GType gee_list_iterator_get_type (void) G_GNUC_CONST;
 GType gee_list_get_type (void) G_GNUC_CONST;
 GType gee_read_only_list_get_type (void) G_GNUC_CONST;
@@ -263,10 +310,10 @@ GeeReadOnlyCollection* gee_read_only_collection_new (GType g_type, GBoxedCopyFun
 GeeReadOnlyCollection* gee_read_only_collection_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeCollection* collection);
 static GeeListIterator* gee_read_only_list_real_list_iterator (GeeList* base);
 GeeListIterator* gee_list_list_iterator (GeeList* self);
-static GeeReadOnlyListIterator* gee_read_only_list_iterator_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeListIterator* iterator);
-static GeeReadOnlyListIterator* gee_read_only_list_iterator_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeListIterator* iterator);
+GeeReadOnlyListIterator* gee_read_only_list_iterator_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeListIterator* iterator);
+GeeReadOnlyListIterator* gee_read_only_list_iterator_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeListIterator* iterator);
 GType gee_read_only_collection_iterator_get_type (void) G_GNUC_CONST;
-static GType gee_read_only_list_iterator_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+GType gee_read_only_list_iterator_get_type (void) G_GNUC_CONST;
 static gint gee_read_only_list_real_index_of (GeeList* base, gconstpointer item);
 gint gee_list_index_of (GeeList* self, gconstpointer item);
 static void gee_read_only_list_real_insert (GeeList* base, gint index, gconstpointer item);
@@ -275,12 +322,13 @@ static gpointer gee_read_only_list_real_get (GeeList* base, gint index);
 gpointer gee_list_get (GeeList* self, gint index);
 static void gee_read_only_list_real_set (GeeList* base, gint index, gconstpointer o);
 static GeeList* gee_read_only_list_real_slice (GeeList* base, gint start, gint stop);
+GeeList* gee_list_slice (GeeList* self, gint start, gint stop);
 static gpointer gee_read_only_list_real_first (GeeList* base);
 gpointer gee_list_first (GeeList* self);
 static gpointer gee_read_only_list_real_last (GeeList* base);
 gpointer gee_list_last (GeeList* self);
 static void gee_read_only_list_real_insert_all (GeeList* base, gint index, GeeCollection* collection);
-static void gee_read_only_list_real_sort (GeeList* base, GCompareFunc compare);
+static void gee_read_only_list_real_sort (GeeList* base, GCompareDataFunc compare, void* compare_target, GDestroyNotify compare_target_destroy_notify);
 GeeList* gee_read_only_list_get_read_only_view (GeeReadOnlyList* self);
 #define GEE_READ_ONLY_LIST_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_READ_ONLY_LIST_TYPE_ITERATOR, GeeReadOnlyListIteratorPrivate))
 enum  {
@@ -291,14 +339,7 @@ enum  {
 };
 GeeReadOnlyCollectionIterator* gee_read_only_collection_iterator_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeIterator* iterator);
 GeeReadOnlyCollectionIterator* gee_read_only_collection_iterator_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeIterator* iterator);
-static gboolean gee_read_only_list_iterator_real_previous (GeeBidirIterator* base);
-gboolean gee_bidir_iterator_previous (GeeBidirIterator* self);
-static gboolean gee_read_only_list_iterator_real_has_previous (GeeBidirIterator* base);
-gboolean gee_bidir_iterator_has_previous (GeeBidirIterator* self);
-static gboolean gee_read_only_list_iterator_real_last (GeeBidirIterator* base);
-gboolean gee_bidir_iterator_last (GeeBidirIterator* self);
 static void gee_read_only_list_iterator_real_set (GeeListIterator* base, gconstpointer item);
-static void gee_read_only_list_iterator_real_insert (GeeListIterator* base, gconstpointer item);
 static void gee_read_only_list_iterator_real_add (GeeListIterator* base, gconstpointer item);
 static gint gee_read_only_list_iterator_real_index (GeeListIterator* base);
 gint gee_list_iterator_index (GeeListIterator* self);
@@ -424,13 +465,21 @@ static void gee_read_only_list_real_set (GeeList* base, gint index, gconstpointe
 
 
 /**
- * Unimplemented method (read only list).
+ * {@inheritDoc}
  */
 static GeeList* gee_read_only_list_real_slice (GeeList* base, gint start, gint stop) {
 	GeeReadOnlyList * self;
 	GeeList* result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	GeeList* _tmp3_ = NULL;
 	self = (GeeReadOnlyList*) base;
-	g_assert_not_reached ();
+	_tmp0_ = ((GeeReadOnlyCollection*) self)->_collection;
+	_tmp1_ = start;
+	_tmp2_ = stop;
+	_tmp3_ = gee_list_slice (G_TYPE_CHECK_INSTANCE_CAST (_tmp0_, GEE_TYPE_LIST, GeeList), _tmp1_, _tmp2_);
+	result = _tmp3_;
 	return result;
 }
 
@@ -481,10 +530,14 @@ static void gee_read_only_list_real_insert_all (GeeList* base, gint index, GeeCo
 /**
  * {@inheritDoc}
  */
-static void gee_read_only_list_real_sort (GeeList* base, GCompareFunc compare) {
+static void gee_read_only_list_real_sort (GeeList* base, GCompareDataFunc compare, void* compare_target, GDestroyNotify compare_target_destroy_notify) {
 	GeeReadOnlyList * self;
 	self = (GeeReadOnlyList*) base;
 	g_assert_not_reached ();
+	(compare_target_destroy_notify == NULL) ? NULL : (compare_target_destroy_notify (compare_target), NULL);
+	compare = NULL;
+	compare_target = NULL;
+	compare_target_destroy_notify = NULL;
 }
 
 
@@ -510,7 +563,7 @@ static GeeList* gee_read_only_list_real_get_read_only_view (GeeReadOnlyList* bas
 }
 
 
-static GeeReadOnlyListIterator* gee_read_only_list_iterator_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeListIterator* iterator) {
+GeeReadOnlyListIterator* gee_read_only_list_iterator_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeListIterator* iterator) {
 	GeeReadOnlyListIterator * self = NULL;
 	GeeListIterator* _tmp0_;
 	g_return_val_if_fail (iterator != NULL, NULL);
@@ -523,58 +576,12 @@ static GeeReadOnlyListIterator* gee_read_only_list_iterator_construct (GType obj
 }
 
 
-static GeeReadOnlyListIterator* gee_read_only_list_iterator_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeListIterator* iterator) {
+GeeReadOnlyListIterator* gee_read_only_list_iterator_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeListIterator* iterator) {
 	return gee_read_only_list_iterator_construct (GEE_READ_ONLY_LIST_TYPE_ITERATOR, g_type, g_dup_func, g_destroy_func, iterator);
 }
 
 
-static gboolean gee_read_only_list_iterator_real_previous (GeeBidirIterator* base) {
-	GeeReadOnlyListIterator * self;
-	gboolean result = FALSE;
-	GeeIterator* _tmp0_;
-	gboolean _tmp1_ = FALSE;
-	self = (GeeReadOnlyListIterator*) base;
-	_tmp0_ = ((GeeReadOnlyCollectionIterator*) self)->_iter;
-	_tmp1_ = gee_bidir_iterator_previous ((GeeBidirIterator*) G_TYPE_CHECK_INSTANCE_CAST (_tmp0_, GEE_TYPE_LIST_ITERATOR, GeeListIterator));
-	result = _tmp1_;
-	return result;
-}
-
-
-static gboolean gee_read_only_list_iterator_real_has_previous (GeeBidirIterator* base) {
-	GeeReadOnlyListIterator * self;
-	gboolean result = FALSE;
-	GeeIterator* _tmp0_;
-	gboolean _tmp1_ = FALSE;
-	self = (GeeReadOnlyListIterator*) base;
-	_tmp0_ = ((GeeReadOnlyCollectionIterator*) self)->_iter;
-	_tmp1_ = gee_bidir_iterator_has_previous ((GeeBidirIterator*) G_TYPE_CHECK_INSTANCE_CAST (_tmp0_, GEE_TYPE_LIST_ITERATOR, GeeListIterator));
-	result = _tmp1_;
-	return result;
-}
-
-
-static gboolean gee_read_only_list_iterator_real_last (GeeBidirIterator* base) {
-	GeeReadOnlyListIterator * self;
-	gboolean result = FALSE;
-	GeeIterator* _tmp0_;
-	gboolean _tmp1_ = FALSE;
-	self = (GeeReadOnlyListIterator*) base;
-	_tmp0_ = ((GeeReadOnlyCollectionIterator*) self)->_iter;
-	_tmp1_ = gee_bidir_iterator_last ((GeeBidirIterator*) G_TYPE_CHECK_INSTANCE_CAST (_tmp0_, GEE_TYPE_LIST_ITERATOR, GeeListIterator));
-	result = _tmp1_;
-	return result;
-}
-
-
 static void gee_read_only_list_iterator_real_set (GeeListIterator* base, gconstpointer item) {
-	GeeReadOnlyListIterator * self;
-	self = (GeeReadOnlyListIterator*) base;
-	g_assert_not_reached ();
-}
-
-
-static void gee_read_only_list_iterator_real_insert (GeeListIterator* base, gconstpointer item) {
 	GeeReadOnlyListIterator * self;
 	self = (GeeReadOnlyListIterator*) base;
 	g_assert_not_reached ();
@@ -612,18 +619,9 @@ static void gee_read_only_list_iterator_class_init (GeeReadOnlyListIteratorClass
 }
 
 
-static void gee_read_only_list_iterator_gee_bidir_iterator_interface_init (GeeBidirIteratorIface * iface) {
-	gee_read_only_list_iterator_gee_bidir_iterator_parent_iface = g_type_interface_peek_parent (iface);
-	iface->previous = (gboolean (*)(GeeBidirIterator*)) gee_read_only_list_iterator_real_previous;
-	iface->has_previous = (gboolean (*)(GeeBidirIterator*)) gee_read_only_list_iterator_real_has_previous;
-	iface->last = (gboolean (*)(GeeBidirIterator*)) gee_read_only_list_iterator_real_last;
-}
-
-
 static void gee_read_only_list_iterator_gee_list_iterator_interface_init (GeeListIteratorIface * iface) {
 	gee_read_only_list_iterator_gee_list_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->set = (void (*)(GeeListIterator*, gconstpointer)) gee_read_only_list_iterator_real_set;
-	iface->insert = (void (*)(GeeListIterator*, gconstpointer)) gee_read_only_list_iterator_real_insert;
 	iface->add = (void (*)(GeeListIterator*, gconstpointer)) gee_read_only_list_iterator_real_add;
 	iface->index = (gint (*)(GeeListIterator*)) gee_read_only_list_iterator_real_index;
 }
@@ -634,15 +632,13 @@ static void gee_read_only_list_iterator_instance_init (GeeReadOnlyListIterator *
 }
 
 
-static GType gee_read_only_list_iterator_get_type (void) {
+GType gee_read_only_list_iterator_get_type (void) {
 	static volatile gsize gee_read_only_list_iterator_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_read_only_list_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeReadOnlyListIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_read_only_list_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeReadOnlyListIterator), 0, (GInstanceInitFunc) gee_read_only_list_iterator_instance_init, NULL };
-		static const GInterfaceInfo gee_bidir_iterator_info = { (GInterfaceInitFunc) gee_read_only_list_iterator_gee_bidir_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_list_iterator_info = { (GInterfaceInitFunc) gee_read_only_list_iterator_gee_list_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_read_only_list_iterator_type_id;
 		gee_read_only_list_iterator_type_id = g_type_register_static (GEE_READ_ONLY_COLLECTION_TYPE_ITERATOR, "GeeReadOnlyListIterator", &g_define_type_info, 0);
-		g_type_add_interface_static (gee_read_only_list_iterator_type_id, GEE_TYPE_BIDIR_ITERATOR, &gee_bidir_iterator_info);
 		g_type_add_interface_static (gee_read_only_list_iterator_type_id, GEE_TYPE_LIST_ITERATOR, &gee_list_iterator_info);
 		g_once_init_leave (&gee_read_only_list_iterator_type_id__volatile, gee_read_only_list_iterator_type_id);
 	}
@@ -697,6 +693,21 @@ static void gee_read_only_list_class_init (GeeReadOnlyListClass * klass) {
 }
 
 
+static GType gee_read_only_list_gee_list_get_g_type (GeeReadOnlyList* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_read_only_list_gee_list_get_g_dup_func (GeeReadOnlyList* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_read_only_list_gee_list_get_g_destroy_func (GeeReadOnlyList* self) {
+	return self->priv->g_destroy_func;
+}
+
+
 static void gee_read_only_list_gee_list_interface_init (GeeListIface * iface) {
 	gee_read_only_list_gee_list_parent_iface = g_type_interface_peek_parent (iface);
 	iface->list_iterator = (GeeListIterator* (*)(GeeList*)) gee_read_only_list_real_list_iterator;
@@ -709,7 +720,10 @@ static void gee_read_only_list_gee_list_interface_init (GeeListIface * iface) {
 	iface->first = (gpointer (*)(GeeList*)) gee_read_only_list_real_first;
 	iface->last = (gpointer (*)(GeeList*)) gee_read_only_list_real_last;
 	iface->insert_all = (void (*)(GeeList*, gint, GeeCollection*)) gee_read_only_list_real_insert_all;
-	iface->sort = (void (*)(GeeList*, GCompareFunc)) gee_read_only_list_real_sort;
+	iface->sort = (void (*)(GeeList*, GCompareDataFunc, void*, GDestroyNotify)) gee_read_only_list_real_sort;
+	iface->get_g_type = (GType(*)(GeeList*)) gee_read_only_list_gee_list_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeList*)) gee_read_only_list_gee_list_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeList*)) gee_read_only_list_gee_list_get_g_destroy_func;
 	iface->get_read_only_view = (GeeList* (*) (GeeList *)) gee_read_only_list_get_read_only_view;
 }
 

@@ -1,6 +1,7 @@
 /* priorityqueue.vala
  *
  * Copyright (C) 2009  Didier Villevalois
+ * Copyright (C) 2012  Maciej Piechotka
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -44,7 +45,8 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 	/**
 	 * The elements' comparator function.
 	 */
-	public CompareFunc compare_func { private set; get; }
+	[CCode (notify = false)]
+	public CompareDataFunc<G> compare_func { private set; get; }
 
 	private int _size = 0;
 	private int _stamp = 0;
@@ -59,7 +61,7 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 	private Type1Node<G>?[] _a = new Type1Node<G>[0];
 #endif
 	private NodePair<G>? _lp_head = null;
-	private NodePair<G>? _lp_tail = null;
+	private unowned NodePair<G>? _lp_tail = null;
 	private bool[] _b = new bool[0];
 	private Type1Node<G>? _ll_head = null;
 	private Type1Node<G>? _ll_tail = null;
@@ -74,7 +76,7 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 	 *
 	 * @param compare_func an optional element comparator function
 	 */
-	public PriorityQueue (CompareFunc? compare_func = null) {
+	public PriorityQueue (owned CompareDataFunc<G>? compare_func = null) {
 		if (compare_func == null) {
 			compare_func = Functions.get_compare_func_for (typeof (G));
 		}
@@ -101,11 +103,18 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 	public override bool is_full {
 		get { return false; }
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public override bool read_only {
+		get { return false; }
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public override bool offer (G element) {
+	public bool offer (G element) {
 		#if DEBUG
 			_dump ("Start offer: %s".printf ((string)element));
 		#endif
@@ -233,9 +242,6 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 		#endif
 
 		// 4. Adjust(Q, P, P)
-		if (_p == null) {
-			_p = _r;
-		}
 		_adjust (_p, _p);
 
 		// For now we can't have type2 node other than R' (left for reference)
@@ -273,7 +279,7 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public override int drain (Collection<G> recipient, int amount = -1) {
+	public int drain (Collection<G> recipient, int amount = -1) {
 		if (amount == -1) {
 			amount = this._size;
 		}
@@ -527,7 +533,7 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 		#endif
 
 		if (_lp_head != null) {
-			NodePair<G> pair = _lp_head;
+			unowned NodePair<G> pair = _lp_head;
 			_link (pair.node1, pair.node2);
 			return true;
 		}
@@ -589,7 +595,7 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 		#endif
 	}
 
-	private void _delete (Node<G> n, out unowned Node<G> prev = null) {
+	private void _delete (Node<G> n) {
 		// DecreaseKey(Q, N, infinite)
 		_decrease_key (n);
 
@@ -699,12 +705,12 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 				node.brothers_next.pair = pair;
 				node.pair = pair;
 				if (_lp_head == null) {
-					_lp_head = pair;
 					_lp_tail = pair;
+					_lp_head = (owned)pair;
 				} else {
 					pair.lp_prev = _lp_tail;
-					_lp_tail.lp_next = pair;
-					_lp_tail = pair;
+					_lp_tail.lp_next = (owned)pair;
+					_lp_tail = _lp_tail.lp_next;
 				}
 				// There is now an even number of child of such degree
 				_b[degree] = false;
@@ -764,7 +770,7 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 
 		// Check whether removed node is P
 		if (node == _p) {
-			_p = null;
+			_p = _r;
 		}
 
 		// Maintain brothers list
@@ -791,6 +797,12 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 	private void _updated_degree (Type1Node<G> node, bool child_removed) {
 		int degree = node.degree ();
 
+		// Ensure proper sizes of A and B
+		if (degree >= _a.length) {
+			_a.resize (degree + 1);
+			_b.resize (degree + 1);
+		}
+
 		// Maintain A and B
 		if (child_removed && _a[degree - 1] == null) {
 			_a[degree - 1] = node;
@@ -816,19 +828,19 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 
 		// Maintain LP
 		if (node.pair != null) {
-			NodePair<G> pair = node.pair;
+			unowned NodePair<G> pair = node.pair;
 			Type1Node<G> other = (pair.node1 == node ? pair.node2 : pair.node1);
 			node.pair = null;
 			other.pair = null;
-			if (pair.lp_prev != null) {
-				pair.lp_prev.lp_next = pair.lp_next;
-			} else {
-				_lp_head = pair.lp_next;
-			}
 			if (pair.lp_next != null) {
 				pair.lp_next.lp_prev = pair.lp_prev;
 			} else {
 				_lp_tail = pair.lp_prev;
+			}
+			if (pair.lp_prev != null) {
+				pair.lp_prev.lp_next = (owned)pair.lp_next;
+			} else {
+				_lp_head = (owned)pair.lp_next;
 			}
 		}
 	}
@@ -1097,11 +1109,12 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 		#endif
 	}
 
+	[Compact]
 	private class NodePair<G> {
-		public weak NodePair<G>? lp_prev = null;
+		public unowned NodePair<G>? lp_prev = null;
 		public NodePair<G>? lp_next = null;
-		public Type1Node<G> node1 = null;
-		public Type1Node<G> node2 = null;
+		public unowned Type1Node<G> node1 = null;
+		public unowned Type1Node<G> node2 = null;
 
 		public NodePair (Type1Node<G> node1, Type1Node<G> node2) {
 			this.node1 = node1;
@@ -1109,7 +1122,7 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 		}
 	}
 
-	private class Iterator<G> : Object, Gee.Iterator<G> {
+	private class Iterator<G> : Object, Traversable<G>, Gee.Iterator<G> {
 		private PriorityQueue<G> queue;
 		private unowned Node<G>? position;
 		private unowned Node<G>? previous;
@@ -1143,13 +1156,6 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 			}
 		}
 
-		public bool first () {
-			assert (stamp == queue._stamp);
-			position = queue._iter_head;
-			previous = null;
-			return position != null;
-		}
-
 		public new G get () {
 			assert (stamp == queue._stamp);
 			assert (position != null);
@@ -1181,6 +1187,27 @@ public class Gee.PriorityQueue<G> : Gee.AbstractQueue<G> {
 			}
 			stamp++;
 			assert (stamp == queue._stamp);
+		}
+		
+		public bool read_only { get { return false; } }
+		
+		public bool valid { get { return position != null; } }
+
+		public bool foreach (ForallFunc<G> f) {
+			if (position == null) {
+				position = (previous != null) ? previous.iter_next : queue._iter_head;
+			}
+			if (!f (position.data)) {
+				return false;
+			}
+			while (position.iter_next != null) {
+				previous = position;
+				position = position.iter_next;
+				if (!f (position.data)) {
+					return false;
+				}
+			}
+			return true;
 		}
 	}
 }

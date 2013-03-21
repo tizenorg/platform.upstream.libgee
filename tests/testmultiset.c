@@ -110,7 +110,7 @@ enum  {
 };
 MultiSetTests* multi_set_tests_construct (GType object_type, const gchar* name);
 CollectionTests* collection_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 static void multi_set_tests_test_duplicates_are_retained (MultiSetTests* self);
 static void _multi_set_tests_test_duplicates_are_retained_gee_test_case_test_method (gpointer self);
 
@@ -126,7 +126,7 @@ MultiSetTests* multi_set_tests_construct (GType object_type, const gchar* name) 
 	g_return_val_if_fail (name != NULL, NULL);
 	_tmp0_ = name;
 	self = (MultiSetTests*) collection_tests_construct (object_type, _tmp0_);
-	gee_test_case_add_test ((GeeTestCase*) self, "[MultiSet] duplicates are retained", _multi_set_tests_test_duplicates_are_retained_gee_test_case_test_method, self);
+	gee_test_case_add_test ((GeeTestCase*) self, "[MultiSet] duplicates are retained", _multi_set_tests_test_duplicates_are_retained_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 

@@ -1,27 +1,228 @@
-2012-11-10  Maciej Piechotka  <uzytkownik2@gmail.com>
+2013-03-05  Maciej Piechotka  <uzytkownik2@gmail.com>
 
-	Release 0.6.6.1
+	Release 0.9.92
+
+2013-03-04  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Fix memory leak in TreeSet and TreeMap
+
+2013-02-17  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Release 0.9.91
+
+	Fix the valadoc documentation
+
+	Add missing gee/readonlymultimap.vala
+
+2013-02-16  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Add read_only_view to Gee.MultiMap, fixes bug #687158
+
+	Add read_only_view to Gee.MultiSet
+
+	Allow creation of ArrayList from array
+
+	Add add/contains/remove_all working on array, partial fix of bug #685175
+	Full fix which would allow overloading methods by subclasses requires
+	fixing bug #693455.
+
+2013-02-07  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Add generic type arguments to HashMultiMap, TreeMultiSet constructor
+
+2012-12-26  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Fix compilation error, fixes bug #690723
+
+2012-12-25  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Make ConcurrentSet implement SortedSet
+
+2012-12-03  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Release 0.9.0
+
+	Add missing fixes for ConcurrentSet from feature local branch
+
+2012-12-02  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Fix warnings and bump requirements to GLib 2.32
+
+	Remove unused lookup of function from AbstractMultiMap
+
+	Small improvements to PriorityQueue
+
+	Fix starting of HazardPointer policy
+
+	Fix missing http:// in link to paper
+
+	Initial implementation of ConcurrentSet
+
+	Small improvement to ConcurrentList.Iterator
+
+	Various small fixes to ConcurrentList
+
+	Fix releasing NULL pointers during atomic exchange
+
+	Making PriorityQueue.NodePair a compact class
+
+2012-11-25  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Refactor testing - do more with less
+	Tests had a lot of repetitive code. It was factored out and this allowed
+	to test much more cases per run.
+
+	Fix Gee.List.Iterator.next
+
+	PriorityQueue: fix segfault discovered during stress-testing
+	If node P is removed then set P to R, as described in paper, instead of
+	NULL.
+
+2012-11-11  Jasper Lievisse Adriaanse  <jasper@humppa.nl>
+
+	Use a portable sed(1) construct to retrieve $libgee_dlname, fixes bug #688106
+
+2012-11-04  Evan Nemerson  <evan@coeus-group.com>
+
+	Add generic type arguments to HashSet constructor delegate parameters.
+
+2012-11-04  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Add .mailmap file
+
+2012-10-20  Daniel Espinosa  <esodan@gmail.com>
+
+	Fixed commit 9e2e24f4.
+
+	GObject Introspection support improved. * Added shared library for g-ir-compiler. * See bug #67987, Bug #658002 and Bug #585116
 
 2012-10-14  Maciej Piechotka  <uzytkownik2@gmail.com>
 
-	Release 0.6.6
+	Release 0.8.1
 
 2012-10-06  Maciej Piechotka  <uzytkownik2@gmail.com>
 
-	Ommited change to fix build
+	Use the highier-level functions in the default methods of Collection
 
 	Fix Iterator.remove in PriorityQueue
 
+2012-09-30  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Remove use of explicit iterators
+
+	Specialize foreach functions for ArrayList and LinkedList
+
+2012-09-27  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Pass slice in ReadOnlyList, fixes bug 684915
+
+2012-09-24  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Release 0.8.0
+
+	Update README
+
+	Move everything to GenericAccessors
+
+	Add tests for Traversable methods implemented by Collections
+
+2012-09-21  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Remove unnecessary stream override in AbstractCollection
+
+	Fix Traversable.chop method, fixes bug #684348
+
+2012-08-28  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Release 0.7.90
+
+	Allow early termination of iteration
+
+	Use views instead of copies inside MultiMap and don't cache Set.empty
+
+2012-08-27  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Remove outdated method from AbstractSortedMap
+
+2012-08-27  Philip Withnall  <philip@tecnocode.co.uk>
+
+	Don’t notify on changes to hash/equal functions
+
+2012-08-26  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Update copyright and whitespaces
+
+2012-08-23  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Release 0.7.4.1
+
+2012-08-23  Alban Browaeys  <prahal@yahoo.com>
+
+	tests: implement read_only in testmap Entry
+
+2012-08-21  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Release 0.7.4
+
+	Bump vala requirements
+
+	Fix warnings about lack of new keyword
+
+2012-08-20  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Add read_only to Map.Entry
+
+	Move *_type to interfaces and remove the ones from classes
+
+	Move key_type/value_type implementation to multimap interface
+
+	Add map_iterator to MultiMap, partial fix for bug #675067
+
+	Add reserved methods to allow future-proof ABI
+
+2012-08-19  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Move stream_impl to Traversable
+
+	Move virtual methods to List interface
+
+	Move virtual methods to Map interface
+
+	Move virtual methods to Queue interface
+
+	Move virtual methods to Collection interface
+
+2012-08-09  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Add GenericAccessors attributes to interfaces and remove _impl methods.
+
 2012-08-06  Maciej Piechotka  <uzytkownik2@gmail.com>
 
-	Release 0.6.5
+	Release 0.7.3
 
 	Disable introspection during distcheck
 
-2012-03-07  Sebastian Pölsterl  <sebp@k-d-w.org>
+	Fixes to ConcurrentList
+	 - Fix using of freed memory in hazard pointers
+	 - Remove memory leak on freeing node in debug build
+	 - Set release policy to main loop by default
+	 - Re-enable the ConcurrentList tests
 
-	Fixed compiler error
-	'NULL' was used instead of 'null'
+2012-08-06  Evan Nemerson  <evan@coeus-group.com>
+
+	Use generics for HashDataFunc and EqualDataFunc, fixes bug 680491
+
+	Add missing CompareDataFunc type arguments, fixes bug 624005
+
+2012-07-30  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Temporary disable broken test.
+
+2012-03-28  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Small typo in file header
+
+	Split SortedMap/SortedSet into bi-directional and uni-directional parts
 
 2012-03-06  Maciej Piechotka  <uzytkownik2@gmail.com>
 
@@ -30,13 +231,19 @@
 	the iteration order. It meant that some elements might not be visited
 	and some might be visited twice.
 
-2012-01-24  Florian Brosch  <flo.brosch@gmail.com>
+2012-02-19  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Refactor benchmarks
+
+	Convert the documentations to valadoc new Note syntax
+
+2012-01-23  Florian Brosch  <flo.brosch@gmail.com>
 
 	Fix valadoc documentation
 
 2012-01-22  Maciej Piechotka  <uzytkownik2@gmail.com>
 
-	Release 0.6.4
+	Release 0.7.2
 
 	Remove --shared-library from .typelib, see bug #667529 for details
 
@@ -44,19 +251,31 @@
 
 2012-01-20  Maciej Piechotka  <uzytkownik2@gmail.com>
 
-	Fix gir_namespace and gir_version attributes, fixes bug #666208
+	Fix problem of partially releasing hp context
 
 	Fix compilation with vala master
 
+	Extend Gee.Deque tests
+
+	Add ArrayQueue
+
+	Add default implementation of AbstractQueue.drain
+
+	Fix warnings
+
+2012-01-11  Daniel Espinosa  <despinosa@git.gnome.org>
+
+	Fixed documentation typo in gee/traversable.vala
+
 2011-12-19  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Add *_type property for all collections, fixes bug #663337
+
+	Fix compilation of priorityqueue.vala on vala from git
 
 	Add gir_namespace and gir_version attributes, fixes bug #666208
 	Currently they are specified in assemblyinfo.vala which needs to be
 	first file passed to vala. See bug # 666478 for details.
-
-2011-11-09  Maciej Piechotka  <uzytkownik2@gmail.com>
-
-	Release 0.6.3
 
 2011-10-08  Diego Escalante Urrelo  <descalante@igalia.com>
 
@@ -67,22 +286,130 @@
 
 	PriorityQueue: Fix underflow while updating degree, fixes bug #647162
 
-2011-09-14  Maciej Piechotka  <uzytkownik2@gmail.com>
+2011-09-29  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Require more realistic version of Vala
+
+2011-09-25  Maciej Piechotka  <uzytkownik2@gmail.com>
 
 	Post-release version bump
 
-	Release 0.6.2.1
+	Release 0.7.1
+
+	Implement ConcurrentList
+	 - After porting to volatile the freeing of data does not work
+
+	Split List interface into List and BidirList
+
+	Add Gee.HazardPointer
+
+	Remove compilation warnings from tests
+
+2011-09-23  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Use VALAFLAGS during building tests
+
+2011-09-20  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Move to new syntax of out parameters
 
 	Add check-news to AM_INIT_AUTOMAKE
 
+2011-09-14  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Revert "hazardpointer - work in progress"
+	This reverts commit f39a9175b63f9f6f58a019621e9d8c41c801ff73.
+
+	hazardpointer - work in progress
+
+2011-08-19  Maciej Piechotka  <uzytkownik2@gmail.com>
+
 	Post-release version bump
 
-	Release 0.6.2
+	Release 0.7.0
+
+2011-08-17  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Fix standard functions for nullable types
+
+	Add Traversable.chop function
+
+	Fix default Traversable.stream implementation for Iterator<G>
+	The implementation assumed in unfolding function that the stream  some
+	value - however it might not be the case.
+
+	Add filter tests
+
+2011-08-15  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Allow to install libgee 0.6 and 0.8 in parallel
+
+2011-08-09  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Fix ordering of prerequests
+
+	Update documentation
+
+2011-08-01  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Add Traversable<G>.filter method
+
+	Fix Traversable<G>.stream in ReadOnlyCollection
+
+2011-07-25  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Preserve laziness in Stream
+
+2011-07-23  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Add Gee.Traversable<G> requirement to Gee.Iterable<G>
+
+2011-07-22  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Export the function part of interface into Traversable
+
+2011-06-25  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Add Iterator.scan method
+
+	Add Iterator.map method
+
+	Add Iterator.stream method based on stream fusion
+
+	Add Iterator.concat function
+
+	Add Iterator.unfold function
+
+	Add Gee.Lazy class (call-by-need)
+
+2011-05-02  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Add read_only_view to SortedMap
+
+	Add read_only_view to SortedSet
+
+	Add SortedMap interface
+
+	Fix wrong copyright information
+
+	Preparation for new Map.set method
+
+2011-04-30  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Fix memory leak in default implementation of foreach and fold
 
 2011-04-29  Maciej Piechotka  <uzytkownik2@gmail.com>
 
 	Change Gee.TreeSet.Range to class
 	It fixes problem that may occured when key used as boundary is freed
+
+2011-04-26  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Change default implementation of fold
+
+2011-04-20  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Add custom foreach function
 
 2011-04-08  Maciej Piechotka  <uzytkownik2@gmail.com>
 
@@ -100,14 +427,20 @@
 
 2011-01-28  Jürg Billeter  <j@bitron.ch>
 
-	Post-release version bump
-
-	Release 0.6.1
-
 	Fix memory leak in LinkedList.clear
 	Based on patch by Travis Reitter, fixes bug 639254.
 
-2011-01-20  Maciej Piechotka  <uzytkownik2@gmail.com>
+2011-01-04  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Add read_only method to Collection, Map and MultiMap
+
+	Add highier-order functions to MapIterator
+
+	Update copyright notices
+
+	Add read_only property to Iterator and MapIterator
+
+2010-12-27  Maciej Piechotka  <uzytkownik2@gmail.com>
 
 	Remove depending on order of iteration in read-only collections' test
 
@@ -116,11 +449,21 @@
 	Fix memory leak on freeing LinkedList
 	If fixes issue described in bug #635224
 
-2010-09-26  Jürg Billeter  <j@bitron.ch>
+2010-11-07  Maciej Piechotka  <uzytkownik2@gmail.com>
 
-	Post-release version bump
+	Add Gee.Iterator<G>.foreach method
 
-	Release 0.6.0
+	Fix several spelling mistakes and leftover debug code
+
+2010-10-17  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Rename Iterator.at_element to Iterator.valid
+
+	Add Iterator.fold aggregative function
+
+	Add Iterator.at_element property to check when other calls are legal
+
+	Move first from Iterator to BidirIterator and remove from MapIterator
 
 2010-09-18  Maciej Piechotka  <uzytkownik2@gmail.com>
 
@@ -128,17 +471,41 @@
 	It fixes build issue described in bug #629933 and make the behavior
 	compatible with ArrayList.
 
-2010-09-16  Jürg Billeter  <j@bitron.ch>
+2010-08-31  Maciej Piechotka  <uzytkownik2@gmail.com>
 
-	Post-release version bump
-
-	Release 0.5.3
+	Version bump to avoid confusion
 
 2010-08-26  Maciej Piechotka  <uzytkownik2@gmail.com>
 
 	Fix memory leak in TimSort
 	This patch converts using of pointers into proper use of weak and normal
 	references and adds the destructor to Gee.TimSort.Slice.
+
+2010-08-24  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Correct naming of variables
+
+	Add Gee.Hashable interface
+
+2010-08-21  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Small typo in tests (it might cuased some false passes but it didn't)
+
+	Remove ComparableTests as they have been integrated in functions tests
+
+	Reintroduce tests
+
+	Assure get_equal_func_for behavies correctly for Comparable
+
+2010-08-17  Alban Browaeys  <prahal@yahoo.com>
+
+	gee: move the delegates into the Gee namespace.
+	Fix for the gir generation breakage where callbacks where
+	out of the namespace.
+
+2010-08-17  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Move to non-static delegates
 
 2010-08-03  Maciej Piechotka  <uzytkownik2@gmail.com>
 
@@ -147,6 +514,15 @@
 	Fix typos in TreeMap and TreeSet fix and other embarrasing mistakes
 
 	Fix the unfreeing on clear in TreeMap/TreeSet
+
+2010-08-02  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Use automake 1.11 vala support + cleaning of the Makefile.am:
+	 - Checks the vala version
+	 - All flags are 'local' (i.e. taget_name_(VALA|C|LD)FLAGS)
+	 - Target variables are next to each other
+	 - All lists are one-item-per-line with $(NULL) at the end
+	 - No newline at the end of file
 
 2010-08-02  Didier 'Ptitjes  <ptitjes@free.fr>
 
@@ -742,3 +1118,7 @@
 
 	Fix build with Vala 0.7
 	Based on patch by Thijs Vermeir, fixes bug 579182.
+
+	Generate ChangeLog from git log
+	Add gitlog-to-changelog script from gnulib and a dist-hook to
+	generate ChangeLog file when creating tarballs.

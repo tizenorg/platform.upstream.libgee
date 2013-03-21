@@ -28,6 +28,7 @@
 #include <glib-object.h>
 #include <stdlib.h>
 #include <string.h>
+#include <gee.h>
 
 
 #define GEE_TYPE_TEST_CASE (gee_test_case_get_type ())
@@ -60,6 +61,16 @@ typedef struct _CollectionTestsClass CollectionTestsClass;
 typedef struct _ListTests ListTests;
 typedef struct _ListTestsClass ListTestsClass;
 
+#define TYPE_BIDIR_LIST_TESTS (bidir_list_tests_get_type ())
+#define BIDIR_LIST_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_BIDIR_LIST_TESTS, BidirListTests))
+#define BIDIR_LIST_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_BIDIR_LIST_TESTS, BidirListTestsClass))
+#define IS_BIDIR_LIST_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_BIDIR_LIST_TESTS))
+#define IS_BIDIR_LIST_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_BIDIR_LIST_TESTS))
+#define BIDIR_LIST_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_BIDIR_LIST_TESTS, BidirListTestsClass))
+
+typedef struct _BidirListTests BidirListTests;
+typedef struct _BidirListTestsClass BidirListTestsClass;
+
 #define TYPE_ARRAY_LIST_TESTS (array_list_tests_get_type ())
 #define ARRAY_LIST_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_ARRAY_LIST_TESTS, ArrayListTests))
 #define ARRAY_LIST_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_ARRAY_LIST_TESTS, ArrayListTestsClass))
@@ -71,15 +82,85 @@ typedef struct _ArrayListTests ArrayListTests;
 typedef struct _ArrayListTestsClass ArrayListTestsClass;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
-#define TYPE_COMPARABLE_TESTS (comparable_tests_get_type ())
-#define COMPARABLE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_COMPARABLE_TESTS, ComparableTests))
-#define COMPARABLE_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_COMPARABLE_TESTS, ComparableTestsClass))
-#define IS_COMPARABLE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_COMPARABLE_TESTS))
-#define IS_COMPARABLE_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_COMPARABLE_TESTS))
-#define COMPARABLE_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_COMPARABLE_TESTS, ComparableTestsClass))
+#define TYPE_QUEUE_TESTS (queue_tests_get_type ())
+#define QUEUE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_QUEUE_TESTS, QueueTests))
+#define QUEUE_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_QUEUE_TESTS, QueueTestsClass))
+#define IS_QUEUE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_QUEUE_TESTS))
+#define IS_QUEUE_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_QUEUE_TESTS))
+#define QUEUE_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_QUEUE_TESTS, QueueTestsClass))
 
-typedef struct _ComparableTests ComparableTests;
-typedef struct _ComparableTestsClass ComparableTestsClass;
+typedef struct _QueueTests QueueTests;
+typedef struct _QueueTestsClass QueueTestsClass;
+
+#define TYPE_DEQUE_TESTS (deque_tests_get_type ())
+#define DEQUE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_DEQUE_TESTS, DequeTests))
+#define DEQUE_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_DEQUE_TESTS, DequeTestsClass))
+#define IS_DEQUE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_DEQUE_TESTS))
+#define IS_DEQUE_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_DEQUE_TESTS))
+#define DEQUE_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_DEQUE_TESTS, DequeTestsClass))
+
+typedef struct _DequeTests DequeTests;
+typedef struct _DequeTestsClass DequeTestsClass;
+
+#define TYPE_ARRAY_QUEUE_TESTS (array_queue_tests_get_type ())
+#define ARRAY_QUEUE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_ARRAY_QUEUE_TESTS, ArrayQueueTests))
+#define ARRAY_QUEUE_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_ARRAY_QUEUE_TESTS, ArrayQueueTestsClass))
+#define IS_ARRAY_QUEUE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_ARRAY_QUEUE_TESTS))
+#define IS_ARRAY_QUEUE_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_ARRAY_QUEUE_TESTS))
+#define ARRAY_QUEUE_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_ARRAY_QUEUE_TESTS, ArrayQueueTestsClass))
+
+typedef struct _ArrayQueueTests ArrayQueueTests;
+typedef struct _ArrayQueueTestsClass ArrayQueueTestsClass;
+
+#define TYPE_CONCURRENT_LIST_TESTS (concurrent_list_tests_get_type ())
+#define CONCURRENT_LIST_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_CONCURRENT_LIST_TESTS, ConcurrentListTests))
+#define CONCURRENT_LIST_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_CONCURRENT_LIST_TESTS, ConcurrentListTestsClass))
+#define IS_CONCURRENT_LIST_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_CONCURRENT_LIST_TESTS))
+#define IS_CONCURRENT_LIST_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_CONCURRENT_LIST_TESTS))
+#define CONCURRENT_LIST_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_CONCURRENT_LIST_TESTS, ConcurrentListTestsClass))
+
+typedef struct _ConcurrentListTests ConcurrentListTests;
+typedef struct _ConcurrentListTestsClass ConcurrentListTestsClass;
+
+#define TYPE_SET_TESTS (set_tests_get_type ())
+#define SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_SET_TESTS, SetTests))
+#define SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_SET_TESTS, SetTestsClass))
+#define IS_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_SET_TESTS))
+#define IS_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_SET_TESTS))
+#define SET_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_SET_TESTS, SetTestsClass))
+
+typedef struct _SetTests SetTests;
+typedef struct _SetTestsClass SetTestsClass;
+
+#define TYPE_SORTED_SET_TESTS (sorted_set_tests_get_type ())
+#define SORTED_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_SORTED_SET_TESTS, SortedSetTests))
+#define SORTED_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_SORTED_SET_TESTS, SortedSetTestsClass))
+#define IS_SORTED_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_SORTED_SET_TESTS))
+#define IS_SORTED_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_SORTED_SET_TESTS))
+#define SORTED_SET_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_SORTED_SET_TESTS, SortedSetTestsClass))
+
+typedef struct _SortedSetTests SortedSetTests;
+typedef struct _SortedSetTestsClass SortedSetTestsClass;
+
+#define TYPE_CONCURRENT_SET_TESTS (concurrent_set_tests_get_type ())
+#define CONCURRENT_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_CONCURRENT_SET_TESTS, ConcurrentSetTests))
+#define CONCURRENT_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_CONCURRENT_SET_TESTS, ConcurrentSetTestsClass))
+#define IS_CONCURRENT_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_CONCURRENT_SET_TESTS))
+#define IS_CONCURRENT_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_CONCURRENT_SET_TESTS))
+#define CONCURRENT_SET_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_CONCURRENT_SET_TESTS, ConcurrentSetTestsClass))
+
+typedef struct _ConcurrentSetTests ConcurrentSetTests;
+typedef struct _ConcurrentSetTestsClass ConcurrentSetTestsClass;
+
+#define TYPE_FUNCTIONS_TESTS (functions_tests_get_type ())
+#define FUNCTIONS_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_FUNCTIONS_TESTS, FunctionsTests))
+#define FUNCTIONS_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_FUNCTIONS_TESTS, FunctionsTestsClass))
+#define IS_FUNCTIONS_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_FUNCTIONS_TESTS))
+#define IS_FUNCTIONS_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_FUNCTIONS_TESTS))
+#define FUNCTIONS_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_FUNCTIONS_TESTS, FunctionsTestsClass))
+
+typedef struct _FunctionsTests FunctionsTests;
+typedef struct _FunctionsTestsClass FunctionsTestsClass;
 
 #define TYPE_MAP_TESTS (map_tests_get_type ())
 #define MAP_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_MAP_TESTS, MapTests))
@@ -141,16 +222,6 @@ typedef struct _MultiSetTestsClass MultiSetTestsClass;
 typedef struct _HashMultiSetTests HashMultiSetTests;
 typedef struct _HashMultiSetTestsClass HashMultiSetTestsClass;
 
-#define TYPE_SET_TESTS (set_tests_get_type ())
-#define SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_SET_TESTS, SetTests))
-#define SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_SET_TESTS, SetTestsClass))
-#define IS_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_SET_TESTS))
-#define IS_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_SET_TESTS))
-#define SET_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_SET_TESTS, SetTestsClass))
-
-typedef struct _SetTests SetTests;
-typedef struct _SetTestsClass SetTestsClass;
-
 #define TYPE_HASH_SET_TESTS (hash_set_tests_get_type ())
 #define HASH_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_HASH_SET_TESTS, HashSetTests))
 #define HASH_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_HASH_SET_TESTS, HashSetTestsClass))
@@ -170,26 +241,6 @@ typedef struct _HashSetTestsClass HashSetTestsClass;
 
 typedef struct _LinkedListTests LinkedListTests;
 typedef struct _LinkedListTestsClass LinkedListTestsClass;
-
-#define TYPE_QUEUE_TESTS (queue_tests_get_type ())
-#define QUEUE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_QUEUE_TESTS, QueueTests))
-#define QUEUE_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_QUEUE_TESTS, QueueTestsClass))
-#define IS_QUEUE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_QUEUE_TESTS))
-#define IS_QUEUE_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_QUEUE_TESTS))
-#define QUEUE_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_QUEUE_TESTS, QueueTestsClass))
-
-typedef struct _QueueTests QueueTests;
-typedef struct _QueueTestsClass QueueTestsClass;
-
-#define TYPE_DEQUE_TESTS (deque_tests_get_type ())
-#define DEQUE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_DEQUE_TESTS, DequeTests))
-#define DEQUE_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_DEQUE_TESTS, DequeTestsClass))
-#define IS_DEQUE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_DEQUE_TESTS))
-#define IS_DEQUE_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_DEQUE_TESTS))
-#define DEQUE_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_DEQUE_TESTS, DequeTestsClass))
-
-typedef struct _DequeTests DequeTests;
-typedef struct _DequeTestsClass DequeTestsClass;
 
 #define TYPE_LINKED_LIST_AS_DEQUE_TESTS (linked_list_as_deque_tests_get_type ())
 #define LINKED_LIST_AS_DEQUE_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_LINKED_LIST_AS_DEQUE_TESTS, LinkedListAsDequeTests))
@@ -231,6 +282,16 @@ typedef struct _ReadOnlyCollectionTestsClass ReadOnlyCollectionTestsClass;
 typedef struct _ReadOnlyListTests ReadOnlyListTests;
 typedef struct _ReadOnlyListTestsClass ReadOnlyListTestsClass;
 
+#define TYPE_READ_ONLY_BIDIR_LIST_TESTS (read_only_bidir_list_tests_get_type ())
+#define READ_ONLY_BIDIR_LIST_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_READ_ONLY_BIDIR_LIST_TESTS, ReadOnlyBidirListTests))
+#define READ_ONLY_BIDIR_LIST_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_READ_ONLY_BIDIR_LIST_TESTS, ReadOnlyBidirListTestsClass))
+#define IS_READ_ONLY_BIDIR_LIST_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_READ_ONLY_BIDIR_LIST_TESTS))
+#define IS_READ_ONLY_BIDIR_LIST_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_READ_ONLY_BIDIR_LIST_TESTS))
+#define READ_ONLY_BIDIR_LIST_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_READ_ONLY_BIDIR_LIST_TESTS, ReadOnlyBidirListTestsClass))
+
+typedef struct _ReadOnlyBidirListTests ReadOnlyBidirListTests;
+typedef struct _ReadOnlyBidirListTestsClass ReadOnlyBidirListTestsClass;
+
 #define TYPE_READ_ONLY_MAP_TESTS (read_only_map_tests_get_type ())
 #define READ_ONLY_MAP_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_READ_ONLY_MAP_TESTS, ReadOnlyMapTests))
 #define READ_ONLY_MAP_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_READ_ONLY_MAP_TESTS, ReadOnlyMapTestsClass))
@@ -250,6 +311,26 @@ typedef struct _ReadOnlyMapTestsClass ReadOnlyMapTestsClass;
 
 typedef struct _ReadOnlySetTests ReadOnlySetTests;
 typedef struct _ReadOnlySetTestsClass ReadOnlySetTestsClass;
+
+#define GEE_TYPE_SORTED_MAP_TESTS (gee_sorted_map_tests_get_type ())
+#define GEE_SORTED_MAP_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_SORTED_MAP_TESTS, GeeSortedMapTests))
+#define GEE_SORTED_MAP_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_SORTED_MAP_TESTS, GeeSortedMapTestsClass))
+#define GEE_IS_SORTED_MAP_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_SORTED_MAP_TESTS))
+#define GEE_IS_SORTED_MAP_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_SORTED_MAP_TESTS))
+#define GEE_SORTED_MAP_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_SORTED_MAP_TESTS, GeeSortedMapTestsClass))
+
+typedef struct _GeeSortedMapTests GeeSortedMapTests;
+typedef struct _GeeSortedMapTestsClass GeeSortedMapTestsClass;
+
+#define TYPE_BIDIR_SORTED_MAP_TESTS (bidir_sorted_map_tests_get_type ())
+#define BIDIR_SORTED_MAP_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_BIDIR_SORTED_MAP_TESTS, BidirSortedMapTests))
+#define BIDIR_SORTED_MAP_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_BIDIR_SORTED_MAP_TESTS, BidirSortedMapTestsClass))
+#define IS_BIDIR_SORTED_MAP_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_BIDIR_SORTED_MAP_TESTS))
+#define IS_BIDIR_SORTED_MAP_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_BIDIR_SORTED_MAP_TESTS))
+#define BIDIR_SORTED_MAP_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_BIDIR_SORTED_MAP_TESTS, BidirSortedMapTestsClass))
+
+typedef struct _BidirSortedMapTests BidirSortedMapTests;
+typedef struct _BidirSortedMapTestsClass BidirSortedMapTestsClass;
 
 #define TYPE_TREE_MAP_TESTS (tree_map_tests_get_type ())
 #define TREE_MAP_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_TREE_MAP_TESTS, TreeMapTests))
@@ -281,15 +362,15 @@ typedef struct _TreeMultiMapTestsClass TreeMultiMapTestsClass;
 typedef struct _TreeMultiSetTests TreeMultiSetTests;
 typedef struct _TreeMultiSetTestsClass TreeMultiSetTestsClass;
 
-#define TYPE_SORTED_SET_TESTS (sorted_set_tests_get_type ())
-#define SORTED_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_SORTED_SET_TESTS, SortedSetTests))
-#define SORTED_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_SORTED_SET_TESTS, SortedSetTestsClass))
-#define IS_SORTED_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_SORTED_SET_TESTS))
-#define IS_SORTED_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_SORTED_SET_TESTS))
-#define SORTED_SET_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_SORTED_SET_TESTS, SortedSetTestsClass))
+#define TYPE_BIDIR_SORTED_SET_TESTS (bidir_sorted_set_tests_get_type ())
+#define BIDIR_SORTED_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_BIDIR_SORTED_SET_TESTS, BidirSortedSetTests))
+#define BIDIR_SORTED_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_BIDIR_SORTED_SET_TESTS, BidirSortedSetTestsClass))
+#define IS_BIDIR_SORTED_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_BIDIR_SORTED_SET_TESTS))
+#define IS_BIDIR_SORTED_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_BIDIR_SORTED_SET_TESTS))
+#define BIDIR_SORTED_SET_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_BIDIR_SORTED_SET_TESTS, BidirSortedSetTestsClass))
 
-typedef struct _SortedSetTests SortedSetTests;
-typedef struct _SortedSetTestsClass SortedSetTestsClass;
+typedef struct _BidirSortedSetTests BidirSortedSetTests;
+typedef struct _BidirSortedSetTestsClass BidirSortedSetTestsClass;
 
 #define TYPE_TREE_SET_TESTS (tree_set_tests_get_type ())
 #define TREE_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_TREE_SET_TESTS, TreeSetTests))
@@ -309,11 +390,25 @@ ArrayListTests* array_list_tests_construct (GType object_type);
 GType gee_test_case_get_type (void) G_GNUC_CONST;
 GType collection_tests_get_type (void) G_GNUC_CONST;
 GType list_tests_get_type (void) G_GNUC_CONST;
+GType bidir_list_tests_get_type (void) G_GNUC_CONST;
 GType array_list_tests_get_type (void) G_GNUC_CONST;
 GTestSuite* gee_test_case_get_suite (GeeTestCase* self);
-ComparableTests* comparable_tests_new (void);
-ComparableTests* comparable_tests_construct (GType object_type);
-GType comparable_tests_get_type (void) G_GNUC_CONST;
+ArrayQueueTests* array_queue_tests_new (void);
+ArrayQueueTests* array_queue_tests_construct (GType object_type);
+GType queue_tests_get_type (void) G_GNUC_CONST;
+GType deque_tests_get_type (void) G_GNUC_CONST;
+GType array_queue_tests_get_type (void) G_GNUC_CONST;
+ConcurrentListTests* concurrent_list_tests_new (void);
+ConcurrentListTests* concurrent_list_tests_construct (GType object_type);
+GType concurrent_list_tests_get_type (void) G_GNUC_CONST;
+ConcurrentSetTests* concurrent_set_tests_new (void);
+ConcurrentSetTests* concurrent_set_tests_construct (GType object_type);
+GType set_tests_get_type (void) G_GNUC_CONST;
+GType sorted_set_tests_get_type (void) G_GNUC_CONST;
+GType concurrent_set_tests_get_type (void) G_GNUC_CONST;
+FunctionsTests* functions_tests_new (void);
+FunctionsTests* functions_tests_construct (GType object_type);
+GType functions_tests_get_type (void) G_GNUC_CONST;
 HashMapTests* hash_map_tests_new (void);
 HashMapTests* hash_map_tests_construct (GType object_type);
 GType map_tests_get_type (void) G_GNUC_CONST;
@@ -328,25 +423,25 @@ GType multi_set_tests_get_type (void) G_GNUC_CONST;
 GType hash_multi_set_tests_get_type (void) G_GNUC_CONST;
 HashSetTests* hash_set_tests_new (void);
 HashSetTests* hash_set_tests_construct (GType object_type);
-GType set_tests_get_type (void) G_GNUC_CONST;
 GType hash_set_tests_get_type (void) G_GNUC_CONST;
 LinkedListTests* linked_list_tests_new (void);
 LinkedListTests* linked_list_tests_construct (GType object_type);
 GType linked_list_tests_get_type (void) G_GNUC_CONST;
 LinkedListAsDequeTests* linked_list_as_deque_tests_new (void);
 LinkedListAsDequeTests* linked_list_as_deque_tests_construct (GType object_type);
-GType queue_tests_get_type (void) G_GNUC_CONST;
-GType deque_tests_get_type (void) G_GNUC_CONST;
 GType linked_list_as_deque_tests_get_type (void) G_GNUC_CONST;
 PriorityQueueTests* priority_queue_tests_new (void);
 PriorityQueueTests* priority_queue_tests_construct (GType object_type);
 GType priority_queue_tests_get_type (void) G_GNUC_CONST;
+ReadOnlyBidirListTests* read_only_bidir_list_tests_new (void);
+ReadOnlyBidirListTests* read_only_bidir_list_tests_construct (GType object_type);
+GType read_only_collection_tests_get_type (void) G_GNUC_CONST;
+GType read_only_list_tests_get_type (void) G_GNUC_CONST;
+GType read_only_bidir_list_tests_get_type (void) G_GNUC_CONST;
 ReadOnlyCollectionTests* read_only_collection_tests_new (void);
 ReadOnlyCollectionTests* read_only_collection_tests_construct (GType object_type);
-GType read_only_collection_tests_get_type (void) G_GNUC_CONST;
 ReadOnlyListTests* read_only_list_tests_new (void);
 ReadOnlyListTests* read_only_list_tests_construct (GType object_type);
-GType read_only_list_tests_get_type (void) G_GNUC_CONST;
 ReadOnlyMapTests* read_only_map_tests_new (void);
 ReadOnlyMapTests* read_only_map_tests_construct (GType object_type);
 GType read_only_map_tests_get_type (void) G_GNUC_CONST;
@@ -355,6 +450,8 @@ ReadOnlySetTests* read_only_set_tests_construct (GType object_type);
 GType read_only_set_tests_get_type (void) G_GNUC_CONST;
 TreeMapTests* tree_map_tests_new (void);
 TreeMapTests* tree_map_tests_construct (GType object_type);
+GType gee_sorted_map_tests_get_type (void) G_GNUC_CONST;
+GType bidir_sorted_map_tests_get_type (void) G_GNUC_CONST;
 GType tree_map_tests_get_type (void) G_GNUC_CONST;
 TreeMultiMapTests* tree_multi_map_tests_new (void);
 TreeMultiMapTests* tree_multi_map_tests_construct (GType object_type);
@@ -364,7 +461,7 @@ TreeMultiSetTests* tree_multi_set_tests_construct (GType object_type);
 GType tree_multi_set_tests_get_type (void) G_GNUC_CONST;
 TreeSetTests* tree_set_tests_new (void);
 TreeSetTests* tree_set_tests_construct (GType object_type);
-GType sorted_set_tests_get_type (void) G_GNUC_CONST;
+GType bidir_sorted_set_tests_get_type (void) G_GNUC_CONST;
 GType tree_set_tests_get_type (void) G_GNUC_CONST;
 
 
@@ -374,70 +471,87 @@ void _vala_main (gchar** args, int args_length1) {
 	ArrayListTests* _tmp2_;
 	GTestSuite* _tmp3_ = NULL;
 	GTestSuite* _tmp4_ = NULL;
-	ComparableTests* _tmp5_;
-	ComparableTests* _tmp6_;
+	ArrayQueueTests* _tmp5_;
+	ArrayQueueTests* _tmp6_;
 	GTestSuite* _tmp7_ = NULL;
 	GTestSuite* _tmp8_ = NULL;
-	HashMapTests* _tmp9_;
-	HashMapTests* _tmp10_;
+	ConcurrentListTests* _tmp9_;
+	ConcurrentListTests* _tmp10_;
 	GTestSuite* _tmp11_ = NULL;
 	GTestSuite* _tmp12_ = NULL;
-	HashMultiMapTests* _tmp13_;
-	HashMultiMapTests* _tmp14_;
+	ConcurrentSetTests* _tmp13_;
+	ConcurrentSetTests* _tmp14_;
 	GTestSuite* _tmp15_ = NULL;
 	GTestSuite* _tmp16_ = NULL;
-	HashMultiSetTests* _tmp17_;
-	HashMultiSetTests* _tmp18_;
+	FunctionsTests* _tmp17_;
+	FunctionsTests* _tmp18_;
 	GTestSuite* _tmp19_ = NULL;
 	GTestSuite* _tmp20_ = NULL;
-	HashSetTests* _tmp21_;
-	HashSetTests* _tmp22_;
+	HashMapTests* _tmp21_;
+	HashMapTests* _tmp22_;
 	GTestSuite* _tmp23_ = NULL;
 	GTestSuite* _tmp24_ = NULL;
-	LinkedListTests* _tmp25_;
-	LinkedListTests* _tmp26_;
+	HashMultiMapTests* _tmp25_;
+	HashMultiMapTests* _tmp26_;
 	GTestSuite* _tmp27_ = NULL;
 	GTestSuite* _tmp28_ = NULL;
-	LinkedListAsDequeTests* _tmp29_;
-	LinkedListAsDequeTests* _tmp30_;
+	HashMultiSetTests* _tmp29_;
+	HashMultiSetTests* _tmp30_;
 	GTestSuite* _tmp31_ = NULL;
 	GTestSuite* _tmp32_ = NULL;
-	PriorityQueueTests* _tmp33_;
-	PriorityQueueTests* _tmp34_;
+	HashSetTests* _tmp33_;
+	HashSetTests* _tmp34_;
 	GTestSuite* _tmp35_ = NULL;
 	GTestSuite* _tmp36_ = NULL;
-	ReadOnlyCollectionTests* _tmp37_;
-	ReadOnlyCollectionTests* _tmp38_;
+	LinkedListTests* _tmp37_;
+	LinkedListTests* _tmp38_;
 	GTestSuite* _tmp39_ = NULL;
 	GTestSuite* _tmp40_ = NULL;
-	ReadOnlyListTests* _tmp41_;
-	ReadOnlyListTests* _tmp42_;
+	LinkedListAsDequeTests* _tmp41_;
+	LinkedListAsDequeTests* _tmp42_;
 	GTestSuite* _tmp43_ = NULL;
 	GTestSuite* _tmp44_ = NULL;
-	ReadOnlyMapTests* _tmp45_;
-	ReadOnlyMapTests* _tmp46_;
+	PriorityQueueTests* _tmp45_;
+	PriorityQueueTests* _tmp46_;
 	GTestSuite* _tmp47_ = NULL;
 	GTestSuite* _tmp48_ = NULL;
-	ReadOnlySetTests* _tmp49_;
-	ReadOnlySetTests* _tmp50_;
+	ReadOnlyBidirListTests* _tmp49_;
+	ReadOnlyBidirListTests* _tmp50_;
 	GTestSuite* _tmp51_ = NULL;
 	GTestSuite* _tmp52_ = NULL;
-	TreeMapTests* _tmp53_;
-	TreeMapTests* _tmp54_;
+	ReadOnlyCollectionTests* _tmp53_;
+	ReadOnlyCollectionTests* _tmp54_;
 	GTestSuite* _tmp55_ = NULL;
 	GTestSuite* _tmp56_ = NULL;
-	TreeMultiMapTests* _tmp57_;
-	TreeMultiMapTests* _tmp58_;
+	ReadOnlyListTests* _tmp57_;
+	ReadOnlyListTests* _tmp58_;
 	GTestSuite* _tmp59_ = NULL;
 	GTestSuite* _tmp60_ = NULL;
-	TreeMultiSetTests* _tmp61_;
-	TreeMultiSetTests* _tmp62_;
+	ReadOnlyMapTests* _tmp61_;
+	ReadOnlyMapTests* _tmp62_;
 	GTestSuite* _tmp63_ = NULL;
 	GTestSuite* _tmp64_ = NULL;
-	TreeSetTests* _tmp65_;
-	TreeSetTests* _tmp66_;
+	ReadOnlySetTests* _tmp65_;
+	ReadOnlySetTests* _tmp66_;
 	GTestSuite* _tmp67_ = NULL;
+	GTestSuite* _tmp68_ = NULL;
+	TreeMapTests* _tmp69_;
+	TreeMapTests* _tmp70_;
+	GTestSuite* _tmp71_ = NULL;
+	GTestSuite* _tmp72_ = NULL;
+	TreeMultiMapTests* _tmp73_;
+	TreeMultiMapTests* _tmp74_;
+	GTestSuite* _tmp75_ = NULL;
+	GTestSuite* _tmp76_ = NULL;
+	TreeMultiSetTests* _tmp77_;
+	TreeMultiSetTests* _tmp78_;
+	GTestSuite* _tmp79_ = NULL;
+	GTestSuite* _tmp80_ = NULL;
+	TreeSetTests* _tmp81_;
+	TreeSetTests* _tmp82_;
+	GTestSuite* _tmp83_ = NULL;
 	g_test_init (&args_length1, &args, NULL);
+	gee_hazard_pointer_set_release_policy (GEE_HAZARD_POINTER_RELEASE_POLICY_MAIN_LOOP);
 	_tmp0_ = g_test_get_root ();
 	_tmp1_ = array_list_tests_new ();
 	_tmp2_ = _tmp1_;
@@ -445,101 +559,125 @@ void _vala_main (gchar** args, int args_length1) {
 	g_test_suite_add_suite (_tmp0_, _tmp3_);
 	_g_object_unref0 (_tmp2_);
 	_tmp4_ = g_test_get_root ();
-	_tmp5_ = comparable_tests_new ();
+	_tmp5_ = array_queue_tests_new ();
 	_tmp6_ = _tmp5_;
 	_tmp7_ = gee_test_case_get_suite ((GeeTestCase*) _tmp6_);
 	g_test_suite_add_suite (_tmp4_, _tmp7_);
 	_g_object_unref0 (_tmp6_);
 	_tmp8_ = g_test_get_root ();
-	_tmp9_ = hash_map_tests_new ();
+	_tmp9_ = concurrent_list_tests_new ();
 	_tmp10_ = _tmp9_;
 	_tmp11_ = gee_test_case_get_suite ((GeeTestCase*) _tmp10_);
 	g_test_suite_add_suite (_tmp8_, _tmp11_);
 	_g_object_unref0 (_tmp10_);
 	_tmp12_ = g_test_get_root ();
-	_tmp13_ = hash_multi_map_tests_new ();
+	_tmp13_ = concurrent_set_tests_new ();
 	_tmp14_ = _tmp13_;
 	_tmp15_ = gee_test_case_get_suite ((GeeTestCase*) _tmp14_);
 	g_test_suite_add_suite (_tmp12_, _tmp15_);
 	_g_object_unref0 (_tmp14_);
 	_tmp16_ = g_test_get_root ();
-	_tmp17_ = hash_multi_set_tests_new ();
+	_tmp17_ = functions_tests_new ();
 	_tmp18_ = _tmp17_;
 	_tmp19_ = gee_test_case_get_suite ((GeeTestCase*) _tmp18_);
 	g_test_suite_add_suite (_tmp16_, _tmp19_);
 	_g_object_unref0 (_tmp18_);
 	_tmp20_ = g_test_get_root ();
-	_tmp21_ = hash_set_tests_new ();
+	_tmp21_ = hash_map_tests_new ();
 	_tmp22_ = _tmp21_;
 	_tmp23_ = gee_test_case_get_suite ((GeeTestCase*) _tmp22_);
 	g_test_suite_add_suite (_tmp20_, _tmp23_);
 	_g_object_unref0 (_tmp22_);
 	_tmp24_ = g_test_get_root ();
-	_tmp25_ = linked_list_tests_new ();
+	_tmp25_ = hash_multi_map_tests_new ();
 	_tmp26_ = _tmp25_;
 	_tmp27_ = gee_test_case_get_suite ((GeeTestCase*) _tmp26_);
 	g_test_suite_add_suite (_tmp24_, _tmp27_);
 	_g_object_unref0 (_tmp26_);
 	_tmp28_ = g_test_get_root ();
-	_tmp29_ = linked_list_as_deque_tests_new ();
+	_tmp29_ = hash_multi_set_tests_new ();
 	_tmp30_ = _tmp29_;
 	_tmp31_ = gee_test_case_get_suite ((GeeTestCase*) _tmp30_);
 	g_test_suite_add_suite (_tmp28_, _tmp31_);
 	_g_object_unref0 (_tmp30_);
 	_tmp32_ = g_test_get_root ();
-	_tmp33_ = priority_queue_tests_new ();
+	_tmp33_ = hash_set_tests_new ();
 	_tmp34_ = _tmp33_;
 	_tmp35_ = gee_test_case_get_suite ((GeeTestCase*) _tmp34_);
 	g_test_suite_add_suite (_tmp32_, _tmp35_);
 	_g_object_unref0 (_tmp34_);
 	_tmp36_ = g_test_get_root ();
-	_tmp37_ = read_only_collection_tests_new ();
+	_tmp37_ = linked_list_tests_new ();
 	_tmp38_ = _tmp37_;
 	_tmp39_ = gee_test_case_get_suite ((GeeTestCase*) _tmp38_);
 	g_test_suite_add_suite (_tmp36_, _tmp39_);
 	_g_object_unref0 (_tmp38_);
 	_tmp40_ = g_test_get_root ();
-	_tmp41_ = read_only_list_tests_new ();
+	_tmp41_ = linked_list_as_deque_tests_new ();
 	_tmp42_ = _tmp41_;
 	_tmp43_ = gee_test_case_get_suite ((GeeTestCase*) _tmp42_);
 	g_test_suite_add_suite (_tmp40_, _tmp43_);
 	_g_object_unref0 (_tmp42_);
 	_tmp44_ = g_test_get_root ();
-	_tmp45_ = read_only_map_tests_new ();
+	_tmp45_ = priority_queue_tests_new ();
 	_tmp46_ = _tmp45_;
 	_tmp47_ = gee_test_case_get_suite ((GeeTestCase*) _tmp46_);
 	g_test_suite_add_suite (_tmp44_, _tmp47_);
 	_g_object_unref0 (_tmp46_);
 	_tmp48_ = g_test_get_root ();
-	_tmp49_ = read_only_set_tests_new ();
+	_tmp49_ = read_only_bidir_list_tests_new ();
 	_tmp50_ = _tmp49_;
 	_tmp51_ = gee_test_case_get_suite ((GeeTestCase*) _tmp50_);
 	g_test_suite_add_suite (_tmp48_, _tmp51_);
 	_g_object_unref0 (_tmp50_);
 	_tmp52_ = g_test_get_root ();
-	_tmp53_ = tree_map_tests_new ();
+	_tmp53_ = read_only_collection_tests_new ();
 	_tmp54_ = _tmp53_;
 	_tmp55_ = gee_test_case_get_suite ((GeeTestCase*) _tmp54_);
 	g_test_suite_add_suite (_tmp52_, _tmp55_);
 	_g_object_unref0 (_tmp54_);
 	_tmp56_ = g_test_get_root ();
-	_tmp57_ = tree_multi_map_tests_new ();
+	_tmp57_ = read_only_list_tests_new ();
 	_tmp58_ = _tmp57_;
 	_tmp59_ = gee_test_case_get_suite ((GeeTestCase*) _tmp58_);
 	g_test_suite_add_suite (_tmp56_, _tmp59_);
 	_g_object_unref0 (_tmp58_);
 	_tmp60_ = g_test_get_root ();
-	_tmp61_ = tree_multi_set_tests_new ();
+	_tmp61_ = read_only_map_tests_new ();
 	_tmp62_ = _tmp61_;
 	_tmp63_ = gee_test_case_get_suite ((GeeTestCase*) _tmp62_);
 	g_test_suite_add_suite (_tmp60_, _tmp63_);
 	_g_object_unref0 (_tmp62_);
 	_tmp64_ = g_test_get_root ();
-	_tmp65_ = tree_set_tests_new ();
+	_tmp65_ = read_only_set_tests_new ();
 	_tmp66_ = _tmp65_;
 	_tmp67_ = gee_test_case_get_suite ((GeeTestCase*) _tmp66_);
 	g_test_suite_add_suite (_tmp64_, _tmp67_);
 	_g_object_unref0 (_tmp66_);
+	_tmp68_ = g_test_get_root ();
+	_tmp69_ = tree_map_tests_new ();
+	_tmp70_ = _tmp69_;
+	_tmp71_ = gee_test_case_get_suite ((GeeTestCase*) _tmp70_);
+	g_test_suite_add_suite (_tmp68_, _tmp71_);
+	_g_object_unref0 (_tmp70_);
+	_tmp72_ = g_test_get_root ();
+	_tmp73_ = tree_multi_map_tests_new ();
+	_tmp74_ = _tmp73_;
+	_tmp75_ = gee_test_case_get_suite ((GeeTestCase*) _tmp74_);
+	g_test_suite_add_suite (_tmp72_, _tmp75_);
+	_g_object_unref0 (_tmp74_);
+	_tmp76_ = g_test_get_root ();
+	_tmp77_ = tree_multi_set_tests_new ();
+	_tmp78_ = _tmp77_;
+	_tmp79_ = gee_test_case_get_suite ((GeeTestCase*) _tmp78_);
+	g_test_suite_add_suite (_tmp76_, _tmp79_);
+	_g_object_unref0 (_tmp78_);
+	_tmp80_ = g_test_get_root ();
+	_tmp81_ = tree_set_tests_new ();
+	_tmp82_ = _tmp81_;
+	_tmp83_ = gee_test_case_get_suite ((GeeTestCase*) _tmp82_);
+	g_test_suite_add_suite (_tmp80_, _tmp83_);
+	_g_object_unref0 (_tmp82_);
 	g_test_run ();
 }
 

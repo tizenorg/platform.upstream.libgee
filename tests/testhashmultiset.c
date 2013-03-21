@@ -132,7 +132,7 @@ enum  {
 HashMultiSetTests* hash_multi_set_tests_new (void);
 HashMultiSetTests* hash_multi_set_tests_construct (GType object_type);
 MultiSetTests* multi_set_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 static void hash_multi_set_tests_test_selected_functions (HashMultiSetTests* self);
 static void _hash_multi_set_tests_test_selected_functions_gee_test_case_test_method (gpointer self);
 static void hash_multi_set_tests_real_set_up (GeeTestCase* base);
@@ -147,7 +147,7 @@ static void _hash_multi_set_tests_test_selected_functions_gee_test_case_test_met
 HashMultiSetTests* hash_multi_set_tests_construct (GType object_type) {
 	HashMultiSetTests * self = NULL;
 	self = (HashMultiSetTests*) multi_set_tests_construct (object_type, "HashMultiSet");
-	gee_test_case_add_test ((GeeTestCase*) self, "[HashMultiSet] selected functions", _hash_multi_set_tests_test_selected_functions_gee_test_case_test_method, self);
+	gee_test_case_add_test ((GeeTestCase*) self, "[HashMultiSet] selected functions", _hash_multi_set_tests_test_selected_functions_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 
@@ -161,7 +161,7 @@ static void hash_multi_set_tests_real_set_up (GeeTestCase* base) {
 	HashMultiSetTests * self;
 	GeeHashMultiSet* _tmp0_;
 	self = (HashMultiSetTests*) base;
-	_tmp0_ = gee_hash_multi_set_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL);
+	_tmp0_ = gee_hash_multi_set_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL, NULL);
 	_g_object_unref0 (((CollectionTests*) self)->test_collection);
 	((CollectionTests*) self)->test_collection = (GeeCollection*) _tmp0_;
 }
@@ -184,25 +184,11 @@ static void hash_multi_set_tests_test_selected_functions (HashMultiSetTests* sel
 	GeeCollection* _tmp0_;
 	GeeHashMultiSet* _tmp1_;
 	GeeHashMultiSet* test_multi_set;
-	GHashFunc _tmp2_;
-	GHashFunc _tmp3_;
-	GHashFunc _tmp4_;
-	GEqualFunc _tmp5_;
-	GEqualFunc _tmp6_;
-	GEqualFunc _tmp7_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = ((CollectionTests*) self)->test_collection;
 	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_HASH_MULTI_SET) ? ((GeeHashMultiSet*) _tmp0_) : NULL);
 	test_multi_set = _tmp1_;
 	_vala_assert (test_multi_set != NULL, "test_multi_set != null");
-	_tmp2_ = gee_hash_multi_set_get_hash_func (test_multi_set);
-	_tmp3_ = _tmp2_;
-	_tmp4_ = g_str_hash;
-	_vala_assert (_tmp3_ == _tmp4_, "test_multi_set.hash_func == str_hash");
-	_tmp5_ = gee_hash_multi_set_get_equal_func (test_multi_set);
-	_tmp6_ = _tmp5_;
-	_tmp7_ = g_str_equal;
-	_vala_assert (_tmp6_ == _tmp7_, "test_multi_set.equal_func == str_equal");
 	_g_object_unref0 (test_multi_set);
 }
 

@@ -68,6 +68,17 @@ typedef struct _ListTests ListTests;
 typedef struct _ListTestsClass ListTestsClass;
 typedef struct _ListTestsPrivate ListTestsPrivate;
 
+#define TYPE_BIDIR_LIST_TESTS (bidir_list_tests_get_type ())
+#define BIDIR_LIST_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_BIDIR_LIST_TESTS, BidirListTests))
+#define BIDIR_LIST_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_BIDIR_LIST_TESTS, BidirListTestsClass))
+#define IS_BIDIR_LIST_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_BIDIR_LIST_TESTS))
+#define IS_BIDIR_LIST_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_BIDIR_LIST_TESTS))
+#define BIDIR_LIST_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_BIDIR_LIST_TESTS, BidirListTestsClass))
+
+typedef struct _BidirListTests BidirListTests;
+typedef struct _BidirListTestsClass BidirListTestsClass;
+typedef struct _BidirListTestsPrivate BidirListTestsPrivate;
+
 #define TYPE_ARRAY_LIST_TESTS (array_list_tests_get_type ())
 #define ARRAY_LIST_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_ARRAY_LIST_TESTS, ArrayListTests))
 #define ARRAY_LIST_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_ARRAY_LIST_TESTS, ArrayListTestsClass))
@@ -113,13 +124,22 @@ struct _ListTestsClass {
 	void (*test_duplicates_are_retained) (ListTests* self);
 };
 
-struct _ArrayListTests {
+struct _BidirListTests {
 	ListTests parent_instance;
+	BidirListTestsPrivate * priv;
+};
+
+struct _BidirListTestsClass {
+	ListTestsClass parent_class;
+};
+
+struct _ArrayListTests {
+	BidirListTests parent_instance;
 	ArrayListTestsPrivate * priv;
 };
 
 struct _ArrayListTestsClass {
-	ListTestsClass parent_class;
+	BidirListTestsClass parent_class;
 };
 
 typedef void (*GeeTestCaseTestMethod) (void* user_data);
@@ -129,6 +149,7 @@ static gpointer array_list_tests_parent_class = NULL;
 GType gee_test_case_get_type (void) G_GNUC_CONST;
 GType collection_tests_get_type (void) G_GNUC_CONST;
 GType list_tests_get_type (void) G_GNUC_CONST;
+GType bidir_list_tests_get_type (void) G_GNUC_CONST;
 GType array_list_tests_get_type (void) G_GNUC_CONST;
 enum  {
 	ARRAY_LIST_TESTS_DUMMY_PROPERTY
@@ -136,12 +157,10 @@ enum  {
 #define ARRAY_LIST_TESTS_BIG_SORT_SIZE 1000000
 ArrayListTests* array_list_tests_new (void);
 ArrayListTests* array_list_tests_construct (GType object_type);
-ListTests* list_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+BidirListTests* bidir_list_tests_construct (GType object_type, const gchar* name);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 void array_list_tests_test_selected_functions (ArrayListTests* self);
 static void _array_list_tests_test_selected_functions_gee_test_case_test_method (gpointer self);
-void array_list_tests_test_gobject_properties (ArrayListTests* self);
-static void _array_list_tests_test_gobject_properties_gee_test_case_test_method (gpointer self);
 static void array_list_tests_test_small_sort (ArrayListTests* self);
 static void _array_list_tests_test_small_sort_gee_test_case_test_method (gpointer self);
 static void array_list_tests_test_big_sort (ArrayListTests* self);
@@ -157,11 +176,6 @@ static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify 
 
 static void _array_list_tests_test_selected_functions_gee_test_case_test_method (gpointer self) {
 	array_list_tests_test_selected_functions (self);
-}
-
-
-static void _array_list_tests_test_gobject_properties_gee_test_case_test_method (gpointer self) {
-	array_list_tests_test_gobject_properties (self);
 }
 
 
@@ -182,12 +196,11 @@ static void _array_list_tests_test_typed_to_array_gee_test_case_test_method (gpo
 
 ArrayListTests* array_list_tests_construct (GType object_type) {
 	ArrayListTests * self = NULL;
-	self = (ArrayListTests*) list_tests_construct (object_type, "ArrayList");
-	gee_test_case_add_test ((GeeTestCase*) self, "[ArrayList] selected functions", _array_list_tests_test_selected_functions_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[ArrayList] GObject properties", _array_list_tests_test_gobject_properties_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[ArrayList] small sort (insertion)", _array_list_tests_test_small_sort_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[ArrayList] big sort (timsort)", _array_list_tests_test_big_sort_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[ArrayList] typed to_array calls", _array_list_tests_test_typed_to_array_gee_test_case_test_method, self);
+	self = (ArrayListTests*) bidir_list_tests_construct (object_type, "ArrayList");
+	gee_test_case_add_test ((GeeTestCase*) self, "[ArrayList] selected functions", _array_list_tests_test_selected_functions_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[ArrayList] small sort (insertion)", _array_list_tests_test_small_sort_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[ArrayList] big sort (timsort)", _array_list_tests_test_big_sort_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[ArrayList] typed to_array calls", _array_list_tests_test_typed_to_array_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 
@@ -201,7 +214,7 @@ static void array_list_tests_real_set_up (GeeTestCase* base) {
 	ArrayListTests * self;
 	GeeArrayList* _tmp0_;
 	self = (ArrayListTests*) base;
-	_tmp0_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp0_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	_g_object_unref0 (((CollectionTests*) self)->test_collection);
 	((CollectionTests*) self)->test_collection = (GeeCollection*) _tmp0_;
 }
@@ -224,48 +237,11 @@ void array_list_tests_test_selected_functions (ArrayListTests* self) {
 	GeeCollection* _tmp0_;
 	GeeArrayList* _tmp1_;
 	GeeArrayList* test_list;
-	GEqualFunc _tmp2_;
-	GEqualFunc _tmp3_;
-	GEqualFunc _tmp4_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = ((CollectionTests*) self)->test_collection;
 	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_ARRAY_LIST) ? ((GeeArrayList*) _tmp0_) : NULL);
 	test_list = _tmp1_;
 	_vala_assert (test_list != NULL, "test_list != null");
-	_tmp2_ = gee_array_list_get_equal_func (test_list);
-	_tmp3_ = _tmp2_;
-	_tmp4_ = g_str_equal;
-	_vala_assert (_tmp3_ == _tmp4_, "test_list.equal_func == str_equal");
-	_g_object_unref0 (test_list);
-}
-
-
-void array_list_tests_test_gobject_properties (ArrayListTests* self) {
-	GeeCollection* _tmp0_;
-	GeeArrayList* _tmp1_;
-	GeeArrayList* test_list;
-	GValue value = {0};
-	GValue _tmp2_ = {0};
-	GValue _tmp3_;
-	void* _tmp4_ = NULL;
-	GEqualFunc _tmp5_;
-	GEqualFunc _tmp6_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((CollectionTests*) self)->test_collection;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_ARRAY_LIST) ? ((GeeArrayList*) _tmp0_) : NULL);
-	test_list = _tmp1_;
-	_vala_assert (test_list != NULL, "test_list != null");
-	g_value_init (&_tmp2_, G_TYPE_POINTER);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	value = _tmp2_;
-	_tmp3_ = value;
-	g_object_get_property ((GObject*) test_list, "equal-func", &value);
-	_tmp4_ = g_value_get_pointer (&value);
-	_tmp5_ = gee_array_list_get_equal_func (test_list);
-	_tmp6_ = _tmp5_;
-	_vala_assert (_tmp4_ == ((void*) _tmp6_), "value.get_pointer () == (void*) test_list.equal_func");
-	g_value_unset (&value);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
 	_g_object_unref0 (test_list);
 }
 
@@ -315,7 +291,7 @@ static void array_list_tests_test_small_sort (ArrayListTests* self) {
 	gee_abstract_collection_add ((GeeAbstractCollection*) test_list, "ten");
 	gee_abstract_collection_add ((GeeAbstractCollection*) test_list, "eleven");
 	gee_abstract_collection_add ((GeeAbstractCollection*) test_list, "twelve");
-	gee_list_sort ((GeeList*) test_list, NULL);
+	gee_list_sort ((GeeList*) test_list, NULL, NULL, NULL);
 	_tmp2_ = gee_abstract_list_get ((GeeAbstractList*) test_list, 0);
 	_tmp3_ = (gchar*) _tmp2_;
 	_vala_assert (g_strcmp0 (_tmp3_, "eight") == 0, "test_list.get (0) == \"eight\"");
@@ -373,7 +349,7 @@ static void array_list_tests_test_big_sort (ArrayListTests* self) {
 	GeeList* big_test_list;
 	GeeList* _tmp7_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = gee_array_list_new (G_TYPE_INT, NULL, NULL, NULL);
+	_tmp0_ = gee_array_list_new (G_TYPE_INT, NULL, NULL, NULL, NULL, NULL);
 	big_test_list = (GeeList*) _tmp0_;
 	{
 		gint i;
@@ -404,7 +380,7 @@ static void array_list_tests_test_big_sort (ArrayListTests* self) {
 		}
 	}
 	_tmp7_ = big_test_list;
-	gee_list_sort (_tmp7_, NULL);
+	gee_list_sort (_tmp7_, NULL, NULL, NULL);
 	{
 		gint i;
 		i = 1;
@@ -501,7 +477,7 @@ static void array_list_tests_test_typed_to_array (ArrayListTests* self) {
 	gint double_array_length1;
 	gint _double_array_size_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = gee_array_list_new (G_TYPE_BOOLEAN, NULL, NULL, NULL);
+	_tmp0_ = gee_array_list_new (G_TYPE_BOOLEAN, NULL, NULL, NULL, NULL, NULL);
 	bool_list = (GeeList*) _tmp0_;
 	_tmp1_ = bool_list;
 	_tmp2_ = gee_collection_add ((GeeCollection*) _tmp1_, (gpointer) ((gintptr) TRUE));
@@ -569,7 +545,7 @@ static void array_list_tests_test_typed_to_array (ArrayListTests* self) {
 		}
 		_g_object_unref0 (_element_list);
 	}
-	_tmp25_ = gee_array_list_new (G_TYPE_INT, NULL, NULL, NULL);
+	_tmp25_ = gee_array_list_new (G_TYPE_INT, NULL, NULL, NULL, NULL, NULL);
 	int_list = (GeeList*) _tmp25_;
 	_tmp26_ = int_list;
 	_tmp27_ = gee_collection_add ((GeeCollection*) _tmp26_, (gpointer) ((gintptr) 1));
@@ -637,7 +613,7 @@ static void array_list_tests_test_typed_to_array (ArrayListTests* self) {
 		}
 		_g_object_unref0 (_element_list);
 	}
-	_tmp50_ = gee_array_list_new (G_TYPE_DOUBLE, (GBoxedCopyFunc) _double_dup, g_free, NULL);
+	_tmp50_ = gee_array_list_new (G_TYPE_DOUBLE, (GBoxedCopyFunc) _double_dup, g_free, NULL, NULL, NULL);
 	double_list = (GeeList*) _tmp50_;
 	_tmp51_ = double_list;
 	_tmp52_ = 1.0;
@@ -738,7 +714,7 @@ GType array_list_tests_get_type (void) {
 	if (g_once_init_enter (&array_list_tests_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (ArrayListTestsClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) array_list_tests_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (ArrayListTests), 0, (GInstanceInitFunc) array_list_tests_instance_init, NULL };
 		GType array_list_tests_type_id;
-		array_list_tests_type_id = g_type_register_static (TYPE_LIST_TESTS, "ArrayListTests", &g_define_type_info, 0);
+		array_list_tests_type_id = g_type_register_static (TYPE_BIDIR_LIST_TESTS, "ArrayListTests", &g_define_type_info, 0);
 		g_once_init_leave (&array_list_tests_type_id__volatile, array_list_tests_type_id);
 	}
 	return array_list_tests_type_id__volatile;

@@ -55,7 +55,7 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(srcdir)/gee-1.0.pc.in $(top_srcdir)/Makefile.decl \
+	$(srcdir)/gee-0.8.pc.in $(top_srcdir)/Makefile.decl \
 	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
 	compile config.guess config.sub depcomp install-sh ltmain.sh \
 	missing
@@ -71,7 +71,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = gee-1.0.pc
+CONFIG_CLEAN_FILES = gee-0.8.pc
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
@@ -310,8 +310,11 @@ GTESTER_REPORT = gtester-report
 
 # initialize variables for unconditional += appending
 EXTRA_DIST = ChangeLog.pre-0-1-5 gitlog-to-changelog MAINTAINERS \
-	gee-1.0.pc.in $(NULL)
+	gee-0.8.pc.in $(NULL)
 TEST_PROGS = 
+
+# useful constants
+NULL = 
 ACLOCAL_AMFLAGS = -I m4
 AM_DISTCHECK_CONFIGURE_FLAGS = --enable-introspection=no
 @ENABLE_DOC_TRUE@DOC_SUBDIR = \
@@ -330,7 +333,7 @@ SUBDIRS = \
 	$(NULL)
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = gee-1.0.pc
+pkgconfig_DATA = gee-0.8.pc
 gen_start_date = 2009-04-30
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -386,7 +389,7 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-gee-1.0.pc: $(top_builddir)/config.status $(srcdir)/gee-1.0.pc.in
+gee-0.8.pc: $(top_builddir)/config.status $(srcdir)/gee-0.8.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:

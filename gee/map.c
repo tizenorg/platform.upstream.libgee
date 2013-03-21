@@ -27,13 +27,25 @@
 #include <glib-object.h>
 
 
-#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
-#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
-#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
-#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+#define GEE_TYPE_TRAVERSABLE (gee_traversable_get_type ())
+#define GEE_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversable))
+#define GEE_IS_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_TRAVERSABLE))
+#define GEE_TRAVERSABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversableIface))
 
-typedef struct _GeeIterable GeeIterable;
-typedef struct _GeeIterableIface GeeIterableIface;
+typedef struct _GeeTraversable GeeTraversable;
+typedef struct _GeeTraversableIface GeeTraversableIface;
+
+#define GEE_TRAVERSABLE_TYPE_STREAM (gee_traversable_stream_get_type ())
+
+#define GEE_TYPE_LAZY (gee_lazy_get_type ())
+#define GEE_LAZY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LAZY, GeeLazy))
+#define GEE_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_LAZY, GeeLazyClass))
+#define GEE_IS_LAZY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LAZY))
+#define GEE_IS_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_LAZY))
+#define GEE_LAZY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_LAZY, GeeLazyClass))
+
+typedef struct _GeeLazy GeeLazy;
+typedef struct _GeeLazyClass GeeLazyClass;
 
 #define GEE_TYPE_ITERATOR (gee_iterator_get_type ())
 #define GEE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERATOR, GeeIterator))
@@ -42,6 +54,14 @@ typedef struct _GeeIterableIface GeeIterableIface;
 
 typedef struct _GeeIterator GeeIterator;
 typedef struct _GeeIteratorIface GeeIteratorIface;
+
+#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
+#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
+#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
+#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+
+typedef struct _GeeIterable GeeIterable;
+typedef struct _GeeIterableIface GeeIterableIface;
 
 #define GEE_TYPE_MAP (gee_map_get_type ())
 #define GEE_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_MAP, GeeMap))
@@ -84,6 +104,7 @@ typedef struct _GeeSetIface GeeSetIface;
 
 typedef struct _GeeMapEntry GeeMapEntry;
 typedef struct _GeeMapEntryClass GeeMapEntryClass;
+#define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
 #define GEE_TYPE_ABSTRACT_MAP (gee_abstract_map_get_type ())
 #define GEE_ABSTRACT_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_MAP, GeeAbstractMap))
@@ -104,37 +125,80 @@ typedef struct _GeeAbstractMapClass GeeAbstractMapClass;
 
 typedef struct _GeeHashMap GeeHashMap;
 typedef struct _GeeHashMapClass GeeHashMapClass;
-#define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 typedef struct _GeeMapEntryPrivate GeeMapEntryPrivate;
 
+typedef gboolean (*GeeForallFunc) (gpointer g, void* user_data);
+typedef enum  {
+	GEE_TRAVERSABLE_STREAM_YIELD,
+	GEE_TRAVERSABLE_STREAM_CONTINUE,
+	GEE_TRAVERSABLE_STREAM_END
+} GeeTraversableStream;
+
+typedef GeeTraversableStream (*GeeStreamFunc) (GeeTraversableStream state, GeeLazy* g, GeeLazy** lazy, void* user_data);
 struct _GeeIteratorIface {
 	GTypeInterface parent_iface;
 	gboolean (*next) (GeeIterator* self);
 	gboolean (*has_next) (GeeIterator* self);
-	gboolean (*first) (GeeIterator* self);
 	gpointer (*get) (GeeIterator* self);
 	void (*remove) (GeeIterator* self);
+	gboolean (*get_valid) (GeeIterator* self);
+	gboolean (*get_read_only) (GeeIterator* self);
+};
+
+typedef gpointer (*GeeFoldFunc) (gpointer g, gpointer a, void* user_data);
+typedef gpointer (*GeeMapFunc) (gpointer g, void* user_data);
+typedef gboolean (*GeePredicate) (gconstpointer g, void* user_data);
+struct _GeeTraversableIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeTraversable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeTraversable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeTraversable* self);
+	gboolean (*foreach) (GeeTraversable* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	gpointer (*fold) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*map) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+	GeeIterator* (*scan) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*filter) (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+	GeeIterator* (*chop) (GeeTraversable* self, gint offset, gint length);
+	GType (*get_element_type) (GeeTraversable* self);
 };
 
 struct _GeeIterableIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeIterable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeIterable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeIterable* self);
 	GeeIterator* (*iterator) (GeeIterable* self);
-	GType (*get_element_type) (GeeIterable* self);
 };
 
+typedef gpointer (*GeeFoldMapFunc) (gconstpointer k, gconstpointer v, gpointer a, void* user_data);
+typedef gboolean (*GeeForallMapFunc) (gconstpointer k, gconstpointer v, void* user_data);
 struct _GeeMapIteratorIface {
 	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeMapIterator* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeMapIterator* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeMapIterator* self);
+	GType (*get_v_type) (GeeMapIterator* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeMapIterator* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeMapIterator* self);
 	gboolean (*next) (GeeMapIterator* self);
 	gboolean (*has_next) (GeeMapIterator* self);
-	gboolean (*first) (GeeMapIterator* self);
 	gpointer (*get_key) (GeeMapIterator* self);
 	gpointer (*get_value) (GeeMapIterator* self);
 	void (*set_value) (GeeMapIterator* self, gconstpointer value);
 	void (*unset) (GeeMapIterator* self);
+	gpointer (*fold) (GeeMapIterator* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldMapFunc f, void* f_target, gpointer seed);
+	gboolean (*foreach) (GeeMapIterator* self, GeeForallMapFunc f, void* f_target);
+	gboolean (*get_valid) (GeeMapIterator* self);
+	gboolean (*get_mutable) (GeeMapIterator* self);
+	gboolean (*get_read_only) (GeeMapIterator* self);
 };
 
 struct _GeeCollectionIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeCollection* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeCollection* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeCollection* self);
 	gboolean (*contains) (GeeCollection* self, gconstpointer item);
 	gboolean (*add) (GeeCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeCollection* self, gconstpointer item);
@@ -146,40 +210,47 @@ struct _GeeCollectionIface {
 	gpointer* (*to_array) (GeeCollection* self, int* result_length1);
 	gint (*get_size) (GeeCollection* self);
 	gboolean (*get_is_empty) (GeeCollection* self);
+	gboolean (*get_read_only) (GeeCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeCollection* self);
 };
 
 struct _GeeSetIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeSet* self);
 	GeeSet* (*get_read_only_view) (GeeSet* self);
 };
 
 struct _GeeMapIface {
 	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeMap* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeMap* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeMap* self);
+	GType (*get_v_type) (GeeMap* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeMap* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeMap* self);
 	gboolean (*has_key) (GeeMap* self, gconstpointer key);
-	gboolean (*contains) (GeeMap* self, gconstpointer key);
 	gboolean (*has) (GeeMap* self, gconstpointer key, gconstpointer value);
 	gpointer (*get) (GeeMap* self, gconstpointer key);
 	void (*set) (GeeMap* self, gconstpointer key, gconstpointer value);
 	gboolean (*unset) (GeeMap* self, gconstpointer key, gpointer* value);
-	gboolean (*remove) (GeeMap* self, gconstpointer key, gpointer* value);
 	void (*clear) (GeeMap* self);
 	GeeMapIterator* (*map_iterator) (GeeMap* self);
 	void (*set_all) (GeeMap* self, GeeMap* map);
 	gboolean (*unset_all) (GeeMap* self, GeeMap* map);
-	gboolean (*remove_all) (GeeMap* self, GeeMap* map);
 	gboolean (*has_all) (GeeMap* self, GeeMap* map);
-	gboolean (*contains_all) (GeeMap* self, GeeMap* map);
 	gint (*get_size) (GeeMap* self);
 	gboolean (*get_is_empty) (GeeMap* self);
+	gboolean (*get_read_only) (GeeMap* self);
 	GeeSet* (*get_keys) (GeeMap* self);
 	GeeCollection* (*get_values) (GeeMap* self);
 	GeeSet* (*get_entries) (GeeMap* self);
 	GeeMap* (*get_read_only_view) (GeeMap* self);
-	GType (*get_key_type) (GeeMap* self);
-	GType (*get_value_type) (GeeMap* self);
 };
 
+typedef guint (*GeeHashDataFunc) (gconstpointer v, void* user_data);
+typedef gboolean (*GeeEqualDataFunc) (gconstpointer a, gconstpointer b, void* user_data);
 struct _GeeMapEntry {
 	GObject parent_instance;
 	GeeMapEntryPrivate * priv;
@@ -190,6 +261,7 @@ struct _GeeMapEntryClass {
 	gconstpointer (*get_key) (GeeMapEntry* self);
 	gconstpointer (*get_value) (GeeMapEntry* self);
 	void (*set_value) (GeeMapEntry* self, gconstpointer value);
+	gboolean (*get_read_only) (GeeMapEntry* self);
 };
 
 struct _GeeMapEntryPrivate {
@@ -204,7 +276,16 @@ struct _GeeMapEntryPrivate {
 
 static gpointer gee_map_entry_parent_class = NULL;
 
+GType gee_traversable_stream_get_type (void) G_GNUC_CONST;
+gpointer gee_lazy_ref (gpointer instance);
+void gee_lazy_unref (gpointer instance);
+GParamSpec* gee_param_spec_lazy (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void gee_value_set_lazy (GValue* value, gpointer v_object);
+void gee_value_take_lazy (GValue* value, gpointer v_object);
+gpointer gee_value_get_lazy (const GValue* value);
+GType gee_lazy_get_type (void) G_GNUC_CONST;
 GType gee_iterator_get_type (void) G_GNUC_CONST;
+GType gee_traversable_get_type (void) G_GNUC_CONST;
 GType gee_iterable_get_type (void) G_GNUC_CONST;
 GType gee_map_iterator_get_type (void) G_GNUC_CONST;
 GType gee_collection_get_type (void) G_GNUC_CONST;
@@ -221,21 +302,30 @@ gboolean gee_map_remove (GeeMap* self, gconstpointer key, gpointer* value) G_GNU
 void gee_map_clear (GeeMap* self);
 GeeMapIterator* gee_map_map_iterator (GeeMap* self);
 void gee_map_set_all (GeeMap* self, GeeMap* map);
+static void gee_map_real_set_all (GeeMap* self, GeeMap* map);
+GeeSet* gee_map_get_entries (GeeMap* self);
+GeeIterator* gee_iterable_iterator (GeeIterable* self);
+gboolean gee_iterator_next (GeeIterator* self);
+gpointer gee_iterator_get (GeeIterator* self);
+gconstpointer gee_map_entry_get_key (GeeMapEntry* self);
+gconstpointer gee_map_entry_get_value (GeeMapEntry* self);
 gboolean gee_map_unset_all (GeeMap* self, GeeMap* map);
+static gboolean gee_map_real_unset_all (GeeMap* self, GeeMap* map);
+GeeSet* gee_map_get_keys (GeeMap* self);
 gboolean gee_map_remove_all (GeeMap* self, GeeMap* map) G_GNUC_DEPRECATED;
 gboolean gee_map_has_all (GeeMap* self, GeeMap* map);
+static gboolean gee_map_real_has_all (GeeMap* self, GeeMap* map);
 gboolean gee_map_contains_all (GeeMap* self, GeeMap* map) G_GNUC_DEPRECATED;
 GeeMap* gee_map_empty (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func);
-GeeHashMap* gee_hash_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GHashFunc key_hash_func, GEqualFunc key_equal_func, GEqualFunc value_equal_func);
-GeeHashMap* gee_hash_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GHashFunc key_hash_func, GEqualFunc key_equal_func, GEqualFunc value_equal_func);
+GeeHashMap* gee_hash_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashDataFunc key_hash_func, void* key_hash_func_target, GDestroyNotify key_hash_func_target_destroy_notify, GeeEqualDataFunc key_equal_func, void* key_equal_func_target, GDestroyNotify key_equal_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
+GeeHashMap* gee_hash_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashDataFunc key_hash_func, void* key_hash_func_target, GDestroyNotify key_hash_func_target_destroy_notify, GeeEqualDataFunc key_equal_func, void* key_equal_func_target, GDestroyNotify key_equal_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
 GType gee_abstract_map_get_type (void) G_GNUC_CONST;
 GType gee_hash_map_get_type (void) G_GNUC_CONST;
 GeeMap* gee_abstract_map_get_read_only_view (GeeAbstractMap* self);
 gint gee_map_get_size (GeeMap* self);
 gboolean gee_map_get_is_empty (GeeMap* self);
-GeeSet* gee_map_get_keys (GeeMap* self);
+gboolean gee_map_get_read_only (GeeMap* self);
 GeeCollection* gee_map_get_values (GeeMap* self);
-GeeSet* gee_map_get_entries (GeeMap* self);
 GeeMap* gee_map_get_read_only_view (GeeMap* self);
 GType gee_map_get_key_type (GeeMap* self);
 GType gee_map_get_value_type (GeeMap* self);
@@ -249,12 +339,12 @@ enum  {
 	GEE_MAP_ENTRY_V_DUP_FUNC,
 	GEE_MAP_ENTRY_V_DESTROY_FUNC,
 	GEE_MAP_ENTRY_KEY,
-	GEE_MAP_ENTRY_VALUE
+	GEE_MAP_ENTRY_VALUE,
+	GEE_MAP_ENTRY_READ_ONLY
 };
 GeeMapEntry* gee_map_entry_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func);
-gconstpointer gee_map_entry_get_key (GeeMapEntry* self);
-gconstpointer gee_map_entry_get_value (GeeMapEntry* self);
 void gee_map_entry_set_value (GeeMapEntry* self, gconstpointer value);
+gboolean gee_map_entry_get_read_only (GeeMapEntry* self);
 static void _vala_gee_map_entry_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_map_entry_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 
@@ -278,12 +368,15 @@ gboolean gee_map_has_key (GeeMap* self, gconstpointer key) {
  * @param key the key to locate in the map
  *
  * @return    ``true`` if key is found, ``false`` otherwise
- *
- * @deprecated Use {@link has_key} method instead.
  */
 gboolean gee_map_contains (GeeMap* self, gconstpointer key) {
-	g_return_val_if_fail (self != NULL, FALSE);
-	return GEE_MAP_GET_INTERFACE (self)->contains (self, key);
+	gboolean result = FALSE;
+	gconstpointer _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	_tmp0_ = key;
+	_tmp1_ = gee_map_has_key (self, _tmp0_);
+	result = _tmp1_;
+	return result;
 }
 
 
@@ -348,12 +441,24 @@ gboolean gee_map_unset (GeeMap* self, gconstpointer key, gpointer* value) {
  * @param value the receiver variable for the removed value
  *
  * @return    ``true`` if the map has been changed, ``false`` otherwise
- *
- * @deprecated Use {@link unset} method instead.
  */
 gboolean gee_map_remove (GeeMap* self, gconstpointer key, gpointer* value) {
-	g_return_val_if_fail (self != NULL, FALSE);
-	return GEE_MAP_GET_INTERFACE (self)->remove (self, key, value);
+	gpointer _vala_value = NULL;
+	gboolean result = FALSE;
+	gconstpointer _tmp0_;
+	gpointer _tmp1_ = NULL;
+	gboolean _tmp2_ = FALSE;
+	_tmp0_ = key;
+	_tmp2_ = gee_map_unset (self, _tmp0_, &_tmp1_);
+	((_vala_value == NULL) || (GEE_MAP_GET_INTERFACE (self)->get_v_destroy_func (self) == NULL)) ? NULL : (_vala_value = (GEE_MAP_GET_INTERFACE (self)->get_v_destroy_func (self) (_vala_value), NULL));
+	_vala_value = _tmp1_;
+	result = _tmp2_;
+	if (value) {
+		*value = _vala_value;
+	} else {
+		((_vala_value == NULL) || (GEE_MAP_GET_INTERFACE (self)->get_v_destroy_func (self) == NULL)) ? NULL : (_vala_value = (GEE_MAP_GET_INTERFACE (self)->get_v_destroy_func (self) (_vala_value), NULL));
+	}
+	return result;
 }
 
 
@@ -383,6 +488,58 @@ GeeMapIterator* gee_map_map_iterator (GeeMap* self) {
  *
  * @param map the map which items are inserted to this map
  */
+static void gee_map_real_set_all (GeeMap* self, GeeMap* map) {
+	g_return_if_fail (map != NULL);
+	{
+		GeeMap* _tmp0_;
+		GeeSet* _tmp1_;
+		GeeSet* _tmp2_;
+		GeeSet* _tmp3_;
+		GeeIterator* _tmp4_ = NULL;
+		GeeIterator* _tmp5_;
+		GeeIterator* _entry_it;
+		_tmp0_ = map;
+		_tmp1_ = gee_map_get_entries (_tmp0_);
+		_tmp2_ = _tmp1_;
+		_tmp3_ = _tmp2_;
+		_tmp4_ = gee_iterable_iterator ((GeeIterable*) _tmp3_);
+		_tmp5_ = _tmp4_;
+		_g_object_unref0 (_tmp3_);
+		_entry_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			GeeMapEntry* entry;
+			GeeMapEntry* _tmp10_;
+			gconstpointer _tmp11_;
+			gconstpointer _tmp12_;
+			GeeMapEntry* _tmp13_;
+			gconstpointer _tmp14_;
+			gconstpointer _tmp15_;
+			_tmp6_ = _entry_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _entry_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			entry = (GeeMapEntry*) _tmp9_;
+			_tmp10_ = entry;
+			_tmp11_ = gee_map_entry_get_key (_tmp10_);
+			_tmp12_ = _tmp11_;
+			_tmp13_ = entry;
+			_tmp14_ = gee_map_entry_get_value (_tmp13_);
+			_tmp15_ = _tmp14_;
+			gee_map_set (self, _tmp12_, _tmp15_);
+			_g_object_unref0 (entry);
+		}
+		_g_object_unref0 (_entry_it);
+	}
+}
+
+
 void gee_map_set_all (GeeMap* self, GeeMap* map) {
 	g_return_if_fail (self != NULL);
 	GEE_MAP_GET_INTERFACE (self)->set_all (self, map);
@@ -395,6 +552,57 @@ void gee_map_set_all (GeeMap* self, GeeMap* map) {
  *
  * @param map the map which common items are deleted from this map
  */
+static gboolean gee_map_real_unset_all (GeeMap* self, GeeMap* map) {
+	gboolean result = FALSE;
+	gboolean changed;
+	g_return_val_if_fail (map != NULL, FALSE);
+	changed = FALSE;
+	{
+		GeeMap* _tmp0_;
+		GeeSet* _tmp1_;
+		GeeSet* _tmp2_;
+		GeeSet* _tmp3_;
+		GeeIterator* _tmp4_ = NULL;
+		GeeIterator* _tmp5_;
+		GeeIterator* _key_it;
+		_tmp0_ = map;
+		_tmp1_ = gee_map_get_keys (_tmp0_);
+		_tmp2_ = _tmp1_;
+		_tmp3_ = _tmp2_;
+		_tmp4_ = gee_iterable_iterator ((GeeIterable*) _tmp3_);
+		_tmp5_ = _tmp4_;
+		_g_object_unref0 (_tmp3_);
+		_key_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			gpointer key;
+			gboolean _tmp10_;
+			gconstpointer _tmp11_;
+			gboolean _tmp12_ = FALSE;
+			_tmp6_ = _key_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _key_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			key = _tmp9_;
+			_tmp10_ = changed;
+			_tmp11_ = key;
+			_tmp12_ = gee_map_unset (self, _tmp11_, NULL);
+			changed = _tmp10_ | _tmp12_;
+			((key == NULL) || (GEE_MAP_GET_INTERFACE (self)->get_k_destroy_func (self) == NULL)) ? NULL : (key = (GEE_MAP_GET_INTERFACE (self)->get_k_destroy_func (self) (key), NULL));
+		}
+		_g_object_unref0 (_key_it);
+	}
+	result = changed;
+	return result;
+}
+
+
 gboolean gee_map_unset_all (GeeMap* self, GeeMap* map) {
 	g_return_val_if_fail (self != NULL, FALSE);
 	return GEE_MAP_GET_INTERFACE (self)->unset_all (self, map);
@@ -406,12 +614,16 @@ gboolean gee_map_unset_all (GeeMap* self, GeeMap* map) {
  * and this map.
  *
  * @param map the map which common items are deleted from this map
- *
- * @deprecated Use {@link unset_all} method instead.
  */
 gboolean gee_map_remove_all (GeeMap* self, GeeMap* map) {
-	g_return_val_if_fail (self != NULL, FALSE);
-	return GEE_MAP_GET_INTERFACE (self)->remove_all (self, map);
+	gboolean result = FALSE;
+	GeeMap* _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	g_return_val_if_fail (map != NULL, FALSE);
+	_tmp0_ = map;
+	_tmp1_ = gee_map_unset_all (self, _tmp0_);
+	result = _tmp1_;
+	return result;
 }
 
 
@@ -420,6 +632,68 @@ gboolean gee_map_remove_all (GeeMap* self, GeeMap* map) {
  *
  * @param map the map which items will be compared with this map
  */
+static gboolean gee_map_real_has_all (GeeMap* self, GeeMap* map) {
+	gboolean result = FALSE;
+	g_return_val_if_fail (map != NULL, FALSE);
+	{
+		GeeMap* _tmp0_;
+		GeeSet* _tmp1_;
+		GeeSet* _tmp2_;
+		GeeSet* _tmp3_;
+		GeeIterator* _tmp4_ = NULL;
+		GeeIterator* _tmp5_;
+		GeeIterator* _entry_it;
+		_tmp0_ = map;
+		_tmp1_ = gee_map_get_entries (_tmp0_);
+		_tmp2_ = _tmp1_;
+		_tmp3_ = _tmp2_;
+		_tmp4_ = gee_iterable_iterator ((GeeIterable*) _tmp3_);
+		_tmp5_ = _tmp4_;
+		_g_object_unref0 (_tmp3_);
+		_entry_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			GeeMapEntry* entry;
+			GeeMapEntry* _tmp10_;
+			gconstpointer _tmp11_;
+			gconstpointer _tmp12_;
+			GeeMapEntry* _tmp13_;
+			gconstpointer _tmp14_;
+			gconstpointer _tmp15_;
+			gboolean _tmp16_ = FALSE;
+			_tmp6_ = _entry_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _entry_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			entry = (GeeMapEntry*) _tmp9_;
+			_tmp10_ = entry;
+			_tmp11_ = gee_map_entry_get_key (_tmp10_);
+			_tmp12_ = _tmp11_;
+			_tmp13_ = entry;
+			_tmp14_ = gee_map_entry_get_value (_tmp13_);
+			_tmp15_ = _tmp14_;
+			_tmp16_ = gee_map_has (self, _tmp12_, _tmp15_);
+			if (!_tmp16_) {
+				result = FALSE;
+				_g_object_unref0 (entry);
+				_g_object_unref0 (_entry_it);
+				return result;
+			}
+			_g_object_unref0 (entry);
+		}
+		_g_object_unref0 (_entry_it);
+	}
+	result = TRUE;
+	return result;
+}
+
+
 gboolean gee_map_has_all (GeeMap* self, GeeMap* map) {
 	g_return_val_if_fail (self != NULL, FALSE);
 	return GEE_MAP_GET_INTERFACE (self)->has_all (self, map);
@@ -430,12 +704,16 @@ gboolean gee_map_has_all (GeeMap* self, GeeMap* map) {
  * Returns ``true`` it this map contains all items as the input map.
  *
  * @param map the map which items will be compared with this map
- *
- * @deprecated Use {@link has_all} method instead.
  */
 gboolean gee_map_contains_all (GeeMap* self, GeeMap* map) {
-	g_return_val_if_fail (self != NULL, FALSE);
-	return GEE_MAP_GET_INTERFACE (self)->contains_all (self, map);
+	gboolean result = FALSE;
+	GeeMap* _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	g_return_val_if_fail (map != NULL, FALSE);
+	_tmp0_ = map;
+	_tmp1_ = gee_map_has_all (self, _tmp0_);
+	result = _tmp1_;
+	return result;
 }
 
 
@@ -451,7 +729,7 @@ GeeMap* gee_map_empty (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k
 	GeeMap* _tmp2_;
 	GeeMap* _tmp3_;
 	GeeMap* _tmp4_;
-	_tmp0_ = gee_hash_map_new (k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, NULL, NULL, NULL);
+	_tmp0_ = gee_hash_map_new (k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 	_tmp1_ = _tmp0_;
 	_tmp2_ = gee_abstract_map_get_read_only_view ((GeeAbstractMap*) _tmp1_);
 	_tmp3_ = _tmp2_;
@@ -471,6 +749,25 @@ gint gee_map_get_size (GeeMap* self) {
 gboolean gee_map_get_is_empty (GeeMap* self) {
 	g_return_val_if_fail (self != NULL, FALSE);
 	return GEE_MAP_GET_INTERFACE (self)->get_is_empty (self);
+}
+
+
+static gboolean gee_map_real_get_is_empty (GeeMap* base) {
+	gboolean result;
+	GeeMap* self;
+	gint _tmp0_;
+	gint _tmp1_;
+	self = base;
+	_tmp0_ = gee_map_get_size (self);
+	_tmp1_ = _tmp0_;
+	result = _tmp1_ == 0;
+	return result;
+}
+
+
+gboolean gee_map_get_read_only (GeeMap* self) {
+	g_return_val_if_fail (self != NULL, FALSE);
+	return GEE_MAP_GET_INTERFACE (self)->get_read_only (self);
 }
 
 
@@ -499,14 +796,18 @@ GeeMap* gee_map_get_read_only_view (GeeMap* self) {
 
 
 GType gee_map_get_key_type (GeeMap* self) {
+	GType result;
 	g_return_val_if_fail (self != NULL, 0UL);
-	return GEE_MAP_GET_INTERFACE (self)->get_key_type (self);
+	result = GEE_MAP_GET_INTERFACE (self)->get_k_type (self);
+	return result;
 }
 
 
 GType gee_map_get_value_type (GeeMap* self) {
+	GType result;
 	g_return_val_if_fail (self != NULL, 0UL);
-	return GEE_MAP_GET_INTERFACE (self)->get_value_type (self);
+	result = GEE_MAP_GET_INTERFACE (self)->get_v_type (self);
+	return result;
 }
 
 
@@ -541,6 +842,12 @@ void gee_map_entry_set_value (GeeMapEntry* self, gconstpointer value) {
 }
 
 
+gboolean gee_map_entry_get_read_only (GeeMapEntry* self) {
+	g_return_val_if_fail (self != NULL, FALSE);
+	return GEE_MAP_ENTRY_GET_CLASS (self)->get_read_only (self);
+}
+
+
 static void gee_map_entry_class_init (GeeMapEntryClass * klass) {
 	gee_map_entry_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeMapEntryPrivate));
@@ -560,6 +867,10 @@ static void gee_map_entry_class_init (GeeMapEntryClass * klass) {
 	 * The value of this entry.
 	 */
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_MAP_ENTRY_VALUE, g_param_spec_pointer ("value", "value", "value", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE | G_PARAM_WRITABLE));
+	/**
+	 * ``true`` if the setting value is permitted.
+	 */
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_MAP_ENTRY_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -632,9 +943,10 @@ static void gee_map_base_init (GeeMapIface * iface) {
 		 */
 		g_object_interface_install_property (iface, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 		/**
-		 * Specifies whether this map is empty.
+		 * Specifies whether this collection can change - i.e. wheather {@link set},
+		 * {@link remove} etc. are legal operations.
 		 */
-		g_object_interface_install_property (iface, g_param_spec_boolean ("is-empty", "is-empty", "is-empty", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+		g_object_interface_install_property (iface, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 		/**
 		 * The read-only view of the keys of this map.
 		 */
@@ -651,14 +963,10 @@ static void gee_map_base_init (GeeMapIface * iface) {
 		 * The read-only view this map.
 		 */
 		g_object_interface_install_property (iface, g_param_spec_object ("read-only-view", "read-only-view", "read-only-view", GEE_TYPE_MAP, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
-		/**
-		 * The type of the keys in this map.
-		 */
-		g_object_interface_install_property (iface, g_param_spec_gtype ("key-type", "key-type", "key-type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
-		/**
-		 * The type of the values in this map.
-		 */
-		g_object_interface_install_property (iface, g_param_spec_gtype ("value-type", "value-type", "value-type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+		iface->set_all = gee_map_real_set_all;
+		iface->unset_all = gee_map_real_unset_all;
+		iface->has_all = gee_map_real_has_all;
+		iface->get_is_empty = gee_map_real_get_is_empty;
 	}
 }
 

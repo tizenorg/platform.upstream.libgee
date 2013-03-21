@@ -130,25 +130,11 @@ enum  {
 PriorityQueueTests* priority_queue_tests_new (void);
 PriorityQueueTests* priority_queue_tests_construct (GType object_type);
 QueueTests* queue_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
-static void priority_queue_tests_test_selected_functions (PriorityQueueTests* self);
-static void _priority_queue_tests_test_selected_functions_gee_test_case_test_method (gpointer self);
-void priority_queue_tests_test_gobject_properties (PriorityQueueTests* self);
-static void _priority_queue_tests_test_gobject_properties_gee_test_case_test_method (gpointer self);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 static void priority_queue_tests_test_poll_gives_minimum (PriorityQueueTests* self);
 static void _priority_queue_tests_test_poll_gives_minimum_gee_test_case_test_method (gpointer self);
 static void priority_queue_tests_real_set_up (GeeTestCase* base);
 static void priority_queue_tests_real_tear_down (GeeTestCase* base);
-
-
-static void _priority_queue_tests_test_selected_functions_gee_test_case_test_method (gpointer self) {
-	priority_queue_tests_test_selected_functions (self);
-}
-
-
-static void _priority_queue_tests_test_gobject_properties_gee_test_case_test_method (gpointer self) {
-	priority_queue_tests_test_gobject_properties (self);
-}
 
 
 static void _priority_queue_tests_test_poll_gives_minimum_gee_test_case_test_method (gpointer self) {
@@ -159,9 +145,7 @@ static void _priority_queue_tests_test_poll_gives_minimum_gee_test_case_test_met
 PriorityQueueTests* priority_queue_tests_construct (GType object_type) {
 	PriorityQueueTests * self = NULL;
 	self = (PriorityQueueTests*) queue_tests_construct (object_type, "PriorityQueue");
-	gee_test_case_add_test ((GeeTestCase*) self, "[PriorityQueue] selected functions", _priority_queue_tests_test_selected_functions_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[PriorityQueue] GObject properties", _priority_queue_tests_test_gobject_properties_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[PriorityQueue] poll gives minimum", _priority_queue_tests_test_poll_gives_minimum_gee_test_case_test_method, self);
+	gee_test_case_add_test ((GeeTestCase*) self, "[PriorityQueue] poll gives minimum", _priority_queue_tests_test_poll_gives_minimum_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 
@@ -175,7 +159,7 @@ static void priority_queue_tests_real_set_up (GeeTestCase* base) {
 	PriorityQueueTests * self;
 	GeePriorityQueue* _tmp0_;
 	self = (PriorityQueueTests*) base;
-	_tmp0_ = gee_priority_queue_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp0_ = gee_priority_queue_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	_g_object_unref0 (((CollectionTests*) self)->test_collection);
 	((CollectionTests*) self)->test_collection = (GeeCollection*) _tmp0_;
 }
@@ -191,56 +175,6 @@ static void priority_queue_tests_real_tear_down (GeeTestCase* base) {
 
 static gpointer _g_object_ref0 (gpointer self) {
 	return self ? g_object_ref (self) : NULL;
-}
-
-
-static void priority_queue_tests_test_selected_functions (PriorityQueueTests* self) {
-	GeeCollection* _tmp0_;
-	GeePriorityQueue* _tmp1_;
-	GeePriorityQueue* test_queue;
-	GCompareFunc _tmp2_;
-	GCompareFunc _tmp3_;
-	GCompareFunc _tmp4_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((CollectionTests*) self)->test_collection;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_PRIORITY_QUEUE) ? ((GeePriorityQueue*) _tmp0_) : NULL);
-	test_queue = _tmp1_;
-	_vala_assert (test_queue != NULL, "test_queue != null");
-	_tmp2_ = gee_priority_queue_get_compare_func (test_queue);
-	_tmp3_ = _tmp2_;
-	_tmp4_ = g_strcmp0;
-	_vala_assert (_tmp3_ == ((GCompareFunc) _tmp4_), "test_queue.compare_func == (CompareFunc) strcmp");
-	_g_object_unref0 (test_queue);
-}
-
-
-void priority_queue_tests_test_gobject_properties (PriorityQueueTests* self) {
-	GeeCollection* _tmp0_;
-	GeePriorityQueue* _tmp1_;
-	GeePriorityQueue* test_queue;
-	GValue value = {0};
-	GValue _tmp2_ = {0};
-	GValue _tmp3_;
-	void* _tmp4_ = NULL;
-	GCompareFunc _tmp5_;
-	GCompareFunc _tmp6_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((CollectionTests*) self)->test_collection;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_PRIORITY_QUEUE) ? ((GeePriorityQueue*) _tmp0_) : NULL);
-	test_queue = _tmp1_;
-	_vala_assert (test_queue != NULL, "test_queue != null");
-	g_value_init (&_tmp2_, G_TYPE_POINTER);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	value = _tmp2_;
-	_tmp3_ = value;
-	g_object_get_property ((GObject*) test_queue, "compare-func", &value);
-	_tmp4_ = g_value_get_pointer (&value);
-	_tmp5_ = gee_priority_queue_get_compare_func (test_queue);
-	_tmp6_ = _tmp5_;
-	_vala_assert (_tmp4_ == ((void*) _tmp6_), "value.get_pointer () == (void*) test_queue.compare_func");
-	g_value_unset (&value);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	_g_object_unref0 (test_queue);
 }
 
 

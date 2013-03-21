@@ -1,6 +1,7 @@
 /* sortedset.vala
  *
  * Copyright (C) 2009  Didier Villevalois, Maciej Piechotka
+ * Copyright (C) 2011  Maciej Piechotka
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +24,7 @@
 /**
  * A sorted set, which you can navigate over and get sub-sets of.
  */
+[GenericAccessors]
 public interface Gee.SortedSet<G> : Gee.Set<G> {
 	/**
 	 * Returns the first element of the sorted set. Set must not be empty.
@@ -39,14 +41,6 @@ public interface Gee.SortedSet<G> : Gee.Set<G> {
 	public abstract G last ();
 
 	/**
-	 * Returns a {@link BidirIterator} that can be used for bi-directional
-	 * iteration over this sorted set.
-	 *
-	 * @return a {@link BidirIterator} over this sorted set
-	 */
-	public abstract BidirIterator<G> bidir_iterator ();
-
-	/**
 	 * Returns a {@link BidirIterator} initialy pointed at the specified
 	 * element.
 	 *
@@ -55,7 +49,7 @@ public interface Gee.SortedSet<G> : Gee.Set<G> {
 	 * @return        a {@link BidirIterator} over this sorted set, or null if
 	 *                the specified element is not in this set
 	 */
-	public abstract BidirIterator<G>? iterator_at (G element);
+	public abstract Iterator<G>? iterator_at (G element);
 
 	/**
 	 * Returns the element which is strictly lower than the specified element.
@@ -126,4 +120,18 @@ public interface Gee.SortedSet<G> : Gee.Set<G> {
 	 * @return     the corresponding sub-set of this sorted set
 	 */
 	public abstract SortedSet<G> sub_set (G from, G to);
+
+	/**
+	 * The read-only view of this set.
+	 */
+	public abstract new SortedSet<G> read_only_view { owned get; }
+
+	/**
+	 * Returns an immutable empty sorted set.
+	 *
+	 * @return an immutable empty sorted set
+	 */
+	public static SortedSet<G> empty<G> () {
+		return new TreeSet<G> ().read_only_view;
+	}
 }

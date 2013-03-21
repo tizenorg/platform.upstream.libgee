@@ -3,7 +3,7 @@
 
 /* treemap.vala
  *
- * Copyright (C) 2009  Maciej Piechotka
+ * Copyright (C) 2009-2011  Maciej Piechotka
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,15 +25,28 @@
 
 #include <glib.h>
 #include <glib-object.h>
+#include <gobject/gvaluecollector.h>
 
 
-#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
-#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
-#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
-#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+#define GEE_TYPE_TRAVERSABLE (gee_traversable_get_type ())
+#define GEE_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversable))
+#define GEE_IS_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_TRAVERSABLE))
+#define GEE_TRAVERSABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversableIface))
 
-typedef struct _GeeIterable GeeIterable;
-typedef struct _GeeIterableIface GeeIterableIface;
+typedef struct _GeeTraversable GeeTraversable;
+typedef struct _GeeTraversableIface GeeTraversableIface;
+
+#define GEE_TRAVERSABLE_TYPE_STREAM (gee_traversable_stream_get_type ())
+
+#define GEE_TYPE_LAZY (gee_lazy_get_type ())
+#define GEE_LAZY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LAZY, GeeLazy))
+#define GEE_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_LAZY, GeeLazyClass))
+#define GEE_IS_LAZY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LAZY))
+#define GEE_IS_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_LAZY))
+#define GEE_LAZY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_LAZY, GeeLazyClass))
+
+typedef struct _GeeLazy GeeLazy;
+typedef struct _GeeLazyClass GeeLazyClass;
 
 #define GEE_TYPE_ITERATOR (gee_iterator_get_type ())
 #define GEE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERATOR, GeeIterator))
@@ -42,6 +55,14 @@ typedef struct _GeeIterableIface GeeIterableIface;
 
 typedef struct _GeeIterator GeeIterator;
 typedef struct _GeeIteratorIface GeeIteratorIface;
+
+#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
+#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
+#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
+#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+
+typedef struct _GeeIterable GeeIterable;
+typedef struct _GeeIterableIface GeeIterableIface;
 
 #define GEE_TYPE_MAP (gee_map_get_type ())
 #define GEE_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_MAP, GeeMap))
@@ -96,6 +117,60 @@ typedef struct _GeeAbstractMap GeeAbstractMap;
 typedef struct _GeeAbstractMapClass GeeAbstractMapClass;
 typedef struct _GeeAbstractMapPrivate GeeAbstractMapPrivate;
 
+#define GEE_TYPE_SORTED_MAP (gee_sorted_map_get_type ())
+#define GEE_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_SORTED_MAP, GeeSortedMap))
+#define GEE_IS_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_SORTED_MAP))
+#define GEE_SORTED_MAP_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_SORTED_MAP, GeeSortedMapIface))
+
+typedef struct _GeeSortedMap GeeSortedMap;
+typedef struct _GeeSortedMapIface GeeSortedMapIface;
+
+#define GEE_TYPE_SORTED_SET (gee_sorted_set_get_type ())
+#define GEE_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_SORTED_SET, GeeSortedSet))
+#define GEE_IS_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_SORTED_SET))
+#define GEE_SORTED_SET_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_SORTED_SET, GeeSortedSetIface))
+
+typedef struct _GeeSortedSet GeeSortedSet;
+typedef struct _GeeSortedSetIface GeeSortedSetIface;
+
+#define GEE_TYPE_ABSTRACT_SORTED_MAP (gee_abstract_sorted_map_get_type ())
+#define GEE_ABSTRACT_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_SORTED_MAP, GeeAbstractSortedMap))
+#define GEE_ABSTRACT_SORTED_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_SORTED_MAP, GeeAbstractSortedMapClass))
+#define GEE_IS_ABSTRACT_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_SORTED_MAP))
+#define GEE_IS_ABSTRACT_SORTED_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_SORTED_MAP))
+#define GEE_ABSTRACT_SORTED_MAP_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_SORTED_MAP, GeeAbstractSortedMapClass))
+
+typedef struct _GeeAbstractSortedMap GeeAbstractSortedMap;
+typedef struct _GeeAbstractSortedMapClass GeeAbstractSortedMapClass;
+typedef struct _GeeAbstractSortedMapPrivate GeeAbstractSortedMapPrivate;
+
+#define GEE_TYPE_BIDIR_SORTED_MAP (gee_bidir_sorted_map_get_type ())
+#define GEE_BIDIR_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_SORTED_MAP, GeeBidirSortedMap))
+#define GEE_IS_BIDIR_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_SORTED_MAP))
+#define GEE_BIDIR_SORTED_MAP_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_SORTED_MAP, GeeBidirSortedMapIface))
+
+typedef struct _GeeBidirSortedMap GeeBidirSortedMap;
+typedef struct _GeeBidirSortedMapIface GeeBidirSortedMapIface;
+
+#define GEE_TYPE_BIDIR_MAP_ITERATOR (gee_bidir_map_iterator_get_type ())
+#define GEE_BIDIR_MAP_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_MAP_ITERATOR, GeeBidirMapIterator))
+#define GEE_IS_BIDIR_MAP_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_MAP_ITERATOR))
+#define GEE_BIDIR_MAP_ITERATOR_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_MAP_ITERATOR, GeeBidirMapIteratorIface))
+
+typedef struct _GeeBidirMapIterator GeeBidirMapIterator;
+typedef struct _GeeBidirMapIteratorIface GeeBidirMapIteratorIface;
+
+#define GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP (gee_abstract_bidir_sorted_map_get_type ())
+#define GEE_ABSTRACT_BIDIR_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP, GeeAbstractBidirSortedMap))
+#define GEE_ABSTRACT_BIDIR_SORTED_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP, GeeAbstractBidirSortedMapClass))
+#define GEE_IS_ABSTRACT_BIDIR_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP))
+#define GEE_IS_ABSTRACT_BIDIR_SORTED_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP))
+#define GEE_ABSTRACT_BIDIR_SORTED_MAP_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP, GeeAbstractBidirSortedMapClass))
+
+typedef struct _GeeAbstractBidirSortedMap GeeAbstractBidirSortedMap;
+typedef struct _GeeAbstractBidirSortedMapClass GeeAbstractBidirSortedMapClass;
+typedef struct _GeeAbstractBidirSortedMapPrivate GeeAbstractBidirSortedMapPrivate;
+
 #define GEE_TYPE_TREE_MAP (gee_tree_map_get_type ())
 #define GEE_TREE_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TREE_MAP, GeeTreeMap))
 #define GEE_TREE_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_TREE_MAP, GeeTreeMapClass))
@@ -107,9 +182,32 @@ typedef struct _GeeTreeMap GeeTreeMap;
 typedef struct _GeeTreeMapClass GeeTreeMapClass;
 typedef struct _GeeTreeMapPrivate GeeTreeMapPrivate;
 typedef struct _GeeTreeMapNode GeeTreeMapNode;
+
+#define GEE_TREE_MAP_TYPE_RANGE_TYPE (gee_tree_map_range_type_get_type ())
 #define _gee_tree_map_node_free0(var) ((var == NULL) ? NULL : (var = (gee_tree_map_node_free (var), NULL)))
 
 #define GEE_TREE_MAP_NODE_TYPE_COLOR (gee_tree_map_node_color_get_type ())
+
+#define GEE_TREE_MAP_TYPE_RANGE (gee_tree_map_range_get_type ())
+#define GEE_TREE_MAP_RANGE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TREE_MAP_TYPE_RANGE, GeeTreeMapRange))
+#define GEE_TREE_MAP_RANGE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TREE_MAP_TYPE_RANGE, GeeTreeMapRangeClass))
+#define GEE_TREE_MAP_IS_RANGE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TREE_MAP_TYPE_RANGE))
+#define GEE_TREE_MAP_IS_RANGE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TREE_MAP_TYPE_RANGE))
+#define GEE_TREE_MAP_RANGE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TREE_MAP_TYPE_RANGE, GeeTreeMapRangeClass))
+
+typedef struct _GeeTreeMapRange GeeTreeMapRange;
+typedef struct _GeeTreeMapRangeClass GeeTreeMapRangeClass;
+
+#define GEE_TREE_MAP_TYPE_SUB_MAP (gee_tree_map_sub_map_get_type ())
+#define GEE_TREE_MAP_SUB_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TREE_MAP_TYPE_SUB_MAP, GeeTreeMapSubMap))
+#define GEE_TREE_MAP_SUB_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TREE_MAP_TYPE_SUB_MAP, GeeTreeMapSubMapClass))
+#define GEE_TREE_MAP_IS_SUB_MAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TREE_MAP_TYPE_SUB_MAP))
+#define GEE_TREE_MAP_IS_SUB_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TREE_MAP_TYPE_SUB_MAP))
+#define GEE_TREE_MAP_SUB_MAP_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TREE_MAP_TYPE_SUB_MAP, GeeTreeMapSubMapClass))
+
+typedef struct _GeeTreeMapSubMap GeeTreeMapSubMap;
+typedef struct _GeeTreeMapSubMapClass GeeTreeMapSubMapClass;
+#define _gee_tree_map_range_unref0(var) ((var == NULL) ? NULL : (var = (gee_tree_map_range_unref (var), NULL)))
 
 #define GEE_TREE_MAP_TYPE_NODE_ITERATOR (gee_tree_map_node_iterator_get_type ())
 #define GEE_TREE_MAP_NODE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TREE_MAP_TYPE_NODE_ITERATOR, GeeTreeMapNodeIterator))
@@ -150,6 +248,26 @@ typedef struct _GeeAbstractCollectionClass GeeAbstractCollectionClass;
 
 typedef struct _GeeAbstractSet GeeAbstractSet;
 typedef struct _GeeAbstractSetClass GeeAbstractSetClass;
+
+#define GEE_TYPE_ABSTRACT_SORTED_SET (gee_abstract_sorted_set_get_type ())
+#define GEE_ABSTRACT_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_SORTED_SET, GeeAbstractSortedSet))
+#define GEE_ABSTRACT_SORTED_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_SORTED_SET, GeeAbstractSortedSetClass))
+#define GEE_IS_ABSTRACT_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_SORTED_SET))
+#define GEE_IS_ABSTRACT_SORTED_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_SORTED_SET))
+#define GEE_ABSTRACT_SORTED_SET_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_SORTED_SET, GeeAbstractSortedSetClass))
+
+typedef struct _GeeAbstractSortedSet GeeAbstractSortedSet;
+typedef struct _GeeAbstractSortedSetClass GeeAbstractSortedSetClass;
+
+#define GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET (gee_abstract_bidir_sorted_set_get_type ())
+#define GEE_ABSTRACT_BIDIR_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, GeeAbstractBidirSortedSet))
+#define GEE_ABSTRACT_BIDIR_SORTED_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, GeeAbstractBidirSortedSetClass))
+#define GEE_IS_ABSTRACT_BIDIR_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET))
+#define GEE_IS_ABSTRACT_BIDIR_SORTED_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET))
+#define GEE_ABSTRACT_BIDIR_SORTED_SET_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, GeeAbstractBidirSortedSetClass))
+
+typedef struct _GeeAbstractBidirSortedSet GeeAbstractBidirSortedSet;
+typedef struct _GeeAbstractBidirSortedSetClass GeeAbstractBidirSortedSetClass;
 
 #define GEE_TREE_MAP_TYPE_KEY_SET (gee_tree_map_key_set_get_type ())
 #define GEE_TREE_MAP_KEY_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TREE_MAP_TYPE_KEY_SET, GeeTreeMapKeySet))
@@ -193,8 +311,80 @@ typedef struct _GeeMapEntryPrivate GeeMapEntryPrivate;
 typedef struct _GeeTreeMapEntry GeeTreeMapEntry;
 typedef struct _GeeTreeMapEntryClass GeeTreeMapEntryClass;
 typedef struct _GeeTreeMapEntryPrivate GeeTreeMapEntryPrivate;
+typedef struct _GeeTreeMapRangePrivate GeeTreeMapRangePrivate;
+#define _k_destroy_func0(var) (((var == NULL) || (k_destroy_func == NULL)) ? NULL : (var = (k_destroy_func (var), NULL)))
+typedef struct _GeeTreeMapParamSpecRange GeeTreeMapParamSpecRange;
+typedef struct _GeeTreeMapSubMapPrivate GeeTreeMapSubMapPrivate;
+
+#define GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR (gee_tree_map_sub_node_iterator_get_type ())
+#define GEE_TREE_MAP_SUB_NODE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, GeeTreeMapSubNodeIterator))
+#define GEE_TREE_MAP_SUB_NODE_ITERATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, GeeTreeMapSubNodeIteratorClass))
+#define GEE_TREE_MAP_IS_SUB_NODE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR))
+#define GEE_TREE_MAP_IS_SUB_NODE_ITERATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR))
+#define GEE_TREE_MAP_SUB_NODE_ITERATOR_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, GeeTreeMapSubNodeIteratorClass))
+
+typedef struct _GeeTreeMapSubNodeIterator GeeTreeMapSubNodeIterator;
+typedef struct _GeeTreeMapSubNodeIteratorClass GeeTreeMapSubNodeIteratorClass;
+
+#define GEE_TREE_MAP_TYPE_SUB_MAP_ITERATOR (gee_tree_map_sub_map_iterator_get_type ())
+#define GEE_TREE_MAP_SUB_MAP_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TREE_MAP_TYPE_SUB_MAP_ITERATOR, GeeTreeMapSubMapIterator))
+#define GEE_TREE_MAP_SUB_MAP_ITERATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TREE_MAP_TYPE_SUB_MAP_ITERATOR, GeeTreeMapSubMapIteratorClass))
+#define GEE_TREE_MAP_IS_SUB_MAP_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TREE_MAP_TYPE_SUB_MAP_ITERATOR))
+#define GEE_TREE_MAP_IS_SUB_MAP_ITERATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TREE_MAP_TYPE_SUB_MAP_ITERATOR))
+#define GEE_TREE_MAP_SUB_MAP_ITERATOR_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TREE_MAP_TYPE_SUB_MAP_ITERATOR, GeeTreeMapSubMapIteratorClass))
+
+typedef struct _GeeTreeMapSubMapIterator GeeTreeMapSubMapIterator;
+typedef struct _GeeTreeMapSubMapIteratorClass GeeTreeMapSubMapIteratorClass;
+
+#define GEE_TREE_MAP_TYPE_SUB_KEY_SET (gee_tree_map_sub_key_set_get_type ())
+#define GEE_TREE_MAP_SUB_KEY_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TREE_MAP_TYPE_SUB_KEY_SET, GeeTreeMapSubKeySet))
+#define GEE_TREE_MAP_SUB_KEY_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TREE_MAP_TYPE_SUB_KEY_SET, GeeTreeMapSubKeySetClass))
+#define GEE_TREE_MAP_IS_SUB_KEY_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TREE_MAP_TYPE_SUB_KEY_SET))
+#define GEE_TREE_MAP_IS_SUB_KEY_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TREE_MAP_TYPE_SUB_KEY_SET))
+#define GEE_TREE_MAP_SUB_KEY_SET_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TREE_MAP_TYPE_SUB_KEY_SET, GeeTreeMapSubKeySetClass))
+
+typedef struct _GeeTreeMapSubKeySet GeeTreeMapSubKeySet;
+typedef struct _GeeTreeMapSubKeySetClass GeeTreeMapSubKeySetClass;
+
+#define GEE_TREE_MAP_TYPE_SUB_VALUE_COLLECTION (gee_tree_map_sub_value_collection_get_type ())
+#define GEE_TREE_MAP_SUB_VALUE_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TREE_MAP_TYPE_SUB_VALUE_COLLECTION, GeeTreeMapSubValueCollection))
+#define GEE_TREE_MAP_SUB_VALUE_COLLECTION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TREE_MAP_TYPE_SUB_VALUE_COLLECTION, GeeTreeMapSubValueCollectionClass))
+#define GEE_TREE_MAP_IS_SUB_VALUE_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TREE_MAP_TYPE_SUB_VALUE_COLLECTION))
+#define GEE_TREE_MAP_IS_SUB_VALUE_COLLECTION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TREE_MAP_TYPE_SUB_VALUE_COLLECTION))
+#define GEE_TREE_MAP_SUB_VALUE_COLLECTION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TREE_MAP_TYPE_SUB_VALUE_COLLECTION, GeeTreeMapSubValueCollectionClass))
+
+typedef struct _GeeTreeMapSubValueCollection GeeTreeMapSubValueCollection;
+typedef struct _GeeTreeMapSubValueCollectionClass GeeTreeMapSubValueCollectionClass;
+
+#define GEE_TREE_MAP_TYPE_SUB_ENTRY_SET (gee_tree_map_sub_entry_set_get_type ())
+#define GEE_TREE_MAP_SUB_ENTRY_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TREE_MAP_TYPE_SUB_ENTRY_SET, GeeTreeMapSubEntrySet))
+#define GEE_TREE_MAP_SUB_ENTRY_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TREE_MAP_TYPE_SUB_ENTRY_SET, GeeTreeMapSubEntrySetClass))
+#define GEE_TREE_MAP_IS_SUB_ENTRY_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TREE_MAP_TYPE_SUB_ENTRY_SET))
+#define GEE_TREE_MAP_IS_SUB_ENTRY_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TREE_MAP_TYPE_SUB_ENTRY_SET))
+#define GEE_TREE_MAP_SUB_ENTRY_SET_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TREE_MAP_TYPE_SUB_ENTRY_SET, GeeTreeMapSubEntrySetClass))
+
+typedef struct _GeeTreeMapSubEntrySet GeeTreeMapSubEntrySet;
+typedef struct _GeeTreeMapSubEntrySetClass GeeTreeMapSubEntrySetClass;
 typedef struct _GeeAbstractCollectionPrivate GeeAbstractCollectionPrivate;
 typedef struct _GeeAbstractSetPrivate GeeAbstractSetPrivate;
+typedef struct _GeeAbstractSortedSetPrivate GeeAbstractSortedSetPrivate;
+
+#define GEE_TYPE_BIDIR_SORTED_SET (gee_bidir_sorted_set_get_type ())
+#define GEE_BIDIR_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_SORTED_SET, GeeBidirSortedSet))
+#define GEE_IS_BIDIR_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_SORTED_SET))
+#define GEE_BIDIR_SORTED_SET_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_SORTED_SET, GeeBidirSortedSetIface))
+
+typedef struct _GeeBidirSortedSet GeeBidirSortedSet;
+typedef struct _GeeBidirSortedSetIface GeeBidirSortedSetIface;
+
+#define GEE_TYPE_BIDIR_ITERATOR (gee_bidir_iterator_get_type ())
+#define GEE_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIterator))
+#define GEE_IS_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_ITERATOR))
+#define GEE_BIDIR_ITERATOR_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIteratorIface))
+
+typedef struct _GeeBidirIterator GeeBidirIterator;
+typedef struct _GeeBidirIteratorIface GeeBidirIteratorIface;
+typedef struct _GeeAbstractBidirSortedSetPrivate GeeAbstractBidirSortedSetPrivate;
 typedef struct _GeeTreeMapKeySetPrivate GeeTreeMapKeySetPrivate;
 
 #define GEE_TREE_MAP_TYPE_KEY_ITERATOR (gee_tree_map_key_iterator_get_type ())
@@ -206,6 +396,17 @@ typedef struct _GeeTreeMapKeySetPrivate GeeTreeMapKeySetPrivate;
 
 typedef struct _GeeTreeMapKeyIterator GeeTreeMapKeyIterator;
 typedef struct _GeeTreeMapKeyIteratorClass GeeTreeMapKeyIteratorClass;
+typedef struct _GeeTreeMapSubKeySetPrivate GeeTreeMapSubKeySetPrivate;
+
+#define GEE_TREE_MAP_TYPE_SUB_KEY_ITERATOR (gee_tree_map_sub_key_iterator_get_type ())
+#define GEE_TREE_MAP_SUB_KEY_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TREE_MAP_TYPE_SUB_KEY_ITERATOR, GeeTreeMapSubKeyIterator))
+#define GEE_TREE_MAP_SUB_KEY_ITERATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TREE_MAP_TYPE_SUB_KEY_ITERATOR, GeeTreeMapSubKeyIteratorClass))
+#define GEE_TREE_MAP_IS_SUB_KEY_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TREE_MAP_TYPE_SUB_KEY_ITERATOR))
+#define GEE_TREE_MAP_IS_SUB_KEY_ITERATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TREE_MAP_TYPE_SUB_KEY_ITERATOR))
+#define GEE_TREE_MAP_SUB_KEY_ITERATOR_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TREE_MAP_TYPE_SUB_KEY_ITERATOR, GeeTreeMapSubKeyIteratorClass))
+
+typedef struct _GeeTreeMapSubKeyIterator GeeTreeMapSubKeyIterator;
+typedef struct _GeeTreeMapSubKeyIteratorClass GeeTreeMapSubKeyIteratorClass;
 typedef struct _GeeTreeMapValueCollectionPrivate GeeTreeMapValueCollectionPrivate;
 
 #define GEE_TREE_MAP_TYPE_VALUE_ITERATOR (gee_tree_map_value_iterator_get_type ())
@@ -217,6 +418,17 @@ typedef struct _GeeTreeMapValueCollectionPrivate GeeTreeMapValueCollectionPrivat
 
 typedef struct _GeeTreeMapValueIterator GeeTreeMapValueIterator;
 typedef struct _GeeTreeMapValueIteratorClass GeeTreeMapValueIteratorClass;
+typedef struct _GeeTreeMapSubValueCollectionPrivate GeeTreeMapSubValueCollectionPrivate;
+
+#define GEE_TREE_MAP_TYPE_SUB_VALUE_ITERATOR (gee_tree_map_sub_value_iterator_get_type ())
+#define GEE_TREE_MAP_SUB_VALUE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TREE_MAP_TYPE_SUB_VALUE_ITERATOR, GeeTreeMapSubValueIterator))
+#define GEE_TREE_MAP_SUB_VALUE_ITERATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TREE_MAP_TYPE_SUB_VALUE_ITERATOR, GeeTreeMapSubValueIteratorClass))
+#define GEE_TREE_MAP_IS_SUB_VALUE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TREE_MAP_TYPE_SUB_VALUE_ITERATOR))
+#define GEE_TREE_MAP_IS_SUB_VALUE_ITERATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TREE_MAP_TYPE_SUB_VALUE_ITERATOR))
+#define GEE_TREE_MAP_SUB_VALUE_ITERATOR_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TREE_MAP_TYPE_SUB_VALUE_ITERATOR, GeeTreeMapSubValueIteratorClass))
+
+typedef struct _GeeTreeMapSubValueIterator GeeTreeMapSubValueIterator;
+typedef struct _GeeTreeMapSubValueIteratorClass GeeTreeMapSubValueIteratorClass;
 typedef struct _GeeTreeMapEntrySetPrivate GeeTreeMapEntrySetPrivate;
 
 #define GEE_TREE_MAP_TYPE_ENTRY_ITERATOR (gee_tree_map_entry_iterator_get_type ())
@@ -228,49 +440,101 @@ typedef struct _GeeTreeMapEntrySetPrivate GeeTreeMapEntrySetPrivate;
 
 typedef struct _GeeTreeMapEntryIterator GeeTreeMapEntryIterator;
 typedef struct _GeeTreeMapEntryIteratorClass GeeTreeMapEntryIteratorClass;
+typedef struct _GeeTreeMapSubEntrySetPrivate GeeTreeMapSubEntrySetPrivate;
+
+#define GEE_TREE_MAP_TYPE_SUB_ENTRY_ITERATOR (gee_tree_map_sub_entry_iterator_get_type ())
+#define GEE_TREE_MAP_SUB_ENTRY_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TREE_MAP_TYPE_SUB_ENTRY_ITERATOR, GeeTreeMapSubEntryIterator))
+#define GEE_TREE_MAP_SUB_ENTRY_ITERATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TREE_MAP_TYPE_SUB_ENTRY_ITERATOR, GeeTreeMapSubEntryIteratorClass))
+#define GEE_TREE_MAP_IS_SUB_ENTRY_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TREE_MAP_TYPE_SUB_ENTRY_ITERATOR))
+#define GEE_TREE_MAP_IS_SUB_ENTRY_ITERATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TREE_MAP_TYPE_SUB_ENTRY_ITERATOR))
+#define GEE_TREE_MAP_SUB_ENTRY_ITERATOR_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TREE_MAP_TYPE_SUB_ENTRY_ITERATOR, GeeTreeMapSubEntryIteratorClass))
+
+typedef struct _GeeTreeMapSubEntryIterator GeeTreeMapSubEntryIterator;
+typedef struct _GeeTreeMapSubEntryIteratorClass GeeTreeMapSubEntryIteratorClass;
 typedef struct _GeeTreeMapNodeIteratorPrivate GeeTreeMapNodeIteratorPrivate;
-
-#define GEE_TYPE_BIDIR_ITERATOR (gee_bidir_iterator_get_type ())
-#define GEE_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIterator))
-#define GEE_IS_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_ITERATOR))
-#define GEE_BIDIR_ITERATOR_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIteratorIface))
-
-typedef struct _GeeBidirIterator GeeBidirIterator;
-typedef struct _GeeBidirIteratorIface GeeBidirIteratorIface;
+typedef struct _GeeTreeMapSubNodeIteratorPrivate GeeTreeMapSubNodeIteratorPrivate;
 typedef struct _GeeTreeMapKeyIteratorPrivate GeeTreeMapKeyIteratorPrivate;
+typedef struct _GeeTreeMapSubKeyIteratorPrivate GeeTreeMapSubKeyIteratorPrivate;
 typedef struct _GeeTreeMapValueIteratorPrivate GeeTreeMapValueIteratorPrivate;
+typedef struct _GeeTreeMapSubValueIteratorPrivate GeeTreeMapSubValueIteratorPrivate;
 typedef struct _GeeTreeMapEntryIteratorPrivate GeeTreeMapEntryIteratorPrivate;
+typedef struct _GeeTreeMapSubEntryIteratorPrivate GeeTreeMapSubEntryIteratorPrivate;
 typedef struct _GeeTreeMapMapIteratorPrivate GeeTreeMapMapIteratorPrivate;
+typedef struct _GeeTreeMapSubMapIteratorPrivate GeeTreeMapSubMapIteratorPrivate;
 #define _vala_assert(expr, msg) if G_LIKELY (expr) ; else g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
 
+typedef gboolean (*GeeForallFunc) (gpointer g, void* user_data);
+typedef enum  {
+	GEE_TRAVERSABLE_STREAM_YIELD,
+	GEE_TRAVERSABLE_STREAM_CONTINUE,
+	GEE_TRAVERSABLE_STREAM_END
+} GeeTraversableStream;
+
+typedef GeeTraversableStream (*GeeStreamFunc) (GeeTraversableStream state, GeeLazy* g, GeeLazy** lazy, void* user_data);
 struct _GeeIteratorIface {
 	GTypeInterface parent_iface;
 	gboolean (*next) (GeeIterator* self);
 	gboolean (*has_next) (GeeIterator* self);
-	gboolean (*first) (GeeIterator* self);
 	gpointer (*get) (GeeIterator* self);
 	void (*remove) (GeeIterator* self);
+	gboolean (*get_valid) (GeeIterator* self);
+	gboolean (*get_read_only) (GeeIterator* self);
+};
+
+typedef gpointer (*GeeFoldFunc) (gpointer g, gpointer a, void* user_data);
+typedef gpointer (*GeeMapFunc) (gpointer g, void* user_data);
+typedef gboolean (*GeePredicate) (gconstpointer g, void* user_data);
+struct _GeeTraversableIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeTraversable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeTraversable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeTraversable* self);
+	gboolean (*foreach) (GeeTraversable* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	gpointer (*fold) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*map) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+	GeeIterator* (*scan) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*filter) (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+	GeeIterator* (*chop) (GeeTraversable* self, gint offset, gint length);
+	GType (*get_element_type) (GeeTraversable* self);
 };
 
 struct _GeeIterableIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeIterable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeIterable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeIterable* self);
 	GeeIterator* (*iterator) (GeeIterable* self);
-	GType (*get_element_type) (GeeIterable* self);
 };
 
+typedef gpointer (*GeeFoldMapFunc) (gconstpointer k, gconstpointer v, gpointer a, void* user_data);
+typedef gboolean (*GeeForallMapFunc) (gconstpointer k, gconstpointer v, void* user_data);
 struct _GeeMapIteratorIface {
 	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeMapIterator* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeMapIterator* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeMapIterator* self);
+	GType (*get_v_type) (GeeMapIterator* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeMapIterator* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeMapIterator* self);
 	gboolean (*next) (GeeMapIterator* self);
 	gboolean (*has_next) (GeeMapIterator* self);
-	gboolean (*first) (GeeMapIterator* self);
 	gpointer (*get_key) (GeeMapIterator* self);
 	gpointer (*get_value) (GeeMapIterator* self);
 	void (*set_value) (GeeMapIterator* self, gconstpointer value);
 	void (*unset) (GeeMapIterator* self);
+	gpointer (*fold) (GeeMapIterator* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldMapFunc f, void* f_target, gpointer seed);
+	gboolean (*foreach) (GeeMapIterator* self, GeeForallMapFunc f, void* f_target);
+	gboolean (*get_valid) (GeeMapIterator* self);
+	gboolean (*get_mutable) (GeeMapIterator* self);
+	gboolean (*get_read_only) (GeeMapIterator* self);
 };
 
 struct _GeeCollectionIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeCollection* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeCollection* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeCollection* self);
 	gboolean (*contains) (GeeCollection* self, gconstpointer item);
 	gboolean (*add) (GeeCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeCollection* self, gconstpointer item);
@@ -282,38 +546,43 @@ struct _GeeCollectionIface {
 	gpointer* (*to_array) (GeeCollection* self, int* result_length1);
 	gint (*get_size) (GeeCollection* self);
 	gboolean (*get_is_empty) (GeeCollection* self);
+	gboolean (*get_read_only) (GeeCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeCollection* self);
 };
 
 struct _GeeSetIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeSet* self);
 	GeeSet* (*get_read_only_view) (GeeSet* self);
 };
 
 struct _GeeMapIface {
 	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeMap* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeMap* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeMap* self);
+	GType (*get_v_type) (GeeMap* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeMap* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeMap* self);
 	gboolean (*has_key) (GeeMap* self, gconstpointer key);
-	gboolean (*contains) (GeeMap* self, gconstpointer key);
 	gboolean (*has) (GeeMap* self, gconstpointer key, gconstpointer value);
 	gpointer (*get) (GeeMap* self, gconstpointer key);
 	void (*set) (GeeMap* self, gconstpointer key, gconstpointer value);
 	gboolean (*unset) (GeeMap* self, gconstpointer key, gpointer* value);
-	gboolean (*remove) (GeeMap* self, gconstpointer key, gpointer* value);
 	void (*clear) (GeeMap* self);
 	GeeMapIterator* (*map_iterator) (GeeMap* self);
 	void (*set_all) (GeeMap* self, GeeMap* map);
 	gboolean (*unset_all) (GeeMap* self, GeeMap* map);
-	gboolean (*remove_all) (GeeMap* self, GeeMap* map);
 	gboolean (*has_all) (GeeMap* self, GeeMap* map);
-	gboolean (*contains_all) (GeeMap* self, GeeMap* map);
 	gint (*get_size) (GeeMap* self);
 	gboolean (*get_is_empty) (GeeMap* self);
+	gboolean (*get_read_only) (GeeMap* self);
 	GeeSet* (*get_keys) (GeeMap* self);
 	GeeCollection* (*get_values) (GeeMap* self);
 	GeeSet* (*get_entries) (GeeMap* self);
 	GeeMap* (*get_read_only_view) (GeeMap* self);
-	GType (*get_key_type) (GeeMap* self);
-	GType (*get_value_type) (GeeMap* self);
 };
 
 struct _GeeAbstractMap {
@@ -330,26 +599,135 @@ struct _GeeAbstractMapClass {
 	gboolean (*unset) (GeeAbstractMap* self, gconstpointer key, gpointer* value);
 	GeeMapIterator* (*map_iterator) (GeeAbstractMap* self);
 	void (*clear) (GeeAbstractMap* self);
-	void (*set_all) (GeeAbstractMap* self, GeeMap* map);
-	gboolean (*unset_all) (GeeAbstractMap* self, GeeMap* map);
-	gboolean (*has_all) (GeeAbstractMap* self, GeeMap* map);
+	gboolean (*foreach) (GeeAbstractMap* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeAbstractMap* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	void (*reserved0) (GeeAbstractMap* self);
+	void (*reserved1) (GeeAbstractMap* self);
+	void (*reserved2) (GeeAbstractMap* self);
+	void (*reserved3) (GeeAbstractMap* self);
+	void (*reserved4) (GeeAbstractMap* self);
+	void (*reserved5) (GeeAbstractMap* self);
+	void (*reserved6) (GeeAbstractMap* self);
+	void (*reserved7) (GeeAbstractMap* self);
+	void (*reserved8) (GeeAbstractMap* self);
+	void (*reserved9) (GeeAbstractMap* self);
 	gint (*get_size) (GeeAbstractMap* self);
-	gboolean (*get_is_empty) (GeeAbstractMap* self);
+	gboolean (*get_read_only) (GeeAbstractMap* self);
 	GeeSet* (*get_keys) (GeeAbstractMap* self);
 	GeeCollection* (*get_values) (GeeAbstractMap* self);
 	GeeSet* (*get_entries) (GeeAbstractMap* self);
 	GeeMap* (*get_read_only_view) (GeeAbstractMap* self);
 };
 
-struct _GeeTreeMap {
+struct _GeeSortedSetIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeSortedSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeSortedSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeSortedSet* self);
+	gpointer (*first) (GeeSortedSet* self);
+	gpointer (*last) (GeeSortedSet* self);
+	GeeIterator* (*iterator_at) (GeeSortedSet* self, gconstpointer element);
+	gpointer (*lower) (GeeSortedSet* self, gconstpointer element);
+	gpointer (*higher) (GeeSortedSet* self, gconstpointer element);
+	gpointer (*floor) (GeeSortedSet* self, gconstpointer element);
+	gpointer (*ceil) (GeeSortedSet* self, gconstpointer element);
+	GeeSortedSet* (*head_set) (GeeSortedSet* self, gconstpointer before);
+	GeeSortedSet* (*tail_set) (GeeSortedSet* self, gconstpointer after);
+	GeeSortedSet* (*sub_set) (GeeSortedSet* self, gconstpointer from, gconstpointer to);
+	GeeSortedSet* (*get_read_only_view) (GeeSortedSet* self);
+};
+
+struct _GeeSortedMapIface {
+	GTypeInterface parent_iface;
+	GeeSortedMap* (*head_map) (GeeSortedMap* self, gconstpointer before);
+	GeeSortedMap* (*tail_map) (GeeSortedMap* self, gconstpointer after);
+	GeeSortedMap* (*sub_map) (GeeSortedMap* self, gconstpointer before, gconstpointer after);
+	GeeSortedSet* (*get_ascending_keys) (GeeSortedMap* self);
+	GeeSortedSet* (*get_ascending_entries) (GeeSortedMap* self);
+	GeeSortedMap* (*get_read_only_view) (GeeSortedMap* self);
+};
+
+struct _GeeAbstractSortedMap {
 	GeeAbstractMap parent_instance;
+	GeeAbstractSortedMapPrivate * priv;
+};
+
+struct _GeeAbstractSortedMapClass {
+	GeeAbstractMapClass parent_class;
+	GeeSortedMap* (*head_map) (GeeAbstractSortedMap* self, gconstpointer before);
+	GeeSortedMap* (*tail_map) (GeeAbstractSortedMap* self, gconstpointer after);
+	GeeSortedMap* (*sub_map) (GeeAbstractSortedMap* self, gconstpointer before, gconstpointer after);
+	void (*reserved0) (GeeAbstractSortedMap* self);
+	void (*reserved1) (GeeAbstractSortedMap* self);
+	void (*reserved2) (GeeAbstractSortedMap* self);
+	void (*reserved3) (GeeAbstractSortedMap* self);
+	void (*reserved4) (GeeAbstractSortedMap* self);
+	void (*reserved5) (GeeAbstractSortedMap* self);
+	void (*reserved6) (GeeAbstractSortedMap* self);
+	void (*reserved7) (GeeAbstractSortedMap* self);
+	void (*reserved8) (GeeAbstractSortedMap* self);
+	void (*reserved9) (GeeAbstractSortedMap* self);
+	GeeSortedSet* (*get_ascending_keys) (GeeAbstractSortedMap* self);
+	GeeSortedSet* (*get_ascending_entries) (GeeAbstractSortedMap* self);
+};
+
+struct _GeeBidirMapIteratorIface {
+	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeBidirMapIterator* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeBidirMapIterator* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeBidirMapIterator* self);
+	GType (*get_v_type) (GeeBidirMapIterator* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeBidirMapIterator* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeBidirMapIterator* self);
+	gboolean (*previous) (GeeBidirMapIterator* self);
+	gboolean (*has_previous) (GeeBidirMapIterator* self);
+	gboolean (*first) (GeeBidirMapIterator* self);
+	gboolean (*last) (GeeBidirMapIterator* self);
+};
+
+struct _GeeBidirSortedMapIface {
+	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeBidirSortedMap* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeBidirSortedMap* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeBidirSortedMap* self);
+	GType (*get_v_type) (GeeBidirSortedMap* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeBidirSortedMap* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeBidirSortedMap* self);
+	GeeBidirMapIterator* (*bidir_map_iterator) (GeeBidirSortedMap* self);
+	GeeBidirSortedMap* (*get_read_only_view) (GeeBidirSortedMap* self);
+};
+
+struct _GeeAbstractBidirSortedMap {
+	GeeAbstractSortedMap parent_instance;
+	GeeAbstractBidirSortedMapPrivate * priv;
+};
+
+struct _GeeAbstractBidirSortedMapClass {
+	GeeAbstractSortedMapClass parent_class;
+	GeeBidirMapIterator* (*bidir_map_iterator) (GeeAbstractBidirSortedMap* self);
+	void (*reserved0) (GeeAbstractBidirSortedMap* self);
+	void (*reserved1) (GeeAbstractBidirSortedMap* self);
+	void (*reserved2) (GeeAbstractBidirSortedMap* self);
+	void (*reserved3) (GeeAbstractBidirSortedMap* self);
+	void (*reserved4) (GeeAbstractBidirSortedMap* self);
+	void (*reserved5) (GeeAbstractBidirSortedMap* self);
+	void (*reserved6) (GeeAbstractBidirSortedMap* self);
+	void (*reserved7) (GeeAbstractBidirSortedMap* self);
+	void (*reserved8) (GeeAbstractBidirSortedMap* self);
+	void (*reserved9) (GeeAbstractBidirSortedMap* self);
+	GeeBidirSortedMap* (*get_read_only_view) (GeeAbstractBidirSortedMap* self);
+};
+
+struct _GeeTreeMap {
+	GeeAbstractBidirSortedMap parent_instance;
 	GeeTreeMapPrivate * priv;
 };
 
 struct _GeeTreeMapClass {
-	GeeAbstractMapClass parent_class;
+	GeeAbstractBidirSortedMapClass parent_class;
 };
 
+typedef gboolean (*GeeEqualDataFunc) (gconstpointer a, gconstpointer b, void* user_data);
 struct _GeeTreeMapPrivate {
 	GType k_type;
 	GBoxedCopyFunc k_dup_func;
@@ -357,17 +735,28 @@ struct _GeeTreeMapPrivate {
 	GType v_type;
 	GBoxedCopyFunc v_dup_func;
 	GDestroyNotify v_destroy_func;
-	GCompareFunc _key_compare_func;
-	GEqualFunc _value_equal_func;
+	GCompareDataFunc _key_compare_func;
+	gpointer _key_compare_func_target;
+	GDestroyNotify _key_compare_func_target_destroy_notify;
+	GeeEqualDataFunc _value_equal_func;
+	gpointer _value_equal_func_target;
+	GDestroyNotify _value_equal_func_target_destroy_notify;
 	gint _size;
-	GeeSet* _keys;
+	GeeSortedSet* _keys;
 	GeeCollection* _values;
-	GeeSet* _entries;
+	GeeSortedSet* _entries;
 	GeeTreeMapNode* root;
 	GeeTreeMapNode* first;
 	GeeTreeMapNode* last;
 	gint stamp;
 };
+
+typedef enum  {
+	GEE_TREE_MAP_RANGE_TYPE_HEAD,
+	GEE_TREE_MAP_RANGE_TYPE_TAIL,
+	GEE_TREE_MAP_RANGE_TYPE_EMPTY,
+	GEE_TREE_MAP_RANGE_TYPE_BOUNDED
+} GeeTreeMapRangeType;
 
 typedef enum  {
 	GEE_TREE_MAP_NODE_COLOR_RED,
@@ -395,6 +784,7 @@ struct _GeeMapEntryClass {
 	gconstpointer (*get_key) (GeeMapEntry* self);
 	gconstpointer (*get_value) (GeeMapEntry* self);
 	void (*set_value) (GeeMapEntry* self, gconstpointer value);
+	gboolean (*get_read_only) (GeeMapEntry* self);
 };
 
 struct _GeeTreeMapEntry {
@@ -416,6 +806,57 @@ struct _GeeTreeMapEntryPrivate {
 	GeeTreeMapNode* _node;
 };
 
+struct _GeeTreeMapRange {
+	GTypeInstance parent_instance;
+	volatile int ref_count;
+	GeeTreeMapRangePrivate * priv;
+};
+
+struct _GeeTreeMapRangeClass {
+	GTypeClass parent_class;
+	void (*finalize) (GeeTreeMapRange *self);
+};
+
+struct _GeeTreeMapRangePrivate {
+	GType k_type;
+	GBoxedCopyFunc k_dup_func;
+	GDestroyNotify k_destroy_func;
+	GType v_type;
+	GBoxedCopyFunc v_dup_func;
+	GDestroyNotify v_destroy_func;
+	GeeTreeMap* map;
+	gpointer after;
+	gpointer before;
+	GeeTreeMapRangeType type;
+};
+
+struct _GeeTreeMapParamSpecRange {
+	GParamSpec parent_instance;
+};
+
+struct _GeeTreeMapSubMap {
+	GeeAbstractBidirSortedMap parent_instance;
+	GeeTreeMapSubMapPrivate * priv;
+};
+
+struct _GeeTreeMapSubMapClass {
+	GeeAbstractBidirSortedMapClass parent_class;
+};
+
+struct _GeeTreeMapSubMapPrivate {
+	GType k_type;
+	GBoxedCopyFunc k_dup_func;
+	GDestroyNotify k_destroy_func;
+	GType v_type;
+	GBoxedCopyFunc v_dup_func;
+	GDestroyNotify v_destroy_func;
+	GeeSortedSet* _keys;
+	GeeCollection* _values;
+	GeeSortedSet* _entries;
+	GeeTreeMap* map;
+	GeeTreeMapRange* range;
+};
+
 struct _GeeAbstractCollection {
 	GObject parent_instance;
 	GeeAbstractCollectionPrivate * priv;
@@ -427,14 +868,20 @@ struct _GeeAbstractCollectionClass {
 	gboolean (*add) (GeeAbstractCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeAbstractCollection* self, gconstpointer item);
 	void (*clear) (GeeAbstractCollection* self);
-	gpointer* (*to_array) (GeeAbstractCollection* self, int* result_length1);
-	gboolean (*add_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*contains_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*remove_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*retain_all) (GeeAbstractCollection* self, GeeCollection* collection);
 	GeeIterator* (*iterator) (GeeAbstractCollection* self);
+	gboolean (*foreach) (GeeAbstractCollection* self, GeeForallFunc f, void* f_target);
+	void (*reserved0) (GeeAbstractCollection* self);
+	void (*reserved1) (GeeAbstractCollection* self);
+	void (*reserved2) (GeeAbstractCollection* self);
+	void (*reserved3) (GeeAbstractCollection* self);
+	void (*reserved4) (GeeAbstractCollection* self);
+	void (*reserved5) (GeeAbstractCollection* self);
+	void (*reserved6) (GeeAbstractCollection* self);
+	void (*reserved7) (GeeAbstractCollection* self);
+	void (*reserved8) (GeeAbstractCollection* self);
+	void (*reserved9) (GeeAbstractCollection* self);
 	gint (*get_size) (GeeAbstractCollection* self);
-	gboolean (*get_is_empty) (GeeAbstractCollection* self);
+	gboolean (*get_read_only) (GeeAbstractCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeAbstractCollection* self);
 };
 
@@ -445,16 +892,97 @@ struct _GeeAbstractSet {
 
 struct _GeeAbstractSetClass {
 	GeeAbstractCollectionClass parent_class;
+	void (*reserved0) (GeeAbstractSet* self);
+	void (*reserved1) (GeeAbstractSet* self);
+	void (*reserved2) (GeeAbstractSet* self);
+	void (*reserved3) (GeeAbstractSet* self);
+	void (*reserved4) (GeeAbstractSet* self);
+	void (*reserved5) (GeeAbstractSet* self);
+	void (*reserved6) (GeeAbstractSet* self);
+	void (*reserved7) (GeeAbstractSet* self);
+	void (*reserved8) (GeeAbstractSet* self);
+	void (*reserved9) (GeeAbstractSet* self);
 	GeeSet* (*get_read_only_view) (GeeAbstractSet* self);
 };
 
-struct _GeeTreeMapKeySet {
+struct _GeeAbstractSortedSet {
 	GeeAbstractSet parent_instance;
+	GeeAbstractSortedSetPrivate * priv;
+};
+
+struct _GeeAbstractSortedSetClass {
+	GeeAbstractSetClass parent_class;
+	gpointer (*first) (GeeAbstractSortedSet* self);
+	gpointer (*last) (GeeAbstractSortedSet* self);
+	GeeIterator* (*iterator_at) (GeeAbstractSortedSet* self, gconstpointer element);
+	gpointer (*lower) (GeeAbstractSortedSet* self, gconstpointer element);
+	gpointer (*higher) (GeeAbstractSortedSet* self, gconstpointer element);
+	gpointer (*floor) (GeeAbstractSortedSet* self, gconstpointer element);
+	gpointer (*ceil) (GeeAbstractSortedSet* self, gconstpointer element);
+	GeeSortedSet* (*head_set) (GeeAbstractSortedSet* self, gconstpointer before);
+	GeeSortedSet* (*tail_set) (GeeAbstractSortedSet* self, gconstpointer after);
+	GeeSortedSet* (*sub_set) (GeeAbstractSortedSet* self, gconstpointer from, gconstpointer to);
+	void (*reserved0) (GeeAbstractSortedSet* self);
+	void (*reserved1) (GeeAbstractSortedSet* self);
+	void (*reserved2) (GeeAbstractSortedSet* self);
+	void (*reserved3) (GeeAbstractSortedSet* self);
+	void (*reserved4) (GeeAbstractSortedSet* self);
+	void (*reserved5) (GeeAbstractSortedSet* self);
+	void (*reserved6) (GeeAbstractSortedSet* self);
+	void (*reserved7) (GeeAbstractSortedSet* self);
+	void (*reserved8) (GeeAbstractSortedSet* self);
+	void (*reserved9) (GeeAbstractSortedSet* self);
+	GeeSortedSet* (*get_read_only_view) (GeeAbstractSortedSet* self);
+};
+
+struct _GeeBidirIteratorIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeBidirIterator* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeBidirIterator* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeBidirIterator* self);
+	gboolean (*previous) (GeeBidirIterator* self);
+	gboolean (*has_previous) (GeeBidirIterator* self);
+	gboolean (*first) (GeeBidirIterator* self);
+	gboolean (*last) (GeeBidirIterator* self);
+};
+
+struct _GeeBidirSortedSetIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeBidirSortedSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeBidirSortedSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeBidirSortedSet* self);
+	GeeBidirIterator* (*bidir_iterator) (GeeBidirSortedSet* self);
+	GeeBidirSortedSet* (*get_read_only_view) (GeeBidirSortedSet* self);
+};
+
+struct _GeeAbstractBidirSortedSet {
+	GeeAbstractSortedSet parent_instance;
+	GeeAbstractBidirSortedSetPrivate * priv;
+};
+
+struct _GeeAbstractBidirSortedSetClass {
+	GeeAbstractSortedSetClass parent_class;
+	GeeBidirIterator* (*bidir_iterator) (GeeAbstractBidirSortedSet* self);
+	void (*reserved0) (GeeAbstractBidirSortedSet* self);
+	void (*reserved1) (GeeAbstractBidirSortedSet* self);
+	void (*reserved2) (GeeAbstractBidirSortedSet* self);
+	void (*reserved3) (GeeAbstractBidirSortedSet* self);
+	void (*reserved4) (GeeAbstractBidirSortedSet* self);
+	void (*reserved5) (GeeAbstractBidirSortedSet* self);
+	void (*reserved6) (GeeAbstractBidirSortedSet* self);
+	void (*reserved7) (GeeAbstractBidirSortedSet* self);
+	void (*reserved8) (GeeAbstractBidirSortedSet* self);
+	void (*reserved9) (GeeAbstractBidirSortedSet* self);
+	GeeBidirSortedSet* (*get_read_only_view) (GeeAbstractBidirSortedSet* self);
+};
+
+struct _GeeTreeMapKeySet {
+	GeeAbstractBidirSortedSet parent_instance;
 	GeeTreeMapKeySetPrivate * priv;
 };
 
 struct _GeeTreeMapKeySetClass {
-	GeeAbstractSetClass parent_class;
+	GeeAbstractBidirSortedSetClass parent_class;
 };
 
 struct _GeeTreeMapKeySetPrivate {
@@ -465,6 +993,26 @@ struct _GeeTreeMapKeySetPrivate {
 	GBoxedCopyFunc v_dup_func;
 	GDestroyNotify v_destroy_func;
 	GeeTreeMap* _map;
+};
+
+struct _GeeTreeMapSubKeySet {
+	GeeAbstractBidirSortedSet parent_instance;
+	GeeTreeMapSubKeySetPrivate * priv;
+};
+
+struct _GeeTreeMapSubKeySetClass {
+	GeeAbstractBidirSortedSetClass parent_class;
+};
+
+struct _GeeTreeMapSubKeySetPrivate {
+	GType k_type;
+	GBoxedCopyFunc k_dup_func;
+	GDestroyNotify k_destroy_func;
+	GType v_type;
+	GBoxedCopyFunc v_dup_func;
+	GDestroyNotify v_destroy_func;
+	GeeTreeMap* _map;
+	GeeTreeMapRange* _range;
 };
 
 struct _GeeTreeMapValueCollection {
@@ -486,13 +1034,33 @@ struct _GeeTreeMapValueCollectionPrivate {
 	GeeTreeMap* _map;
 };
 
+struct _GeeTreeMapSubValueCollection {
+	GeeAbstractCollection parent_instance;
+	GeeTreeMapSubValueCollectionPrivate * priv;
+};
+
+struct _GeeTreeMapSubValueCollectionClass {
+	GeeAbstractCollectionClass parent_class;
+};
+
+struct _GeeTreeMapSubValueCollectionPrivate {
+	GType k_type;
+	GBoxedCopyFunc k_dup_func;
+	GDestroyNotify k_destroy_func;
+	GType v_type;
+	GBoxedCopyFunc v_dup_func;
+	GDestroyNotify v_destroy_func;
+	GeeTreeMap* _map;
+	GeeTreeMapRange* _range;
+};
+
 struct _GeeTreeMapEntrySet {
-	GeeAbstractSet parent_instance;
+	GeeAbstractBidirSortedSet parent_instance;
 	GeeTreeMapEntrySetPrivate * priv;
 };
 
 struct _GeeTreeMapEntrySetClass {
-	GeeAbstractSetClass parent_class;
+	GeeAbstractBidirSortedSetClass parent_class;
 };
 
 struct _GeeTreeMapEntrySetPrivate {
@@ -505,11 +1073,32 @@ struct _GeeTreeMapEntrySetPrivate {
 	GeeTreeMap* _map;
 };
 
+struct _GeeTreeMapSubEntrySet {
+	GeeAbstractBidirSortedSet parent_instance;
+	GeeTreeMapSubEntrySetPrivate * priv;
+};
+
+struct _GeeTreeMapSubEntrySetClass {
+	GeeAbstractBidirSortedSetClass parent_class;
+};
+
+struct _GeeTreeMapSubEntrySetPrivate {
+	GType k_type;
+	GBoxedCopyFunc k_dup_func;
+	GDestroyNotify k_destroy_func;
+	GType v_type;
+	GBoxedCopyFunc v_dup_func;
+	GDestroyNotify v_destroy_func;
+	GeeTreeMap* _map;
+	GeeTreeMapRange* _range;
+};
+
 struct _GeeTreeMapNodeIterator {
 	GObject parent_instance;
 	GeeTreeMapNodeIteratorPrivate * priv;
 	GeeTreeMap* _map;
 	gint stamp;
+	gboolean started;
 	GeeTreeMapNode* current;
 	GeeTreeMapNode* _next;
 	GeeTreeMapNode* _prev;
@@ -517,6 +1106,7 @@ struct _GeeTreeMapNodeIterator {
 
 struct _GeeTreeMapNodeIteratorClass {
 	GObjectClass parent_class;
+	gboolean (*get_read_only) (GeeTreeMapNodeIterator* self);
 };
 
 struct _GeeTreeMapNodeIteratorPrivate {
@@ -528,11 +1118,29 @@ struct _GeeTreeMapNodeIteratorPrivate {
 	GDestroyNotify v_destroy_func;
 };
 
-struct _GeeBidirIteratorIface {
-	GTypeInterface parent_iface;
-	gboolean (*previous) (GeeBidirIterator* self);
-	gboolean (*has_previous) (GeeBidirIterator* self);
-	gboolean (*last) (GeeBidirIterator* self);
+struct _GeeTreeMapSubNodeIterator {
+	GObject parent_instance;
+	GeeTreeMapSubNodeIteratorPrivate * priv;
+	GeeTreeMap* _map;
+	GeeTreeMapRange* range;
+	GeeTreeMapNodeIterator* iterator;
+};
+
+struct _GeeTreeMapSubNodeIteratorClass {
+	GObjectClass parent_class;
+	gboolean (*first) (GeeTreeMapSubNodeIterator* self);
+	gboolean (*last) (GeeTreeMapSubNodeIterator* self);
+	GeeTreeMapNodeIterator* (*iterator_pointing_at) (GeeTreeMapSubNodeIterator* self, GeeTreeMapNode* node);
+	gboolean (*get_read_only) (GeeTreeMapSubNodeIterator* self);
+};
+
+struct _GeeTreeMapSubNodeIteratorPrivate {
+	GType k_type;
+	GBoxedCopyFunc k_dup_func;
+	GDestroyNotify k_destroy_func;
+	GType v_type;
+	GBoxedCopyFunc v_dup_func;
+	GDestroyNotify v_destroy_func;
 };
 
 struct _GeeTreeMapKeyIterator {
@@ -545,6 +1153,24 @@ struct _GeeTreeMapKeyIteratorClass {
 };
 
 struct _GeeTreeMapKeyIteratorPrivate {
+	GType k_type;
+	GBoxedCopyFunc k_dup_func;
+	GDestroyNotify k_destroy_func;
+	GType v_type;
+	GBoxedCopyFunc v_dup_func;
+	GDestroyNotify v_destroy_func;
+};
+
+struct _GeeTreeMapSubKeyIterator {
+	GeeTreeMapSubNodeIterator parent_instance;
+	GeeTreeMapSubKeyIteratorPrivate * priv;
+};
+
+struct _GeeTreeMapSubKeyIteratorClass {
+	GeeTreeMapSubNodeIteratorClass parent_class;
+};
+
+struct _GeeTreeMapSubKeyIteratorPrivate {
 	GType k_type;
 	GBoxedCopyFunc k_dup_func;
 	GDestroyNotify k_destroy_func;
@@ -571,6 +1197,24 @@ struct _GeeTreeMapValueIteratorPrivate {
 	GDestroyNotify v_destroy_func;
 };
 
+struct _GeeTreeMapSubValueIterator {
+	GeeTreeMapSubNodeIterator parent_instance;
+	GeeTreeMapSubValueIteratorPrivate * priv;
+};
+
+struct _GeeTreeMapSubValueIteratorClass {
+	GeeTreeMapSubNodeIteratorClass parent_class;
+};
+
+struct _GeeTreeMapSubValueIteratorPrivate {
+	GType k_type;
+	GBoxedCopyFunc k_dup_func;
+	GDestroyNotify k_destroy_func;
+	GType v_type;
+	GBoxedCopyFunc v_dup_func;
+	GDestroyNotify v_destroy_func;
+};
+
 struct _GeeTreeMapEntryIterator {
 	GeeTreeMapNodeIterator parent_instance;
 	GeeTreeMapEntryIteratorPrivate * priv;
@@ -581,6 +1225,24 @@ struct _GeeTreeMapEntryIteratorClass {
 };
 
 struct _GeeTreeMapEntryIteratorPrivate {
+	GType k_type;
+	GBoxedCopyFunc k_dup_func;
+	GDestroyNotify k_destroy_func;
+	GType v_type;
+	GBoxedCopyFunc v_dup_func;
+	GDestroyNotify v_destroy_func;
+};
+
+struct _GeeTreeMapSubEntryIterator {
+	GeeTreeMapSubNodeIterator parent_instance;
+	GeeTreeMapSubEntryIteratorPrivate * priv;
+};
+
+struct _GeeTreeMapSubEntryIteratorClass {
+	GeeTreeMapSubNodeIteratorClass parent_class;
+};
+
+struct _GeeTreeMapSubEntryIteratorPrivate {
 	GType k_type;
 	GBoxedCopyFunc k_dup_func;
 	GDestroyNotify k_destroy_func;
@@ -607,26 +1269,78 @@ struct _GeeTreeMapMapIteratorPrivate {
 	GDestroyNotify v_destroy_func;
 };
 
+struct _GeeTreeMapSubMapIterator {
+	GeeTreeMapSubNodeIterator parent_instance;
+	GeeTreeMapSubMapIteratorPrivate * priv;
+};
+
+struct _GeeTreeMapSubMapIteratorClass {
+	GeeTreeMapSubNodeIteratorClass parent_class;
+};
+
+struct _GeeTreeMapSubMapIteratorPrivate {
+	GType k_type;
+	GBoxedCopyFunc k_dup_func;
+	GDestroyNotify k_destroy_func;
+	GType v_type;
+	GBoxedCopyFunc v_dup_func;
+	GDestroyNotify v_destroy_func;
+};
+
 
 static gpointer gee_tree_map_parent_class = NULL;
 static gpointer gee_tree_map_entry_parent_class = NULL;
+static gpointer gee_tree_map_range_parent_class = NULL;
+static gpointer gee_tree_map_sub_map_parent_class = NULL;
 static gpointer gee_tree_map_key_set_parent_class = NULL;
+static gpointer gee_tree_map_sub_key_set_parent_class = NULL;
 static gpointer gee_tree_map_value_collection_parent_class = NULL;
+static gpointer gee_tree_map_sub_value_collection_parent_class = NULL;
 static gpointer gee_tree_map_entry_set_parent_class = NULL;
+static gpointer gee_tree_map_sub_entry_set_parent_class = NULL;
 static gpointer gee_tree_map_node_iterator_parent_class = NULL;
+static gpointer gee_tree_map_sub_node_iterator_parent_class = NULL;
 static gpointer gee_tree_map_key_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_tree_map_key_iterator_gee_traversable_parent_iface = NULL;
 static GeeIteratorIface* gee_tree_map_key_iterator_gee_iterator_parent_iface = NULL;
 static GeeBidirIteratorIface* gee_tree_map_key_iterator_gee_bidir_iterator_parent_iface = NULL;
+static gpointer gee_tree_map_sub_key_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_tree_map_sub_key_iterator_gee_traversable_parent_iface = NULL;
+static GeeIteratorIface* gee_tree_map_sub_key_iterator_gee_iterator_parent_iface = NULL;
+static GeeBidirIteratorIface* gee_tree_map_sub_key_iterator_gee_bidir_iterator_parent_iface = NULL;
 static gpointer gee_tree_map_value_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_tree_map_value_iterator_gee_traversable_parent_iface = NULL;
 static GeeIteratorIface* gee_tree_map_value_iterator_gee_iterator_parent_iface = NULL;
 static GeeBidirIteratorIface* gee_tree_map_value_iterator_gee_bidir_iterator_parent_iface = NULL;
+static gpointer gee_tree_map_sub_value_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_tree_map_sub_value_iterator_gee_traversable_parent_iface = NULL;
+static GeeIteratorIface* gee_tree_map_sub_value_iterator_gee_iterator_parent_iface = NULL;
+static GeeBidirIteratorIface* gee_tree_map_sub_value_iterator_gee_bidir_iterator_parent_iface = NULL;
 static gpointer gee_tree_map_entry_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_tree_map_entry_iterator_gee_traversable_parent_iface = NULL;
 static GeeIteratorIface* gee_tree_map_entry_iterator_gee_iterator_parent_iface = NULL;
 static GeeBidirIteratorIface* gee_tree_map_entry_iterator_gee_bidir_iterator_parent_iface = NULL;
+static gpointer gee_tree_map_sub_entry_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_tree_map_sub_entry_iterator_gee_traversable_parent_iface = NULL;
+static GeeIteratorIface* gee_tree_map_sub_entry_iterator_gee_iterator_parent_iface = NULL;
+static GeeBidirIteratorIface* gee_tree_map_sub_entry_iterator_gee_bidir_iterator_parent_iface = NULL;
 static gpointer gee_tree_map_map_iterator_parent_class = NULL;
 static GeeMapIteratorIface* gee_tree_map_map_iterator_gee_map_iterator_parent_iface = NULL;
+static GeeBidirMapIteratorIface* gee_tree_map_map_iterator_gee_bidir_map_iterator_parent_iface = NULL;
+static gpointer gee_tree_map_sub_map_iterator_parent_class = NULL;
+static GeeMapIteratorIface* gee_tree_map_sub_map_iterator_gee_map_iterator_parent_iface = NULL;
+static GeeBidirMapIteratorIface* gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_parent_iface = NULL;
 
+GType gee_traversable_stream_get_type (void) G_GNUC_CONST;
+gpointer gee_lazy_ref (gpointer instance);
+void gee_lazy_unref (gpointer instance);
+GParamSpec* gee_param_spec_lazy (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void gee_value_set_lazy (GValue* value, gpointer v_object);
+void gee_value_take_lazy (GValue* value, gpointer v_object);
+gpointer gee_value_get_lazy (const GValue* value);
+GType gee_lazy_get_type (void) G_GNUC_CONST;
 GType gee_iterator_get_type (void) G_GNUC_CONST;
+GType gee_traversable_get_type (void) G_GNUC_CONST;
 GType gee_iterable_get_type (void) G_GNUC_CONST;
 GType gee_map_iterator_get_type (void) G_GNUC_CONST;
 GType gee_collection_get_type (void) G_GNUC_CONST;
@@ -634,6 +1348,12 @@ GType gee_set_get_type (void) G_GNUC_CONST;
 GType gee_map_entry_get_type (void) G_GNUC_CONST;
 GType gee_map_get_type (void) G_GNUC_CONST;
 GType gee_abstract_map_get_type (void) G_GNUC_CONST;
+GType gee_sorted_set_get_type (void) G_GNUC_CONST;
+GType gee_sorted_map_get_type (void) G_GNUC_CONST;
+GType gee_abstract_sorted_map_get_type (void) G_GNUC_CONST;
+GType gee_bidir_map_iterator_get_type (void) G_GNUC_CONST;
+GType gee_bidir_sorted_map_get_type (void) G_GNUC_CONST;
+GType gee_abstract_bidir_sorted_map_get_type (void) G_GNUC_CONST;
 GType gee_tree_map_get_type (void) G_GNUC_CONST;
 static void gee_tree_map_node_free (GeeTreeMapNode* self);
 #define GEE_TREE_MAP_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TYPE_TREE_MAP, GeeTreeMapPrivate))
@@ -646,31 +1366,34 @@ enum  {
 	GEE_TREE_MAP_V_DUP_FUNC,
 	GEE_TREE_MAP_V_DESTROY_FUNC,
 	GEE_TREE_MAP_SIZE,
+	GEE_TREE_MAP_READ_ONLY,
 	GEE_TREE_MAP_KEYS,
 	GEE_TREE_MAP_VALUES,
 	GEE_TREE_MAP_ENTRIES,
-	GEE_TREE_MAP_KEY_COMPARE_FUNC,
-	GEE_TREE_MAP_VALUE_EQUAL_FUNC
+	GEE_TREE_MAP_ASCENDING_KEYS,
+	GEE_TREE_MAP_ASCENDING_ENTRIES
 };
-GeeTreeMap* gee_tree_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareFunc key_compare_func, GEqualFunc value_equal_func);
-GeeTreeMap* gee_tree_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareFunc key_compare_func, GEqualFunc value_equal_func);
-GeeAbstractMap* gee_abstract_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func);
-GCompareFunc gee_functions_get_compare_func_for (GType t);
-GEqualFunc gee_functions_get_equal_func_for (GType t);
-static void gee_tree_map_set_key_compare_func (GeeTreeMap* self, GCompareFunc value);
-static void gee_tree_map_set_value_equal_func (GeeTreeMap* self, GEqualFunc value);
+void gee_abstract_map_clear (GeeAbstractMap* self);
+static GType gee_tree_map_range_type_get_type (void) G_GNUC_UNUSED;
+GeeTreeMap* gee_tree_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareDataFunc key_compare_func, void* key_compare_func_target, GDestroyNotify key_compare_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
+GeeTreeMap* gee_tree_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareDataFunc key_compare_func, void* key_compare_func_target, GDestroyNotify key_compare_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
+GeeAbstractBidirSortedMap* gee_abstract_bidir_sorted_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func);
+GCompareDataFunc gee_functions_get_compare_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+GeeEqualDataFunc gee_functions_get_equal_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+static void gee_tree_map_set_key_compare_func (GeeTreeMap* self, GCompareDataFunc value, gpointer value_target);
+static void gee_tree_map_set_value_equal_func (GeeTreeMap* self, GeeEqualDataFunc value, gpointer value_target);
 static void gee_tree_map_rotate_right (GeeTreeMap* self, GeeTreeMapNode** root);
 GType gee_tree_map_node_color_get_type (void) G_GNUC_CONST;
 static void gee_tree_map_rotate_left (GeeTreeMap* self, GeeTreeMapNode** root);
 static gboolean gee_tree_map_is_red (GeeTreeMap* self, GeeTreeMapNode* n);
 static gboolean gee_tree_map_is_black (GeeTreeMap* self, GeeTreeMapNode* n);
 static gboolean gee_tree_map_real_has_key (GeeAbstractMap* base, gconstpointer key);
-GCompareFunc gee_tree_map_get_key_compare_func (GeeTreeMap* self);
+GCompareDataFunc gee_tree_map_get_key_compare_func (GeeTreeMap* self, gpointer* result_target);
 static gboolean gee_tree_map_real_has (GeeAbstractMap* base, gconstpointer key, gconstpointer value);
 gpointer gee_abstract_map_get (GeeAbstractMap* self, gconstpointer key);
-GEqualFunc gee_tree_map_get_value_equal_func (GeeTreeMap* self);
+GeeEqualDataFunc gee_tree_map_get_value_equal_func (GeeTreeMap* self, gpointer* result_target);
 static gpointer gee_tree_map_real_get (GeeAbstractMap* base, gconstpointer key);
-static void gee_tree_map_set_to_node (GeeTreeMap* self, GeeTreeMapNode** node, gconstpointer key, gconstpointer value, GeeTreeMapNode* prev, GeeTreeMapNode* next);
+static gboolean gee_tree_map_set_to_node (GeeTreeMap* self, GeeTreeMapNode** node, gconstpointer key, gconstpointer value, gpointer* old_value, GeeTreeMapNode* prev, GeeTreeMapNode* next);
 static GeeTreeMapNode* gee_tree_map_node_new (gpointer key, gpointer value, GeeTreeMapNode* prev, GeeTreeMapNode* next);
 static GeeTreeMapNode* gee_tree_map_node_new (gpointer key, gpointer value, GeeTreeMapNode* prev, GeeTreeMapNode* next);
 static void gee_tree_map_fix_up (GeeTreeMap* self, GeeTreeMapNode** node);
@@ -684,15 +1407,46 @@ static gboolean gee_tree_map_remove_from_node (GeeTreeMap* self, GeeTreeMapNode*
 static gboolean gee_tree_map_real_unset (GeeAbstractMap* base, gconstpointer key, gpointer* value);
 static inline void gee_tree_map_clear_subtree (GeeTreeMap* self, GeeTreeMapNode* node);
 static void gee_tree_map_real_clear (GeeAbstractMap* base);
+static GeeSortedMap* gee_tree_map_real_head_map (GeeAbstractSortedMap* base, gconstpointer before);
+static GeeTreeMapRange* gee_tree_map_range_new_head (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, gconstpointer before);
+static GeeTreeMapRange* gee_tree_map_range_construct_head (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, gconstpointer before);
+static gpointer gee_tree_map_range_ref (gpointer instance);
+static void gee_tree_map_range_unref (gpointer instance);
+static GParamSpec* gee_tree_map_param_spec_range (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags) G_GNUC_UNUSED;
+static void gee_tree_map_value_set_range (GValue* value, gpointer v_object) G_GNUC_UNUSED;
+static void gee_tree_map_value_take_range (GValue* value, gpointer v_object) G_GNUC_UNUSED;
+static gpointer gee_tree_map_value_get_range (const GValue* value) G_GNUC_UNUSED;
+static GType gee_tree_map_range_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+static GeeTreeMapSubMap* gee_tree_map_sub_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GeeTreeMapSubMap* gee_tree_map_sub_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GType gee_tree_map_sub_map_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+static GeeSortedMap* gee_tree_map_real_tail_map (GeeAbstractSortedMap* base, gconstpointer after);
+static GeeTreeMapRange* gee_tree_map_range_new_tail (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, gconstpointer after);
+static GeeTreeMapRange* gee_tree_map_range_construct_tail (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, gconstpointer after);
+static GeeSortedMap* gee_tree_map_real_sub_map (GeeAbstractSortedMap* base, gconstpointer after, gconstpointer before);
+static GeeTreeMapRange* gee_tree_map_range_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, gconstpointer after, gconstpointer before);
+static GeeTreeMapRange* gee_tree_map_range_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, gconstpointer after, gconstpointer before);
 static GeeMapIterator* gee_tree_map_real_map_iterator (GeeAbstractMap* base);
 static GeeTreeMapMapIterator* gee_tree_map_map_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
 static GeeTreeMapMapIterator* gee_tree_map_map_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
 static GType gee_tree_map_node_iterator_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
 static GType gee_tree_map_map_iterator_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+static GeeBidirMapIterator* gee_tree_map_real_bidir_map_iterator (GeeAbstractBidirSortedMap* base);
+static inline gpointer gee_tree_map_min (GeeTreeMap* self, gconstpointer a, gconstpointer b);
+static inline gpointer gee_tree_map_max (GeeTreeMap* self, gconstpointer a, gconstpointer b);
+static inline GeeTreeMapNode* gee_tree_map_find_node (GeeTreeMap* self, gconstpointer key);
+static inline GeeTreeMapNode* gee_tree_map_find_nearest (GeeTreeMap* self, gconstpointer key);
+static inline GeeTreeMapNode* gee_tree_map_find_lower (GeeTreeMap* self, gconstpointer key);
+static inline GeeTreeMapNode* gee_tree_map_find_higher (GeeTreeMap* self, gconstpointer key);
+static inline GeeTreeMapNode* gee_tree_map_find_floor (GeeTreeMap* self, gconstpointer key);
+static inline GeeTreeMapNode* gee_tree_map_find_ceil (GeeTreeMap* self, gconstpointer key);
+static inline gpointer gee_tree_map_lift_null_key (GeeTreeMap* self, GeeTreeMapNode* node);
 static GeeTreeMapKeySet* gee_tree_map_key_set_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
 static GeeTreeMapKeySet* gee_tree_map_key_set_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
 GType gee_abstract_collection_get_type (void) G_GNUC_CONST;
 GType gee_abstract_set_get_type (void) G_GNUC_CONST;
+GType gee_abstract_sorted_set_get_type (void) G_GNUC_CONST;
+GType gee_abstract_bidir_sorted_set_get_type (void) G_GNUC_CONST;
 static GType gee_tree_map_key_set_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
 static GeeTreeMapValueCollection* gee_tree_map_value_collection_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
 static GeeTreeMapValueCollection* gee_tree_map_value_collection_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
@@ -713,7 +1467,8 @@ enum  {
 	GEE_TREE_MAP_ENTRY_V_DUP_FUNC,
 	GEE_TREE_MAP_ENTRY_V_DESTROY_FUNC,
 	GEE_TREE_MAP_ENTRY_KEY,
-	GEE_TREE_MAP_ENTRY_VALUE
+	GEE_TREE_MAP_ENTRY_VALUE,
+	GEE_TREE_MAP_ENTRY_READ_ONLY
 };
 static GeeMapEntry* gee_tree_map_entry_entry_for (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMapNode* node);
 static GeeTreeMapEntry* gee_tree_map_entry_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMapNode* node);
@@ -722,9 +1477,89 @@ GeeMapEntry* gee_map_entry_construct (GType object_type, GType k_type, GBoxedCop
 static void gee_tree_map_entry_finalize (GObject* obj);
 gconstpointer gee_map_entry_get_key (GeeMapEntry* self);
 gconstpointer gee_map_entry_get_value (GeeMapEntry* self);
+gboolean gee_map_entry_get_read_only (GeeMapEntry* self);
 static void _vala_gee_tree_map_entry_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 void gee_map_entry_set_value (GeeMapEntry* self, gconstpointer value);
 static void _vala_gee_tree_map_entry_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
+#define GEE_TREE_MAP_RANGE_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_RANGE, GeeTreeMapRangePrivate))
+enum  {
+	GEE_TREE_MAP_RANGE_DUMMY_PROPERTY
+};
+static GeeTreeMapRange* gee_tree_map_range_new_empty (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
+static GeeTreeMapRange* gee_tree_map_range_construct_empty (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
+static GeeTreeMapRange* gee_tree_map_range_cut_head (GeeTreeMapRange* self, gconstpointer after);
+static GeeTreeMapRange* gee_tree_map_range_cut_tail (GeeTreeMapRange* self, gconstpointer before);
+static GeeTreeMapRange* gee_tree_map_range_cut (GeeTreeMapRange* self, gconstpointer after, gconstpointer before);
+static gboolean gee_tree_map_range_in_range (GeeTreeMapRange* self, gconstpointer key);
+static gint gee_tree_map_range_compare_range (GeeTreeMapRange* self, gconstpointer key);
+static gboolean gee_tree_map_range_empty_submap (GeeTreeMapRange* self);
+static GeeTreeMapNode* gee_tree_map_range_first (GeeTreeMapRange* self);
+static GeeTreeMapNode* gee_tree_map_range_last (GeeTreeMapRange* self);
+static void gee_tree_map_range_finalize (GeeTreeMapRange* obj);
+#define GEE_TREE_MAP_SUB_MAP_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_SUB_MAP, GeeTreeMapSubMapPrivate))
+enum  {
+	GEE_TREE_MAP_SUB_MAP_DUMMY_PROPERTY,
+	GEE_TREE_MAP_SUB_MAP_K_TYPE,
+	GEE_TREE_MAP_SUB_MAP_K_DUP_FUNC,
+	GEE_TREE_MAP_SUB_MAP_K_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_MAP_V_TYPE,
+	GEE_TREE_MAP_SUB_MAP_V_DUP_FUNC,
+	GEE_TREE_MAP_SUB_MAP_V_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_MAP_SIZE,
+	GEE_TREE_MAP_SUB_MAP_IS_EMPTY,
+	GEE_TREE_MAP_SUB_MAP_KEYS,
+	GEE_TREE_MAP_SUB_MAP_VALUES,
+	GEE_TREE_MAP_SUB_MAP_ENTRIES,
+	GEE_TREE_MAP_SUB_MAP_READ_ONLY,
+	GEE_TREE_MAP_SUB_MAP_ASCENDING_KEYS,
+	GEE_TREE_MAP_SUB_MAP_ASCENDING_ENTRIES
+};
+static gboolean gee_tree_map_sub_map_real_has_key (GeeAbstractMap* base, gconstpointer key);
+gboolean gee_abstract_map_has_key (GeeAbstractMap* self, gconstpointer key);
+static gboolean gee_tree_map_sub_map_real_has (GeeAbstractMap* base, gconstpointer key, gconstpointer value);
+gboolean gee_abstract_map_has (GeeAbstractMap* self, gconstpointer key, gconstpointer value);
+static gpointer gee_tree_map_sub_map_real_get (GeeAbstractMap* base, gconstpointer key);
+static void gee_tree_map_sub_map_real_set (GeeAbstractMap* base, gconstpointer key, gconstpointer value);
+void gee_abstract_map_set (GeeAbstractMap* self, gconstpointer key, gconstpointer value);
+static gboolean gee_tree_map_sub_map_real_unset (GeeAbstractMap* base, gconstpointer key, gpointer* value);
+gboolean gee_abstract_map_unset (GeeAbstractMap* self, gconstpointer key, gpointer* value);
+static void gee_tree_map_sub_map_real_clear (GeeAbstractMap* base);
+GeeMapIterator* gee_abstract_map_map_iterator (GeeAbstractMap* self);
+gboolean gee_map_iterator_next (GeeMapIterator* self);
+void gee_map_iterator_unset (GeeMapIterator* self);
+static GeeMapIterator* gee_tree_map_sub_map_real_map_iterator (GeeAbstractMap* base);
+static GeeTreeMapSubMapIterator* gee_tree_map_sub_map_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GeeTreeMapSubMapIterator* gee_tree_map_sub_map_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GType gee_tree_map_sub_node_iterator_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+static GType gee_tree_map_sub_map_iterator_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+static GeeBidirMapIterator* gee_tree_map_sub_map_real_bidir_map_iterator (GeeAbstractBidirSortedMap* base);
+static GeeSortedMap* gee_tree_map_sub_map_real_head_map (GeeAbstractSortedMap* base, gconstpointer before);
+static GeeSortedMap* gee_tree_map_sub_map_real_tail_map (GeeAbstractSortedMap* base, gconstpointer after);
+static GeeSortedMap* gee_tree_map_sub_map_real_sub_map (GeeAbstractSortedMap* base, gconstpointer after, gconstpointer before);
+GeeSet* gee_abstract_map_get_keys (GeeAbstractMap* self);
+gint gee_collection_get_size (GeeCollection* self);
+static gboolean gee_tree_map_sub_map_get_is_empty (GeeTreeMapSubMap* self);
+gboolean gee_collection_get_is_empty (GeeCollection* self);
+static GeeTreeMapSubKeySet* gee_tree_map_sub_key_set_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GeeTreeMapSubKeySet* gee_tree_map_sub_key_set_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GType gee_tree_map_sub_key_set_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+static GeeTreeMapSubValueCollection* gee_tree_map_sub_value_collection_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GeeTreeMapSubValueCollection* gee_tree_map_sub_value_collection_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GType gee_tree_map_sub_value_collection_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+static GeeTreeMapSubEntrySet* gee_tree_map_sub_entry_set_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GeeTreeMapSubEntrySet* gee_tree_map_sub_entry_set_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GType gee_tree_map_sub_entry_set_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+static void gee_tree_map_sub_map_finalize (GObject* obj);
+gint gee_abstract_map_get_size (GeeAbstractMap* self);
+GeeCollection* gee_abstract_map_get_values (GeeAbstractMap* self);
+GeeSet* gee_abstract_map_get_entries (GeeAbstractMap* self);
+gboolean gee_abstract_map_get_read_only (GeeAbstractMap* self);
+GeeSortedSet* gee_abstract_sorted_map_get_ascending_keys (GeeAbstractSortedMap* self);
+GeeSortedSet* gee_abstract_sorted_map_get_ascending_entries (GeeAbstractSortedMap* self);
+static void _vala_gee_tree_map_sub_map_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
+static void _vala_gee_tree_map_sub_map_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
+GType gee_bidir_iterator_get_type (void) G_GNUC_CONST;
+GType gee_bidir_sorted_set_get_type (void) G_GNUC_CONST;
 #define GEE_TREE_MAP_KEY_SET_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_KEY_SET, GeeTreeMapKeySetPrivate))
 enum  {
 	GEE_TREE_MAP_KEY_SET_DUMMY_PROPERTY,
@@ -734,9 +1569,10 @@ enum  {
 	GEE_TREE_MAP_KEY_SET_V_TYPE,
 	GEE_TREE_MAP_KEY_SET_V_DUP_FUNC,
 	GEE_TREE_MAP_KEY_SET_V_DESTROY_FUNC,
-	GEE_TREE_MAP_KEY_SET_SIZE
+	GEE_TREE_MAP_KEY_SET_SIZE,
+	GEE_TREE_MAP_KEY_SET_READ_ONLY
 };
-GeeAbstractSet* gee_abstract_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
+GeeAbstractBidirSortedSet* gee_abstract_bidir_sorted_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
 static GeeIterator* gee_tree_map_key_set_real_iterator (GeeAbstractCollection* base);
 static GeeTreeMapKeyIterator* gee_tree_map_key_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
 static GeeTreeMapKeyIterator* gee_tree_map_key_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
@@ -745,15 +1581,72 @@ static gboolean gee_tree_map_key_set_real_add (GeeAbstractCollection* base, gcon
 static void gee_tree_map_key_set_real_clear (GeeAbstractCollection* base);
 static gboolean gee_tree_map_key_set_real_remove (GeeAbstractCollection* base, gconstpointer key);
 static gboolean gee_tree_map_key_set_real_contains (GeeAbstractCollection* base, gconstpointer key);
-gboolean gee_abstract_map_has_key (GeeAbstractMap* self, gconstpointer key);
-static gboolean gee_tree_map_key_set_real_add_all (GeeAbstractCollection* base, GeeCollection* collection);
-static gboolean gee_tree_map_key_set_real_remove_all (GeeAbstractCollection* base, GeeCollection* collection);
-static gboolean gee_tree_map_key_set_real_retain_all (GeeAbstractCollection* base, GeeCollection* collection);
-gint gee_abstract_map_get_size (GeeAbstractMap* self);
+static gpointer gee_tree_map_key_set_real_first (GeeAbstractSortedSet* base);
+static gpointer gee_tree_map_key_set_real_last (GeeAbstractSortedSet* base);
+static GeeBidirIterator* gee_tree_map_key_set_real_bidir_iterator (GeeAbstractBidirSortedSet* base);
+static GeeSortedSet* gee_tree_map_key_set_real_head_set (GeeAbstractSortedSet* base, gconstpointer before);
+static GeeSortedSet* gee_tree_map_key_set_real_tail_set (GeeAbstractSortedSet* base, gconstpointer after);
+static GeeSortedSet* gee_tree_map_key_set_real_sub_set (GeeAbstractSortedSet* base, gconstpointer after, gconstpointer before);
+static GeeIterator* gee_tree_map_key_set_real_iterator_at (GeeAbstractSortedSet* base, gconstpointer item);
+static GeeTreeMapKeyIterator* gee_tree_map_key_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* current);
+static GeeTreeMapKeyIterator* gee_tree_map_key_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* current);
+static gpointer gee_tree_map_key_set_real_lower (GeeAbstractSortedSet* base, gconstpointer item);
+static gpointer gee_tree_map_key_set_real_higher (GeeAbstractSortedSet* base, gconstpointer item);
+static gpointer gee_tree_map_key_set_real_floor (GeeAbstractSortedSet* base, gconstpointer item);
+static gpointer gee_tree_map_key_set_real_ceil (GeeAbstractSortedSet* base, gconstpointer item);
 static void gee_tree_map_key_set_finalize (GObject* obj);
 gint gee_abstract_collection_get_size (GeeAbstractCollection* self);
+gboolean gee_abstract_collection_get_read_only (GeeAbstractCollection* self);
 static void _vala_gee_tree_map_key_set_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_map_key_set_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
+#define GEE_TREE_MAP_SUB_KEY_SET_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_SUB_KEY_SET, GeeTreeMapSubKeySetPrivate))
+enum  {
+	GEE_TREE_MAP_SUB_KEY_SET_DUMMY_PROPERTY,
+	GEE_TREE_MAP_SUB_KEY_SET_K_TYPE,
+	GEE_TREE_MAP_SUB_KEY_SET_K_DUP_FUNC,
+	GEE_TREE_MAP_SUB_KEY_SET_K_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_KEY_SET_V_TYPE,
+	GEE_TREE_MAP_SUB_KEY_SET_V_DUP_FUNC,
+	GEE_TREE_MAP_SUB_KEY_SET_V_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_KEY_SET_MAP,
+	GEE_TREE_MAP_SUB_KEY_SET_RANGE,
+	GEE_TREE_MAP_SUB_KEY_SET_SIZE,
+	GEE_TREE_MAP_SUB_KEY_SET_READ_ONLY,
+	GEE_TREE_MAP_SUB_KEY_SET_IS_EMPTY
+};
+static void gee_tree_map_sub_key_set_set_map (GeeTreeMapSubKeySet* self, GeeTreeMap* value);
+static void gee_tree_map_sub_key_set_set_range (GeeTreeMapSubKeySet* self, GeeTreeMapRange* value);
+static GeeIterator* gee_tree_map_sub_key_set_real_iterator (GeeAbstractCollection* base);
+static GeeTreeMap* gee_tree_map_sub_key_set_get_map (GeeTreeMapSubKeySet* self);
+static GeeTreeMapRange* gee_tree_map_sub_key_set_get_range (GeeTreeMapSubKeySet* self);
+static GeeTreeMapSubKeyIterator* gee_tree_map_sub_key_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GeeTreeMapSubKeyIterator* gee_tree_map_sub_key_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GType gee_tree_map_sub_key_iterator_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+static gboolean gee_tree_map_sub_key_set_real_add (GeeAbstractCollection* base, gconstpointer key);
+static void gee_tree_map_sub_key_set_real_clear (GeeAbstractCollection* base);
+static gboolean gee_tree_map_sub_key_set_real_remove (GeeAbstractCollection* base, gconstpointer key);
+static gboolean gee_tree_map_sub_key_set_real_contains (GeeAbstractCollection* base, gconstpointer key);
+static GeeBidirIterator* gee_tree_map_sub_key_set_real_bidir_iterator (GeeAbstractBidirSortedSet* base);
+static gpointer gee_tree_map_sub_key_set_real_first (GeeAbstractSortedSet* base);
+static gpointer gee_tree_map_sub_key_set_real_last (GeeAbstractSortedSet* base);
+static GeeSortedSet* gee_tree_map_sub_key_set_real_head_set (GeeAbstractSortedSet* base, gconstpointer before);
+static GeeSortedSet* gee_tree_map_sub_key_set_real_tail_set (GeeAbstractSortedSet* base, gconstpointer after);
+static GeeSortedSet* gee_tree_map_sub_key_set_real_sub_set (GeeAbstractSortedSet* base, gconstpointer after, gconstpointer before);
+static GeeIterator* gee_tree_map_sub_key_set_real_iterator_at (GeeAbstractSortedSet* base, gconstpointer key);
+static GeeTreeMapSubKeyIterator* gee_tree_map_sub_key_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node);
+static GeeTreeMapSubKeyIterator* gee_tree_map_sub_key_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node);
+static gpointer gee_tree_map_sub_key_set_real_lower (GeeAbstractSortedSet* base, gconstpointer key);
+gpointer gee_abstract_sorted_set_last (GeeAbstractSortedSet* self);
+static gpointer gee_tree_map_sub_key_set_real_higher (GeeAbstractSortedSet* base, gconstpointer key);
+gpointer gee_abstract_sorted_set_first (GeeAbstractSortedSet* self);
+static gpointer gee_tree_map_sub_key_set_real_floor (GeeAbstractSortedSet* base, gconstpointer key);
+static gpointer gee_tree_map_sub_key_set_real_ceil (GeeAbstractSortedSet* base, gconstpointer key);
+GeeIterator* gee_abstract_collection_iterator (GeeAbstractCollection* self);
+gboolean gee_iterator_next (GeeIterator* self);
+static gboolean gee_tree_map_sub_key_set_get_is_empty (GeeTreeMapSubKeySet* self);
+static void gee_tree_map_sub_key_set_finalize (GObject* obj);
+static void _vala_gee_tree_map_sub_key_set_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
+static void _vala_gee_tree_map_sub_key_set_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 #define GEE_TREE_MAP_VALUE_COLLECTION_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_VALUE_COLLECTION, GeeTreeMapValueCollectionPrivate))
 enum  {
 	GEE_TREE_MAP_VALUE_COLLECTION_DUMMY_PROPERTY,
@@ -763,7 +1656,8 @@ enum  {
 	GEE_TREE_MAP_VALUE_COLLECTION_V_TYPE,
 	GEE_TREE_MAP_VALUE_COLLECTION_V_DUP_FUNC,
 	GEE_TREE_MAP_VALUE_COLLECTION_V_DESTROY_FUNC,
-	GEE_TREE_MAP_VALUE_COLLECTION_SIZE
+	GEE_TREE_MAP_VALUE_COLLECTION_SIZE,
+	GEE_TREE_MAP_VALUE_COLLECTION_READ_ONLY
 };
 GeeAbstractCollection* gee_abstract_collection_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
 static GeeIterator* gee_tree_map_value_collection_real_iterator (GeeAbstractCollection* base);
@@ -774,15 +1668,41 @@ static gboolean gee_tree_map_value_collection_real_add (GeeAbstractCollection* b
 static void gee_tree_map_value_collection_real_clear (GeeAbstractCollection* base);
 static gboolean gee_tree_map_value_collection_real_remove (GeeAbstractCollection* base, gconstpointer key);
 static gboolean gee_tree_map_value_collection_real_contains (GeeAbstractCollection* base, gconstpointer key);
-GeeIterator* gee_abstract_collection_iterator (GeeAbstractCollection* self);
-gboolean gee_iterator_next (GeeIterator* self);
 gpointer gee_iterator_get (GeeIterator* self);
-static gboolean gee_tree_map_value_collection_real_add_all (GeeAbstractCollection* base, GeeCollection* collection);
-static gboolean gee_tree_map_value_collection_real_remove_all (GeeAbstractCollection* base, GeeCollection* collection);
-static gboolean gee_tree_map_value_collection_real_retain_all (GeeAbstractCollection* base, GeeCollection* collection);
 static void gee_tree_map_value_collection_finalize (GObject* obj);
 static void _vala_gee_tree_map_value_collection_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_map_value_collection_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
+#define GEE_TREE_MAP_SUB_VALUE_COLLECTION_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_SUB_VALUE_COLLECTION, GeeTreeMapSubValueCollectionPrivate))
+enum  {
+	GEE_TREE_MAP_SUB_VALUE_COLLECTION_DUMMY_PROPERTY,
+	GEE_TREE_MAP_SUB_VALUE_COLLECTION_K_TYPE,
+	GEE_TREE_MAP_SUB_VALUE_COLLECTION_K_DUP_FUNC,
+	GEE_TREE_MAP_SUB_VALUE_COLLECTION_K_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_VALUE_COLLECTION_V_TYPE,
+	GEE_TREE_MAP_SUB_VALUE_COLLECTION_V_DUP_FUNC,
+	GEE_TREE_MAP_SUB_VALUE_COLLECTION_V_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_VALUE_COLLECTION_MAP,
+	GEE_TREE_MAP_SUB_VALUE_COLLECTION_RANGE,
+	GEE_TREE_MAP_SUB_VALUE_COLLECTION_READ_ONLY,
+	GEE_TREE_MAP_SUB_VALUE_COLLECTION_SIZE,
+	GEE_TREE_MAP_SUB_VALUE_COLLECTION_IS_EMPTY
+};
+static void gee_tree_map_sub_value_collection_set_map (GeeTreeMapSubValueCollection* self, GeeTreeMap* value);
+static void gee_tree_map_sub_value_collection_set_range (GeeTreeMapSubValueCollection* self, GeeTreeMapRange* value);
+static GeeIterator* gee_tree_map_sub_value_collection_real_iterator (GeeAbstractCollection* base);
+static GeeTreeMap* gee_tree_map_sub_value_collection_get_map (GeeTreeMapSubValueCollection* self);
+static GeeTreeMapRange* gee_tree_map_sub_value_collection_get_range (GeeTreeMapSubValueCollection* self);
+static GeeTreeMapSubValueIterator* gee_tree_map_sub_value_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GeeTreeMapSubValueIterator* gee_tree_map_sub_value_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GType gee_tree_map_sub_value_iterator_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+static gboolean gee_tree_map_sub_value_collection_real_add (GeeAbstractCollection* base, gconstpointer key);
+static void gee_tree_map_sub_value_collection_real_clear (GeeAbstractCollection* base);
+static gboolean gee_tree_map_sub_value_collection_real_remove (GeeAbstractCollection* base, gconstpointer key);
+static gboolean gee_tree_map_sub_value_collection_real_contains (GeeAbstractCollection* base, gconstpointer key);
+static gboolean gee_tree_map_sub_value_collection_get_is_empty (GeeTreeMapSubValueCollection* self);
+static void gee_tree_map_sub_value_collection_finalize (GObject* obj);
+static void _vala_gee_tree_map_sub_value_collection_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
+static void _vala_gee_tree_map_sub_value_collection_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 #define GEE_TREE_MAP_ENTRY_SET_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_ENTRY_SET, GeeTreeMapEntrySetPrivate))
 enum  {
 	GEE_TREE_MAP_ENTRY_SET_DUMMY_PROPERTY,
@@ -792,7 +1712,8 @@ enum  {
 	GEE_TREE_MAP_ENTRY_SET_V_TYPE,
 	GEE_TREE_MAP_ENTRY_SET_V_DUP_FUNC,
 	GEE_TREE_MAP_ENTRY_SET_V_DESTROY_FUNC,
-	GEE_TREE_MAP_ENTRY_SET_SIZE
+	GEE_TREE_MAP_ENTRY_SET_SIZE,
+	GEE_TREE_MAP_ENTRY_SET_READ_ONLY
 };
 static GeeIterator* gee_tree_map_entry_set_real_iterator (GeeAbstractCollection* base);
 static GeeTreeMapEntryIterator* gee_tree_map_entry_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
@@ -802,13 +1723,66 @@ static gboolean gee_tree_map_entry_set_real_add (GeeAbstractCollection* base, Ge
 static void gee_tree_map_entry_set_real_clear (GeeAbstractCollection* base);
 static gboolean gee_tree_map_entry_set_real_remove (GeeAbstractCollection* base, GeeMapEntry* entry);
 static gboolean gee_tree_map_entry_set_real_contains (GeeAbstractCollection* base, GeeMapEntry* entry);
-gboolean gee_abstract_map_has (GeeAbstractMap* self, gconstpointer key, gconstpointer value);
-static gboolean gee_tree_map_entry_set_real_add_all (GeeAbstractCollection* base, GeeCollection* entries);
-static gboolean gee_tree_map_entry_set_real_remove_all (GeeAbstractCollection* base, GeeCollection* entries);
-static gboolean gee_tree_map_entry_set_real_retain_all (GeeAbstractCollection* base, GeeCollection* entries);
+static GeeMapEntry* gee_tree_map_entry_set_real_first (GeeAbstractSortedSet* base);
+static GeeMapEntry* gee_tree_map_entry_set_real_last (GeeAbstractSortedSet* base);
+static GeeBidirIterator* gee_tree_map_entry_set_real_bidir_iterator (GeeAbstractBidirSortedSet* base);
+static GeeSortedSet* gee_tree_map_entry_set_real_head_set (GeeAbstractSortedSet* base, GeeMapEntry* before);
+static GeeSortedSet* gee_tree_map_entry_set_real_tail_set (GeeAbstractSortedSet* base, GeeMapEntry* after);
+static GeeSortedSet* gee_tree_map_entry_set_real_sub_set (GeeAbstractSortedSet* base, GeeMapEntry* after, GeeMapEntry* before);
+static GeeIterator* gee_tree_map_entry_set_real_iterator_at (GeeAbstractSortedSet* base, GeeMapEntry* item);
+static GeeTreeMapEntryIterator* gee_tree_map_entry_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* node);
+static GeeTreeMapEntryIterator* gee_tree_map_entry_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* node);
+static GeeMapEntry* gee_tree_map_entry_set_real_lower (GeeAbstractSortedSet* base, GeeMapEntry* item);
+static GeeMapEntry* gee_tree_map_entry_set_real_higher (GeeAbstractSortedSet* base, GeeMapEntry* item);
+static GeeMapEntry* gee_tree_map_entry_set_real_floor (GeeAbstractSortedSet* base, GeeMapEntry* item);
+static GeeMapEntry* gee_tree_map_entry_set_real_ceil (GeeAbstractSortedSet* base, GeeMapEntry* item);
 static void gee_tree_map_entry_set_finalize (GObject* obj);
 static void _vala_gee_tree_map_entry_set_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_map_entry_set_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
+#define GEE_TREE_MAP_SUB_ENTRY_SET_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_SUB_ENTRY_SET, GeeTreeMapSubEntrySetPrivate))
+enum  {
+	GEE_TREE_MAP_SUB_ENTRY_SET_DUMMY_PROPERTY,
+	GEE_TREE_MAP_SUB_ENTRY_SET_K_TYPE,
+	GEE_TREE_MAP_SUB_ENTRY_SET_K_DUP_FUNC,
+	GEE_TREE_MAP_SUB_ENTRY_SET_K_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_ENTRY_SET_V_TYPE,
+	GEE_TREE_MAP_SUB_ENTRY_SET_V_DUP_FUNC,
+	GEE_TREE_MAP_SUB_ENTRY_SET_V_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_ENTRY_SET_MAP,
+	GEE_TREE_MAP_SUB_ENTRY_SET_RANGE,
+	GEE_TREE_MAP_SUB_ENTRY_SET_SIZE,
+	GEE_TREE_MAP_SUB_ENTRY_SET_READ_ONLY,
+	GEE_TREE_MAP_SUB_ENTRY_SET_IS_EMPTY
+};
+static void gee_tree_map_sub_entry_set_set_map (GeeTreeMapSubEntrySet* self, GeeTreeMap* value);
+static void gee_tree_map_sub_entry_set_set_range (GeeTreeMapSubEntrySet* self, GeeTreeMapRange* value);
+static GeeIterator* gee_tree_map_sub_entry_set_real_iterator (GeeAbstractCollection* base);
+static GeeTreeMap* gee_tree_map_sub_entry_set_get_map (GeeTreeMapSubEntrySet* self);
+static GeeTreeMapRange* gee_tree_map_sub_entry_set_get_range (GeeTreeMapSubEntrySet* self);
+static GeeTreeMapSubEntryIterator* gee_tree_map_sub_entry_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GeeTreeMapSubEntryIterator* gee_tree_map_sub_entry_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GType gee_tree_map_sub_entry_iterator_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+static gboolean gee_tree_map_sub_entry_set_real_add (GeeAbstractCollection* base, GeeMapEntry* entry);
+static void gee_tree_map_sub_entry_set_real_clear (GeeAbstractCollection* base);
+static gboolean gee_tree_map_sub_entry_set_real_remove (GeeAbstractCollection* base, GeeMapEntry* entry);
+static gboolean gee_tree_map_sub_entry_set_real_contains (GeeAbstractCollection* base, GeeMapEntry* entry);
+static GeeBidirIterator* gee_tree_map_sub_entry_set_real_bidir_iterator (GeeAbstractBidirSortedSet* base);
+static GeeMapEntry* gee_tree_map_sub_entry_set_real_first (GeeAbstractSortedSet* base);
+static GeeMapEntry* gee_tree_map_sub_entry_set_real_last (GeeAbstractSortedSet* base);
+static GeeSortedSet* gee_tree_map_sub_entry_set_real_head_set (GeeAbstractSortedSet* base, GeeMapEntry* before);
+static GeeSortedSet* gee_tree_map_sub_entry_set_real_tail_set (GeeAbstractSortedSet* base, GeeMapEntry* after);
+static GeeSortedSet* gee_tree_map_sub_entry_set_real_sub_set (GeeAbstractSortedSet* base, GeeMapEntry* after, GeeMapEntry* before);
+static GeeIterator* gee_tree_map_sub_entry_set_real_iterator_at (GeeAbstractSortedSet* base, GeeMapEntry* entry);
+static GeeTreeMapSubEntryIterator* gee_tree_map_sub_entry_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node);
+static GeeTreeMapSubEntryIterator* gee_tree_map_sub_entry_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node);
+static GeeMapEntry* gee_tree_map_sub_entry_set_real_lower (GeeAbstractSortedSet* base, GeeMapEntry* entry);
+static GeeMapEntry* gee_tree_map_sub_entry_set_real_higher (GeeAbstractSortedSet* base, GeeMapEntry* entry);
+static GeeMapEntry* gee_tree_map_sub_entry_set_real_floor (GeeAbstractSortedSet* base, GeeMapEntry* entry);
+static GeeMapEntry* gee_tree_map_sub_entry_set_real_ceil (GeeAbstractSortedSet* base, GeeMapEntry* entry);
+static gboolean gee_tree_map_sub_entry_set_get_is_empty (GeeTreeMapSubEntrySet* self);
+static void gee_tree_map_sub_entry_set_finalize (GObject* obj);
+static void _vala_gee_tree_map_sub_entry_set_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
+static void _vala_gee_tree_map_sub_entry_set_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 #define GEE_TREE_MAP_NODE_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_NODE_ITERATOR, GeeTreeMapNodeIteratorPrivate))
 enum  {
 	GEE_TREE_MAP_NODE_ITERATOR_DUMMY_PROPERTY,
@@ -817,10 +1791,14 @@ enum  {
 	GEE_TREE_MAP_NODE_ITERATOR_K_DESTROY_FUNC,
 	GEE_TREE_MAP_NODE_ITERATOR_V_TYPE,
 	GEE_TREE_MAP_NODE_ITERATOR_V_DUP_FUNC,
-	GEE_TREE_MAP_NODE_ITERATOR_V_DESTROY_FUNC
+	GEE_TREE_MAP_NODE_ITERATOR_V_DESTROY_FUNC,
+	GEE_TREE_MAP_NODE_ITERATOR_READ_ONLY,
+	GEE_TREE_MAP_NODE_ITERATOR_VALID
 };
 static GeeTreeMapNodeIterator* gee_tree_map_node_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
 static GeeTreeMapNodeIterator* gee_tree_map_node_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map);
+static GeeTreeMapNodeIterator* gee_tree_map_node_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* current);
+static GeeTreeMapNodeIterator* gee_tree_map_node_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* current);
 static gboolean gee_tree_map_node_iterator_next (GeeTreeMapNodeIterator* self);
 static gboolean gee_tree_map_node_iterator_has_next (GeeTreeMapNodeIterator* self);
 static gboolean gee_tree_map_node_iterator_first (GeeTreeMapNodeIterator* self);
@@ -829,10 +1807,46 @@ static gboolean gee_tree_map_node_iterator_has_previous (GeeTreeMapNodeIterator*
 static gboolean gee_tree_map_node_iterator_last (GeeTreeMapNodeIterator* self);
 static void gee_tree_map_node_iterator_remove (GeeTreeMapNodeIterator* self);
 static void gee_tree_map_node_iterator_unset (GeeTreeMapNodeIterator* self);
+static GeeTreeMapNode* gee_tree_map_node_iterator_safe_next_get (GeeTreeMapNodeIterator* self);
+static GeeTreeMapNode* gee_tree_map_node_iterator_safe_previous_get (GeeTreeMapNodeIterator* self);
+static gboolean gee_tree_map_node_iterator_get_read_only (GeeTreeMapNodeIterator* self);
+static gboolean gee_tree_map_node_iterator_get_valid (GeeTreeMapNodeIterator* self);
 static void gee_tree_map_node_iterator_finalize (GObject* obj);
 static void _vala_gee_tree_map_node_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_map_node_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
-GType gee_bidir_iterator_get_type (void) G_GNUC_CONST;
+#define GEE_TREE_MAP_SUB_NODE_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, GeeTreeMapSubNodeIteratorPrivate))
+enum  {
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_DUMMY_PROPERTY,
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_K_TYPE,
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_K_DUP_FUNC,
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_K_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_V_TYPE,
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_V_DUP_FUNC,
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_V_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_READ_ONLY,
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_VALID
+};
+static GeeTreeMapSubNodeIterator* gee_tree_map_sub_node_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GeeTreeMapSubNodeIterator* gee_tree_map_sub_node_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range);
+static GeeTreeMapSubNodeIterator* gee_tree_map_sub_node_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node);
+static GeeTreeMapSubNodeIterator* gee_tree_map_sub_node_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node);
+static gboolean gee_tree_map_sub_node_iterator_next (GeeTreeMapSubNodeIterator* self);
+static gboolean gee_tree_map_sub_node_iterator_first (GeeTreeMapSubNodeIterator* self);
+static gboolean gee_tree_map_sub_node_iterator_has_next (GeeTreeMapSubNodeIterator* self);
+static gboolean gee_tree_map_sub_node_iterator_real_first (GeeTreeMapSubNodeIterator* self);
+static GeeTreeMapNodeIterator* gee_tree_map_sub_node_iterator_iterator_pointing_at (GeeTreeMapSubNodeIterator* self, GeeTreeMapNode* node);
+static gboolean gee_tree_map_sub_node_iterator_previous (GeeTreeMapSubNodeIterator* self);
+static gboolean gee_tree_map_sub_node_iterator_has_previous (GeeTreeMapSubNodeIterator* self);
+static gboolean gee_tree_map_sub_node_iterator_last (GeeTreeMapSubNodeIterator* self);
+static gboolean gee_tree_map_sub_node_iterator_real_last (GeeTreeMapSubNodeIterator* self);
+static void gee_tree_map_sub_node_iterator_remove (GeeTreeMapSubNodeIterator* self);
+static gboolean gee_tree_map_sub_node_iterator_get_valid (GeeTreeMapSubNodeIterator* self);
+static void gee_tree_map_sub_node_iterator_unset (GeeTreeMapSubNodeIterator* self);
+static GeeTreeMapNodeIterator* gee_tree_map_sub_node_iterator_real_iterator_pointing_at (GeeTreeMapSubNodeIterator* self, GeeTreeMapNode* node);
+static gboolean gee_tree_map_sub_node_iterator_get_read_only (GeeTreeMapSubNodeIterator* self);
+static void gee_tree_map_sub_node_iterator_finalize (GObject* obj);
+static void _vala_gee_tree_map_sub_node_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
+static void _vala_gee_tree_map_sub_node_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 #define GEE_TREE_MAP_KEY_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_KEY_ITERATOR, GeeTreeMapKeyIteratorPrivate))
 enum  {
 	GEE_TREE_MAP_KEY_ITERATOR_DUMMY_PROPERTY,
@@ -844,8 +1858,24 @@ enum  {
 	GEE_TREE_MAP_KEY_ITERATOR_V_DESTROY_FUNC
 };
 static gpointer gee_tree_map_key_iterator_real_get (GeeIterator* base);
+static gboolean gee_tree_map_key_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
 static void _vala_gee_tree_map_key_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_map_key_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
+#define GEE_TREE_MAP_SUB_KEY_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_SUB_KEY_ITERATOR, GeeTreeMapSubKeyIteratorPrivate))
+enum  {
+	GEE_TREE_MAP_SUB_KEY_ITERATOR_DUMMY_PROPERTY,
+	GEE_TREE_MAP_SUB_KEY_ITERATOR_K_TYPE,
+	GEE_TREE_MAP_SUB_KEY_ITERATOR_K_DUP_FUNC,
+	GEE_TREE_MAP_SUB_KEY_ITERATOR_K_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_KEY_ITERATOR_V_TYPE,
+	GEE_TREE_MAP_SUB_KEY_ITERATOR_V_DUP_FUNC,
+	GEE_TREE_MAP_SUB_KEY_ITERATOR_V_DESTROY_FUNC
+};
+static gpointer gee_tree_map_sub_key_iterator_real_get (GeeIterator* base);
+gboolean gee_iterator_get_valid (GeeIterator* self);
+static gboolean gee_tree_map_sub_key_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
+static void _vala_gee_tree_map_sub_key_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
+static void _vala_gee_tree_map_sub_key_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 #define GEE_TREE_MAP_VALUE_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_VALUE_ITERATOR, GeeTreeMapValueIteratorPrivate))
 enum  {
 	GEE_TREE_MAP_VALUE_ITERATOR_DUMMY_PROPERTY,
@@ -856,9 +1886,28 @@ enum  {
 	GEE_TREE_MAP_VALUE_ITERATOR_V_DUP_FUNC,
 	GEE_TREE_MAP_VALUE_ITERATOR_V_DESTROY_FUNC
 };
+static GeeTreeMapValueIterator* gee_tree_map_value_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* current);
+static GeeTreeMapValueIterator* gee_tree_map_value_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* current);
 static gpointer gee_tree_map_value_iterator_real_get (GeeIterator* base);
+static gboolean gee_tree_map_value_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
 static void _vala_gee_tree_map_value_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_map_value_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
+#define GEE_TREE_MAP_SUB_VALUE_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_SUB_VALUE_ITERATOR, GeeTreeMapSubValueIteratorPrivate))
+enum  {
+	GEE_TREE_MAP_SUB_VALUE_ITERATOR_DUMMY_PROPERTY,
+	GEE_TREE_MAP_SUB_VALUE_ITERATOR_K_TYPE,
+	GEE_TREE_MAP_SUB_VALUE_ITERATOR_K_DUP_FUNC,
+	GEE_TREE_MAP_SUB_VALUE_ITERATOR_K_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_VALUE_ITERATOR_V_TYPE,
+	GEE_TREE_MAP_SUB_VALUE_ITERATOR_V_DUP_FUNC,
+	GEE_TREE_MAP_SUB_VALUE_ITERATOR_V_DESTROY_FUNC
+};
+static GeeTreeMapSubValueIterator* gee_tree_map_sub_value_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node);
+static GeeTreeMapSubValueIterator* gee_tree_map_sub_value_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node);
+static gpointer gee_tree_map_sub_value_iterator_real_get (GeeIterator* base);
+static gboolean gee_tree_map_sub_value_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
+static void _vala_gee_tree_map_sub_value_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
+static void _vala_gee_tree_map_sub_value_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 #define GEE_TREE_MAP_ENTRY_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_ENTRY_ITERATOR, GeeTreeMapEntryIteratorPrivate))
 enum  {
 	GEE_TREE_MAP_ENTRY_ITERATOR_DUMMY_PROPERTY,
@@ -870,8 +1919,25 @@ enum  {
 	GEE_TREE_MAP_ENTRY_ITERATOR_V_DESTROY_FUNC
 };
 static GeeMapEntry* gee_tree_map_entry_iterator_real_get (GeeIterator* base);
+static void gee_tree_map_entry_iterator_real_remove (GeeIterator* base);
+static gboolean gee_tree_map_entry_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
 static void _vala_gee_tree_map_entry_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_map_entry_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
+#define GEE_TREE_MAP_SUB_ENTRY_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_SUB_ENTRY_ITERATOR, GeeTreeMapSubEntryIteratorPrivate))
+enum  {
+	GEE_TREE_MAP_SUB_ENTRY_ITERATOR_DUMMY_PROPERTY,
+	GEE_TREE_MAP_SUB_ENTRY_ITERATOR_K_TYPE,
+	GEE_TREE_MAP_SUB_ENTRY_ITERATOR_K_DUP_FUNC,
+	GEE_TREE_MAP_SUB_ENTRY_ITERATOR_K_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_ENTRY_ITERATOR_V_TYPE,
+	GEE_TREE_MAP_SUB_ENTRY_ITERATOR_V_DUP_FUNC,
+	GEE_TREE_MAP_SUB_ENTRY_ITERATOR_V_DESTROY_FUNC
+};
+static GeeMapEntry* gee_tree_map_sub_entry_iterator_real_get (GeeIterator* base);
+static void gee_tree_map_sub_entry_iterator_real_remove (GeeIterator* base);
+static gboolean gee_tree_map_sub_entry_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
+static void _vala_gee_tree_map_sub_entry_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
+static void _vala_gee_tree_map_sub_entry_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 #define GEE_TREE_MAP_MAP_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_MAP_ITERATOR, GeeTreeMapMapIteratorPrivate))
 enum  {
 	GEE_TREE_MAP_MAP_ITERATOR_DUMMY_PROPERTY,
@@ -880,19 +1946,49 @@ enum  {
 	GEE_TREE_MAP_MAP_ITERATOR_K_DESTROY_FUNC,
 	GEE_TREE_MAP_MAP_ITERATOR_V_TYPE,
 	GEE_TREE_MAP_MAP_ITERATOR_V_DUP_FUNC,
-	GEE_TREE_MAP_MAP_ITERATOR_V_DESTROY_FUNC
+	GEE_TREE_MAP_MAP_ITERATOR_V_DESTROY_FUNC,
+	GEE_TREE_MAP_MAP_ITERATOR_READ_ONLY,
+	GEE_TREE_MAP_MAP_ITERATOR_MUTABLE
 };
 static gpointer gee_tree_map_map_iterator_real_get_key (GeeMapIterator* base);
+gboolean gee_map_iterator_get_valid (GeeMapIterator* self);
 static gpointer gee_tree_map_map_iterator_real_get_value (GeeMapIterator* base);
 static void gee_tree_map_map_iterator_real_set_value (GeeMapIterator* base, gconstpointer value);
+gboolean gee_map_iterator_get_mutable (GeeMapIterator* self);
 static void _vala_gee_tree_map_map_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_map_map_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
+#define GEE_TREE_MAP_SUB_MAP_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_MAP_TYPE_SUB_MAP_ITERATOR, GeeTreeMapSubMapIteratorPrivate))
+enum  {
+	GEE_TREE_MAP_SUB_MAP_ITERATOR_DUMMY_PROPERTY,
+	GEE_TREE_MAP_SUB_MAP_ITERATOR_K_TYPE,
+	GEE_TREE_MAP_SUB_MAP_ITERATOR_K_DUP_FUNC,
+	GEE_TREE_MAP_SUB_MAP_ITERATOR_K_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_MAP_ITERATOR_V_TYPE,
+	GEE_TREE_MAP_SUB_MAP_ITERATOR_V_DUP_FUNC,
+	GEE_TREE_MAP_SUB_MAP_ITERATOR_V_DESTROY_FUNC,
+	GEE_TREE_MAP_SUB_MAP_ITERATOR_READ_ONLY,
+	GEE_TREE_MAP_SUB_MAP_ITERATOR_MUTABLE
+};
+static gpointer gee_tree_map_sub_map_iterator_real_get_key (GeeMapIterator* base);
+static gpointer gee_tree_map_sub_map_iterator_real_get_value (GeeMapIterator* base);
+static void gee_tree_map_sub_map_iterator_real_set_value (GeeMapIterator* base, gconstpointer value);
+static void _vala_gee_tree_map_sub_map_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
+static void _vala_gee_tree_map_sub_map_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 static void gee_tree_map_finalize (GObject* obj);
-GeeSet* gee_abstract_map_get_keys (GeeAbstractMap* self);
-GeeCollection* gee_abstract_map_get_values (GeeAbstractMap* self);
-GeeSet* gee_abstract_map_get_entries (GeeAbstractMap* self);
 static void _vala_gee_tree_map_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_map_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
+
+
+static GType gee_tree_map_range_type_get_type (void) {
+	static volatile gsize gee_tree_map_range_type_type_id__volatile = 0;
+	if (g_once_init_enter (&gee_tree_map_range_type_type_id__volatile)) {
+		static const GEnumValue values[] = {{GEE_TREE_MAP_RANGE_TYPE_HEAD, "GEE_TREE_MAP_RANGE_TYPE_HEAD", "head"}, {GEE_TREE_MAP_RANGE_TYPE_TAIL, "GEE_TREE_MAP_RANGE_TYPE_TAIL", "tail"}, {GEE_TREE_MAP_RANGE_TYPE_EMPTY, "GEE_TREE_MAP_RANGE_TYPE_EMPTY", "empty"}, {GEE_TREE_MAP_RANGE_TYPE_BOUNDED, "GEE_TREE_MAP_RANGE_TYPE_BOUNDED", "bounded"}, {0, NULL, NULL}};
+		GType gee_tree_map_range_type_type_id;
+		gee_tree_map_range_type_type_id = g_enum_register_static ("GeeTreeMapRangeType", values);
+		g_once_init_leave (&gee_tree_map_range_type_type_id__volatile, gee_tree_map_range_type_type_id);
+	}
+	return gee_tree_map_range_type_type_id__volatile;
+}
 
 
 /**
@@ -905,13 +2001,17 @@ static void _vala_gee_tree_map_set_property (GObject * object, guint property_id
  * @param key_compare_func an optional key comparator function
  * @param value_equal_func an optional values equality testing function
  */
-GeeTreeMap* gee_tree_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareFunc key_compare_func, GEqualFunc value_equal_func) {
+GeeTreeMap* gee_tree_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareDataFunc key_compare_func, void* key_compare_func_target, GDestroyNotify key_compare_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify) {
 	GeeTreeMap * self = NULL;
-	GCompareFunc _tmp0_;
-	GEqualFunc _tmp2_;
-	GCompareFunc _tmp4_;
-	GEqualFunc _tmp5_;
-	self = (GeeTreeMap*) gee_abstract_map_construct (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func);
+	GCompareDataFunc _tmp0_;
+	void* _tmp0__target;
+	GeeEqualDataFunc _tmp4_;
+	void* _tmp4__target;
+	GCompareDataFunc _tmp8_;
+	void* _tmp8__target;
+	GeeEqualDataFunc _tmp9_;
+	void* _tmp9__target;
+	self = (GeeTreeMap*) gee_abstract_bidir_sorted_map_construct (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func);
 	self->priv->k_type = k_type;
 	self->priv->k_dup_func = k_dup_func;
 	self->priv->k_destroy_func = k_destroy_func;
@@ -919,27 +2019,55 @@ GeeTreeMap* gee_tree_map_construct (GType object_type, GType k_type, GBoxedCopyF
 	self->priv->v_dup_func = v_dup_func;
 	self->priv->v_destroy_func = v_destroy_func;
 	_tmp0_ = key_compare_func;
+	_tmp0__target = key_compare_func_target;
 	if (_tmp0_ == NULL) {
-		GCompareFunc _tmp1_ = NULL;
-		_tmp1_ = gee_functions_get_compare_func_for (k_type);
-		key_compare_func = _tmp1_;
+		void* _tmp1_ = NULL;
+		GDestroyNotify _tmp2_ = NULL;
+		GCompareDataFunc _tmp3_ = NULL;
+		_tmp3_ = gee_functions_get_compare_func_for (k_type, &_tmp1_, &_tmp2_);
+		(key_compare_func_target_destroy_notify == NULL) ? NULL : (key_compare_func_target_destroy_notify (key_compare_func_target), NULL);
+		key_compare_func = NULL;
+		key_compare_func_target = NULL;
+		key_compare_func_target_destroy_notify = NULL;
+		key_compare_func = _tmp3_;
+		key_compare_func_target = _tmp1_;
+		key_compare_func_target_destroy_notify = _tmp2_;
 	}
-	_tmp2_ = value_equal_func;
-	if (_tmp2_ == NULL) {
-		GEqualFunc _tmp3_ = NULL;
-		_tmp3_ = gee_functions_get_equal_func_for (v_type);
-		value_equal_func = _tmp3_;
+	_tmp4_ = value_equal_func;
+	_tmp4__target = value_equal_func_target;
+	if (_tmp4_ == NULL) {
+		void* _tmp5_ = NULL;
+		GDestroyNotify _tmp6_ = NULL;
+		GeeEqualDataFunc _tmp7_ = NULL;
+		_tmp7_ = gee_functions_get_equal_func_for (v_type, &_tmp5_, &_tmp6_);
+		(value_equal_func_target_destroy_notify == NULL) ? NULL : (value_equal_func_target_destroy_notify (value_equal_func_target), NULL);
+		value_equal_func = NULL;
+		value_equal_func_target = NULL;
+		value_equal_func_target_destroy_notify = NULL;
+		value_equal_func = _tmp7_;
+		value_equal_func_target = _tmp5_;
+		value_equal_func_target_destroy_notify = _tmp6_;
 	}
-	_tmp4_ = key_compare_func;
-	gee_tree_map_set_key_compare_func (self, _tmp4_);
-	_tmp5_ = value_equal_func;
-	gee_tree_map_set_value_equal_func (self, _tmp5_);
+	_tmp8_ = key_compare_func;
+	_tmp8__target = key_compare_func_target;
+	gee_tree_map_set_key_compare_func (self, _tmp8_, _tmp8__target);
+	_tmp9_ = value_equal_func;
+	_tmp9__target = value_equal_func_target;
+	gee_tree_map_set_value_equal_func (self, _tmp9_, _tmp9__target);
+	(key_compare_func_target_destroy_notify == NULL) ? NULL : (key_compare_func_target_destroy_notify (key_compare_func_target), NULL);
+	key_compare_func = NULL;
+	key_compare_func_target = NULL;
+	key_compare_func_target_destroy_notify = NULL;
+	(value_equal_func_target_destroy_notify == NULL) ? NULL : (value_equal_func_target_destroy_notify (value_equal_func_target), NULL);
+	value_equal_func = NULL;
+	value_equal_func_target = NULL;
+	value_equal_func_target_destroy_notify = NULL;
 	return self;
 }
 
 
-GeeTreeMap* gee_tree_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareFunc key_compare_func, GEqualFunc value_equal_func) {
-	return gee_tree_map_construct (GEE_TYPE_TREE_MAP, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, key_compare_func, value_equal_func);
+GeeTreeMap* gee_tree_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareDataFunc key_compare_func, void* key_compare_func_target, GDestroyNotify key_compare_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify) {
+	return gee_tree_map_construct (GEE_TYPE_TREE_MAP, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, key_compare_func, key_compare_func_target, key_compare_func_target_destroy_notify, value_equal_func, value_equal_func_target, value_equal_func_target_destroy_notify);
 }
 
 
@@ -1090,8 +2218,10 @@ static gboolean gee_tree_map_real_has_key (GeeAbstractMap* base, gconstpointer k
 	cur = _tmp0_;
 	while (TRUE) {
 		GeeTreeMapNode* _tmp1_;
-		GCompareFunc _tmp2_;
-		GCompareFunc _tmp3_;
+		GCompareDataFunc _tmp2_;
+		void* _tmp2__target;
+		GCompareDataFunc _tmp3_;
+		void* _tmp3__target;
 		gconstpointer _tmp4_;
 		GeeTreeMapNode* _tmp5_;
 		gconstpointer _tmp6_;
@@ -1102,12 +2232,13 @@ static gboolean gee_tree_map_real_has_key (GeeAbstractMap* base, gconstpointer k
 		if (!(_tmp1_ != NULL)) {
 			break;
 		}
-		_tmp2_ = gee_tree_map_get_key_compare_func (self);
+		_tmp2_ = gee_tree_map_get_key_compare_func (self, &_tmp2__target);
 		_tmp3_ = _tmp2_;
+		_tmp3__target = _tmp2__target;
 		_tmp4_ = key;
 		_tmp5_ = cur;
 		_tmp6_ = _tmp5_->key;
-		_tmp7_ = _tmp3_ (_tmp4_, _tmp6_);
+		_tmp7_ = _tmp3_ (_tmp4_, _tmp6_, _tmp3__target);
 		res = _tmp7_;
 		_tmp8_ = res;
 		if (_tmp8_ == 0) {
@@ -1154,16 +2285,19 @@ static gboolean gee_tree_map_real_has (GeeAbstractMap* base, gconstpointer key, 
 	own_value = _tmp1_;
 	_tmp3_ = own_value;
 	if (_tmp3_ != NULL) {
-		GEqualFunc _tmp4_;
-		GEqualFunc _tmp5_;
+		GeeEqualDataFunc _tmp4_;
+		void* _tmp4__target;
+		GeeEqualDataFunc _tmp5_;
+		void* _tmp5__target;
 		gconstpointer _tmp6_;
 		gconstpointer _tmp7_;
 		gboolean _tmp8_ = FALSE;
-		_tmp4_ = gee_tree_map_get_value_equal_func (self);
+		_tmp4_ = gee_tree_map_get_value_equal_func (self, &_tmp4__target);
 		_tmp5_ = _tmp4_;
+		_tmp5__target = _tmp4__target;
 		_tmp6_ = own_value;
 		_tmp7_ = value;
-		_tmp8_ = _tmp5_ (_tmp6_, _tmp7_);
+		_tmp8_ = _tmp5_ (_tmp6_, _tmp7_, _tmp5__target);
 		_tmp2_ = _tmp8_;
 	} else {
 		_tmp2_ = FALSE;
@@ -1188,8 +2322,10 @@ static gpointer gee_tree_map_real_get (GeeAbstractMap* base, gconstpointer key) 
 	cur = _tmp0_;
 	while (TRUE) {
 		GeeTreeMapNode* _tmp1_;
-		GCompareFunc _tmp2_;
-		GCompareFunc _tmp3_;
+		GCompareDataFunc _tmp2_;
+		void* _tmp2__target;
+		GCompareDataFunc _tmp3_;
+		void* _tmp3__target;
 		gconstpointer _tmp4_;
 		GeeTreeMapNode* _tmp5_;
 		gconstpointer _tmp6_;
@@ -1200,12 +2336,13 @@ static gpointer gee_tree_map_real_get (GeeAbstractMap* base, gconstpointer key) 
 		if (!(_tmp1_ != NULL)) {
 			break;
 		}
-		_tmp2_ = gee_tree_map_get_key_compare_func (self);
+		_tmp2_ = gee_tree_map_get_key_compare_func (self, &_tmp2__target);
 		_tmp3_ = _tmp2_;
+		_tmp3__target = _tmp2__target;
 		_tmp4_ = key;
 		_tmp5_ = cur;
 		_tmp6_ = _tmp5_->key;
-		_tmp7_ = _tmp3_ (_tmp4_, _tmp6_);
+		_tmp7_ = _tmp3_ (_tmp4_, _tmp6_, _tmp3__target);
 		res = _tmp7_;
 		_tmp8_ = res;
 		if (_tmp8_ == 0) {
@@ -1240,17 +2377,22 @@ static gpointer gee_tree_map_real_get (GeeAbstractMap* base, gconstpointer key) 
 }
 
 
-static void gee_tree_map_set_to_node (GeeTreeMap* self, GeeTreeMapNode** node, gconstpointer key, gconstpointer value, GeeTreeMapNode* prev, GeeTreeMapNode* next) {
+static gboolean gee_tree_map_set_to_node (GeeTreeMap* self, GeeTreeMapNode** node, gconstpointer key, gconstpointer value, gpointer* old_value, GeeTreeMapNode* prev, GeeTreeMapNode* next) {
+	gpointer _vala_old_value = NULL;
+	gboolean result = FALSE;
 	GeeTreeMapNode* _tmp0_;
-	GCompareFunc _tmp13_;
-	GCompareFunc _tmp14_;
+	GCompareDataFunc _tmp13_;
+	void* _tmp13__target;
+	GCompareDataFunc _tmp14_;
+	void* _tmp14__target;
 	gconstpointer _tmp15_;
 	GeeTreeMapNode* _tmp16_;
 	gconstpointer _tmp17_;
 	gint _tmp18_ = 0;
 	gint cmp;
+	gboolean changed = FALSE;
 	gint _tmp19_;
-	g_return_if_fail (self != NULL);
+	g_return_val_if_fail (self != NULL, FALSE);
 	_tmp0_ = *node;
 	if (_tmp0_ == NULL) {
 		gconstpointer _tmp1_;
@@ -1263,6 +2405,8 @@ static void gee_tree_map_set_to_node (GeeTreeMap* self, GeeTreeMapNode** node, g
 		GeeTreeMapNode* _tmp8_;
 		GeeTreeMapNode* _tmp10_;
 		gint _tmp12_;
+		((_vala_old_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_old_value = (self->priv->v_destroy_func (_vala_old_value), NULL));
+		_vala_old_value = NULL;
 		_tmp1_ = key;
 		_tmp2_ = ((_tmp1_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp1_) : ((gpointer) _tmp1_);
 		_tmp3_ = value;
@@ -1286,58 +2430,112 @@ static void gee_tree_map_set_to_node (GeeTreeMap* self, GeeTreeMapNode** node, g
 		}
 		_tmp12_ = self->priv->_size;
 		self->priv->_size = _tmp12_ + 1;
+		result = TRUE;
+		if (old_value) {
+			*old_value = _vala_old_value;
+		} else {
+			((_vala_old_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_old_value = (self->priv->v_destroy_func (_vala_old_value), NULL));
+		}
+		return result;
 	}
-	_tmp13_ = gee_tree_map_get_key_compare_func (self);
+	_tmp13_ = gee_tree_map_get_key_compare_func (self, &_tmp13__target);
 	_tmp14_ = _tmp13_;
+	_tmp14__target = _tmp13__target;
 	_tmp15_ = key;
 	_tmp16_ = *node;
 	_tmp17_ = _tmp16_->key;
-	_tmp18_ = _tmp14_ (_tmp15_, _tmp17_);
+	_tmp18_ = _tmp14_ (_tmp15_, _tmp17_, _tmp14__target);
 	cmp = _tmp18_;
 	_tmp19_ = cmp;
 	if (_tmp19_ == 0) {
-		GeeTreeMapNode* _tmp20_;
-		gconstpointer _tmp21_;
-		gpointer _tmp22_;
-		_tmp20_ = *node;
-		_tmp21_ = value;
-		_tmp22_ = ((_tmp21_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp21_) : ((gpointer) _tmp21_);
-		((_tmp20_->value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_tmp20_->value = (self->priv->v_destroy_func (_tmp20_->value), NULL));
-		_tmp20_->value = _tmp22_;
-	} else {
-		gint _tmp23_;
-		_tmp23_ = cmp;
-		if (_tmp23_ < 0) {
-			GeeTreeMapNode* _tmp24_;
-			gconstpointer _tmp25_;
-			gconstpointer _tmp26_;
-			GeeTreeMapNode* _tmp27_;
-			GeeTreeMapNode* _tmp28_;
-			GeeTreeMapNode* _tmp29_;
-			_tmp24_ = *node;
-			_tmp25_ = key;
-			_tmp26_ = value;
-			_tmp27_ = *node;
-			_tmp28_ = _tmp27_->prev;
-			_tmp29_ = *node;
-			gee_tree_map_set_to_node (self, &_tmp24_->left, _tmp25_, _tmp26_, _tmp28_, _tmp29_);
+		GeeEqualDataFunc _tmp20_;
+		void* _tmp20__target;
+		GeeEqualDataFunc _tmp21_;
+		void* _tmp21__target;
+		gconstpointer _tmp22_;
+		GeeTreeMapNode* _tmp23_;
+		gconstpointer _tmp24_;
+		gboolean _tmp25_ = FALSE;
+		_tmp20_ = gee_tree_map_get_value_equal_func (self, &_tmp20__target);
+		_tmp21_ = _tmp20_;
+		_tmp21__target = _tmp20__target;
+		_tmp22_ = value;
+		_tmp23_ = *node;
+		_tmp24_ = _tmp23_->value;
+		_tmp25_ = _tmp21_ (_tmp22_, _tmp24_, _tmp21__target);
+		if (_tmp25_) {
+			((_vala_old_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_old_value = (self->priv->v_destroy_func (_vala_old_value), NULL));
+			_vala_old_value = NULL;
+			changed = FALSE;
 		} else {
-			GeeTreeMapNode* _tmp30_;
-			gconstpointer _tmp31_;
-			gconstpointer _tmp32_;
-			GeeTreeMapNode* _tmp33_;
-			GeeTreeMapNode* _tmp34_;
+			GeeTreeMapNode* _tmp26_;
+			gpointer _tmp27_;
+			GeeTreeMapNode* _tmp28_;
+			gconstpointer _tmp29_;
+			gpointer _tmp30_;
+			_tmp26_ = *node;
+			_tmp27_ = _tmp26_->value;
+			_tmp26_->value = NULL;
+			((_vala_old_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_old_value = (self->priv->v_destroy_func (_vala_old_value), NULL));
+			_vala_old_value = _tmp27_;
+			_tmp28_ = *node;
+			_tmp29_ = value;
+			_tmp30_ = ((_tmp29_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp29_) : ((gpointer) _tmp29_);
+			((_tmp28_->value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_tmp28_->value = (self->priv->v_destroy_func (_tmp28_->value), NULL));
+			_tmp28_->value = _tmp30_;
+			changed = TRUE;
+		}
+	} else {
+		gint _tmp31_;
+		_tmp31_ = cmp;
+		if (_tmp31_ < 0) {
+			GeeTreeMapNode* _tmp32_;
+			gconstpointer _tmp33_;
+			gconstpointer _tmp34_;
 			GeeTreeMapNode* _tmp35_;
-			_tmp30_ = *node;
-			_tmp31_ = key;
-			_tmp32_ = value;
-			_tmp33_ = *node;
-			_tmp34_ = *node;
-			_tmp35_ = _tmp34_->next;
-			gee_tree_map_set_to_node (self, &_tmp30_->right, _tmp31_, _tmp32_, _tmp33_, _tmp35_);
+			GeeTreeMapNode* _tmp36_;
+			GeeTreeMapNode* _tmp37_;
+			gpointer _tmp38_ = NULL;
+			gboolean _tmp39_ = FALSE;
+			_tmp32_ = *node;
+			_tmp33_ = key;
+			_tmp34_ = value;
+			_tmp35_ = *node;
+			_tmp36_ = _tmp35_->prev;
+			_tmp37_ = *node;
+			_tmp39_ = gee_tree_map_set_to_node (self, &_tmp32_->left, _tmp33_, _tmp34_, &_tmp38_, _tmp36_, _tmp37_);
+			((_vala_old_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_old_value = (self->priv->v_destroy_func (_vala_old_value), NULL));
+			_vala_old_value = _tmp38_;
+			changed = _tmp39_;
+		} else {
+			GeeTreeMapNode* _tmp40_;
+			gconstpointer _tmp41_;
+			gconstpointer _tmp42_;
+			GeeTreeMapNode* _tmp43_;
+			GeeTreeMapNode* _tmp44_;
+			GeeTreeMapNode* _tmp45_;
+			gpointer _tmp46_ = NULL;
+			gboolean _tmp47_ = FALSE;
+			_tmp40_ = *node;
+			_tmp41_ = key;
+			_tmp42_ = value;
+			_tmp43_ = *node;
+			_tmp44_ = *node;
+			_tmp45_ = _tmp44_->next;
+			_tmp47_ = gee_tree_map_set_to_node (self, &_tmp40_->right, _tmp41_, _tmp42_, &_tmp46_, _tmp43_, _tmp45_);
+			((_vala_old_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_old_value = (self->priv->v_destroy_func (_vala_old_value), NULL));
+			_vala_old_value = _tmp46_;
+			changed = _tmp47_;
 		}
 	}
 	gee_tree_map_fix_up (self, node);
+	result = changed;
+	if (old_value) {
+		*old_value = _vala_old_value;
+	} else {
+		((_vala_old_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_old_value = (self->priv->v_destroy_func (_vala_old_value), NULL));
+	}
+	return result;
 }
 
 
@@ -1346,18 +2544,23 @@ static void gee_tree_map_set_to_node (GeeTreeMap* self, GeeTreeMapNode** node, g
  */
 static void gee_tree_map_real_set (GeeAbstractMap* base, gconstpointer key, gconstpointer value) {
 	GeeTreeMap * self;
+	gpointer old_value = NULL;
 	gconstpointer _tmp0_;
 	gconstpointer _tmp1_;
-	GeeTreeMapNode* _tmp2_;
-	gint _tmp3_;
+	gpointer _tmp2_ = NULL;
+	GeeTreeMapNode* _tmp3_;
+	gint _tmp4_;
 	self = (GeeTreeMap*) base;
 	_tmp0_ = key;
 	_tmp1_ = value;
-	gee_tree_map_set_to_node (self, &self->priv->root, _tmp0_, _tmp1_, NULL, NULL);
-	_tmp2_ = self->priv->root;
-	_tmp2_->color = GEE_TREE_MAP_NODE_COLOR_BLACK;
-	_tmp3_ = self->priv->stamp;
-	self->priv->stamp = _tmp3_ + 1;
+	gee_tree_map_set_to_node (self, &self->priv->root, _tmp0_, _tmp1_, &_tmp2_, NULL, NULL);
+	((old_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (old_value = (self->priv->v_destroy_func (old_value), NULL));
+	old_value = _tmp2_;
+	_tmp3_ = self->priv->root;
+	_tmp3_->color = GEE_TREE_MAP_NODE_COLOR_BLACK;
+	_tmp4_ = self->priv->stamp;
+	self->priv->stamp = _tmp4_ + 1;
+	((old_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (old_value = (self->priv->v_destroy_func (old_value), NULL));
 }
 
 
@@ -1415,85 +2618,76 @@ static void gee_tree_map_fix_removal (GeeTreeMap* self, GeeTreeMapNode** node, g
 	gpointer _vala_value = NULL;
 	GeeTreeMapNode* _tmp0_;
 	GeeTreeMapNode* n;
+	GeeTreeMapNode* _tmp1_;
+	gpointer _tmp2_;
+	GeeTreeMapNode* _tmp3_;
+	gpointer _tmp4_;
+	GeeTreeMapNode* _tmp5_;
 	GeeTreeMapNode* _tmp6_;
-	GeeTreeMapNode* _tmp7_;
+	GeeTreeMapNode* _tmp13_;
 	GeeTreeMapNode* _tmp14_;
-	GeeTreeMapNode* _tmp15_;
-	GeeTreeMapNode* _tmp22_;
-	gint _tmp23_;
+	GeeTreeMapNode* _tmp21_;
+	gint _tmp22_;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (*node != NULL);
 	_tmp0_ = *node;
 	*node = NULL;
 	n = _tmp0_;
-	if ((&_vala_key) != NULL) {
-		GeeTreeMapNode* _tmp1_;
-		gpointer _tmp2_;
-		_tmp1_ = n;
-		_tmp2_ = _tmp1_->key;
-		_tmp1_->key = NULL;
-		((_vala_key == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_vala_key = (self->priv->k_destroy_func (_vala_key), NULL));
-		_vala_key = _tmp2_;
-	} else {
-		GeeTreeMapNode* _tmp3_;
-		_tmp3_ = n;
-		((_tmp3_->key == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_tmp3_->key = (self->priv->k_destroy_func (_tmp3_->key), NULL));
-		_tmp3_->key = NULL;
-	}
-	if ((&_vala_value) != NULL) {
-		GeeTreeMapNode* _tmp4_;
-		gpointer _tmp5_;
-		_tmp4_ = n;
-		_tmp5_ = _tmp4_->value;
-		_tmp4_->value = NULL;
-		((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
-		_vala_value = _tmp5_;
-	}
-	_tmp6_ = n;
-	_tmp7_ = _tmp6_->prev;
-	if (_tmp7_ != NULL) {
+	_tmp1_ = n;
+	_tmp2_ = _tmp1_->key;
+	_tmp1_->key = NULL;
+	((_vala_key == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_vala_key = (self->priv->k_destroy_func (_vala_key), NULL));
+	_vala_key = _tmp2_;
+	_tmp3_ = n;
+	_tmp4_ = _tmp3_->value;
+	_tmp3_->value = NULL;
+	((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
+	_vala_value = _tmp4_;
+	_tmp5_ = n;
+	_tmp6_ = _tmp5_->prev;
+	if (_tmp6_ != NULL) {
+		GeeTreeMapNode* _tmp7_;
 		GeeTreeMapNode* _tmp8_;
 		GeeTreeMapNode* _tmp9_;
 		GeeTreeMapNode* _tmp10_;
-		GeeTreeMapNode* _tmp11_;
-		_tmp8_ = n;
-		_tmp9_ = _tmp8_->prev;
-		_tmp10_ = n;
-		_tmp11_ = _tmp10_->next;
-		_tmp9_->next = _tmp11_;
+		_tmp7_ = n;
+		_tmp8_ = _tmp7_->prev;
+		_tmp9_ = n;
+		_tmp10_ = _tmp9_->next;
+		_tmp8_->next = _tmp10_;
 	} else {
+		GeeTreeMapNode* _tmp11_;
 		GeeTreeMapNode* _tmp12_;
-		GeeTreeMapNode* _tmp13_;
-		_tmp12_ = n;
-		_tmp13_ = _tmp12_->next;
-		self->priv->first = _tmp13_;
+		_tmp11_ = n;
+		_tmp12_ = _tmp11_->next;
+		self->priv->first = _tmp12_;
 	}
-	_tmp14_ = n;
-	_tmp15_ = _tmp14_->next;
-	if (_tmp15_ != NULL) {
+	_tmp13_ = n;
+	_tmp14_ = _tmp13_->next;
+	if (_tmp14_ != NULL) {
+		GeeTreeMapNode* _tmp15_;
 		GeeTreeMapNode* _tmp16_;
 		GeeTreeMapNode* _tmp17_;
 		GeeTreeMapNode* _tmp18_;
-		GeeTreeMapNode* _tmp19_;
-		_tmp16_ = n;
-		_tmp17_ = _tmp16_->next;
-		_tmp18_ = n;
-		_tmp19_ = _tmp18_->prev;
-		_tmp17_->prev = _tmp19_;
+		_tmp15_ = n;
+		_tmp16_ = _tmp15_->next;
+		_tmp17_ = n;
+		_tmp18_ = _tmp17_->prev;
+		_tmp16_->prev = _tmp18_;
 	} else {
+		GeeTreeMapNode* _tmp19_;
 		GeeTreeMapNode* _tmp20_;
-		GeeTreeMapNode* _tmp21_;
-		_tmp20_ = n;
-		_tmp21_ = _tmp20_->next;
-		self->priv->last = _tmp21_;
+		_tmp19_ = n;
+		_tmp20_ = _tmp19_->next;
+		self->priv->last = _tmp20_;
 	}
-	_tmp22_ = n;
-	((_tmp22_->value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_tmp22_->value = (self->priv->v_destroy_func (_tmp22_->value), NULL));
-	_tmp22_->value = NULL;
+	_tmp21_ = n;
+	((_tmp21_->value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_tmp21_->value = (self->priv->v_destroy_func (_tmp21_->value), NULL));
+	_tmp21_->value = NULL;
 	_gee_tree_map_node_free0 (*node);
 	*node = NULL;
-	_tmp23_ = self->priv->_size;
-	self->priv->_size = _tmp23_ - 1;
+	_tmp22_ = self->priv->_size;
+	self->priv->_size = _tmp22_ - 1;
 	_gee_tree_map_node_free0 (n);
 	if (key) {
 		*key = _vala_key;
@@ -1594,6 +2788,10 @@ static gboolean gee_tree_map_remove_from_node (GeeTreeMap* self, GeeTreeMapNode*
 	g_return_val_if_fail (self != NULL, FALSE);
 	_tmp0_ = *node;
 	if (_tmp0_ == NULL) {
+		((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
+		_vala_value = NULL;
+		_vala_next = NULL;
+		_vala_prev = NULL;
 		result = FALSE;
 		if (value) {
 			*value = _vala_value;
@@ -1608,18 +2806,21 @@ static gboolean gee_tree_map_remove_from_node (GeeTreeMap* self, GeeTreeMapNode*
 		}
 		return result;
 	} else {
-		GCompareFunc _tmp1_;
-		GCompareFunc _tmp2_;
+		GCompareDataFunc _tmp1_;
+		void* _tmp1__target;
+		GCompareDataFunc _tmp2_;
+		void* _tmp2__target;
 		gconstpointer _tmp3_;
 		GeeTreeMapNode* _tmp4_;
 		gconstpointer _tmp5_;
 		gint _tmp6_ = 0;
-		_tmp1_ = gee_tree_map_get_key_compare_func (self);
+		_tmp1_ = gee_tree_map_get_key_compare_func (self, &_tmp1__target);
 		_tmp2_ = _tmp1_;
+		_tmp2__target = _tmp1__target;
 		_tmp3_ = key;
 		_tmp4_ = *node;
 		_tmp5_ = _tmp4_->key;
-		_tmp6_ = _tmp2_ (_tmp3_, _tmp5_);
+		_tmp6_ = _tmp2_ (_tmp3_, _tmp5_, _tmp2__target);
 		if (_tmp6_ < 0) {
 			GeeTreeMapNode* _tmp7_;
 			GeeTreeMapNode* _tmp8_;
@@ -1643,6 +2844,10 @@ static gboolean gee_tree_map_remove_from_node (GeeTreeMap* self, GeeTreeMapNode*
 			left = _tmp8_;
 			_tmp9_ = left;
 			if (_tmp9_ == NULL) {
+				((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
+				_vala_value = NULL;
+				_vala_next = NULL;
+				_vala_prev = NULL;
 				result = FALSE;
 				if (value) {
 					*value = _vala_value;
@@ -1714,8 +2919,10 @@ static gboolean gee_tree_map_remove_from_node (GeeTreeMap* self, GeeTreeMapNode*
 			GeeTreeMapNode* _tmp31_;
 			GeeTreeMapNode* r;
 			gboolean _tmp32_ = FALSE;
-			GCompareFunc _tmp33_;
-			GCompareFunc _tmp34_;
+			GCompareDataFunc _tmp33_;
+			void* _tmp33__target;
+			GCompareDataFunc _tmp34_;
+			void* _tmp34__target;
 			gconstpointer _tmp35_;
 			GeeTreeMapNode* _tmp36_;
 			gconstpointer _tmp37_;
@@ -1727,8 +2934,10 @@ static gboolean gee_tree_map_remove_from_node (GeeTreeMap* self, GeeTreeMapNode*
 			gboolean _tmp49_ = FALSE;
 			gboolean _tmp51_;
 			gboolean _tmp55_;
-			GCompareFunc _tmp56_;
-			GCompareFunc _tmp57_;
+			GCompareDataFunc _tmp56_;
+			void* _tmp56__target;
+			GCompareDataFunc _tmp57_;
+			void* _tmp57__target;
 			gconstpointer _tmp58_;
 			GeeTreeMapNode* _tmp59_;
 			gconstpointer _tmp60_;
@@ -1742,12 +2951,13 @@ static gboolean gee_tree_map_remove_from_node (GeeTreeMap* self, GeeTreeMapNode*
 			_tmp30_ = *node;
 			_tmp31_ = _tmp30_->right;
 			r = _tmp31_;
-			_tmp33_ = gee_tree_map_get_key_compare_func (self);
+			_tmp33_ = gee_tree_map_get_key_compare_func (self, &_tmp33__target);
 			_tmp34_ = _tmp33_;
+			_tmp34__target = _tmp33__target;
 			_tmp35_ = key;
 			_tmp36_ = *node;
 			_tmp37_ = _tmp36_->key;
-			_tmp38_ = _tmp34_ (_tmp35_, _tmp37_);
+			_tmp38_ = _tmp34_ (_tmp35_, _tmp37_, _tmp34__target);
 			if (_tmp38_ == 0) {
 				GeeTreeMapNode* _tmp39_;
 				_tmp39_ = r;
@@ -1757,21 +2967,17 @@ static gboolean gee_tree_map_remove_from_node (GeeTreeMap* self, GeeTreeMapNode*
 			}
 			_tmp40_ = _tmp32_;
 			if (_tmp40_) {
+				GeeTreeMapNode* _tmp41_;
+				GeeTreeMapNode* _tmp42_;
+				GeeTreeMapNode* _tmp43_;
+				GeeTreeMapNode* _tmp44_;
 				gpointer _tmp45_ = NULL;
-				if ((&_vala_prev) != NULL) {
-					GeeTreeMapNode* _tmp41_;
-					GeeTreeMapNode* _tmp42_;
-					_tmp41_ = *node;
-					_tmp42_ = _tmp41_->prev;
-					_vala_prev = _tmp42_;
-				}
-				if ((&_vala_next) != NULL) {
-					GeeTreeMapNode* _tmp43_;
-					GeeTreeMapNode* _tmp44_;
-					_tmp43_ = *node;
-					_tmp44_ = _tmp43_->next;
-					_vala_next = _tmp44_;
-				}
+				_tmp41_ = *node;
+				_tmp42_ = _tmp41_->prev;
+				_vala_prev = _tmp42_;
+				_tmp43_ = *node;
+				_tmp44_ = _tmp43_->next;
+				_vala_next = _tmp44_;
 				gee_tree_map_fix_removal (self, node, NULL, &_tmp45_);
 				((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
 				_vala_value = _tmp45_;
@@ -1814,15 +3020,19 @@ static gboolean gee_tree_map_remove_from_node (GeeTreeMap* self, GeeTreeMapNode*
 			if (_tmp55_) {
 				gee_tree_map_move_red_right (self, node);
 			}
-			_tmp56_ = gee_tree_map_get_key_compare_func (self);
+			_tmp56_ = gee_tree_map_get_key_compare_func (self, &_tmp56__target);
 			_tmp57_ = _tmp56_;
+			_tmp57__target = _tmp56__target;
 			_tmp58_ = key;
 			_tmp59_ = *node;
 			_tmp60_ = _tmp59_->key;
-			_tmp61_ = _tmp57_ (_tmp58_, _tmp60_);
+			_tmp61_ = _tmp57_ (_tmp58_, _tmp60_, _tmp57__target);
 			if (_tmp61_ == 0) {
 				GeeTreeMapNode* _tmp62_;
 				gpointer _tmp63_;
+				GeeTreeMapNode* _tmp64_;
+				GeeTreeMapNode* _tmp65_;
+				GeeTreeMapNode* _tmp66_;
 				GeeTreeMapNode* _tmp67_;
 				GeeTreeMapNode* _tmp68_;
 				GeeTreeMapNode* _tmp69_;
@@ -1833,18 +3043,11 @@ static gboolean gee_tree_map_remove_from_node (GeeTreeMap* self, GeeTreeMapNode*
 				_tmp62_->value = NULL;
 				((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
 				_vala_value = _tmp63_;
-				if ((&_vala_prev) != NULL) {
-					GeeTreeMapNode* _tmp64_;
-					GeeTreeMapNode* _tmp65_;
-					_tmp64_ = *node;
-					_tmp65_ = _tmp64_->prev;
-					_vala_prev = _tmp65_;
-				}
-				if ((&_vala_next) != NULL) {
-					GeeTreeMapNode* _tmp66_;
-					_tmp66_ = *node;
-					_vala_next = _tmp66_;
-				}
+				_tmp64_ = *node;
+				_tmp65_ = _tmp64_->prev;
+				_vala_prev = _tmp65_;
+				_tmp66_ = *node;
+				_vala_next = _tmp66_;
 				_tmp67_ = *node;
 				_tmp68_ = *node;
 				_tmp69_ = *node;
@@ -2000,36 +3203,27 @@ static gboolean gee_tree_map_real_unset (GeeAbstractMap* base, gconstpointer key
 	GeeTreeMap * self;
 	gpointer _vala_value = NULL;
 	gboolean result = FALSE;
-	gpointer node_value = NULL;
 	gconstpointer _tmp0_;
 	gpointer _tmp1_ = NULL;
 	gboolean _tmp2_ = FALSE;
 	gboolean b;
-	GeeTreeMapNode* _tmp4_;
-	gint _tmp6_;
+	GeeTreeMapNode* _tmp3_;
+	gint _tmp5_;
 	self = (GeeTreeMap*) base;
 	_tmp0_ = key;
 	_tmp2_ = gee_tree_map_remove_from_node (self, &self->priv->root, _tmp0_, &_tmp1_, NULL, NULL);
-	((node_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (node_value = (self->priv->v_destroy_func (node_value), NULL));
-	node_value = _tmp1_;
+	((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
+	_vala_value = _tmp1_;
 	b = _tmp2_;
-	if ((&_vala_value) != NULL) {
-		gpointer _tmp3_;
-		_tmp3_ = node_value;
-		node_value = NULL;
-		((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
-		_vala_value = _tmp3_;
+	_tmp3_ = self->priv->root;
+	if (_tmp3_ != NULL) {
+		GeeTreeMapNode* _tmp4_;
+		_tmp4_ = self->priv->root;
+		_tmp4_->color = GEE_TREE_MAP_NODE_COLOR_BLACK;
 	}
-	_tmp4_ = self->priv->root;
-	if (_tmp4_ != NULL) {
-		GeeTreeMapNode* _tmp5_;
-		_tmp5_ = self->priv->root;
-		_tmp5_->color = GEE_TREE_MAP_NODE_COLOR_BLACK;
-	}
-	_tmp6_ = self->priv->stamp;
-	self->priv->stamp = _tmp6_ + 1;
+	_tmp5_ = self->priv->stamp;
+	self->priv->stamp = _tmp5_ + 1;
 	result = b;
-	((node_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (node_value = (self->priv->v_destroy_func (node_value), NULL));
 	if (value) {
 		*value = _vala_value;
 	} else {
@@ -2106,6 +3300,77 @@ static void gee_tree_map_real_clear (GeeAbstractMap* base) {
 /**
  * {@inheritDoc}
  */
+static GeeSortedMap* gee_tree_map_real_head_map (GeeAbstractSortedMap* base, gconstpointer before) {
+	GeeTreeMap * self;
+	GeeSortedMap* result = NULL;
+	gconstpointer _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeTreeMapRange* _tmp2_;
+	GeeTreeMapSubMap* _tmp3_;
+	GeeSortedMap* _tmp4_;
+	self = (GeeTreeMap*) base;
+	_tmp0_ = before;
+	_tmp1_ = gee_tree_map_range_new_head (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, self, _tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = gee_tree_map_sub_map_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, self, _tmp2_);
+	_tmp4_ = (GeeSortedMap*) _tmp3_;
+	_gee_tree_map_range_unref0 (_tmp2_);
+	result = _tmp4_;
+	return result;
+}
+
+
+/**
+ * {@inheritDoc}
+ */
+static GeeSortedMap* gee_tree_map_real_tail_map (GeeAbstractSortedMap* base, gconstpointer after) {
+	GeeTreeMap * self;
+	GeeSortedMap* result = NULL;
+	gconstpointer _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeTreeMapRange* _tmp2_;
+	GeeTreeMapSubMap* _tmp3_;
+	GeeSortedMap* _tmp4_;
+	self = (GeeTreeMap*) base;
+	_tmp0_ = after;
+	_tmp1_ = gee_tree_map_range_new_tail (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, self, _tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = gee_tree_map_sub_map_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, self, _tmp2_);
+	_tmp4_ = (GeeSortedMap*) _tmp3_;
+	_gee_tree_map_range_unref0 (_tmp2_);
+	result = _tmp4_;
+	return result;
+}
+
+
+/**
+ * {@inheritDoc}
+ */
+static GeeSortedMap* gee_tree_map_real_sub_map (GeeAbstractSortedMap* base, gconstpointer after, gconstpointer before) {
+	GeeTreeMap * self;
+	GeeSortedMap* result = NULL;
+	gconstpointer _tmp0_;
+	gconstpointer _tmp1_;
+	GeeTreeMapRange* _tmp2_;
+	GeeTreeMapRange* _tmp3_;
+	GeeTreeMapSubMap* _tmp4_;
+	GeeSortedMap* _tmp5_;
+	self = (GeeTreeMap*) base;
+	_tmp0_ = after;
+	_tmp1_ = before;
+	_tmp2_ = gee_tree_map_range_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, self, _tmp0_, _tmp1_);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = gee_tree_map_sub_map_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, self, _tmp3_);
+	_tmp5_ = (GeeSortedMap*) _tmp4_;
+	_gee_tree_map_range_unref0 (_tmp3_);
+	result = _tmp5_;
+	return result;
+}
+
+
+/**
+ * {@inheritDoc}
+ */
 static GeeMapIterator* gee_tree_map_real_map_iterator (GeeAbstractMap* base) {
 	GeeTreeMap * self;
 	GeeMapIterator* result = NULL;
@@ -2113,6 +3378,450 @@ static GeeMapIterator* gee_tree_map_real_map_iterator (GeeAbstractMap* base) {
 	self = (GeeTreeMap*) base;
 	_tmp0_ = gee_tree_map_map_iterator_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, self);
 	result = (GeeMapIterator*) _tmp0_;
+	return result;
+}
+
+
+/**
+ * {@inheritDoc}
+ */
+static GeeBidirMapIterator* gee_tree_map_real_bidir_map_iterator (GeeAbstractBidirSortedMap* base) {
+	GeeTreeMap * self;
+	GeeBidirMapIterator* result = NULL;
+	GeeTreeMapMapIterator* _tmp0_;
+	self = (GeeTreeMap*) base;
+	_tmp0_ = gee_tree_map_map_iterator_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, self);
+	result = (GeeBidirMapIterator*) _tmp0_;
+	return result;
+}
+
+
+static inline gpointer gee_tree_map_min (GeeTreeMap* self, gconstpointer a, gconstpointer b) {
+	gpointer result = NULL;
+	gconstpointer _tmp0_ = NULL;
+	GCompareDataFunc _tmp1_;
+	void* _tmp1__target;
+	GCompareDataFunc _tmp2_;
+	void* _tmp2__target;
+	gconstpointer _tmp3_;
+	gconstpointer _tmp4_;
+	gint _tmp5_ = 0;
+	gconstpointer _tmp8_;
+	gpointer _tmp9_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp1_ = gee_tree_map_get_key_compare_func (self, &_tmp1__target);
+	_tmp2_ = _tmp1_;
+	_tmp2__target = _tmp1__target;
+	_tmp3_ = a;
+	_tmp4_ = b;
+	_tmp5_ = _tmp2_ (_tmp3_, _tmp4_, _tmp2__target);
+	if (_tmp5_ <= 0) {
+		gconstpointer _tmp6_;
+		_tmp6_ = a;
+		_tmp0_ = _tmp6_;
+	} else {
+		gconstpointer _tmp7_;
+		_tmp7_ = b;
+		_tmp0_ = _tmp7_;
+	}
+	_tmp8_ = _tmp0_;
+	_tmp9_ = ((_tmp8_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp8_) : ((gpointer) _tmp8_);
+	result = _tmp9_;
+	return result;
+}
+
+
+static inline gpointer gee_tree_map_max (GeeTreeMap* self, gconstpointer a, gconstpointer b) {
+	gpointer result = NULL;
+	gconstpointer _tmp0_ = NULL;
+	GCompareDataFunc _tmp1_;
+	void* _tmp1__target;
+	GCompareDataFunc _tmp2_;
+	void* _tmp2__target;
+	gconstpointer _tmp3_;
+	gconstpointer _tmp4_;
+	gint _tmp5_ = 0;
+	gconstpointer _tmp8_;
+	gpointer _tmp9_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp1_ = gee_tree_map_get_key_compare_func (self, &_tmp1__target);
+	_tmp2_ = _tmp1_;
+	_tmp2__target = _tmp1__target;
+	_tmp3_ = a;
+	_tmp4_ = b;
+	_tmp5_ = _tmp2_ (_tmp3_, _tmp4_, _tmp2__target);
+	if (_tmp5_ > 0) {
+		gconstpointer _tmp6_;
+		_tmp6_ = a;
+		_tmp0_ = _tmp6_;
+	} else {
+		gconstpointer _tmp7_;
+		_tmp7_ = b;
+		_tmp0_ = _tmp7_;
+	}
+	_tmp8_ = _tmp0_;
+	_tmp9_ = ((_tmp8_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp8_) : ((gpointer) _tmp8_);
+	result = _tmp9_;
+	return result;
+}
+
+
+static inline GeeTreeMapNode* gee_tree_map_find_node (GeeTreeMap* self, gconstpointer key) {
+	GeeTreeMapNode* result = NULL;
+	GeeTreeMapNode* _tmp0_;
+	GeeTreeMapNode* cur;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->root;
+	cur = _tmp0_;
+	while (TRUE) {
+		GeeTreeMapNode* _tmp1_;
+		GCompareDataFunc _tmp2_;
+		void* _tmp2__target;
+		GCompareDataFunc _tmp3_;
+		void* _tmp3__target;
+		gconstpointer _tmp4_;
+		GeeTreeMapNode* _tmp5_;
+		gconstpointer _tmp6_;
+		gint _tmp7_ = 0;
+		gint res;
+		gint _tmp8_;
+		_tmp1_ = cur;
+		if (!(_tmp1_ != NULL)) {
+			break;
+		}
+		_tmp2_ = gee_tree_map_get_key_compare_func (self, &_tmp2__target);
+		_tmp3_ = _tmp2_;
+		_tmp3__target = _tmp2__target;
+		_tmp4_ = key;
+		_tmp5_ = cur;
+		_tmp6_ = _tmp5_->key;
+		_tmp7_ = _tmp3_ (_tmp4_, _tmp6_, _tmp3__target);
+		res = _tmp7_;
+		_tmp8_ = res;
+		if (_tmp8_ == 0) {
+			GeeTreeMapNode* _tmp9_;
+			_tmp9_ = cur;
+			result = _tmp9_;
+			return result;
+		} else {
+			gint _tmp10_;
+			_tmp10_ = res;
+			if (_tmp10_ < 0) {
+				GeeTreeMapNode* _tmp11_;
+				GeeTreeMapNode* _tmp12_;
+				_tmp11_ = cur;
+				_tmp12_ = _tmp11_->left;
+				cur = _tmp12_;
+			} else {
+				GeeTreeMapNode* _tmp13_;
+				GeeTreeMapNode* _tmp14_;
+				_tmp13_ = cur;
+				_tmp14_ = _tmp13_->right;
+				cur = _tmp14_;
+			}
+		}
+	}
+	result = NULL;
+	return result;
+}
+
+
+static inline GeeTreeMapNode* gee_tree_map_find_nearest (GeeTreeMap* self, gconstpointer key) {
+	GeeTreeMapNode* result = NULL;
+	GeeTreeMapNode* _tmp0_;
+	GeeTreeMapNode* cur;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->root;
+	cur = _tmp0_;
+	while (TRUE) {
+		GeeTreeMapNode* _tmp1_;
+		GCompareDataFunc _tmp2_;
+		void* _tmp2__target;
+		GCompareDataFunc _tmp3_;
+		void* _tmp3__target;
+		gconstpointer _tmp4_;
+		GeeTreeMapNode* _tmp5_;
+		gconstpointer _tmp6_;
+		gint _tmp7_ = 0;
+		gint res;
+		gint _tmp8_;
+		_tmp1_ = cur;
+		if (!(_tmp1_ != NULL)) {
+			break;
+		}
+		_tmp2_ = gee_tree_map_get_key_compare_func (self, &_tmp2__target);
+		_tmp3_ = _tmp2_;
+		_tmp3__target = _tmp2__target;
+		_tmp4_ = key;
+		_tmp5_ = cur;
+		_tmp6_ = _tmp5_->key;
+		_tmp7_ = _tmp3_ (_tmp4_, _tmp6_, _tmp3__target);
+		res = _tmp7_;
+		_tmp8_ = res;
+		if (_tmp8_ == 0) {
+			GeeTreeMapNode* _tmp9_;
+			_tmp9_ = cur;
+			result = _tmp9_;
+			return result;
+		} else {
+			gint _tmp10_;
+			_tmp10_ = res;
+			if (_tmp10_ < 0) {
+				GeeTreeMapNode* _tmp11_;
+				GeeTreeMapNode* _tmp12_;
+				GeeTreeMapNode* _tmp14_;
+				GeeTreeMapNode* _tmp15_;
+				_tmp11_ = cur;
+				_tmp12_ = _tmp11_->left;
+				if (_tmp12_ == NULL) {
+					GeeTreeMapNode* _tmp13_;
+					_tmp13_ = cur;
+					result = _tmp13_;
+					return result;
+				}
+				_tmp14_ = cur;
+				_tmp15_ = _tmp14_->left;
+				cur = _tmp15_;
+			} else {
+				GeeTreeMapNode* _tmp16_;
+				GeeTreeMapNode* _tmp17_;
+				GeeTreeMapNode* _tmp19_;
+				GeeTreeMapNode* _tmp20_;
+				_tmp16_ = cur;
+				_tmp17_ = _tmp16_->right;
+				if (_tmp17_ == NULL) {
+					GeeTreeMapNode* _tmp18_;
+					_tmp18_ = cur;
+					result = _tmp18_;
+					return result;
+				}
+				_tmp19_ = cur;
+				_tmp20_ = _tmp19_->right;
+				cur = _tmp20_;
+			}
+		}
+	}
+	result = NULL;
+	return result;
+}
+
+
+static inline GeeTreeMapNode* gee_tree_map_find_lower (GeeTreeMap* self, gconstpointer key) {
+	GeeTreeMapNode* result = NULL;
+	gconstpointer _tmp0_;
+	GeeTreeMapNode* _tmp1_ = NULL;
+	GeeTreeMapNode* node;
+	GeeTreeMapNode* _tmp2_;
+	GeeTreeMapNode* _tmp3_ = NULL;
+	GCompareDataFunc _tmp4_;
+	void* _tmp4__target;
+	GCompareDataFunc _tmp5_;
+	void* _tmp5__target;
+	gconstpointer _tmp6_;
+	GeeTreeMapNode* _tmp7_;
+	gconstpointer _tmp8_;
+	gint _tmp9_ = 0;
+	GeeTreeMapNode* _tmp13_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = key;
+	_tmp1_ = gee_tree_map_find_nearest (self, _tmp0_);
+	node = _tmp1_;
+	_tmp2_ = node;
+	if (_tmp2_ == NULL) {
+		result = NULL;
+		return result;
+	}
+	_tmp4_ = gee_tree_map_get_key_compare_func (self, &_tmp4__target);
+	_tmp5_ = _tmp4_;
+	_tmp5__target = _tmp4__target;
+	_tmp6_ = key;
+	_tmp7_ = node;
+	_tmp8_ = _tmp7_->key;
+	_tmp9_ = _tmp5_ (_tmp6_, _tmp8_, _tmp5__target);
+	if (_tmp9_ <= 0) {
+		GeeTreeMapNode* _tmp10_;
+		GeeTreeMapNode* _tmp11_;
+		_tmp10_ = node;
+		_tmp11_ = _tmp10_->prev;
+		_tmp3_ = _tmp11_;
+	} else {
+		GeeTreeMapNode* _tmp12_;
+		_tmp12_ = node;
+		_tmp3_ = _tmp12_;
+	}
+	_tmp13_ = _tmp3_;
+	result = _tmp13_;
+	return result;
+}
+
+
+static inline GeeTreeMapNode* gee_tree_map_find_higher (GeeTreeMap* self, gconstpointer key) {
+	GeeTreeMapNode* result = NULL;
+	gconstpointer _tmp0_;
+	GeeTreeMapNode* _tmp1_ = NULL;
+	GeeTreeMapNode* node;
+	GeeTreeMapNode* _tmp2_;
+	GeeTreeMapNode* _tmp3_ = NULL;
+	GCompareDataFunc _tmp4_;
+	void* _tmp4__target;
+	GCompareDataFunc _tmp5_;
+	void* _tmp5__target;
+	gconstpointer _tmp6_;
+	GeeTreeMapNode* _tmp7_;
+	gconstpointer _tmp8_;
+	gint _tmp9_ = 0;
+	GeeTreeMapNode* _tmp13_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = key;
+	_tmp1_ = gee_tree_map_find_nearest (self, _tmp0_);
+	node = _tmp1_;
+	_tmp2_ = node;
+	if (_tmp2_ == NULL) {
+		result = NULL;
+		return result;
+	}
+	_tmp4_ = gee_tree_map_get_key_compare_func (self, &_tmp4__target);
+	_tmp5_ = _tmp4_;
+	_tmp5__target = _tmp4__target;
+	_tmp6_ = key;
+	_tmp7_ = node;
+	_tmp8_ = _tmp7_->key;
+	_tmp9_ = _tmp5_ (_tmp6_, _tmp8_, _tmp5__target);
+	if (_tmp9_ >= 0) {
+		GeeTreeMapNode* _tmp10_;
+		GeeTreeMapNode* _tmp11_;
+		_tmp10_ = node;
+		_tmp11_ = _tmp10_->next;
+		_tmp3_ = _tmp11_;
+	} else {
+		GeeTreeMapNode* _tmp12_;
+		_tmp12_ = node;
+		_tmp3_ = _tmp12_;
+	}
+	_tmp13_ = _tmp3_;
+	result = _tmp13_;
+	return result;
+}
+
+
+static inline GeeTreeMapNode* gee_tree_map_find_floor (GeeTreeMap* self, gconstpointer key) {
+	GeeTreeMapNode* result = NULL;
+	gconstpointer _tmp0_;
+	GeeTreeMapNode* _tmp1_ = NULL;
+	GeeTreeMapNode* node;
+	GeeTreeMapNode* _tmp2_;
+	GeeTreeMapNode* _tmp3_ = NULL;
+	GCompareDataFunc _tmp4_;
+	void* _tmp4__target;
+	GCompareDataFunc _tmp5_;
+	void* _tmp5__target;
+	gconstpointer _tmp6_;
+	GeeTreeMapNode* _tmp7_;
+	gconstpointer _tmp8_;
+	gint _tmp9_ = 0;
+	GeeTreeMapNode* _tmp13_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = key;
+	_tmp1_ = gee_tree_map_find_nearest (self, _tmp0_);
+	node = _tmp1_;
+	_tmp2_ = node;
+	if (_tmp2_ == NULL) {
+		result = NULL;
+		return result;
+	}
+	_tmp4_ = gee_tree_map_get_key_compare_func (self, &_tmp4__target);
+	_tmp5_ = _tmp4_;
+	_tmp5__target = _tmp4__target;
+	_tmp6_ = key;
+	_tmp7_ = node;
+	_tmp8_ = _tmp7_->key;
+	_tmp9_ = _tmp5_ (_tmp6_, _tmp8_, _tmp5__target);
+	if (_tmp9_ < 0) {
+		GeeTreeMapNode* _tmp10_;
+		GeeTreeMapNode* _tmp11_;
+		_tmp10_ = node;
+		_tmp11_ = _tmp10_->prev;
+		_tmp3_ = _tmp11_;
+	} else {
+		GeeTreeMapNode* _tmp12_;
+		_tmp12_ = node;
+		_tmp3_ = _tmp12_;
+	}
+	_tmp13_ = _tmp3_;
+	result = _tmp13_;
+	return result;
+}
+
+
+static inline GeeTreeMapNode* gee_tree_map_find_ceil (GeeTreeMap* self, gconstpointer key) {
+	GeeTreeMapNode* result = NULL;
+	gconstpointer _tmp0_;
+	GeeTreeMapNode* _tmp1_ = NULL;
+	GeeTreeMapNode* node;
+	GeeTreeMapNode* _tmp2_;
+	GeeTreeMapNode* _tmp3_ = NULL;
+	GCompareDataFunc _tmp4_;
+	void* _tmp4__target;
+	GCompareDataFunc _tmp5_;
+	void* _tmp5__target;
+	gconstpointer _tmp6_;
+	GeeTreeMapNode* _tmp7_;
+	gconstpointer _tmp8_;
+	gint _tmp9_ = 0;
+	GeeTreeMapNode* _tmp13_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = key;
+	_tmp1_ = gee_tree_map_find_nearest (self, _tmp0_);
+	node = _tmp1_;
+	_tmp2_ = node;
+	if (_tmp2_ == NULL) {
+		result = NULL;
+		return result;
+	}
+	_tmp4_ = gee_tree_map_get_key_compare_func (self, &_tmp4__target);
+	_tmp5_ = _tmp4_;
+	_tmp5__target = _tmp4__target;
+	_tmp6_ = key;
+	_tmp7_ = node;
+	_tmp8_ = _tmp7_->key;
+	_tmp9_ = _tmp5_ (_tmp6_, _tmp8_, _tmp5__target);
+	if (_tmp9_ > 0) {
+		GeeTreeMapNode* _tmp10_;
+		GeeTreeMapNode* _tmp11_;
+		_tmp10_ = node;
+		_tmp11_ = _tmp10_->next;
+		_tmp3_ = _tmp11_;
+	} else {
+		GeeTreeMapNode* _tmp12_;
+		_tmp12_ = node;
+		_tmp3_ = _tmp12_;
+	}
+	_tmp13_ = _tmp3_;
+	result = _tmp13_;
+	return result;
+}
+
+
+static inline gpointer gee_tree_map_lift_null_key (GeeTreeMap* self, GeeTreeMapNode* node) {
+	gpointer result = NULL;
+	gconstpointer _tmp0_ = NULL;
+	GeeTreeMapNode* _tmp1_;
+	gconstpointer _tmp4_;
+	gpointer _tmp5_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp1_ = node;
+	if (_tmp1_ != NULL) {
+		GeeTreeMapNode* _tmp2_;
+		gconstpointer _tmp3_;
+		_tmp2_ = node;
+		_tmp3_ = _tmp2_->key;
+		_tmp0_ = _tmp3_;
+	} else {
+		_tmp0_ = NULL;
+	}
+	_tmp4_ = _tmp0_;
+	_tmp5_ = ((_tmp4_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp4_) : ((gpointer) _tmp4_);
+	result = _tmp5_;
 	return result;
 }
 
@@ -2128,6 +3837,15 @@ static gint gee_tree_map_real_get_size (GeeAbstractMap* base) {
 }
 
 
+static gboolean gee_tree_map_real_get_read_only (GeeAbstractMap* base) {
+	gboolean result;
+	GeeTreeMap* self;
+	self = (GeeTreeMap*) base;
+	result = FALSE;
+	return result;
+}
+
+
 static gpointer _g_object_ref0 (gpointer self) {
 	return self ? g_object_ref (self) : NULL;
 }
@@ -2136,10 +3854,10 @@ static gpointer _g_object_ref0 (gpointer self) {
 static GeeSet* gee_tree_map_real_get_keys (GeeAbstractMap* base) {
 	GeeSet* result;
 	GeeTreeMap* self;
-	GeeSet* _tmp0_;
-	GeeSet* _tmp1_;
-	GeeSet* keys;
-	GeeSet* _tmp2_;
+	GeeSortedSet* _tmp0_;
+	GeeSortedSet* _tmp1_;
+	GeeSortedSet* keys;
+	GeeSortedSet* _tmp2_;
 	self = (GeeTreeMap*) base;
 	_tmp0_ = self->priv->_keys;
 	_tmp1_ = _g_object_ref0 (_tmp0_);
@@ -2147,17 +3865,17 @@ static GeeSet* gee_tree_map_real_get_keys (GeeAbstractMap* base) {
 	_tmp2_ = self->priv->_keys;
 	if (_tmp2_ == NULL) {
 		GeeTreeMapKeySet* _tmp3_;
-		GeeSet* _tmp4_;
-		GeeSet* _tmp5_;
+		GeeSortedSet* _tmp4_;
+		GeeSortedSet* _tmp5_;
 		_tmp3_ = gee_tree_map_key_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, self);
 		_g_object_unref0 (keys);
-		keys = (GeeSet*) _tmp3_;
+		keys = (GeeSortedSet*) _tmp3_;
 		_tmp4_ = keys;
 		self->priv->_keys = _tmp4_;
 		_tmp5_ = keys;
 		g_object_add_weak_pointer ((GObject*) _tmp5_, (void**) (&self->priv->_keys));
 	}
-	result = keys;
+	result = (GeeSet*) keys;
 	return result;
 }
 
@@ -2194,10 +3912,10 @@ static GeeCollection* gee_tree_map_real_get_values (GeeAbstractMap* base) {
 static GeeSet* gee_tree_map_real_get_entries (GeeAbstractMap* base) {
 	GeeSet* result;
 	GeeTreeMap* self;
-	GeeSet* _tmp0_;
-	GeeSet* _tmp1_;
-	GeeSet* entries;
-	GeeSet* _tmp2_;
+	GeeSortedSet* _tmp0_;
+	GeeSortedSet* _tmp1_;
+	GeeSortedSet* entries;
+	GeeSortedSet* _tmp2_;
 	self = (GeeTreeMap*) base;
 	_tmp0_ = self->priv->_entries;
 	_tmp1_ = _g_object_ref0 (_tmp0_);
@@ -2205,56 +3923,142 @@ static GeeSet* gee_tree_map_real_get_entries (GeeAbstractMap* base) {
 	_tmp2_ = self->priv->_entries;
 	if (_tmp2_ == NULL) {
 		GeeTreeMapEntrySet* _tmp3_;
-		GeeSet* _tmp4_;
-		GeeSet* _tmp5_;
+		GeeSortedSet* _tmp4_;
+		GeeSortedSet* _tmp5_;
 		_tmp3_ = gee_tree_map_entry_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, self);
 		_g_object_unref0 (entries);
-		entries = (GeeSet*) _tmp3_;
+		entries = (GeeSortedSet*) _tmp3_;
 		_tmp4_ = entries;
 		self->priv->_entries = _tmp4_;
 		_tmp5_ = entries;
 		g_object_add_weak_pointer ((GObject*) _tmp5_, (void**) (&self->priv->_entries));
 	}
-	result = entries;
+	result = (GeeSet*) entries;
 	return result;
 }
 
 
-GCompareFunc gee_tree_map_get_key_compare_func (GeeTreeMap* self) {
-	GCompareFunc result;
-	GCompareFunc _tmp0_;
+GCompareDataFunc gee_tree_map_get_key_compare_func (GeeTreeMap* self, gpointer* result_target) {
+	GCompareDataFunc result;
+	GCompareDataFunc _tmp0_;
+	void* _tmp0__target;
+	GCompareDataFunc _tmp1_;
+	void* _tmp1__target;
 	g_return_val_if_fail (self != NULL, NULL);
 	_tmp0_ = self->priv->_key_compare_func;
-	result = _tmp0_;
+	_tmp0__target = self->priv->_key_compare_func_target;
+	_tmp1_ = _tmp0_;
+	_tmp1__target = _tmp0__target;
+	*result_target = _tmp1__target;
+	result = _tmp1_;
 	return result;
 }
 
 
-static void gee_tree_map_set_key_compare_func (GeeTreeMap* self, GCompareFunc value) {
-	GCompareFunc _tmp0_;
+static void gee_tree_map_set_key_compare_func (GeeTreeMap* self, GCompareDataFunc value, gpointer value_target) {
+	GCompareDataFunc _tmp0_;
+	void* _tmp0__target;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = value;
+	_tmp0__target = value_target;
+	(self->priv->_key_compare_func_target_destroy_notify == NULL) ? NULL : (self->priv->_key_compare_func_target_destroy_notify (self->priv->_key_compare_func_target), NULL);
+	self->priv->_key_compare_func = NULL;
+	self->priv->_key_compare_func_target = NULL;
+	self->priv->_key_compare_func_target_destroy_notify = NULL;
 	self->priv->_key_compare_func = _tmp0_;
-	g_object_notify ((GObject *) self, "key-compare-func");
+	self->priv->_key_compare_func_target = _tmp0__target;
+	self->priv->_key_compare_func_target_destroy_notify = NULL;
 }
 
 
-GEqualFunc gee_tree_map_get_value_equal_func (GeeTreeMap* self) {
-	GEqualFunc result;
-	GEqualFunc _tmp0_;
+GeeEqualDataFunc gee_tree_map_get_value_equal_func (GeeTreeMap* self, gpointer* result_target) {
+	GeeEqualDataFunc result;
+	GeeEqualDataFunc _tmp0_;
+	void* _tmp0__target;
+	GeeEqualDataFunc _tmp1_;
+	void* _tmp1__target;
 	g_return_val_if_fail (self != NULL, NULL);
 	_tmp0_ = self->priv->_value_equal_func;
-	result = _tmp0_;
+	_tmp0__target = self->priv->_value_equal_func_target;
+	_tmp1_ = _tmp0_;
+	_tmp1__target = _tmp0__target;
+	*result_target = _tmp1__target;
+	result = _tmp1_;
 	return result;
 }
 
 
-static void gee_tree_map_set_value_equal_func (GeeTreeMap* self, GEqualFunc value) {
-	GEqualFunc _tmp0_;
+static void gee_tree_map_set_value_equal_func (GeeTreeMap* self, GeeEqualDataFunc value, gpointer value_target) {
+	GeeEqualDataFunc _tmp0_;
+	void* _tmp0__target;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = value;
+	_tmp0__target = value_target;
+	(self->priv->_value_equal_func_target_destroy_notify == NULL) ? NULL : (self->priv->_value_equal_func_target_destroy_notify (self->priv->_value_equal_func_target), NULL);
+	self->priv->_value_equal_func = NULL;
+	self->priv->_value_equal_func_target = NULL;
+	self->priv->_value_equal_func_target_destroy_notify = NULL;
 	self->priv->_value_equal_func = _tmp0_;
-	g_object_notify ((GObject *) self, "value-equal-func");
+	self->priv->_value_equal_func_target = _tmp0__target;
+	self->priv->_value_equal_func_target_destroy_notify = NULL;
+}
+
+
+static GeeSortedSet* gee_tree_map_real_get_ascending_keys (GeeAbstractSortedMap* base) {
+	GeeSortedSet* result;
+	GeeTreeMap* self;
+	GeeSortedSet* _tmp0_;
+	GeeSortedSet* _tmp1_;
+	GeeSortedSet* keys;
+	GeeSortedSet* _tmp2_;
+	self = (GeeTreeMap*) base;
+	_tmp0_ = self->priv->_keys;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	keys = _tmp1_;
+	_tmp2_ = self->priv->_keys;
+	if (_tmp2_ == NULL) {
+		GeeTreeMapKeySet* _tmp3_;
+		GeeSortedSet* _tmp4_;
+		GeeSortedSet* _tmp5_;
+		_tmp3_ = gee_tree_map_key_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, self);
+		_g_object_unref0 (keys);
+		keys = (GeeSortedSet*) _tmp3_;
+		_tmp4_ = keys;
+		self->priv->_keys = _tmp4_;
+		_tmp5_ = keys;
+		g_object_add_weak_pointer ((GObject*) _tmp5_, &self->priv->_keys);
+	}
+	result = keys;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_real_get_ascending_entries (GeeAbstractSortedMap* base) {
+	GeeSortedSet* result;
+	GeeTreeMap* self;
+	GeeSortedSet* _tmp0_;
+	GeeSortedSet* _tmp1_;
+	GeeSortedSet* entries;
+	GeeSortedSet* _tmp2_;
+	self = (GeeTreeMap*) base;
+	_tmp0_ = self->priv->_entries;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	entries = _tmp1_;
+	_tmp2_ = self->priv->_entries;
+	if (_tmp2_ == NULL) {
+		GeeTreeMapEntrySet* _tmp3_;
+		GeeSortedSet* _tmp4_;
+		GeeSortedSet* _tmp5_;
+		_tmp3_ = gee_tree_map_entry_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, self);
+		_g_object_unref0 (entries);
+		entries = (GeeSortedSet*) _tmp3_;
+		_tmp4_ = entries;
+		self->priv->_entries = _tmp4_;
+		_tmp5_ = entries;
+		g_object_add_weak_pointer ((GObject*) _tmp5_, &self->priv->_entries);
+	}
+	result = entries;
+	return result;
 }
 
 
@@ -2372,32 +4176,30 @@ static GeeMapEntry* gee_tree_map_entry_entry_for (GType k_type, GBoxedCopyFunc k
 	GeeMapEntry* _tmp1_;
 	GeeMapEntry* _tmp2_;
 	GeeMapEntry* _result_;
-	GeeTreeMapNode* _tmp3_;
-	GeeMapEntry* _tmp4_;
+	GeeMapEntry* _tmp3_;
 	g_return_val_if_fail (node != NULL, NULL);
 	_tmp0_ = node;
 	_tmp1_ = _tmp0_->entry;
 	_tmp2_ = _g_object_ref0 (_tmp1_);
 	_result_ = _tmp2_;
-	_tmp3_ = node;
-	_tmp4_ = _tmp3_->entry;
-	if (_tmp4_ == NULL) {
-		GeeTreeMapNode* _tmp5_;
-		GeeTreeMapEntry* _tmp6_;
-		GeeTreeMapNode* _tmp7_;
+	_tmp3_ = _result_;
+	if (_tmp3_ == NULL) {
+		GeeTreeMapNode* _tmp4_;
+		GeeTreeMapEntry* _tmp5_;
+		GeeTreeMapNode* _tmp6_;
+		GeeMapEntry* _tmp7_;
 		GeeMapEntry* _tmp8_;
-		GeeMapEntry* _tmp9_;
-		GeeTreeMapNode* _tmp10_;
-		_tmp5_ = node;
-		_tmp6_ = gee_tree_map_entry_new (k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp5_);
+		GeeTreeMapNode* _tmp9_;
+		_tmp4_ = node;
+		_tmp5_ = gee_tree_map_entry_new (k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp4_);
 		_g_object_unref0 (_result_);
-		_result_ = (GeeMapEntry*) _tmp6_;
-		_tmp7_ = node;
+		_result_ = (GeeMapEntry*) _tmp5_;
+		_tmp6_ = node;
+		_tmp7_ = _result_;
+		_tmp6_->entry = _tmp7_;
 		_tmp8_ = _result_;
-		_tmp7_->entry = _tmp8_;
-		_tmp9_ = _result_;
-		_tmp10_ = node;
-		g_object_add_weak_pointer ((GObject*) _tmp9_, (void**) (&_tmp10_->entry));
+		_tmp9_ = node;
+		g_object_add_weak_pointer ((GObject*) _tmp8_, (void**) (&_tmp9_->entry));
 	}
 	result = _result_;
 	return result;
@@ -2467,12 +4269,22 @@ static void gee_tree_map_entry_real_set_value (GeeMapEntry* base, gconstpointer 
 }
 
 
+static gboolean gee_tree_map_entry_real_get_read_only (GeeMapEntry* base) {
+	gboolean result;
+	GeeTreeMapEntry* self;
+	self = (GeeTreeMapEntry*) base;
+	result = FALSE;
+	return result;
+}
+
+
 static void gee_tree_map_entry_class_init (GeeTreeMapEntryClass * klass) {
 	gee_tree_map_entry_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeTreeMapEntryPrivate));
 	GEE_MAP_ENTRY_CLASS (klass)->get_key = gee_tree_map_entry_real_get_key;
 	GEE_MAP_ENTRY_CLASS (klass)->get_value = gee_tree_map_entry_real_get_value;
 	GEE_MAP_ENTRY_CLASS (klass)->set_value = gee_tree_map_entry_real_set_value;
+	GEE_MAP_ENTRY_CLASS (klass)->get_read_only = gee_tree_map_entry_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_entry_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_entry_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_tree_map_entry_finalize;
@@ -2484,6 +4296,7 @@ static void gee_tree_map_entry_class_init (GeeTreeMapEntryClass * klass) {
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_ENTRY_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_ENTRY_KEY, g_param_spec_pointer ("key", "key", "key", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_ENTRY_VALUE, g_param_spec_pointer ("value", "value", "value", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE | G_PARAM_WRITABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_ENTRY_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -2520,6 +4333,9 @@ static void _vala_gee_tree_map_entry_get_property (GObject * object, guint prope
 		break;
 		case GEE_TREE_MAP_ENTRY_VALUE:
 		g_value_set_pointer (value, gee_map_entry_get_value ((GeeMapEntry*) self));
+		break;
+		case GEE_TREE_MAP_ENTRY_READ_ONLY:
+		g_value_set_boolean (value, gee_map_entry_get_read_only ((GeeMapEntry*) self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -2560,12 +4376,1559 @@ static void _vala_gee_tree_map_entry_set_property (GObject * object, guint prope
 }
 
 
+static GeeTreeMapRange* gee_tree_map_range_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, gconstpointer after, gconstpointer before) {
+	GeeTreeMapRange* self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	GeeTreeMap* _tmp2_;
+	GCompareDataFunc _tmp3_;
+	void* _tmp3__target;
+	GCompareDataFunc _tmp4_;
+	void* _tmp4__target;
+	gconstpointer _tmp5_;
+	gconstpointer _tmp6_;
+	gint _tmp7_ = 0;
+	g_return_val_if_fail (map != NULL, NULL);
+	self = (GeeTreeMapRange*) g_type_create_instance (object_type);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	_tmp0_ = map;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	_g_object_unref0 (self->priv->map);
+	self->priv->map = _tmp1_;
+	_tmp2_ = map;
+	_tmp3_ = gee_tree_map_get_key_compare_func (_tmp2_, &_tmp3__target);
+	_tmp4_ = _tmp3_;
+	_tmp4__target = _tmp3__target;
+	_tmp5_ = after;
+	_tmp6_ = before;
+	_tmp7_ = _tmp4_ (_tmp5_, _tmp6_, _tmp4__target);
+	if (_tmp7_ < 0) {
+		gconstpointer _tmp8_;
+		gpointer _tmp9_;
+		gconstpointer _tmp10_;
+		gpointer _tmp11_;
+		_tmp8_ = after;
+		_tmp9_ = ((_tmp8_ != NULL) && (k_dup_func != NULL)) ? k_dup_func ((gpointer) _tmp8_) : ((gpointer) _tmp8_);
+		_k_destroy_func0 (self->priv->after);
+		self->priv->after = _tmp9_;
+		_tmp10_ = before;
+		_tmp11_ = ((_tmp10_ != NULL) && (k_dup_func != NULL)) ? k_dup_func ((gpointer) _tmp10_) : ((gpointer) _tmp10_);
+		_k_destroy_func0 (self->priv->before);
+		self->priv->before = _tmp11_;
+		self->priv->type = GEE_TREE_MAP_RANGE_TYPE_BOUNDED;
+	} else {
+		self->priv->type = GEE_TREE_MAP_RANGE_TYPE_EMPTY;
+	}
+	return self;
+}
+
+
+static GeeTreeMapRange* gee_tree_map_range_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, gconstpointer after, gconstpointer before) {
+	return gee_tree_map_range_construct (GEE_TREE_MAP_TYPE_RANGE, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, after, before);
+}
+
+
+static GeeTreeMapRange* gee_tree_map_range_construct_head (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, gconstpointer before) {
+	GeeTreeMapRange* self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	gconstpointer _tmp2_;
+	gpointer _tmp3_;
+	g_return_val_if_fail (map != NULL, NULL);
+	self = (GeeTreeMapRange*) g_type_create_instance (object_type);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	_tmp0_ = map;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	_g_object_unref0 (self->priv->map);
+	self->priv->map = _tmp1_;
+	_tmp2_ = before;
+	_tmp3_ = ((_tmp2_ != NULL) && (k_dup_func != NULL)) ? k_dup_func ((gpointer) _tmp2_) : ((gpointer) _tmp2_);
+	_k_destroy_func0 (self->priv->before);
+	self->priv->before = _tmp3_;
+	self->priv->type = GEE_TREE_MAP_RANGE_TYPE_HEAD;
+	return self;
+}
+
+
+static GeeTreeMapRange* gee_tree_map_range_new_head (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, gconstpointer before) {
+	return gee_tree_map_range_construct_head (GEE_TREE_MAP_TYPE_RANGE, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, before);
+}
+
+
+static GeeTreeMapRange* gee_tree_map_range_construct_tail (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, gconstpointer after) {
+	GeeTreeMapRange* self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	gconstpointer _tmp2_;
+	gpointer _tmp3_;
+	g_return_val_if_fail (map != NULL, NULL);
+	self = (GeeTreeMapRange*) g_type_create_instance (object_type);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	_tmp0_ = map;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	_g_object_unref0 (self->priv->map);
+	self->priv->map = _tmp1_;
+	_tmp2_ = after;
+	_tmp3_ = ((_tmp2_ != NULL) && (k_dup_func != NULL)) ? k_dup_func ((gpointer) _tmp2_) : ((gpointer) _tmp2_);
+	_k_destroy_func0 (self->priv->after);
+	self->priv->after = _tmp3_;
+	self->priv->type = GEE_TREE_MAP_RANGE_TYPE_TAIL;
+	return self;
+}
+
+
+static GeeTreeMapRange* gee_tree_map_range_new_tail (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, gconstpointer after) {
+	return gee_tree_map_range_construct_tail (GEE_TREE_MAP_TYPE_RANGE, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, after);
+}
+
+
+static GeeTreeMapRange* gee_tree_map_range_construct_empty (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map) {
+	GeeTreeMapRange* self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	g_return_val_if_fail (map != NULL, NULL);
+	self = (GeeTreeMapRange*) g_type_create_instance (object_type);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	_tmp0_ = map;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	_g_object_unref0 (self->priv->map);
+	self->priv->map = _tmp1_;
+	self->priv->type = GEE_TREE_MAP_RANGE_TYPE_EMPTY;
+	return self;
+}
+
+
+static GeeTreeMapRange* gee_tree_map_range_new_empty (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map) {
+	return gee_tree_map_range_construct_empty (GEE_TREE_MAP_TYPE_RANGE, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map);
+}
+
+
+static gpointer _gee_tree_map_range_ref0 (gpointer self) {
+	return self ? gee_tree_map_range_ref (self) : NULL;
+}
+
+
+static GeeTreeMapRange* gee_tree_map_range_cut_head (GeeTreeMapRange* self, gconstpointer after) {
+	GeeTreeMapRange* result = NULL;
+	GeeTreeMapRangeType _tmp0_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->type;
+	switch (_tmp0_) {
+		case GEE_TREE_MAP_RANGE_TYPE_HEAD:
+		{
+			GeeTreeMap* _tmp1_;
+			gconstpointer _tmp2_;
+			gconstpointer _tmp3_;
+			GeeTreeMapRange* _tmp4_;
+			_tmp1_ = self->priv->map;
+			_tmp2_ = after;
+			_tmp3_ = self->priv->before;
+			_tmp4_ = gee_tree_map_range_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp1_, _tmp2_, _tmp3_);
+			result = _tmp4_;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_TAIL:
+		{
+			GeeTreeMap* _tmp5_;
+			GeeTreeMap* _tmp6_;
+			gconstpointer _tmp7_;
+			gconstpointer _tmp8_;
+			gpointer _tmp9_ = NULL;
+			gpointer _tmp10_;
+			GeeTreeMapRange* _tmp11_;
+			GeeTreeMapRange* _tmp12_;
+			_tmp5_ = self->priv->map;
+			_tmp6_ = self->priv->map;
+			_tmp7_ = after;
+			_tmp8_ = self->priv->after;
+			_tmp9_ = gee_tree_map_max (_tmp6_, _tmp7_, _tmp8_);
+			_tmp10_ = _tmp9_;
+			_tmp11_ = gee_tree_map_range_new_tail (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp5_, _tmp10_);
+			_tmp12_ = _tmp11_;
+			((_tmp10_ == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_tmp10_ = (self->priv->k_destroy_func (_tmp10_), NULL));
+			result = _tmp12_;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_EMPTY:
+		{
+			GeeTreeMapRange* _tmp13_;
+			_tmp13_ = _gee_tree_map_range_ref0 (self);
+			result = _tmp13_;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_BOUNDED:
+		{
+			GeeTreeMap* _tmp14_;
+			gconstpointer _tmp15_;
+			gconstpointer _tmp16_;
+			gpointer _tmp17_ = NULL;
+			gpointer _after;
+			GeeTreeMap* _tmp18_;
+			gconstpointer _tmp19_;
+			gconstpointer _tmp20_;
+			GeeTreeMapRange* _tmp21_;
+			_tmp14_ = self->priv->map;
+			_tmp15_ = after;
+			_tmp16_ = self->priv->after;
+			_tmp17_ = gee_tree_map_max (_tmp14_, _tmp15_, _tmp16_);
+			_after = _tmp17_;
+			_tmp18_ = self->priv->map;
+			_tmp19_ = _after;
+			_tmp20_ = self->priv->before;
+			_tmp21_ = gee_tree_map_range_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp18_, _tmp19_, _tmp20_);
+			result = _tmp21_;
+			((_after == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_after = (self->priv->k_destroy_func (_after), NULL));
+			return result;
+		}
+		default:
+		{
+			g_assert_not_reached ();
+		}
+	}
+}
+
+
+static GeeTreeMapRange* gee_tree_map_range_cut_tail (GeeTreeMapRange* self, gconstpointer before) {
+	GeeTreeMapRange* result = NULL;
+	GeeTreeMapRangeType _tmp0_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->type;
+	switch (_tmp0_) {
+		case GEE_TREE_MAP_RANGE_TYPE_HEAD:
+		{
+			GeeTreeMap* _tmp1_;
+			GeeTreeMap* _tmp2_;
+			gconstpointer _tmp3_;
+			gconstpointer _tmp4_;
+			gpointer _tmp5_ = NULL;
+			gpointer _tmp6_;
+			GeeTreeMapRange* _tmp7_;
+			GeeTreeMapRange* _tmp8_;
+			_tmp1_ = self->priv->map;
+			_tmp2_ = self->priv->map;
+			_tmp3_ = before;
+			_tmp4_ = self->priv->before;
+			_tmp5_ = gee_tree_map_min (_tmp2_, _tmp3_, _tmp4_);
+			_tmp6_ = _tmp5_;
+			_tmp7_ = gee_tree_map_range_new_head (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp1_, _tmp6_);
+			_tmp8_ = _tmp7_;
+			((_tmp6_ == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_tmp6_ = (self->priv->k_destroy_func (_tmp6_), NULL));
+			result = _tmp8_;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_TAIL:
+		{
+			GeeTreeMap* _tmp9_;
+			gconstpointer _tmp10_;
+			gconstpointer _tmp11_;
+			GeeTreeMapRange* _tmp12_;
+			_tmp9_ = self->priv->map;
+			_tmp10_ = self->priv->after;
+			_tmp11_ = before;
+			_tmp12_ = gee_tree_map_range_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp9_, _tmp10_, _tmp11_);
+			result = _tmp12_;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_EMPTY:
+		{
+			GeeTreeMapRange* _tmp13_;
+			_tmp13_ = _gee_tree_map_range_ref0 (self);
+			result = _tmp13_;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_BOUNDED:
+		{
+			GeeTreeMap* _tmp14_;
+			gconstpointer _tmp15_;
+			gconstpointer _tmp16_;
+			gpointer _tmp17_ = NULL;
+			gpointer _before;
+			GeeTreeMap* _tmp18_;
+			gconstpointer _tmp19_;
+			gconstpointer _tmp20_;
+			GeeTreeMapRange* _tmp21_;
+			_tmp14_ = self->priv->map;
+			_tmp15_ = before;
+			_tmp16_ = self->priv->before;
+			_tmp17_ = gee_tree_map_min (_tmp14_, _tmp15_, _tmp16_);
+			_before = _tmp17_;
+			_tmp18_ = self->priv->map;
+			_tmp19_ = self->priv->after;
+			_tmp20_ = _before;
+			_tmp21_ = gee_tree_map_range_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp18_, _tmp19_, _tmp20_);
+			result = _tmp21_;
+			((_before == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_before = (self->priv->k_destroy_func (_before), NULL));
+			return result;
+		}
+		default:
+		{
+			g_assert_not_reached ();
+		}
+	}
+}
+
+
+static GeeTreeMapRange* gee_tree_map_range_cut (GeeTreeMapRange* self, gconstpointer after, gconstpointer before) {
+	GeeTreeMapRange* result = NULL;
+	GeeTreeMapRangeType _tmp0_;
+	gpointer _tmp2_ = NULL;
+	gboolean _tmp3_ = FALSE;
+	GeeTreeMapRangeType _tmp4_;
+	gboolean _tmp6_;
+	gconstpointer _tmp13_;
+	gpointer _tmp14_;
+	gpointer _before;
+	gpointer _tmp15_ = NULL;
+	gboolean _tmp16_ = FALSE;
+	GeeTreeMapRangeType _tmp17_;
+	gboolean _tmp19_;
+	gconstpointer _tmp26_;
+	gpointer _tmp27_;
+	gpointer _after;
+	GeeTreeMap* _tmp28_;
+	gconstpointer _tmp29_;
+	gconstpointer _tmp30_;
+	GeeTreeMapRange* _tmp31_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->type;
+	if (_tmp0_ == GEE_TREE_MAP_RANGE_TYPE_EMPTY) {
+		GeeTreeMapRange* _tmp1_;
+		_tmp1_ = _gee_tree_map_range_ref0 (self);
+		result = _tmp1_;
+		return result;
+	}
+	_tmp4_ = self->priv->type;
+	if (_tmp4_ == GEE_TREE_MAP_RANGE_TYPE_HEAD) {
+		_tmp3_ = TRUE;
+	} else {
+		GeeTreeMapRangeType _tmp5_;
+		_tmp5_ = self->priv->type;
+		_tmp3_ = _tmp5_ == GEE_TREE_MAP_RANGE_TYPE_BOUNDED;
+	}
+	_tmp6_ = _tmp3_;
+	if (_tmp6_) {
+		GeeTreeMap* _tmp7_;
+		gconstpointer _tmp8_;
+		gconstpointer _tmp9_;
+		gpointer _tmp10_ = NULL;
+		_tmp7_ = self->priv->map;
+		_tmp8_ = before;
+		_tmp9_ = self->priv->before;
+		_tmp10_ = gee_tree_map_min (_tmp7_, _tmp8_, _tmp9_);
+		((_tmp2_ == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_tmp2_ = (self->priv->k_destroy_func (_tmp2_), NULL));
+		_tmp2_ = _tmp10_;
+	} else {
+		gconstpointer _tmp11_;
+		gpointer _tmp12_;
+		_tmp11_ = before;
+		_tmp12_ = ((_tmp11_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp11_) : ((gpointer) _tmp11_);
+		((_tmp2_ == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_tmp2_ = (self->priv->k_destroy_func (_tmp2_), NULL));
+		_tmp2_ = _tmp12_;
+	}
+	_tmp13_ = _tmp2_;
+	_tmp14_ = ((_tmp13_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp13_) : ((gpointer) _tmp13_);
+	_before = _tmp14_;
+	_tmp17_ = self->priv->type;
+	if (_tmp17_ == GEE_TREE_MAP_RANGE_TYPE_TAIL) {
+		_tmp16_ = TRUE;
+	} else {
+		GeeTreeMapRangeType _tmp18_;
+		_tmp18_ = self->priv->type;
+		_tmp16_ = _tmp18_ == GEE_TREE_MAP_RANGE_TYPE_BOUNDED;
+	}
+	_tmp19_ = _tmp16_;
+	if (_tmp19_) {
+		GeeTreeMap* _tmp20_;
+		gconstpointer _tmp21_;
+		gconstpointer _tmp22_;
+		gpointer _tmp23_ = NULL;
+		_tmp20_ = self->priv->map;
+		_tmp21_ = after;
+		_tmp22_ = self->priv->after;
+		_tmp23_ = gee_tree_map_max (_tmp20_, _tmp21_, _tmp22_);
+		((_tmp15_ == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_tmp15_ = (self->priv->k_destroy_func (_tmp15_), NULL));
+		_tmp15_ = _tmp23_;
+	} else {
+		gconstpointer _tmp24_;
+		gpointer _tmp25_;
+		_tmp24_ = after;
+		_tmp25_ = ((_tmp24_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp24_) : ((gpointer) _tmp24_);
+		((_tmp15_ == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_tmp15_ = (self->priv->k_destroy_func (_tmp15_), NULL));
+		_tmp15_ = _tmp25_;
+	}
+	_tmp26_ = _tmp15_;
+	_tmp27_ = ((_tmp26_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp26_) : ((gpointer) _tmp26_);
+	_after = _tmp27_;
+	_tmp28_ = self->priv->map;
+	_tmp29_ = _after;
+	_tmp30_ = _before;
+	_tmp31_ = gee_tree_map_range_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp28_, _tmp29_, _tmp30_);
+	result = _tmp31_;
+	((_after == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_after = (self->priv->k_destroy_func (_after), NULL));
+	((_tmp15_ == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_tmp15_ = (self->priv->k_destroy_func (_tmp15_), NULL));
+	((_before == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_before = (self->priv->k_destroy_func (_before), NULL));
+	((_tmp2_ == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (_tmp2_ = (self->priv->k_destroy_func (_tmp2_), NULL));
+	return result;
+}
+
+
+static gboolean gee_tree_map_range_in_range (GeeTreeMapRange* self, gconstpointer key) {
+	gboolean result = FALSE;
+	gboolean _tmp0_ = FALSE;
+	GeeTreeMapRangeType _tmp1_;
+	gboolean _tmp4_;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp1_ = self->priv->type;
+	if (_tmp1_ == GEE_TREE_MAP_RANGE_TYPE_EMPTY) {
+		_tmp0_ = FALSE;
+	} else {
+		gconstpointer _tmp2_;
+		gint _tmp3_ = 0;
+		_tmp2_ = key;
+		_tmp3_ = gee_tree_map_range_compare_range (self, _tmp2_);
+		_tmp0_ = _tmp3_ == 0;
+	}
+	_tmp4_ = _tmp0_;
+	result = _tmp4_;
+	return result;
+}
+
+
+static gint gee_tree_map_range_compare_range (GeeTreeMapRange* self, gconstpointer key) {
+	gint result = 0;
+	GeeTreeMapRangeType _tmp0_;
+	g_return_val_if_fail (self != NULL, 0);
+	_tmp0_ = self->priv->type;
+	switch (_tmp0_) {
+		case GEE_TREE_MAP_RANGE_TYPE_HEAD:
+		{
+			gint _tmp1_ = 0;
+			GeeTreeMap* _tmp2_;
+			GCompareDataFunc _tmp3_;
+			void* _tmp3__target;
+			GCompareDataFunc _tmp4_;
+			void* _tmp4__target;
+			gconstpointer _tmp5_;
+			gconstpointer _tmp6_;
+			gint _tmp7_ = 0;
+			gint _tmp8_;
+			_tmp2_ = self->priv->map;
+			_tmp3_ = gee_tree_map_get_key_compare_func (_tmp2_, &_tmp3__target);
+			_tmp4_ = _tmp3_;
+			_tmp4__target = _tmp3__target;
+			_tmp5_ = key;
+			_tmp6_ = self->priv->before;
+			_tmp7_ = _tmp4_ (_tmp5_, _tmp6_, _tmp4__target);
+			if (_tmp7_ < 0) {
+				_tmp1_ = 0;
+			} else {
+				_tmp1_ = 1;
+			}
+			_tmp8_ = _tmp1_;
+			result = _tmp8_;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_TAIL:
+		{
+			gint _tmp9_ = 0;
+			GeeTreeMap* _tmp10_;
+			GCompareDataFunc _tmp11_;
+			void* _tmp11__target;
+			GCompareDataFunc _tmp12_;
+			void* _tmp12__target;
+			gconstpointer _tmp13_;
+			gconstpointer _tmp14_;
+			gint _tmp15_ = 0;
+			gint _tmp16_;
+			_tmp10_ = self->priv->map;
+			_tmp11_ = gee_tree_map_get_key_compare_func (_tmp10_, &_tmp11__target);
+			_tmp12_ = _tmp11_;
+			_tmp12__target = _tmp11__target;
+			_tmp13_ = key;
+			_tmp14_ = self->priv->after;
+			_tmp15_ = _tmp12_ (_tmp13_, _tmp14_, _tmp12__target);
+			if (_tmp15_ >= 0) {
+				_tmp9_ = 0;
+			} else {
+				_tmp9_ = -1;
+			}
+			_tmp16_ = _tmp9_;
+			result = _tmp16_;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_EMPTY:
+		{
+			result = 0;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_BOUNDED:
+		{
+			gint _tmp17_ = 0;
+			GeeTreeMap* _tmp18_;
+			GCompareDataFunc _tmp19_;
+			void* _tmp19__target;
+			GCompareDataFunc _tmp20_;
+			void* _tmp20__target;
+			gconstpointer _tmp21_;
+			gconstpointer _tmp22_;
+			gint _tmp23_ = 0;
+			gint _tmp32_;
+			_tmp18_ = self->priv->map;
+			_tmp19_ = gee_tree_map_get_key_compare_func (_tmp18_, &_tmp19__target);
+			_tmp20_ = _tmp19_;
+			_tmp20__target = _tmp19__target;
+			_tmp21_ = key;
+			_tmp22_ = self->priv->after;
+			_tmp23_ = _tmp20_ (_tmp21_, _tmp22_, _tmp20__target);
+			if (_tmp23_ >= 0) {
+				gint _tmp24_ = 0;
+				GeeTreeMap* _tmp25_;
+				GCompareDataFunc _tmp26_;
+				void* _tmp26__target;
+				GCompareDataFunc _tmp27_;
+				void* _tmp27__target;
+				gconstpointer _tmp28_;
+				gconstpointer _tmp29_;
+				gint _tmp30_ = 0;
+				gint _tmp31_;
+				_tmp25_ = self->priv->map;
+				_tmp26_ = gee_tree_map_get_key_compare_func (_tmp25_, &_tmp26__target);
+				_tmp27_ = _tmp26_;
+				_tmp27__target = _tmp26__target;
+				_tmp28_ = key;
+				_tmp29_ = self->priv->before;
+				_tmp30_ = _tmp27_ (_tmp28_, _tmp29_, _tmp27__target);
+				if (_tmp30_ < 0) {
+					_tmp24_ = 0;
+				} else {
+					_tmp24_ = 1;
+				}
+				_tmp31_ = _tmp24_;
+				_tmp17_ = _tmp31_;
+			} else {
+				_tmp17_ = -1;
+			}
+			_tmp32_ = _tmp17_;
+			result = _tmp32_;
+			return result;
+		}
+		default:
+		{
+			g_assert_not_reached ();
+		}
+	}
+}
+
+
+static gboolean gee_tree_map_range_empty_submap (GeeTreeMapRange* self) {
+	gboolean result = FALSE;
+	GeeTreeMapRangeType _tmp0_;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp0_ = self->priv->type;
+	switch (_tmp0_) {
+		case GEE_TREE_MAP_RANGE_TYPE_HEAD:
+		{
+			gboolean _tmp1_ = FALSE;
+			GeeTreeMap* _tmp2_;
+			GeeTreeMapNode* _tmp3_;
+			gboolean _tmp8_;
+			_tmp2_ = self->priv->map;
+			_tmp3_ = _tmp2_->priv->first;
+			if (_tmp3_ == NULL) {
+				_tmp1_ = TRUE;
+			} else {
+				GeeTreeMap* _tmp4_;
+				GeeTreeMapNode* _tmp5_;
+				gconstpointer _tmp6_;
+				gboolean _tmp7_ = FALSE;
+				_tmp4_ = self->priv->map;
+				_tmp5_ = _tmp4_->priv->first;
+				_tmp6_ = _tmp5_->key;
+				_tmp7_ = gee_tree_map_range_in_range (self, _tmp6_);
+				_tmp1_ = !_tmp7_;
+			}
+			_tmp8_ = _tmp1_;
+			result = _tmp8_;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_TAIL:
+		{
+			gboolean _tmp9_ = FALSE;
+			GeeTreeMap* _tmp10_;
+			GeeTreeMapNode* _tmp11_;
+			gboolean _tmp16_;
+			_tmp10_ = self->priv->map;
+			_tmp11_ = _tmp10_->priv->last;
+			if (_tmp11_ == NULL) {
+				_tmp9_ = TRUE;
+			} else {
+				GeeTreeMap* _tmp12_;
+				GeeTreeMapNode* _tmp13_;
+				gconstpointer _tmp14_;
+				gboolean _tmp15_ = FALSE;
+				_tmp12_ = self->priv->map;
+				_tmp13_ = _tmp12_->priv->last;
+				_tmp14_ = _tmp13_->key;
+				_tmp15_ = gee_tree_map_range_in_range (self, _tmp14_);
+				_tmp9_ = !_tmp15_;
+			}
+			_tmp16_ = _tmp9_;
+			result = _tmp16_;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_EMPTY:
+		{
+			result = TRUE;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_BOUNDED:
+		{
+			GeeTreeMapNode* _tmp17_ = NULL;
+			_tmp17_ = gee_tree_map_range_first (self);
+			result = _tmp17_ == NULL;
+			return result;
+		}
+		default:
+		{
+			g_assert_not_reached ();
+		}
+	}
+}
+
+
+static GeeTreeMapNode* gee_tree_map_range_first (GeeTreeMapRange* self) {
+	GeeTreeMapNode* result = NULL;
+	GeeTreeMapRangeType _tmp0_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->type;
+	switch (_tmp0_) {
+		case GEE_TREE_MAP_RANGE_TYPE_EMPTY:
+		{
+			result = NULL;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_HEAD:
+		{
+			GeeTreeMap* _tmp1_;
+			GeeTreeMapNode* _tmp2_;
+			_tmp1_ = self->priv->map;
+			_tmp2_ = _tmp1_->priv->first;
+			result = _tmp2_;
+			return result;
+		}
+		default:
+		{
+			GeeTreeMap* _tmp3_;
+			gconstpointer _tmp4_;
+			GeeTreeMapNode* _tmp5_ = NULL;
+			_tmp3_ = self->priv->map;
+			_tmp4_ = self->priv->after;
+			_tmp5_ = gee_tree_map_find_floor (_tmp3_, _tmp4_);
+			result = _tmp5_;
+			return result;
+		}
+	}
+}
+
+
+static GeeTreeMapNode* gee_tree_map_range_last (GeeTreeMapRange* self) {
+	GeeTreeMapNode* result = NULL;
+	GeeTreeMapRangeType _tmp0_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->type;
+	switch (_tmp0_) {
+		case GEE_TREE_MAP_RANGE_TYPE_EMPTY:
+		{
+			result = NULL;
+			return result;
+		}
+		case GEE_TREE_MAP_RANGE_TYPE_TAIL:
+		{
+			GeeTreeMap* _tmp1_;
+			GeeTreeMapNode* _tmp2_;
+			_tmp1_ = self->priv->map;
+			_tmp2_ = _tmp1_->priv->last;
+			result = _tmp2_;
+			return result;
+		}
+		default:
+		{
+			GeeTreeMap* _tmp3_;
+			gconstpointer _tmp4_;
+			GeeTreeMapNode* _tmp5_ = NULL;
+			_tmp3_ = self->priv->map;
+			_tmp4_ = self->priv->before;
+			_tmp5_ = gee_tree_map_find_lower (_tmp3_, _tmp4_);
+			result = _tmp5_;
+			return result;
+		}
+	}
+}
+
+
+static void gee_tree_map_value_range_init (GValue* value) {
+	value->data[0].v_pointer = NULL;
+}
+
+
+static void gee_tree_map_value_range_free_value (GValue* value) {
+	if (value->data[0].v_pointer) {
+		gee_tree_map_range_unref (value->data[0].v_pointer);
+	}
+}
+
+
+static void gee_tree_map_value_range_copy_value (const GValue* src_value, GValue* dest_value) {
+	if (src_value->data[0].v_pointer) {
+		dest_value->data[0].v_pointer = gee_tree_map_range_ref (src_value->data[0].v_pointer);
+	} else {
+		dest_value->data[0].v_pointer = NULL;
+	}
+}
+
+
+static gpointer gee_tree_map_value_range_peek_pointer (const GValue* value) {
+	return value->data[0].v_pointer;
+}
+
+
+static gchar* gee_tree_map_value_range_collect_value (GValue* value, guint n_collect_values, GTypeCValue* collect_values, guint collect_flags) {
+	if (collect_values[0].v_pointer) {
+		GeeTreeMapRange* object;
+		object = collect_values[0].v_pointer;
+		if (object->parent_instance.g_class == NULL) {
+			return g_strconcat ("invalid unclassed object pointer for value type `", G_VALUE_TYPE_NAME (value), "'", NULL);
+		} else if (!g_value_type_compatible (G_TYPE_FROM_INSTANCE (object), G_VALUE_TYPE (value))) {
+			return g_strconcat ("invalid object type `", g_type_name (G_TYPE_FROM_INSTANCE (object)), "' for value type `", G_VALUE_TYPE_NAME (value), "'", NULL);
+		}
+		value->data[0].v_pointer = gee_tree_map_range_ref (object);
+	} else {
+		value->data[0].v_pointer = NULL;
+	}
+	return NULL;
+}
+
+
+static gchar* gee_tree_map_value_range_lcopy_value (const GValue* value, guint n_collect_values, GTypeCValue* collect_values, guint collect_flags) {
+	GeeTreeMapRange** object_p;
+	object_p = collect_values[0].v_pointer;
+	if (!object_p) {
+		return g_strdup_printf ("value location for `%s' passed as NULL", G_VALUE_TYPE_NAME (value));
+	}
+	if (!value->data[0].v_pointer) {
+		*object_p = NULL;
+	} else if (collect_flags & G_VALUE_NOCOPY_CONTENTS) {
+		*object_p = value->data[0].v_pointer;
+	} else {
+		*object_p = gee_tree_map_range_ref (value->data[0].v_pointer);
+	}
+	return NULL;
+}
+
+
+static GParamSpec* gee_tree_map_param_spec_range (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags) {
+	GeeTreeMapParamSpecRange* spec;
+	g_return_val_if_fail (g_type_is_a (object_type, GEE_TREE_MAP_TYPE_RANGE), NULL);
+	spec = g_param_spec_internal (G_TYPE_PARAM_OBJECT, name, nick, blurb, flags);
+	G_PARAM_SPEC (spec)->value_type = object_type;
+	return G_PARAM_SPEC (spec);
+}
+
+
+static gpointer gee_tree_map_value_get_range (const GValue* value) {
+	g_return_val_if_fail (G_TYPE_CHECK_VALUE_TYPE (value, GEE_TREE_MAP_TYPE_RANGE), NULL);
+	return value->data[0].v_pointer;
+}
+
+
+static void gee_tree_map_value_set_range (GValue* value, gpointer v_object) {
+	GeeTreeMapRange* old;
+	g_return_if_fail (G_TYPE_CHECK_VALUE_TYPE (value, GEE_TREE_MAP_TYPE_RANGE));
+	old = value->data[0].v_pointer;
+	if (v_object) {
+		g_return_if_fail (G_TYPE_CHECK_INSTANCE_TYPE (v_object, GEE_TREE_MAP_TYPE_RANGE));
+		g_return_if_fail (g_value_type_compatible (G_TYPE_FROM_INSTANCE (v_object), G_VALUE_TYPE (value)));
+		value->data[0].v_pointer = v_object;
+		gee_tree_map_range_ref (value->data[0].v_pointer);
+	} else {
+		value->data[0].v_pointer = NULL;
+	}
+	if (old) {
+		gee_tree_map_range_unref (old);
+	}
+}
+
+
+static void gee_tree_map_value_take_range (GValue* value, gpointer v_object) {
+	GeeTreeMapRange* old;
+	g_return_if_fail (G_TYPE_CHECK_VALUE_TYPE (value, GEE_TREE_MAP_TYPE_RANGE));
+	old = value->data[0].v_pointer;
+	if (v_object) {
+		g_return_if_fail (G_TYPE_CHECK_INSTANCE_TYPE (v_object, GEE_TREE_MAP_TYPE_RANGE));
+		g_return_if_fail (g_value_type_compatible (G_TYPE_FROM_INSTANCE (v_object), G_VALUE_TYPE (value)));
+		value->data[0].v_pointer = v_object;
+	} else {
+		value->data[0].v_pointer = NULL;
+	}
+	if (old) {
+		gee_tree_map_range_unref (old);
+	}
+}
+
+
+static void gee_tree_map_range_class_init (GeeTreeMapRangeClass * klass) {
+	gee_tree_map_range_parent_class = g_type_class_peek_parent (klass);
+	GEE_TREE_MAP_RANGE_CLASS (klass)->finalize = gee_tree_map_range_finalize;
+	g_type_class_add_private (klass, sizeof (GeeTreeMapRangePrivate));
+}
+
+
+static void gee_tree_map_range_instance_init (GeeTreeMapRange * self) {
+	self->priv = GEE_TREE_MAP_RANGE_GET_PRIVATE (self);
+	self->ref_count = 1;
+}
+
+
+static void gee_tree_map_range_finalize (GeeTreeMapRange* obj) {
+	GeeTreeMapRange * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (obj, GEE_TREE_MAP_TYPE_RANGE, GeeTreeMapRange);
+	_g_object_unref0 (self->priv->map);
+	((self->priv->after == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (self->priv->after = (self->priv->k_destroy_func (self->priv->after), NULL));
+	((self->priv->before == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (self->priv->before = (self->priv->k_destroy_func (self->priv->before), NULL));
+}
+
+
+static GType gee_tree_map_range_get_type (void) {
+	static volatile gsize gee_tree_map_range_type_id__volatile = 0;
+	if (g_once_init_enter (&gee_tree_map_range_type_id__volatile)) {
+		static const GTypeValueTable g_define_type_value_table = { gee_tree_map_value_range_init, gee_tree_map_value_range_free_value, gee_tree_map_value_range_copy_value, gee_tree_map_value_range_peek_pointer, "p", gee_tree_map_value_range_collect_value, "p", gee_tree_map_value_range_lcopy_value };
+		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapRangeClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_range_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapRange), 0, (GInstanceInitFunc) gee_tree_map_range_instance_init, &g_define_type_value_table };
+		static const GTypeFundamentalInfo g_define_type_fundamental_info = { (G_TYPE_FLAG_CLASSED | G_TYPE_FLAG_INSTANTIATABLE | G_TYPE_FLAG_DERIVABLE | G_TYPE_FLAG_DEEP_DERIVABLE) };
+		GType gee_tree_map_range_type_id;
+		gee_tree_map_range_type_id = g_type_register_fundamental (g_type_fundamental_next (), "GeeTreeMapRange", &g_define_type_info, &g_define_type_fundamental_info, 0);
+		g_once_init_leave (&gee_tree_map_range_type_id__volatile, gee_tree_map_range_type_id);
+	}
+	return gee_tree_map_range_type_id__volatile;
+}
+
+
+static gpointer gee_tree_map_range_ref (gpointer instance) {
+	GeeTreeMapRange* self;
+	self = instance;
+	g_atomic_int_inc (&self->ref_count);
+	return instance;
+}
+
+
+static void gee_tree_map_range_unref (gpointer instance) {
+	GeeTreeMapRange* self;
+	self = instance;
+	if (g_atomic_int_dec_and_test (&self->ref_count)) {
+		GEE_TREE_MAP_RANGE_GET_CLASS (self)->finalize (self);
+		g_type_free_instance ((GTypeInstance *) self);
+	}
+}
+
+
+static GeeTreeMapSubMap* gee_tree_map_sub_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	GeeTreeMapSubMap * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	GeeTreeMapRange* _tmp2_;
+	GeeTreeMapRange* _tmp3_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	self = (GeeTreeMapSubMap*) gee_abstract_bidir_sorted_map_construct (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	_tmp0_ = map;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	_g_object_unref0 (self->priv->map);
+	self->priv->map = _tmp1_;
+	_tmp2_ = range;
+	_tmp3_ = _gee_tree_map_range_ref0 (_tmp2_);
+	_gee_tree_map_range_unref0 (self->priv->range);
+	self->priv->range = _tmp3_;
+	return self;
+}
+
+
+static GeeTreeMapSubMap* gee_tree_map_sub_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	return gee_tree_map_sub_map_construct (GEE_TREE_MAP_TYPE_SUB_MAP, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range);
+}
+
+
+static gboolean gee_tree_map_sub_map_real_has_key (GeeAbstractMap* base, gconstpointer key) {
+	GeeTreeMapSubMap * self;
+	gboolean result = FALSE;
+	gboolean _tmp0_ = FALSE;
+	GeeTreeMapRange* _tmp1_;
+	gconstpointer _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	gboolean _tmp7_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp1_ = self->priv->range;
+	_tmp2_ = key;
+	_tmp3_ = gee_tree_map_range_in_range (_tmp1_, _tmp2_);
+	if (_tmp3_) {
+		GeeTreeMap* _tmp4_;
+		gconstpointer _tmp5_;
+		gboolean _tmp6_ = FALSE;
+		_tmp4_ = self->priv->map;
+		_tmp5_ = key;
+		_tmp6_ = gee_abstract_map_has_key ((GeeAbstractMap*) _tmp4_, _tmp5_);
+		_tmp0_ = _tmp6_;
+	} else {
+		_tmp0_ = FALSE;
+	}
+	_tmp7_ = _tmp0_;
+	result = _tmp7_;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_map_real_has (GeeAbstractMap* base, gconstpointer key, gconstpointer value) {
+	GeeTreeMapSubMap * self;
+	gboolean result = FALSE;
+	gboolean _tmp0_ = FALSE;
+	GeeTreeMapRange* _tmp1_;
+	gconstpointer _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	gboolean _tmp8_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp1_ = self->priv->range;
+	_tmp2_ = key;
+	_tmp3_ = gee_tree_map_range_in_range (_tmp1_, _tmp2_);
+	if (_tmp3_) {
+		GeeTreeMap* _tmp4_;
+		gconstpointer _tmp5_;
+		gconstpointer _tmp6_;
+		gboolean _tmp7_ = FALSE;
+		_tmp4_ = self->priv->map;
+		_tmp5_ = key;
+		_tmp6_ = value;
+		_tmp7_ = gee_abstract_map_has ((GeeAbstractMap*) _tmp4_, _tmp5_, _tmp6_);
+		_tmp0_ = _tmp7_;
+	} else {
+		_tmp0_ = FALSE;
+	}
+	_tmp8_ = _tmp0_;
+	result = _tmp8_;
+	return result;
+}
+
+
+static gpointer gee_tree_map_sub_map_real_get (GeeAbstractMap* base, gconstpointer key) {
+	GeeTreeMapSubMap * self;
+	gpointer result = NULL;
+	gpointer _tmp0_ = NULL;
+	GeeTreeMapRange* _tmp1_;
+	gconstpointer _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp1_ = self->priv->range;
+	_tmp2_ = key;
+	_tmp3_ = gee_tree_map_range_in_range (_tmp1_, _tmp2_);
+	if (_tmp3_) {
+		GeeTreeMap* _tmp4_;
+		gconstpointer _tmp5_;
+		gpointer _tmp6_ = NULL;
+		_tmp4_ = self->priv->map;
+		_tmp5_ = key;
+		_tmp6_ = gee_abstract_map_get ((GeeAbstractMap*) _tmp4_, _tmp5_);
+		((_tmp0_ == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_tmp0_ = (self->priv->v_destroy_func (_tmp0_), NULL));
+		_tmp0_ = _tmp6_;
+	} else {
+		((_tmp0_ == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_tmp0_ = (self->priv->v_destroy_func (_tmp0_), NULL));
+		_tmp0_ = NULL;
+	}
+	result = _tmp0_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_map_real_set (GeeAbstractMap* base, gconstpointer key, gconstpointer value) {
+	GeeTreeMapSubMap * self;
+	GeeTreeMapRange* _tmp0_;
+	gconstpointer _tmp1_;
+	gboolean _tmp2_ = FALSE;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp0_ = self->priv->range;
+	_tmp1_ = key;
+	_tmp2_ = gee_tree_map_range_in_range (_tmp0_, _tmp1_);
+	if (_tmp2_) {
+		GeeTreeMap* _tmp3_;
+		gconstpointer _tmp4_;
+		gconstpointer _tmp5_;
+		_tmp3_ = self->priv->map;
+		_tmp4_ = key;
+		_tmp5_ = value;
+		gee_abstract_map_set ((GeeAbstractMap*) _tmp3_, _tmp4_, _tmp5_);
+	}
+}
+
+
+static gboolean gee_tree_map_sub_map_real_unset (GeeAbstractMap* base, gconstpointer key, gpointer* value) {
+	GeeTreeMapSubMap * self;
+	gpointer _vala_value = NULL;
+	gboolean result = FALSE;
+	gboolean _tmp0_ = FALSE;
+	GeeTreeMapRange* _tmp1_;
+	gconstpointer _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	gboolean _tmp8_;
+	self = (GeeTreeMapSubMap*) base;
+	((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
+	_vala_value = NULL;
+	_tmp1_ = self->priv->range;
+	_tmp2_ = key;
+	_tmp3_ = gee_tree_map_range_in_range (_tmp1_, _tmp2_);
+	if (_tmp3_) {
+		GeeTreeMap* _tmp4_;
+		gconstpointer _tmp5_;
+		gpointer _tmp6_ = NULL;
+		gboolean _tmp7_ = FALSE;
+		_tmp4_ = self->priv->map;
+		_tmp5_ = key;
+		_tmp7_ = gee_abstract_map_unset ((GeeAbstractMap*) _tmp4_, _tmp5_, &_tmp6_);
+		((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
+		_vala_value = _tmp6_;
+		_tmp0_ = _tmp7_;
+	} else {
+		_tmp0_ = FALSE;
+	}
+	_tmp8_ = _tmp0_;
+	result = _tmp8_;
+	if (value) {
+		*value = _vala_value;
+	} else {
+		((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
+	}
+	return result;
+}
+
+
+static void gee_tree_map_sub_map_real_clear (GeeAbstractMap* base) {
+	GeeTreeMapSubMap * self;
+	self = (GeeTreeMapSubMap*) base;
+	{
+		GeeMapIterator* _tmp0_ = NULL;
+		GeeMapIterator* iterator;
+		_tmp0_ = gee_abstract_map_map_iterator ((GeeAbstractMap*) self);
+		iterator = _tmp0_;
+		{
+			gboolean _tmp1_;
+			_tmp1_ = TRUE;
+			while (TRUE) {
+				gboolean _tmp2_;
+				GeeMapIterator* _tmp3_;
+				gboolean _tmp4_ = FALSE;
+				GeeMapIterator* _tmp5_;
+				_tmp2_ = _tmp1_;
+				if (!_tmp2_) {
+				}
+				_tmp1_ = FALSE;
+				_tmp3_ = iterator;
+				_tmp4_ = gee_map_iterator_next (_tmp3_);
+				if (!_tmp4_) {
+					break;
+				}
+				_tmp5_ = iterator;
+				gee_map_iterator_unset (_tmp5_);
+			}
+		}
+		_g_object_unref0 (iterator);
+	}
+}
+
+
+static GeeMapIterator* gee_tree_map_sub_map_real_map_iterator (GeeAbstractMap* base) {
+	GeeTreeMapSubMap * self;
+	GeeMapIterator* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeTreeMapSubMapIterator* _tmp2_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp0_ = self->priv->map;
+	_tmp1_ = self->priv->range;
+	_tmp2_ = gee_tree_map_sub_map_iterator_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp1_);
+	result = (GeeMapIterator*) _tmp2_;
+	return result;
+}
+
+
+static GeeBidirMapIterator* gee_tree_map_sub_map_real_bidir_map_iterator (GeeAbstractBidirSortedMap* base) {
+	GeeTreeMapSubMap * self;
+	GeeBidirMapIterator* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeTreeMapSubMapIterator* _tmp2_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp0_ = self->priv->map;
+	_tmp1_ = self->priv->range;
+	_tmp2_ = gee_tree_map_sub_map_iterator_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp1_);
+	result = (GeeBidirMapIterator*) _tmp2_;
+	return result;
+}
+
+
+static GeeSortedMap* gee_tree_map_sub_map_real_head_map (GeeAbstractSortedMap* base, gconstpointer before) {
+	GeeTreeMapSubMap * self;
+	GeeSortedMap* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	gconstpointer _tmp2_;
+	GeeTreeMapRange* _tmp3_ = NULL;
+	GeeTreeMapRange* _tmp4_;
+	GeeTreeMapSubMap* _tmp5_;
+	GeeSortedMap* _tmp6_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp0_ = self->priv->map;
+	_tmp1_ = self->priv->range;
+	_tmp2_ = before;
+	_tmp3_ = gee_tree_map_range_cut_tail (_tmp1_, _tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = gee_tree_map_sub_map_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp4_);
+	_tmp6_ = (GeeSortedMap*) _tmp5_;
+	_gee_tree_map_range_unref0 (_tmp4_);
+	result = _tmp6_;
+	return result;
+}
+
+
+static GeeSortedMap* gee_tree_map_sub_map_real_tail_map (GeeAbstractSortedMap* base, gconstpointer after) {
+	GeeTreeMapSubMap * self;
+	GeeSortedMap* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	gconstpointer _tmp2_;
+	GeeTreeMapRange* _tmp3_ = NULL;
+	GeeTreeMapRange* _tmp4_;
+	GeeTreeMapSubMap* _tmp5_;
+	GeeSortedMap* _tmp6_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp0_ = self->priv->map;
+	_tmp1_ = self->priv->range;
+	_tmp2_ = after;
+	_tmp3_ = gee_tree_map_range_cut_head (_tmp1_, _tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = gee_tree_map_sub_map_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp4_);
+	_tmp6_ = (GeeSortedMap*) _tmp5_;
+	_gee_tree_map_range_unref0 (_tmp4_);
+	result = _tmp6_;
+	return result;
+}
+
+
+static GeeSortedMap* gee_tree_map_sub_map_real_sub_map (GeeAbstractSortedMap* base, gconstpointer after, gconstpointer before) {
+	GeeTreeMapSubMap * self;
+	GeeSortedMap* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	GeeTreeMapRange* _tmp4_ = NULL;
+	GeeTreeMapRange* _tmp5_;
+	GeeTreeMapSubMap* _tmp6_;
+	GeeSortedMap* _tmp7_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp0_ = self->priv->map;
+	_tmp1_ = self->priv->range;
+	_tmp2_ = after;
+	_tmp3_ = before;
+	_tmp4_ = gee_tree_map_range_cut (_tmp1_, _tmp2_, _tmp3_);
+	_tmp5_ = _tmp4_;
+	_tmp6_ = gee_tree_map_sub_map_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp5_);
+	_tmp7_ = (GeeSortedMap*) _tmp6_;
+	_gee_tree_map_range_unref0 (_tmp5_);
+	result = _tmp7_;
+	return result;
+}
+
+
+static gint gee_tree_map_sub_map_real_get_size (GeeAbstractMap* base) {
+	gint result;
+	GeeTreeMapSubMap* self;
+	GeeSet* _tmp0_;
+	GeeSet* _tmp1_;
+	GeeSet* _tmp2_;
+	gint _tmp3_;
+	gint _tmp4_;
+	gint _tmp5_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp0_ = gee_abstract_map_get_keys ((GeeMap*) self);
+	_tmp1_ = _tmp0_;
+	_tmp2_ = _tmp1_;
+	_tmp3_ = gee_collection_get_size ((GeeCollection*) _tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = _tmp4_;
+	_g_object_unref0 (_tmp2_);
+	result = _tmp5_;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_map_get_is_empty (GeeTreeMapSubMap* self) {
+	gboolean result;
+	GeeSet* _tmp0_;
+	GeeSet* _tmp1_;
+	GeeSet* _tmp2_;
+	gboolean _tmp3_;
+	gboolean _tmp4_;
+	gboolean _tmp5_;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp0_ = gee_abstract_map_get_keys ((GeeMap*) self);
+	_tmp1_ = _tmp0_;
+	_tmp2_ = _tmp1_;
+	_tmp3_ = gee_collection_get_is_empty ((GeeCollection*) _tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = _tmp4_;
+	_g_object_unref0 (_tmp2_);
+	result = _tmp5_;
+	return result;
+}
+
+
+static GeeSet* gee_tree_map_sub_map_real_get_keys (GeeAbstractMap* base) {
+	GeeSet* result;
+	GeeTreeMapSubMap* self;
+	GeeSortedSet* _tmp0_;
+	GeeSortedSet* _tmp1_;
+	GeeSortedSet* keys;
+	GeeSortedSet* _tmp2_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp0_ = self->priv->_keys;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	keys = _tmp1_;
+	_tmp2_ = self->priv->_keys;
+	if (_tmp2_ == NULL) {
+		GeeTreeMap* _tmp3_;
+		GeeTreeMapRange* _tmp4_;
+		GeeTreeMapSubKeySet* _tmp5_;
+		GeeSortedSet* _tmp6_;
+		GeeSortedSet* _tmp7_;
+		_tmp3_ = self->priv->map;
+		_tmp4_ = self->priv->range;
+		_tmp5_ = gee_tree_map_sub_key_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp3_, _tmp4_);
+		_g_object_unref0 (keys);
+		keys = (GeeSortedSet*) _tmp5_;
+		_tmp6_ = keys;
+		self->priv->_keys = _tmp6_;
+		_tmp7_ = keys;
+		g_object_add_weak_pointer ((GObject*) _tmp7_, &self->priv->_keys);
+	}
+	result = (GeeSet*) keys;
+	return result;
+}
+
+
+static GeeCollection* gee_tree_map_sub_map_real_get_values (GeeAbstractMap* base) {
+	GeeCollection* result;
+	GeeTreeMapSubMap* self;
+	GeeCollection* _tmp0_;
+	GeeCollection* _tmp1_;
+	GeeCollection* values;
+	GeeCollection* _tmp2_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp0_ = self->priv->_values;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	values = _tmp1_;
+	_tmp2_ = self->priv->_values;
+	if (_tmp2_ == NULL) {
+		GeeTreeMap* _tmp3_;
+		GeeTreeMapRange* _tmp4_;
+		GeeTreeMapSubValueCollection* _tmp5_;
+		GeeCollection* _tmp6_;
+		GeeCollection* _tmp7_;
+		_tmp3_ = self->priv->map;
+		_tmp4_ = self->priv->range;
+		_tmp5_ = gee_tree_map_sub_value_collection_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp3_, _tmp4_);
+		_g_object_unref0 (values);
+		values = (GeeCollection*) _tmp5_;
+		_tmp6_ = values;
+		self->priv->_values = _tmp6_;
+		_tmp7_ = values;
+		g_object_add_weak_pointer ((GObject*) _tmp7_, &self->priv->_values);
+	}
+	result = values;
+	return result;
+}
+
+
+static GeeSet* gee_tree_map_sub_map_real_get_entries (GeeAbstractMap* base) {
+	GeeSet* result;
+	GeeTreeMapSubMap* self;
+	GeeSortedSet* _tmp0_;
+	GeeSortedSet* _tmp1_;
+	GeeSortedSet* entries;
+	GeeSortedSet* _tmp2_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp0_ = self->priv->_entries;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	entries = _tmp1_;
+	_tmp2_ = self->priv->_entries;
+	if (_tmp2_ == NULL) {
+		GeeTreeMap* _tmp3_;
+		GeeTreeMapRange* _tmp4_;
+		GeeTreeMapSubEntrySet* _tmp5_;
+		GeeSortedSet* _tmp6_;
+		GeeSortedSet* _tmp7_;
+		_tmp3_ = self->priv->map;
+		_tmp4_ = self->priv->range;
+		_tmp5_ = gee_tree_map_sub_entry_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp3_, _tmp4_);
+		_g_object_unref0 (entries);
+		entries = (GeeSortedSet*) _tmp5_;
+		_tmp6_ = entries;
+		self->priv->_entries = _tmp6_;
+		_tmp7_ = entries;
+		g_object_add_weak_pointer ((GObject*) _tmp7_, &self->priv->_entries);
+	}
+	result = (GeeSet*) entries;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_map_real_get_read_only (GeeAbstractMap* base) {
+	gboolean result;
+	GeeTreeMapSubMap* self;
+	self = (GeeTreeMapSubMap*) base;
+	result = TRUE;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_sub_map_real_get_ascending_keys (GeeAbstractSortedMap* base) {
+	GeeSortedSet* result;
+	GeeTreeMapSubMap* self;
+	GeeSortedSet* _tmp0_;
+	GeeSortedSet* _tmp1_;
+	GeeSortedSet* keys;
+	GeeSortedSet* _tmp2_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp0_ = self->priv->_keys;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	keys = _tmp1_;
+	_tmp2_ = self->priv->_keys;
+	if (_tmp2_ == NULL) {
+		GeeTreeMap* _tmp3_;
+		GeeTreeMapRange* _tmp4_;
+		GeeTreeMapSubKeySet* _tmp5_;
+		GeeSortedSet* _tmp6_;
+		GeeSortedSet* _tmp7_;
+		_tmp3_ = self->priv->map;
+		_tmp4_ = self->priv->range;
+		_tmp5_ = gee_tree_map_sub_key_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp3_, _tmp4_);
+		_g_object_unref0 (keys);
+		keys = (GeeSortedSet*) _tmp5_;
+		_tmp6_ = keys;
+		self->priv->_keys = _tmp6_;
+		_tmp7_ = keys;
+		g_object_add_weak_pointer ((GObject*) _tmp7_, &self->priv->_keys);
+	}
+	result = keys;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_sub_map_real_get_ascending_entries (GeeAbstractSortedMap* base) {
+	GeeSortedSet* result;
+	GeeTreeMapSubMap* self;
+	GeeSortedSet* _tmp0_;
+	GeeSortedSet* _tmp1_;
+	GeeSortedSet* entries;
+	GeeSortedSet* _tmp2_;
+	GeeSortedSet* _tmp8_;
+	GeeSortedSet* _tmp9_;
+	self = (GeeTreeMapSubMap*) base;
+	_tmp0_ = self->priv->_entries;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	entries = _tmp1_;
+	_tmp2_ = self->priv->_entries;
+	if (_tmp2_ == NULL) {
+		GeeTreeMap* _tmp3_;
+		GeeTreeMapRange* _tmp4_;
+		GeeTreeMapSubEntrySet* _tmp5_;
+		GeeSortedSet* _tmp6_;
+		GeeSortedSet* _tmp7_;
+		_tmp3_ = self->priv->map;
+		_tmp4_ = self->priv->range;
+		_tmp5_ = gee_tree_map_sub_entry_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp3_, _tmp4_);
+		_g_object_unref0 (entries);
+		entries = (GeeSortedSet*) _tmp5_;
+		_tmp6_ = entries;
+		self->priv->_entries = _tmp6_;
+		_tmp7_ = entries;
+		g_object_add_weak_pointer ((GObject*) _tmp7_, &self->priv->_entries);
+	}
+	_tmp8_ = self->priv->_entries;
+	_tmp9_ = _g_object_ref0 (_tmp8_);
+	result = _tmp9_;
+	_g_object_unref0 (entries);
+	return result;
+}
+
+
+static void gee_tree_map_sub_map_class_init (GeeTreeMapSubMapClass * klass) {
+	gee_tree_map_sub_map_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (GeeTreeMapSubMapPrivate));
+	GEE_ABSTRACT_MAP_CLASS (klass)->has_key = gee_tree_map_sub_map_real_has_key;
+	GEE_ABSTRACT_MAP_CLASS (klass)->has = gee_tree_map_sub_map_real_has;
+	GEE_ABSTRACT_MAP_CLASS (klass)->get = gee_tree_map_sub_map_real_get;
+	GEE_ABSTRACT_MAP_CLASS (klass)->set = gee_tree_map_sub_map_real_set;
+	GEE_ABSTRACT_MAP_CLASS (klass)->unset = gee_tree_map_sub_map_real_unset;
+	GEE_ABSTRACT_MAP_CLASS (klass)->clear = gee_tree_map_sub_map_real_clear;
+	GEE_ABSTRACT_MAP_CLASS (klass)->map_iterator = gee_tree_map_sub_map_real_map_iterator;
+	GEE_ABSTRACT_BIDIR_SORTED_MAP_CLASS (klass)->bidir_map_iterator = gee_tree_map_sub_map_real_bidir_map_iterator;
+	GEE_ABSTRACT_SORTED_MAP_CLASS (klass)->head_map = gee_tree_map_sub_map_real_head_map;
+	GEE_ABSTRACT_SORTED_MAP_CLASS (klass)->tail_map = gee_tree_map_sub_map_real_tail_map;
+	GEE_ABSTRACT_SORTED_MAP_CLASS (klass)->sub_map = gee_tree_map_sub_map_real_sub_map;
+	GEE_ABSTRACT_MAP_CLASS (klass)->get_size = gee_tree_map_sub_map_real_get_size;
+	GEE_ABSTRACT_MAP_CLASS (klass)->get_keys = gee_tree_map_sub_map_real_get_keys;
+	GEE_ABSTRACT_MAP_CLASS (klass)->get_values = gee_tree_map_sub_map_real_get_values;
+	GEE_ABSTRACT_MAP_CLASS (klass)->get_entries = gee_tree_map_sub_map_real_get_entries;
+	GEE_ABSTRACT_MAP_CLASS (klass)->get_read_only = gee_tree_map_sub_map_real_get_read_only;
+	GEE_ABSTRACT_SORTED_MAP_CLASS (klass)->get_ascending_keys = gee_tree_map_sub_map_real_get_ascending_keys;
+	GEE_ABSTRACT_SORTED_MAP_CLASS (klass)->get_ascending_entries = gee_tree_map_sub_map_real_get_ascending_entries;
+	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_sub_map_get_property;
+	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_sub_map_set_property;
+	G_OBJECT_CLASS (klass)->finalize = gee_tree_map_sub_map_finalize;
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_K_TYPE, g_param_spec_gtype ("k-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_K_DUP_FUNC, g_param_spec_pointer ("k-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_K_DESTROY_FUNC, g_param_spec_pointer ("k-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_IS_EMPTY, g_param_spec_boolean ("is-empty", "is-empty", "is-empty", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_KEYS, g_param_spec_object ("keys", "keys", "keys", GEE_TYPE_SET, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_VALUES, g_param_spec_object ("values", "values", "values", GEE_TYPE_COLLECTION, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_ENTRIES, g_param_spec_object ("entries", "entries", "entries", GEE_TYPE_SET, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_ASCENDING_KEYS, g_param_spec_object ("ascending-keys", "ascending-keys", "ascending-keys", GEE_TYPE_SORTED_SET, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_ASCENDING_ENTRIES, g_param_spec_object ("ascending-entries", "ascending-entries", "ascending-entries", GEE_TYPE_SORTED_SET, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static void gee_tree_map_sub_map_instance_init (GeeTreeMapSubMap * self) {
+	self->priv = GEE_TREE_MAP_SUB_MAP_GET_PRIVATE (self);
+}
+
+
+static void gee_tree_map_sub_map_finalize (GObject* obj) {
+	GeeTreeMapSubMap * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (obj, GEE_TREE_MAP_TYPE_SUB_MAP, GeeTreeMapSubMap);
+	_g_object_unref0 (self->priv->map);
+	_gee_tree_map_range_unref0 (self->priv->range);
+	G_OBJECT_CLASS (gee_tree_map_sub_map_parent_class)->finalize (obj);
+}
+
+
+static GType gee_tree_map_sub_map_get_type (void) {
+	static volatile gsize gee_tree_map_sub_map_type_id__volatile = 0;
+	if (g_once_init_enter (&gee_tree_map_sub_map_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapSubMapClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_sub_map_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapSubMap), 0, (GInstanceInitFunc) gee_tree_map_sub_map_instance_init, NULL };
+		GType gee_tree_map_sub_map_type_id;
+		gee_tree_map_sub_map_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP, "GeeTreeMapSubMap", &g_define_type_info, 0);
+		g_once_init_leave (&gee_tree_map_sub_map_type_id__volatile, gee_tree_map_sub_map_type_id);
+	}
+	return gee_tree_map_sub_map_type_id__volatile;
+}
+
+
+static void _vala_gee_tree_map_sub_map_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubMap * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_MAP, GeeTreeMapSubMap);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_MAP_SIZE:
+		g_value_set_int (value, gee_abstract_map_get_size ((GeeAbstractMap*) self));
+		break;
+		case GEE_TREE_MAP_SUB_MAP_IS_EMPTY:
+		g_value_set_boolean (value, gee_tree_map_sub_map_get_is_empty (self));
+		break;
+		case GEE_TREE_MAP_SUB_MAP_KEYS:
+		g_value_take_object (value, gee_abstract_map_get_keys ((GeeAbstractMap*) self));
+		break;
+		case GEE_TREE_MAP_SUB_MAP_VALUES:
+		g_value_take_object (value, gee_abstract_map_get_values ((GeeAbstractMap*) self));
+		break;
+		case GEE_TREE_MAP_SUB_MAP_ENTRIES:
+		g_value_take_object (value, gee_abstract_map_get_entries ((GeeAbstractMap*) self));
+		break;
+		case GEE_TREE_MAP_SUB_MAP_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_map_get_read_only ((GeeAbstractMap*) self));
+		break;
+		case GEE_TREE_MAP_SUB_MAP_ASCENDING_KEYS:
+		g_value_take_object (value, gee_abstract_sorted_map_get_ascending_keys ((GeeAbstractSortedMap*) self));
+		break;
+		case GEE_TREE_MAP_SUB_MAP_ASCENDING_ENTRIES:
+		g_value_take_object (value, gee_abstract_sorted_map_get_ascending_entries ((GeeAbstractSortedMap*) self));
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
+static void _vala_gee_tree_map_sub_map_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubMap * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_MAP, GeeTreeMapSubMap);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_MAP_K_TYPE:
+		self->priv->k_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_MAP_K_DUP_FUNC:
+		self->priv->k_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_MAP_K_DESTROY_FUNC:
+		self->priv->k_destroy_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_MAP_V_TYPE:
+		self->priv->v_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_MAP_V_DUP_FUNC:
+		self->priv->v_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_MAP_V_DESTROY_FUNC:
+		self->priv->v_destroy_func = g_value_get_pointer (value);
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
 static GeeTreeMapKeySet* gee_tree_map_key_set_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map) {
 	GeeTreeMapKeySet * self = NULL;
 	GeeTreeMap* _tmp0_;
 	GeeTreeMap* _tmp1_;
 	g_return_val_if_fail (map != NULL, NULL);
-	self = (GeeTreeMapKeySet*) gee_abstract_set_construct (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func);
+	self = (GeeTreeMapKeySet*) gee_abstract_bidir_sorted_set_construct (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func);
 	self->priv->k_type = k_type;
 	self->priv->k_dup_func = k_dup_func;
 	self->priv->k_destroy_func = k_destroy_func;
@@ -2638,32 +6001,238 @@ static gboolean gee_tree_map_key_set_real_contains (GeeAbstractCollection* base,
 }
 
 
-static gboolean gee_tree_map_key_set_real_add_all (GeeAbstractCollection* base, GeeCollection* collection) {
+static gpointer gee_tree_map_key_set_real_first (GeeAbstractSortedSet* base) {
 	GeeTreeMapKeySet * self;
-	gboolean result = FALSE;
+	gpointer result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapNode* _tmp1_;
+	GeeTreeMap* _tmp2_;
+	GeeTreeMapNode* _tmp3_;
+	gconstpointer _tmp4_;
+	gpointer _tmp5_;
 	self = (GeeTreeMapKeySet*) base;
-	g_return_val_if_fail (collection != NULL, FALSE);
-	g_assert_not_reached ();
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = _tmp0_->priv->first;
+	_vala_assert (_tmp1_ != NULL, "_map.first != null");
+	_tmp2_ = self->priv->_map;
+	_tmp3_ = _tmp2_->priv->first;
+	_tmp4_ = _tmp3_->key;
+	_tmp5_ = ((_tmp4_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp4_) : ((gpointer) _tmp4_);
+	result = _tmp5_;
 	return result;
 }
 
 
-static gboolean gee_tree_map_key_set_real_remove_all (GeeAbstractCollection* base, GeeCollection* collection) {
+static gpointer gee_tree_map_key_set_real_last (GeeAbstractSortedSet* base) {
 	GeeTreeMapKeySet * self;
-	gboolean result = FALSE;
+	gpointer result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapNode* _tmp1_;
+	GeeTreeMap* _tmp2_;
+	GeeTreeMapNode* _tmp3_;
+	gconstpointer _tmp4_;
+	gpointer _tmp5_;
 	self = (GeeTreeMapKeySet*) base;
-	g_return_val_if_fail (collection != NULL, FALSE);
-	g_assert_not_reached ();
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = _tmp0_->priv->last;
+	_vala_assert (_tmp1_ != NULL, "_map.last != null");
+	_tmp2_ = self->priv->_map;
+	_tmp3_ = _tmp2_->priv->last;
+	_tmp4_ = _tmp3_->key;
+	_tmp5_ = ((_tmp4_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp4_) : ((gpointer) _tmp4_);
+	result = _tmp5_;
 	return result;
 }
 
 
-static gboolean gee_tree_map_key_set_real_retain_all (GeeAbstractCollection* base, GeeCollection* collection) {
+static GeeBidirIterator* gee_tree_map_key_set_real_bidir_iterator (GeeAbstractBidirSortedSet* base) {
 	GeeTreeMapKeySet * self;
-	gboolean result = FALSE;
+	GeeBidirIterator* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapKeyIterator* _tmp1_;
 	self = (GeeTreeMapKeySet*) base;
-	g_return_val_if_fail (collection != NULL, FALSE);
-	g_assert_not_reached ();
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = gee_tree_map_key_iterator_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_);
+	result = (GeeBidirIterator*) _tmp1_;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_key_set_real_head_set (GeeAbstractSortedSet* base, gconstpointer before) {
+	GeeTreeMapKeySet * self;
+	GeeSortedSet* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	gconstpointer _tmp2_;
+	GeeTreeMapRange* _tmp3_;
+	GeeTreeMapRange* _tmp4_;
+	GeeTreeMapSubKeySet* _tmp5_;
+	GeeSortedSet* _tmp6_;
+	self = (GeeTreeMapKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_map;
+	_tmp2_ = before;
+	_tmp3_ = gee_tree_map_range_new_head (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp1_, _tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = gee_tree_map_sub_key_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp4_);
+	_tmp6_ = (GeeSortedSet*) _tmp5_;
+	_gee_tree_map_range_unref0 (_tmp4_);
+	result = _tmp6_;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_key_set_real_tail_set (GeeAbstractSortedSet* base, gconstpointer after) {
+	GeeTreeMapKeySet * self;
+	GeeSortedSet* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	gconstpointer _tmp2_;
+	GeeTreeMapRange* _tmp3_;
+	GeeTreeMapRange* _tmp4_;
+	GeeTreeMapSubKeySet* _tmp5_;
+	GeeSortedSet* _tmp6_;
+	self = (GeeTreeMapKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_map;
+	_tmp2_ = after;
+	_tmp3_ = gee_tree_map_range_new_tail (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp1_, _tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = gee_tree_map_sub_key_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp4_);
+	_tmp6_ = (GeeSortedSet*) _tmp5_;
+	_gee_tree_map_range_unref0 (_tmp4_);
+	result = _tmp6_;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_key_set_real_sub_set (GeeAbstractSortedSet* base, gconstpointer after, gconstpointer before) {
+	GeeTreeMapKeySet * self;
+	GeeSortedSet* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	GeeTreeMapRange* _tmp4_;
+	GeeTreeMapRange* _tmp5_;
+	GeeTreeMapSubKeySet* _tmp6_;
+	GeeSortedSet* _tmp7_;
+	self = (GeeTreeMapKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_map;
+	_tmp2_ = after;
+	_tmp3_ = before;
+	_tmp4_ = gee_tree_map_range_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp1_, _tmp2_, _tmp3_);
+	_tmp5_ = _tmp4_;
+	_tmp6_ = gee_tree_map_sub_key_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp5_);
+	_tmp7_ = (GeeSortedSet*) _tmp6_;
+	_gee_tree_map_range_unref0 (_tmp5_);
+	result = _tmp7_;
+	return result;
+}
+
+
+static GeeIterator* gee_tree_map_key_set_real_iterator_at (GeeAbstractSortedSet* base, gconstpointer item) {
+	GeeTreeMapKeySet * self;
+	GeeIterator* result = NULL;
+	GeeTreeMap* _tmp0_;
+	gconstpointer _tmp1_;
+	GeeTreeMapNode* _tmp2_ = NULL;
+	GeeTreeMapNode* node;
+	GeeTreeMapNode* _tmp3_;
+	GeeTreeMap* _tmp4_;
+	GeeTreeMapNode* _tmp5_;
+	GeeTreeMapKeyIterator* _tmp6_;
+	self = (GeeTreeMapKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = item;
+	_tmp2_ = gee_tree_map_find_node (_tmp0_, _tmp1_);
+	node = _tmp2_;
+	_tmp3_ = node;
+	if (_tmp3_ == NULL) {
+		result = NULL;
+		return result;
+	}
+	_tmp4_ = self->priv->_map;
+	_tmp5_ = node;
+	_tmp6_ = gee_tree_map_key_iterator_new_pointing (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp4_, _tmp5_);
+	result = (GeeIterator*) _tmp6_;
+	return result;
+}
+
+
+static gpointer gee_tree_map_key_set_real_lower (GeeAbstractSortedSet* base, gconstpointer item) {
+	GeeTreeMapKeySet * self;
+	gpointer result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	gconstpointer _tmp2_;
+	GeeTreeMapNode* _tmp3_ = NULL;
+	gpointer _tmp4_ = NULL;
+	self = (GeeTreeMapKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_map;
+	_tmp2_ = item;
+	_tmp3_ = gee_tree_map_find_lower (_tmp1_, _tmp2_);
+	_tmp4_ = gee_tree_map_lift_null_key (_tmp0_, _tmp3_);
+	result = _tmp4_;
+	return result;
+}
+
+
+static gpointer gee_tree_map_key_set_real_higher (GeeAbstractSortedSet* base, gconstpointer item) {
+	GeeTreeMapKeySet * self;
+	gpointer result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	gconstpointer _tmp2_;
+	GeeTreeMapNode* _tmp3_ = NULL;
+	gpointer _tmp4_ = NULL;
+	self = (GeeTreeMapKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_map;
+	_tmp2_ = item;
+	_tmp3_ = gee_tree_map_find_higher (_tmp1_, _tmp2_);
+	_tmp4_ = gee_tree_map_lift_null_key (_tmp0_, _tmp3_);
+	result = _tmp4_;
+	return result;
+}
+
+
+static gpointer gee_tree_map_key_set_real_floor (GeeAbstractSortedSet* base, gconstpointer item) {
+	GeeTreeMapKeySet * self;
+	gpointer result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	gconstpointer _tmp2_;
+	GeeTreeMapNode* _tmp3_ = NULL;
+	gpointer _tmp4_ = NULL;
+	self = (GeeTreeMapKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_map;
+	_tmp2_ = item;
+	_tmp3_ = gee_tree_map_find_floor (_tmp1_, _tmp2_);
+	_tmp4_ = gee_tree_map_lift_null_key (_tmp0_, _tmp3_);
+	result = _tmp4_;
+	return result;
+}
+
+
+static gpointer gee_tree_map_key_set_real_ceil (GeeAbstractSortedSet* base, gconstpointer item) {
+	GeeTreeMapKeySet * self;
+	gpointer result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	gconstpointer _tmp2_;
+	GeeTreeMapNode* _tmp3_ = NULL;
+	gpointer _tmp4_ = NULL;
+	self = (GeeTreeMapKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_map;
+	_tmp2_ = item;
+	_tmp3_ = gee_tree_map_find_ceil (_tmp1_, _tmp2_);
+	_tmp4_ = gee_tree_map_lift_null_key (_tmp0_, _tmp3_);
+	result = _tmp4_;
 	return result;
 }
 
@@ -2683,6 +6252,15 @@ static gint gee_tree_map_key_set_real_get_size (GeeAbstractCollection* base) {
 }
 
 
+static gboolean gee_tree_map_key_set_real_get_read_only (GeeAbstractCollection* base) {
+	gboolean result;
+	GeeTreeMapKeySet* self;
+	self = (GeeTreeMapKeySet*) base;
+	result = TRUE;
+	return result;
+}
+
+
 static void gee_tree_map_key_set_class_init (GeeTreeMapKeySetClass * klass) {
 	gee_tree_map_key_set_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeTreeMapKeySetPrivate));
@@ -2691,10 +6269,19 @@ static void gee_tree_map_key_set_class_init (GeeTreeMapKeySetClass * klass) {
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->clear = gee_tree_map_key_set_real_clear;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove = gee_tree_map_key_set_real_remove;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->contains = gee_tree_map_key_set_real_contains;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->add_all = gee_tree_map_key_set_real_add_all;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove_all = gee_tree_map_key_set_real_remove_all;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->retain_all = gee_tree_map_key_set_real_retain_all;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->first = gee_tree_map_key_set_real_first;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->last = gee_tree_map_key_set_real_last;
+	GEE_ABSTRACT_BIDIR_SORTED_SET_CLASS (klass)->bidir_iterator = gee_tree_map_key_set_real_bidir_iterator;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->head_set = gee_tree_map_key_set_real_head_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->tail_set = gee_tree_map_key_set_real_tail_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->sub_set = gee_tree_map_key_set_real_sub_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->iterator_at = gee_tree_map_key_set_real_iterator_at;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->lower = gee_tree_map_key_set_real_lower;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->higher = gee_tree_map_key_set_real_higher;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->floor = gee_tree_map_key_set_real_floor;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->ceil = gee_tree_map_key_set_real_ceil;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_tree_map_key_set_real_get_size;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_tree_map_key_set_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_key_set_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_key_set_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_tree_map_key_set_finalize;
@@ -2705,6 +6292,7 @@ static void gee_tree_map_key_set_class_init (GeeTreeMapKeySetClass * klass) {
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_KEY_SET_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_KEY_SET_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_KEY_SET_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_KEY_SET_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -2726,7 +6314,7 @@ static GType gee_tree_map_key_set_get_type (void) {
 	if (g_once_init_enter (&gee_tree_map_key_set_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapKeySetClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_key_set_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapKeySet), 0, (GInstanceInitFunc) gee_tree_map_key_set_instance_init, NULL };
 		GType gee_tree_map_key_set_type_id;
-		gee_tree_map_key_set_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_SET, "GeeTreeMapKeySet", &g_define_type_info, 0);
+		gee_tree_map_key_set_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, "GeeTreeMapKeySet", &g_define_type_info, 0);
 		g_once_init_leave (&gee_tree_map_key_set_type_id__volatile, gee_tree_map_key_set_type_id);
 	}
 	return gee_tree_map_key_set_type_id__volatile;
@@ -2739,6 +6327,9 @@ static void _vala_gee_tree_map_key_set_get_property (GObject * object, guint pro
 	switch (property_id) {
 		case GEE_TREE_MAP_KEY_SET_SIZE:
 		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
+		break;
+		case GEE_TREE_MAP_KEY_SET_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -2767,6 +6358,753 @@ static void _vala_gee_tree_map_key_set_set_property (GObject * object, guint pro
 		self->priv->v_dup_func = g_value_get_pointer (value);
 		break;
 		case GEE_TREE_MAP_KEY_SET_V_DESTROY_FUNC:
+		self->priv->v_destroy_func = g_value_get_pointer (value);
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
+static GeeTreeMapSubKeySet* gee_tree_map_sub_key_set_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	GeeTreeMapSubKeySet * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	self = (GeeTreeMapSubKeySet*) gee_abstract_bidir_sorted_set_construct (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	_tmp0_ = map;
+	gee_tree_map_sub_key_set_set_map (self, _tmp0_);
+	_tmp1_ = range;
+	gee_tree_map_sub_key_set_set_range (self, _tmp1_);
+	return self;
+}
+
+
+static GeeTreeMapSubKeySet* gee_tree_map_sub_key_set_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	return gee_tree_map_sub_key_set_construct (GEE_TREE_MAP_TYPE_SUB_KEY_SET, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range);
+}
+
+
+static GeeIterator* gee_tree_map_sub_key_set_real_iterator (GeeAbstractCollection* base) {
+	GeeTreeMapSubKeySet * self;
+	GeeIterator* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeTreeMapSubKeyIterator* _tmp2_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = gee_tree_map_sub_key_iterator_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp1_);
+	result = (GeeIterator*) _tmp2_;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_key_set_real_add (GeeAbstractCollection* base, gconstpointer key) {
+	GeeTreeMapSubKeySet * self;
+	gboolean result = FALSE;
+	self = (GeeTreeMapSubKeySet*) base;
+	g_assert_not_reached ();
+	return result;
+}
+
+
+static void gee_tree_map_sub_key_set_real_clear (GeeAbstractCollection* base) {
+	GeeTreeMapSubKeySet * self;
+	self = (GeeTreeMapSubKeySet*) base;
+	g_assert_not_reached ();
+}
+
+
+static gboolean gee_tree_map_sub_key_set_real_remove (GeeAbstractCollection* base, gconstpointer key) {
+	GeeTreeMapSubKeySet * self;
+	gboolean result = FALSE;
+	self = (GeeTreeMapSubKeySet*) base;
+	g_assert_not_reached ();
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_key_set_real_contains (GeeAbstractCollection* base, gconstpointer key) {
+	GeeTreeMapSubKeySet * self;
+	gboolean result = FALSE;
+	gboolean _tmp0_ = FALSE;
+	GeeTreeMapRange* _tmp1_;
+	gconstpointer _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	gboolean _tmp7_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = key;
+	_tmp3_ = gee_tree_map_range_in_range (_tmp1_, _tmp2_);
+	if (_tmp3_) {
+		GeeTreeMap* _tmp4_;
+		gconstpointer _tmp5_;
+		gboolean _tmp6_ = FALSE;
+		_tmp4_ = self->priv->_map;
+		_tmp5_ = key;
+		_tmp6_ = gee_abstract_map_has_key ((GeeAbstractMap*) _tmp4_, _tmp5_);
+		_tmp0_ = _tmp6_;
+	} else {
+		_tmp0_ = FALSE;
+	}
+	_tmp7_ = _tmp0_;
+	result = _tmp7_;
+	return result;
+}
+
+
+static GeeBidirIterator* gee_tree_map_sub_key_set_real_bidir_iterator (GeeAbstractBidirSortedSet* base) {
+	GeeTreeMapSubKeySet * self;
+	GeeBidirIterator* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeTreeMapSubKeyIterator* _tmp2_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = gee_tree_map_sub_key_iterator_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp1_);
+	result = (GeeBidirIterator*) _tmp2_;
+	return result;
+}
+
+
+static gpointer gee_tree_map_sub_key_set_real_first (GeeAbstractSortedSet* base) {
+	GeeTreeMapSubKeySet * self;
+	gpointer result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	GeeTreeMapNode* _tmp1_ = NULL;
+	GeeTreeMapNode* _first;
+	gconstpointer _tmp2_;
+	gpointer _tmp3_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = gee_tree_map_range_first (_tmp0_);
+	_first = _tmp1_;
+	_vala_assert (_first != NULL, "_first != null");
+	_tmp2_ = _first->key;
+	_tmp3_ = ((_tmp2_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp2_) : ((gpointer) _tmp2_);
+	result = _tmp3_;
+	return result;
+}
+
+
+static gpointer gee_tree_map_sub_key_set_real_last (GeeAbstractSortedSet* base) {
+	GeeTreeMapSubKeySet * self;
+	gpointer result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	GeeTreeMapNode* _tmp1_ = NULL;
+	GeeTreeMapNode* _last;
+	gconstpointer _tmp2_;
+	gpointer _tmp3_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = gee_tree_map_range_last (_tmp0_);
+	_last = _tmp1_;
+	_vala_assert (_last != NULL, "_last != null");
+	_tmp2_ = _last->key;
+	_tmp3_ = ((_tmp2_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp2_) : ((gpointer) _tmp2_);
+	result = _tmp3_;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_sub_key_set_real_head_set (GeeAbstractSortedSet* base, gconstpointer before) {
+	GeeTreeMapSubKeySet * self;
+	GeeSortedSet* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	gconstpointer _tmp2_;
+	GeeTreeMapRange* _tmp3_ = NULL;
+	GeeTreeMapRange* _tmp4_;
+	GeeTreeMapSubKeySet* _tmp5_;
+	GeeSortedSet* _tmp6_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = before;
+	_tmp3_ = gee_tree_map_range_cut_tail (_tmp1_, _tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = gee_tree_map_sub_key_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp4_);
+	_tmp6_ = (GeeSortedSet*) _tmp5_;
+	_gee_tree_map_range_unref0 (_tmp4_);
+	result = _tmp6_;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_sub_key_set_real_tail_set (GeeAbstractSortedSet* base, gconstpointer after) {
+	GeeTreeMapSubKeySet * self;
+	GeeSortedSet* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	gconstpointer _tmp2_;
+	GeeTreeMapRange* _tmp3_ = NULL;
+	GeeTreeMapRange* _tmp4_;
+	GeeTreeMapSubKeySet* _tmp5_;
+	GeeSortedSet* _tmp6_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = after;
+	_tmp3_ = gee_tree_map_range_cut_head (_tmp1_, _tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = gee_tree_map_sub_key_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp4_);
+	_tmp6_ = (GeeSortedSet*) _tmp5_;
+	_gee_tree_map_range_unref0 (_tmp4_);
+	result = _tmp6_;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_sub_key_set_real_sub_set (GeeAbstractSortedSet* base, gconstpointer after, gconstpointer before) {
+	GeeTreeMapSubKeySet * self;
+	GeeSortedSet* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	GeeTreeMapRange* _tmp4_ = NULL;
+	GeeTreeMapRange* _tmp5_;
+	GeeTreeMapSubKeySet* _tmp6_;
+	GeeSortedSet* _tmp7_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = after;
+	_tmp3_ = before;
+	_tmp4_ = gee_tree_map_range_cut (_tmp1_, _tmp2_, _tmp3_);
+	_tmp5_ = _tmp4_;
+	_tmp6_ = gee_tree_map_sub_key_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp5_);
+	_tmp7_ = (GeeSortedSet*) _tmp6_;
+	_gee_tree_map_range_unref0 (_tmp5_);
+	result = _tmp7_;
+	return result;
+}
+
+
+static GeeIterator* gee_tree_map_sub_key_set_real_iterator_at (GeeAbstractSortedSet* base, gconstpointer key) {
+	GeeTreeMapSubKeySet * self;
+	GeeIterator* result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	gconstpointer _tmp1_;
+	gboolean _tmp2_ = FALSE;
+	GeeTreeMap* _tmp3_;
+	gconstpointer _tmp4_;
+	GeeTreeMapNode* _tmp5_ = NULL;
+	GeeTreeMapNode* n;
+	GeeTreeMapNode* _tmp6_;
+	GeeTreeMap* _tmp7_;
+	GeeTreeMapRange* _tmp8_;
+	GeeTreeMapNode* _tmp9_;
+	GeeTreeMapSubKeyIterator* _tmp10_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = key;
+	_tmp2_ = gee_tree_map_range_in_range (_tmp0_, _tmp1_);
+	if (!_tmp2_) {
+		result = NULL;
+		return result;
+	}
+	_tmp3_ = self->priv->_map;
+	_tmp4_ = key;
+	_tmp5_ = gee_tree_map_find_node (_tmp3_, _tmp4_);
+	n = _tmp5_;
+	_tmp6_ = n;
+	if (_tmp6_ == NULL) {
+		result = NULL;
+		return result;
+	}
+	_tmp7_ = self->priv->_map;
+	_tmp8_ = self->priv->_range;
+	_tmp9_ = n;
+	_tmp10_ = gee_tree_map_sub_key_iterator_new_pointing (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp7_, _tmp8_, _tmp9_);
+	result = (GeeIterator*) _tmp10_;
+	return result;
+}
+
+
+static gpointer gee_tree_map_sub_key_set_real_lower (GeeAbstractSortedSet* base, gconstpointer key) {
+	GeeTreeMapSubKeySet * self;
+	gpointer result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	gconstpointer _tmp1_;
+	gint _tmp2_ = 0;
+	gint res;
+	gint _tmp3_;
+	GeeTreeMap* _tmp5_;
+	GeeTreeMap* _tmp6_;
+	gconstpointer _tmp7_;
+	GeeTreeMapNode* _tmp8_ = NULL;
+	gpointer _tmp9_ = NULL;
+	gpointer l;
+	gconstpointer _tmp10_ = NULL;
+	gboolean _tmp11_ = FALSE;
+	gconstpointer _tmp12_;
+	gboolean _tmp16_;
+	gconstpointer _tmp18_;
+	gpointer _tmp19_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = key;
+	_tmp2_ = gee_tree_map_range_compare_range (_tmp0_, _tmp1_);
+	res = _tmp2_;
+	_tmp3_ = res;
+	if (_tmp3_ > 0) {
+		gpointer _tmp4_ = NULL;
+		_tmp4_ = gee_abstract_sorted_set_last ((GeeAbstractSortedSet*) self);
+		result = _tmp4_;
+		return result;
+	}
+	_tmp5_ = self->priv->_map;
+	_tmp6_ = self->priv->_map;
+	_tmp7_ = key;
+	_tmp8_ = gee_tree_map_find_lower (_tmp6_, _tmp7_);
+	_tmp9_ = gee_tree_map_lift_null_key (_tmp5_, _tmp8_);
+	l = _tmp9_;
+	_tmp12_ = l;
+	if (_tmp12_ != NULL) {
+		GeeTreeMapRange* _tmp13_;
+		gconstpointer _tmp14_;
+		gboolean _tmp15_ = FALSE;
+		_tmp13_ = self->priv->_range;
+		_tmp14_ = l;
+		_tmp15_ = gee_tree_map_range_in_range (_tmp13_, _tmp14_);
+		_tmp11_ = _tmp15_;
+	} else {
+		_tmp11_ = FALSE;
+	}
+	_tmp16_ = _tmp11_;
+	if (_tmp16_) {
+		gconstpointer _tmp17_;
+		_tmp17_ = l;
+		_tmp10_ = _tmp17_;
+	} else {
+		_tmp10_ = NULL;
+	}
+	_tmp18_ = _tmp10_;
+	_tmp19_ = ((_tmp18_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp18_) : ((gpointer) _tmp18_);
+	result = _tmp19_;
+	((l == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (l = (self->priv->k_destroy_func (l), NULL));
+	return result;
+}
+
+
+static gpointer gee_tree_map_sub_key_set_real_higher (GeeAbstractSortedSet* base, gconstpointer key) {
+	GeeTreeMapSubKeySet * self;
+	gpointer result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	gconstpointer _tmp1_;
+	gint _tmp2_ = 0;
+	gint res;
+	gint _tmp3_;
+	GeeTreeMap* _tmp5_;
+	GeeTreeMap* _tmp6_;
+	gconstpointer _tmp7_;
+	GeeTreeMapNode* _tmp8_ = NULL;
+	gpointer _tmp9_ = NULL;
+	gpointer h;
+	gconstpointer _tmp10_ = NULL;
+	gboolean _tmp11_ = FALSE;
+	gconstpointer _tmp12_;
+	gboolean _tmp16_;
+	gconstpointer _tmp18_;
+	gpointer _tmp19_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = key;
+	_tmp2_ = gee_tree_map_range_compare_range (_tmp0_, _tmp1_);
+	res = _tmp2_;
+	_tmp3_ = res;
+	if (_tmp3_ < 0) {
+		gpointer _tmp4_ = NULL;
+		_tmp4_ = gee_abstract_sorted_set_first ((GeeAbstractSortedSet*) self);
+		result = _tmp4_;
+		return result;
+	}
+	_tmp5_ = self->priv->_map;
+	_tmp6_ = self->priv->_map;
+	_tmp7_ = key;
+	_tmp8_ = gee_tree_map_find_higher (_tmp6_, _tmp7_);
+	_tmp9_ = gee_tree_map_lift_null_key (_tmp5_, _tmp8_);
+	h = _tmp9_;
+	_tmp12_ = h;
+	if (_tmp12_ != NULL) {
+		GeeTreeMapRange* _tmp13_;
+		gconstpointer _tmp14_;
+		gboolean _tmp15_ = FALSE;
+		_tmp13_ = self->priv->_range;
+		_tmp14_ = h;
+		_tmp15_ = gee_tree_map_range_in_range (_tmp13_, _tmp14_);
+		_tmp11_ = _tmp15_;
+	} else {
+		_tmp11_ = FALSE;
+	}
+	_tmp16_ = _tmp11_;
+	if (_tmp16_) {
+		gconstpointer _tmp17_;
+		_tmp17_ = h;
+		_tmp10_ = _tmp17_;
+	} else {
+		_tmp10_ = NULL;
+	}
+	_tmp18_ = _tmp10_;
+	_tmp19_ = ((_tmp18_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp18_) : ((gpointer) _tmp18_);
+	result = _tmp19_;
+	((h == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (h = (self->priv->k_destroy_func (h), NULL));
+	return result;
+}
+
+
+static gpointer gee_tree_map_sub_key_set_real_floor (GeeAbstractSortedSet* base, gconstpointer key) {
+	GeeTreeMapSubKeySet * self;
+	gpointer result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	gconstpointer _tmp1_;
+	gint _tmp2_ = 0;
+	gint res;
+	gint _tmp3_;
+	GeeTreeMap* _tmp5_;
+	GeeTreeMap* _tmp6_;
+	gconstpointer _tmp7_;
+	GeeTreeMapNode* _tmp8_ = NULL;
+	gpointer _tmp9_ = NULL;
+	gpointer l;
+	gconstpointer _tmp10_ = NULL;
+	gboolean _tmp11_ = FALSE;
+	gconstpointer _tmp12_;
+	gboolean _tmp16_;
+	gconstpointer _tmp18_;
+	gpointer _tmp19_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = key;
+	_tmp2_ = gee_tree_map_range_compare_range (_tmp0_, _tmp1_);
+	res = _tmp2_;
+	_tmp3_ = res;
+	if (_tmp3_ > 0) {
+		gpointer _tmp4_ = NULL;
+		_tmp4_ = gee_abstract_sorted_set_last ((GeeAbstractSortedSet*) self);
+		result = _tmp4_;
+		return result;
+	}
+	_tmp5_ = self->priv->_map;
+	_tmp6_ = self->priv->_map;
+	_tmp7_ = key;
+	_tmp8_ = gee_tree_map_find_floor (_tmp6_, _tmp7_);
+	_tmp9_ = gee_tree_map_lift_null_key (_tmp5_, _tmp8_);
+	l = _tmp9_;
+	_tmp12_ = l;
+	if (_tmp12_ != NULL) {
+		GeeTreeMapRange* _tmp13_;
+		gconstpointer _tmp14_;
+		gboolean _tmp15_ = FALSE;
+		_tmp13_ = self->priv->_range;
+		_tmp14_ = l;
+		_tmp15_ = gee_tree_map_range_in_range (_tmp13_, _tmp14_);
+		_tmp11_ = _tmp15_;
+	} else {
+		_tmp11_ = FALSE;
+	}
+	_tmp16_ = _tmp11_;
+	if (_tmp16_) {
+		gconstpointer _tmp17_;
+		_tmp17_ = l;
+		_tmp10_ = _tmp17_;
+	} else {
+		_tmp10_ = NULL;
+	}
+	_tmp18_ = _tmp10_;
+	_tmp19_ = ((_tmp18_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp18_) : ((gpointer) _tmp18_);
+	result = _tmp19_;
+	((l == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (l = (self->priv->k_destroy_func (l), NULL));
+	return result;
+}
+
+
+static gpointer gee_tree_map_sub_key_set_real_ceil (GeeAbstractSortedSet* base, gconstpointer key) {
+	GeeTreeMapSubKeySet * self;
+	gpointer result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	gconstpointer _tmp1_;
+	gint _tmp2_ = 0;
+	gint res;
+	gint _tmp3_;
+	GeeTreeMap* _tmp5_;
+	GeeTreeMap* _tmp6_;
+	gconstpointer _tmp7_;
+	GeeTreeMapNode* _tmp8_ = NULL;
+	gpointer _tmp9_ = NULL;
+	gpointer h;
+	gconstpointer _tmp10_ = NULL;
+	gboolean _tmp11_ = FALSE;
+	gconstpointer _tmp12_;
+	gboolean _tmp16_;
+	gconstpointer _tmp18_;
+	gpointer _tmp19_;
+	self = (GeeTreeMapSubKeySet*) base;
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = key;
+	_tmp2_ = gee_tree_map_range_compare_range (_tmp0_, _tmp1_);
+	res = _tmp2_;
+	_tmp3_ = res;
+	if (_tmp3_ < 0) {
+		gpointer _tmp4_ = NULL;
+		_tmp4_ = gee_abstract_sorted_set_first ((GeeAbstractSortedSet*) self);
+		result = _tmp4_;
+		return result;
+	}
+	_tmp5_ = self->priv->_map;
+	_tmp6_ = self->priv->_map;
+	_tmp7_ = key;
+	_tmp8_ = gee_tree_map_find_ceil (_tmp6_, _tmp7_);
+	_tmp9_ = gee_tree_map_lift_null_key (_tmp5_, _tmp8_);
+	h = _tmp9_;
+	_tmp12_ = h;
+	if (_tmp12_ != NULL) {
+		GeeTreeMapRange* _tmp13_;
+		gconstpointer _tmp14_;
+		gboolean _tmp15_ = FALSE;
+		_tmp13_ = self->priv->_range;
+		_tmp14_ = h;
+		_tmp15_ = gee_tree_map_range_in_range (_tmp13_, _tmp14_);
+		_tmp11_ = _tmp15_;
+	} else {
+		_tmp11_ = FALSE;
+	}
+	_tmp16_ = _tmp11_;
+	if (_tmp16_) {
+		gconstpointer _tmp17_;
+		_tmp17_ = h;
+		_tmp10_ = _tmp17_;
+	} else {
+		_tmp10_ = NULL;
+	}
+	_tmp18_ = _tmp10_;
+	_tmp19_ = ((_tmp18_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp18_) : ((gpointer) _tmp18_);
+	result = _tmp19_;
+	((h == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : (h = (self->priv->k_destroy_func (h), NULL));
+	return result;
+}
+
+
+static GeeTreeMap* gee_tree_map_sub_key_set_get_map (GeeTreeMapSubKeySet* self) {
+	GeeTreeMap* result;
+	GeeTreeMap* _tmp0_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	result = _tmp0_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_key_set_set_map (GeeTreeMapSubKeySet* self, GeeTreeMap* value) {
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = value;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	_g_object_unref0 (self->priv->_map);
+	self->priv->_map = _tmp1_;
+}
+
+
+static GeeTreeMapRange* gee_tree_map_sub_key_set_get_range (GeeTreeMapSubKeySet* self) {
+	GeeTreeMapRange* result;
+	GeeTreeMapRange* _tmp0_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->_range;
+	result = _tmp0_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_key_set_set_range (GeeTreeMapSubKeySet* self, GeeTreeMapRange* value) {
+	GeeTreeMapRange* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = value;
+	_tmp1_ = _gee_tree_map_range_ref0 (_tmp0_);
+	_gee_tree_map_range_unref0 (self->priv->_range);
+	self->priv->_range = _tmp1_;
+}
+
+
+static gint gee_tree_map_sub_key_set_real_get_size (GeeAbstractCollection* base) {
+	gint result;
+	GeeTreeMapSubKeySet* self;
+	gint i;
+	GeeIterator* _tmp0_ = NULL;
+	GeeIterator* iterator;
+	gint _tmp4_;
+	self = (GeeTreeMapSubKeySet*) base;
+	i = 0;
+	_tmp0_ = gee_abstract_collection_iterator ((GeeAbstractCollection*) self);
+	iterator = _tmp0_;
+	while (TRUE) {
+		GeeIterator* _tmp1_;
+		gboolean _tmp2_ = FALSE;
+		gint _tmp3_;
+		_tmp1_ = iterator;
+		_tmp2_ = gee_iterator_next (_tmp1_);
+		if (!_tmp2_) {
+			break;
+		}
+		_tmp3_ = i;
+		i = _tmp3_ + 1;
+	}
+	_tmp4_ = i;
+	result = _tmp4_;
+	_g_object_unref0 (iterator);
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_key_set_real_get_read_only (GeeAbstractCollection* base) {
+	gboolean result;
+	GeeTreeMapSubKeySet* self;
+	self = (GeeTreeMapSubKeySet*) base;
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_key_set_get_is_empty (GeeTreeMapSubKeySet* self) {
+	gboolean result;
+	GeeTreeMapRange* _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = gee_tree_map_range_empty_submap (_tmp0_);
+	result = _tmp1_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_key_set_class_init (GeeTreeMapSubKeySetClass * klass) {
+	gee_tree_map_sub_key_set_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (GeeTreeMapSubKeySetPrivate));
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->iterator = gee_tree_map_sub_key_set_real_iterator;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->add = gee_tree_map_sub_key_set_real_add;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->clear = gee_tree_map_sub_key_set_real_clear;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove = gee_tree_map_sub_key_set_real_remove;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->contains = gee_tree_map_sub_key_set_real_contains;
+	GEE_ABSTRACT_BIDIR_SORTED_SET_CLASS (klass)->bidir_iterator = gee_tree_map_sub_key_set_real_bidir_iterator;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->first = gee_tree_map_sub_key_set_real_first;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->last = gee_tree_map_sub_key_set_real_last;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->head_set = gee_tree_map_sub_key_set_real_head_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->tail_set = gee_tree_map_sub_key_set_real_tail_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->sub_set = gee_tree_map_sub_key_set_real_sub_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->iterator_at = gee_tree_map_sub_key_set_real_iterator_at;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->lower = gee_tree_map_sub_key_set_real_lower;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->higher = gee_tree_map_sub_key_set_real_higher;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->floor = gee_tree_map_sub_key_set_real_floor;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->ceil = gee_tree_map_sub_key_set_real_ceil;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_tree_map_sub_key_set_real_get_size;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_tree_map_sub_key_set_real_get_read_only;
+	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_sub_key_set_get_property;
+	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_sub_key_set_set_property;
+	G_OBJECT_CLASS (klass)->finalize = gee_tree_map_sub_key_set_finalize;
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_SET_K_TYPE, g_param_spec_gtype ("k-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_SET_K_DUP_FUNC, g_param_spec_pointer ("k-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_SET_K_DESTROY_FUNC, g_param_spec_pointer ("k-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_SET_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_SET_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_SET_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_SET_MAP, g_param_spec_object ("map", "map", "map", GEE_TYPE_TREE_MAP, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_SET_RANGE, gee_tree_map_param_spec_range ("range", "range", "range", GEE_TREE_MAP_TYPE_RANGE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_SET_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_SET_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_SET_IS_EMPTY, g_param_spec_boolean ("is-empty", "is-empty", "is-empty", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static void gee_tree_map_sub_key_set_instance_init (GeeTreeMapSubKeySet * self) {
+	self->priv = GEE_TREE_MAP_SUB_KEY_SET_GET_PRIVATE (self);
+}
+
+
+static void gee_tree_map_sub_key_set_finalize (GObject* obj) {
+	GeeTreeMapSubKeySet * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (obj, GEE_TREE_MAP_TYPE_SUB_KEY_SET, GeeTreeMapSubKeySet);
+	_g_object_unref0 (self->priv->_map);
+	_gee_tree_map_range_unref0 (self->priv->_range);
+	G_OBJECT_CLASS (gee_tree_map_sub_key_set_parent_class)->finalize (obj);
+}
+
+
+static GType gee_tree_map_sub_key_set_get_type (void) {
+	static volatile gsize gee_tree_map_sub_key_set_type_id__volatile = 0;
+	if (g_once_init_enter (&gee_tree_map_sub_key_set_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapSubKeySetClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_sub_key_set_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapSubKeySet), 0, (GInstanceInitFunc) gee_tree_map_sub_key_set_instance_init, NULL };
+		GType gee_tree_map_sub_key_set_type_id;
+		gee_tree_map_sub_key_set_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, "GeeTreeMapSubKeySet", &g_define_type_info, 0);
+		g_once_init_leave (&gee_tree_map_sub_key_set_type_id__volatile, gee_tree_map_sub_key_set_type_id);
+	}
+	return gee_tree_map_sub_key_set_type_id__volatile;
+}
+
+
+static void _vala_gee_tree_map_sub_key_set_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubKeySet * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_KEY_SET, GeeTreeMapSubKeySet);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_KEY_SET_MAP:
+		g_value_set_object (value, gee_tree_map_sub_key_set_get_map (self));
+		break;
+		case GEE_TREE_MAP_SUB_KEY_SET_RANGE:
+		gee_tree_map_value_set_range (value, gee_tree_map_sub_key_set_get_range (self));
+		break;
+		case GEE_TREE_MAP_SUB_KEY_SET_SIZE:
+		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
+		break;
+		case GEE_TREE_MAP_SUB_KEY_SET_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
+		break;
+		case GEE_TREE_MAP_SUB_KEY_SET_IS_EMPTY:
+		g_value_set_boolean (value, gee_tree_map_sub_key_set_get_is_empty (self));
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
+static void _vala_gee_tree_map_sub_key_set_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubKeySet * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_KEY_SET, GeeTreeMapSubKeySet);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_KEY_SET_MAP:
+		gee_tree_map_sub_key_set_set_map (self, g_value_get_object (value));
+		break;
+		case GEE_TREE_MAP_SUB_KEY_SET_RANGE:
+		gee_tree_map_sub_key_set_set_range (self, gee_tree_map_value_get_range (value));
+		break;
+		case GEE_TREE_MAP_SUB_KEY_SET_K_TYPE:
+		self->priv->k_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_KEY_SET_K_DUP_FUNC:
+		self->priv->k_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_KEY_SET_K_DESTROY_FUNC:
+		self->priv->k_destroy_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_KEY_SET_V_TYPE:
+		self->priv->v_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_KEY_SET_V_DUP_FUNC:
+		self->priv->v_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_KEY_SET_V_DESTROY_FUNC:
 		self->priv->v_destroy_func = g_value_get_pointer (value);
 		break;
 		default:
@@ -2851,8 +7189,10 @@ static gboolean gee_tree_map_value_collection_real_contains (GeeAbstractCollecti
 		GeeIterator* _tmp1_;
 		gboolean _tmp2_ = FALSE;
 		GeeTreeMap* _tmp3_;
-		GEqualFunc _tmp4_;
-		GEqualFunc _tmp5_;
+		GeeEqualDataFunc _tmp4_;
+		void* _tmp4__target;
+		GeeEqualDataFunc _tmp5_;
+		void* _tmp5__target;
 		gconstpointer _tmp6_;
 		GeeIterator* _tmp7_;
 		gpointer _tmp8_ = NULL;
@@ -2865,13 +7205,14 @@ static gboolean gee_tree_map_value_collection_real_contains (GeeAbstractCollecti
 			break;
 		}
 		_tmp3_ = self->priv->_map;
-		_tmp4_ = gee_tree_map_get_value_equal_func (_tmp3_);
+		_tmp4_ = gee_tree_map_get_value_equal_func (_tmp3_, &_tmp4__target);
 		_tmp5_ = _tmp4_;
+		_tmp5__target = _tmp4__target;
 		_tmp6_ = key;
 		_tmp7_ = it;
 		_tmp8_ = gee_iterator_get (_tmp7_);
 		_tmp9_ = _tmp8_;
-		_tmp10_ = _tmp5_ (_tmp6_, _tmp9_);
+		_tmp10_ = _tmp5_ (_tmp6_, _tmp9_, _tmp5__target);
 		_tmp11_ = _tmp10_;
 		((_tmp9_ == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_tmp9_ = (self->priv->v_destroy_func (_tmp9_), NULL));
 		if (_tmp11_) {
@@ -2882,36 +7223,6 @@ static gboolean gee_tree_map_value_collection_real_contains (GeeAbstractCollecti
 	}
 	result = FALSE;
 	_g_object_unref0 (it);
-	return result;
-}
-
-
-static gboolean gee_tree_map_value_collection_real_add_all (GeeAbstractCollection* base, GeeCollection* collection) {
-	GeeTreeMapValueCollection * self;
-	gboolean result = FALSE;
-	self = (GeeTreeMapValueCollection*) base;
-	g_return_val_if_fail (collection != NULL, FALSE);
-	g_assert_not_reached ();
-	return result;
-}
-
-
-static gboolean gee_tree_map_value_collection_real_remove_all (GeeAbstractCollection* base, GeeCollection* collection) {
-	GeeTreeMapValueCollection * self;
-	gboolean result = FALSE;
-	self = (GeeTreeMapValueCollection*) base;
-	g_return_val_if_fail (collection != NULL, FALSE);
-	g_assert_not_reached ();
-	return result;
-}
-
-
-static gboolean gee_tree_map_value_collection_real_retain_all (GeeAbstractCollection* base, GeeCollection* collection) {
-	GeeTreeMapValueCollection * self;
-	gboolean result = FALSE;
-	self = (GeeTreeMapValueCollection*) base;
-	g_return_val_if_fail (collection != NULL, FALSE);
-	g_assert_not_reached ();
 	return result;
 }
 
@@ -2931,6 +7242,15 @@ static gint gee_tree_map_value_collection_real_get_size (GeeAbstractCollection* 
 }
 
 
+static gboolean gee_tree_map_value_collection_real_get_read_only (GeeAbstractCollection* base) {
+	gboolean result;
+	GeeTreeMapValueCollection* self;
+	self = (GeeTreeMapValueCollection*) base;
+	result = TRUE;
+	return result;
+}
+
+
 static void gee_tree_map_value_collection_class_init (GeeTreeMapValueCollectionClass * klass) {
 	gee_tree_map_value_collection_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeTreeMapValueCollectionPrivate));
@@ -2939,10 +7259,8 @@ static void gee_tree_map_value_collection_class_init (GeeTreeMapValueCollectionC
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->clear = gee_tree_map_value_collection_real_clear;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove = gee_tree_map_value_collection_real_remove;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->contains = gee_tree_map_value_collection_real_contains;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->add_all = gee_tree_map_value_collection_real_add_all;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove_all = gee_tree_map_value_collection_real_remove_all;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->retain_all = gee_tree_map_value_collection_real_retain_all;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_tree_map_value_collection_real_get_size;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_tree_map_value_collection_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_value_collection_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_value_collection_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_tree_map_value_collection_finalize;
@@ -2953,6 +7271,7 @@ static void gee_tree_map_value_collection_class_init (GeeTreeMapValueCollectionC
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_VALUE_COLLECTION_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_VALUE_COLLECTION_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_VALUE_COLLECTION_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_VALUE_COLLECTION_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -2987,6 +7306,9 @@ static void _vala_gee_tree_map_value_collection_get_property (GObject * object, 
 	switch (property_id) {
 		case GEE_TREE_MAP_VALUE_COLLECTION_SIZE:
 		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
+		break;
+		case GEE_TREE_MAP_VALUE_COLLECTION_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -3024,12 +7346,335 @@ static void _vala_gee_tree_map_value_collection_set_property (GObject * object, 
 }
 
 
+static GeeTreeMapSubValueCollection* gee_tree_map_sub_value_collection_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	GeeTreeMapSubValueCollection * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	self = (GeeTreeMapSubValueCollection*) gee_abstract_collection_construct (object_type, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	_tmp0_ = map;
+	gee_tree_map_sub_value_collection_set_map (self, _tmp0_);
+	_tmp1_ = range;
+	gee_tree_map_sub_value_collection_set_range (self, _tmp1_);
+	return self;
+}
+
+
+static GeeTreeMapSubValueCollection* gee_tree_map_sub_value_collection_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	return gee_tree_map_sub_value_collection_construct (GEE_TREE_MAP_TYPE_SUB_VALUE_COLLECTION, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range);
+}
+
+
+static GeeIterator* gee_tree_map_sub_value_collection_real_iterator (GeeAbstractCollection* base) {
+	GeeTreeMapSubValueCollection * self;
+	GeeIterator* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeTreeMapSubValueIterator* _tmp2_;
+	self = (GeeTreeMapSubValueCollection*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = gee_tree_map_sub_value_iterator_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp1_);
+	result = (GeeIterator*) _tmp2_;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_value_collection_real_add (GeeAbstractCollection* base, gconstpointer key) {
+	GeeTreeMapSubValueCollection * self;
+	gboolean result = FALSE;
+	self = (GeeTreeMapSubValueCollection*) base;
+	g_assert_not_reached ();
+	return result;
+}
+
+
+static void gee_tree_map_sub_value_collection_real_clear (GeeAbstractCollection* base) {
+	GeeTreeMapSubValueCollection * self;
+	self = (GeeTreeMapSubValueCollection*) base;
+	g_assert_not_reached ();
+}
+
+
+static gboolean gee_tree_map_sub_value_collection_real_remove (GeeAbstractCollection* base, gconstpointer key) {
+	GeeTreeMapSubValueCollection * self;
+	gboolean result = FALSE;
+	self = (GeeTreeMapSubValueCollection*) base;
+	g_assert_not_reached ();
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_value_collection_real_contains (GeeAbstractCollection* base, gconstpointer key) {
+	GeeTreeMapSubValueCollection * self;
+	gboolean result = FALSE;
+	GeeIterator* _tmp0_ = NULL;
+	GeeIterator* it;
+	self = (GeeTreeMapSubValueCollection*) base;
+	_tmp0_ = gee_abstract_collection_iterator ((GeeAbstractCollection*) self);
+	it = _tmp0_;
+	while (TRUE) {
+		GeeIterator* _tmp1_;
+		gboolean _tmp2_ = FALSE;
+		GeeTreeMap* _tmp3_;
+		GeeEqualDataFunc _tmp4_;
+		void* _tmp4__target;
+		GeeEqualDataFunc _tmp5_;
+		void* _tmp5__target;
+		gconstpointer _tmp6_;
+		GeeIterator* _tmp7_;
+		gpointer _tmp8_ = NULL;
+		gpointer _tmp9_;
+		gboolean _tmp10_ = FALSE;
+		gboolean _tmp11_;
+		_tmp1_ = it;
+		_tmp2_ = gee_iterator_next (_tmp1_);
+		if (!_tmp2_) {
+			break;
+		}
+		_tmp3_ = self->priv->_map;
+		_tmp4_ = gee_tree_map_get_value_equal_func (_tmp3_, &_tmp4__target);
+		_tmp5_ = _tmp4_;
+		_tmp5__target = _tmp4__target;
+		_tmp6_ = key;
+		_tmp7_ = it;
+		_tmp8_ = gee_iterator_get (_tmp7_);
+		_tmp9_ = _tmp8_;
+		_tmp10_ = _tmp5_ (_tmp6_, _tmp9_, _tmp5__target);
+		_tmp11_ = _tmp10_;
+		((_tmp9_ == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_tmp9_ = (self->priv->v_destroy_func (_tmp9_), NULL));
+		if (_tmp11_) {
+			result = TRUE;
+			_g_object_unref0 (it);
+			return result;
+		}
+	}
+	result = FALSE;
+	_g_object_unref0 (it);
+	return result;
+}
+
+
+static GeeTreeMap* gee_tree_map_sub_value_collection_get_map (GeeTreeMapSubValueCollection* self) {
+	GeeTreeMap* result;
+	GeeTreeMap* _tmp0_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	result = _tmp0_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_value_collection_set_map (GeeTreeMapSubValueCollection* self, GeeTreeMap* value) {
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = value;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	_g_object_unref0 (self->priv->_map);
+	self->priv->_map = _tmp1_;
+}
+
+
+static GeeTreeMapRange* gee_tree_map_sub_value_collection_get_range (GeeTreeMapSubValueCollection* self) {
+	GeeTreeMapRange* result;
+	GeeTreeMapRange* _tmp0_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->_range;
+	result = _tmp0_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_value_collection_set_range (GeeTreeMapSubValueCollection* self, GeeTreeMapRange* value) {
+	GeeTreeMapRange* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = value;
+	_tmp1_ = _gee_tree_map_range_ref0 (_tmp0_);
+	_gee_tree_map_range_unref0 (self->priv->_range);
+	self->priv->_range = _tmp1_;
+}
+
+
+static gboolean gee_tree_map_sub_value_collection_real_get_read_only (GeeAbstractCollection* base) {
+	gboolean result;
+	GeeTreeMapSubValueCollection* self;
+	self = (GeeTreeMapSubValueCollection*) base;
+	result = TRUE;
+	return result;
+}
+
+
+static gint gee_tree_map_sub_value_collection_real_get_size (GeeAbstractCollection* base) {
+	gint result;
+	GeeTreeMapSubValueCollection* self;
+	gint i;
+	GeeIterator* _tmp0_ = NULL;
+	GeeIterator* iterator;
+	gint _tmp4_;
+	self = (GeeTreeMapSubValueCollection*) base;
+	i = 0;
+	_tmp0_ = gee_abstract_collection_iterator ((GeeAbstractCollection*) self);
+	iterator = _tmp0_;
+	while (TRUE) {
+		GeeIterator* _tmp1_;
+		gboolean _tmp2_ = FALSE;
+		gint _tmp3_;
+		_tmp1_ = iterator;
+		_tmp2_ = gee_iterator_next (_tmp1_);
+		if (!_tmp2_) {
+			break;
+		}
+		_tmp3_ = i;
+		i = _tmp3_ + 1;
+	}
+	_tmp4_ = i;
+	result = _tmp4_;
+	_g_object_unref0 (iterator);
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_value_collection_get_is_empty (GeeTreeMapSubValueCollection* self) {
+	gboolean result;
+	GeeTreeMapRange* _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = gee_tree_map_range_empty_submap (_tmp0_);
+	result = _tmp1_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_value_collection_class_init (GeeTreeMapSubValueCollectionClass * klass) {
+	gee_tree_map_sub_value_collection_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (GeeTreeMapSubValueCollectionPrivate));
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->iterator = gee_tree_map_sub_value_collection_real_iterator;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->add = gee_tree_map_sub_value_collection_real_add;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->clear = gee_tree_map_sub_value_collection_real_clear;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove = gee_tree_map_sub_value_collection_real_remove;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->contains = gee_tree_map_sub_value_collection_real_contains;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_tree_map_sub_value_collection_real_get_read_only;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_tree_map_sub_value_collection_real_get_size;
+	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_sub_value_collection_get_property;
+	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_sub_value_collection_set_property;
+	G_OBJECT_CLASS (klass)->finalize = gee_tree_map_sub_value_collection_finalize;
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_COLLECTION_K_TYPE, g_param_spec_gtype ("k-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_COLLECTION_K_DUP_FUNC, g_param_spec_pointer ("k-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_COLLECTION_K_DESTROY_FUNC, g_param_spec_pointer ("k-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_COLLECTION_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_COLLECTION_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_COLLECTION_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_COLLECTION_MAP, g_param_spec_object ("map", "map", "map", GEE_TYPE_TREE_MAP, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_COLLECTION_RANGE, gee_tree_map_param_spec_range ("range", "range", "range", GEE_TREE_MAP_TYPE_RANGE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_COLLECTION_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_COLLECTION_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_COLLECTION_IS_EMPTY, g_param_spec_boolean ("is-empty", "is-empty", "is-empty", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static void gee_tree_map_sub_value_collection_instance_init (GeeTreeMapSubValueCollection * self) {
+	self->priv = GEE_TREE_MAP_SUB_VALUE_COLLECTION_GET_PRIVATE (self);
+}
+
+
+static void gee_tree_map_sub_value_collection_finalize (GObject* obj) {
+	GeeTreeMapSubValueCollection * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (obj, GEE_TREE_MAP_TYPE_SUB_VALUE_COLLECTION, GeeTreeMapSubValueCollection);
+	_g_object_unref0 (self->priv->_map);
+	_gee_tree_map_range_unref0 (self->priv->_range);
+	G_OBJECT_CLASS (gee_tree_map_sub_value_collection_parent_class)->finalize (obj);
+}
+
+
+static GType gee_tree_map_sub_value_collection_get_type (void) {
+	static volatile gsize gee_tree_map_sub_value_collection_type_id__volatile = 0;
+	if (g_once_init_enter (&gee_tree_map_sub_value_collection_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapSubValueCollectionClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_sub_value_collection_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapSubValueCollection), 0, (GInstanceInitFunc) gee_tree_map_sub_value_collection_instance_init, NULL };
+		GType gee_tree_map_sub_value_collection_type_id;
+		gee_tree_map_sub_value_collection_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_COLLECTION, "GeeTreeMapSubValueCollection", &g_define_type_info, 0);
+		g_once_init_leave (&gee_tree_map_sub_value_collection_type_id__volatile, gee_tree_map_sub_value_collection_type_id);
+	}
+	return gee_tree_map_sub_value_collection_type_id__volatile;
+}
+
+
+static void _vala_gee_tree_map_sub_value_collection_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubValueCollection * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_VALUE_COLLECTION, GeeTreeMapSubValueCollection);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_MAP:
+		g_value_set_object (value, gee_tree_map_sub_value_collection_get_map (self));
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_RANGE:
+		gee_tree_map_value_set_range (value, gee_tree_map_sub_value_collection_get_range (self));
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_SIZE:
+		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_IS_EMPTY:
+		g_value_set_boolean (value, gee_tree_map_sub_value_collection_get_is_empty (self));
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
+static void _vala_gee_tree_map_sub_value_collection_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubValueCollection * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_VALUE_COLLECTION, GeeTreeMapSubValueCollection);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_MAP:
+		gee_tree_map_sub_value_collection_set_map (self, g_value_get_object (value));
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_RANGE:
+		gee_tree_map_sub_value_collection_set_range (self, gee_tree_map_value_get_range (value));
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_K_TYPE:
+		self->priv->k_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_K_DUP_FUNC:
+		self->priv->k_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_K_DESTROY_FUNC:
+		self->priv->k_destroy_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_V_TYPE:
+		self->priv->v_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_V_DUP_FUNC:
+		self->priv->v_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_COLLECTION_V_DESTROY_FUNC:
+		self->priv->v_destroy_func = g_value_get_pointer (value);
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
 static GeeTreeMapEntrySet* gee_tree_map_entry_set_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map) {
 	GeeTreeMapEntrySet * self = NULL;
 	GeeTreeMap* _tmp0_;
 	GeeTreeMap* _tmp1_;
 	g_return_val_if_fail (map != NULL, NULL);
-	self = (GeeTreeMapEntrySet*) gee_abstract_set_construct (object_type, GEE_MAP_TYPE_ENTRY, (GBoxedCopyFunc) g_object_ref, g_object_unref);
+	self = (GeeTreeMapEntrySet*) gee_abstract_bidir_sorted_set_construct (object_type, GEE_MAP_TYPE_ENTRY, (GBoxedCopyFunc) g_object_ref, g_object_unref);
 	self->priv->k_type = k_type;
 	self->priv->k_dup_func = k_dup_func;
 	self->priv->k_destroy_func = k_destroy_func;
@@ -3115,32 +7760,356 @@ static gboolean gee_tree_map_entry_set_real_contains (GeeAbstractCollection* bas
 }
 
 
-static gboolean gee_tree_map_entry_set_real_add_all (GeeAbstractCollection* base, GeeCollection* entries) {
+static GeeMapEntry* gee_tree_map_entry_set_real_first (GeeAbstractSortedSet* base) {
 	GeeTreeMapEntrySet * self;
-	gboolean result = FALSE;
+	GeeMapEntry* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapNode* _tmp1_;
+	GeeTreeMap* _tmp2_;
+	GeeTreeMapNode* _tmp3_;
+	GeeMapEntry* _tmp4_ = NULL;
 	self = (GeeTreeMapEntrySet*) base;
-	g_return_val_if_fail (entries != NULL, FALSE);
-	g_assert_not_reached ();
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = _tmp0_->priv->first;
+	_vala_assert (_tmp1_ != NULL, "_map.first != null");
+	_tmp2_ = self->priv->_map;
+	_tmp3_ = _tmp2_->priv->first;
+	_tmp4_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp3_);
+	result = _tmp4_;
 	return result;
 }
 
 
-static gboolean gee_tree_map_entry_set_real_remove_all (GeeAbstractCollection* base, GeeCollection* entries) {
+static GeeMapEntry* gee_tree_map_entry_set_real_last (GeeAbstractSortedSet* base) {
 	GeeTreeMapEntrySet * self;
-	gboolean result = FALSE;
+	GeeMapEntry* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapNode* _tmp1_;
+	GeeTreeMap* _tmp2_;
+	GeeTreeMapNode* _tmp3_;
+	GeeMapEntry* _tmp4_ = NULL;
 	self = (GeeTreeMapEntrySet*) base;
-	g_return_val_if_fail (entries != NULL, FALSE);
-	g_assert_not_reached ();
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = _tmp0_->priv->last;
+	_vala_assert (_tmp1_ != NULL, "_map.last != null");
+	_tmp2_ = self->priv->_map;
+	_tmp3_ = _tmp2_->priv->last;
+	_tmp4_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp3_);
+	result = _tmp4_;
 	return result;
 }
 
 
-static gboolean gee_tree_map_entry_set_real_retain_all (GeeAbstractCollection* base, GeeCollection* entries) {
+static GeeBidirIterator* gee_tree_map_entry_set_real_bidir_iterator (GeeAbstractBidirSortedSet* base) {
 	GeeTreeMapEntrySet * self;
-	gboolean result = FALSE;
+	GeeBidirIterator* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapEntryIterator* _tmp1_;
 	self = (GeeTreeMapEntrySet*) base;
-	g_return_val_if_fail (entries != NULL, FALSE);
-	g_assert_not_reached ();
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = gee_tree_map_entry_iterator_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_);
+	result = (GeeBidirIterator*) _tmp1_;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_entry_set_real_head_set (GeeAbstractSortedSet* base, GeeMapEntry* before) {
+	GeeTreeMapEntrySet * self;
+	GeeSortedSet* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	GeeMapEntry* _tmp2_;
+	gconstpointer _tmp3_;
+	gconstpointer _tmp4_;
+	GeeTreeMapRange* _tmp5_;
+	GeeTreeMapRange* _tmp6_;
+	GeeTreeMapSubEntrySet* _tmp7_;
+	GeeSortedSet* _tmp8_;
+	self = (GeeTreeMapEntrySet*) base;
+	g_return_val_if_fail (before != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_map;
+	_tmp2_ = before;
+	_tmp3_ = gee_map_entry_get_key (_tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = gee_tree_map_range_new_head (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp1_, _tmp4_);
+	_tmp6_ = _tmp5_;
+	_tmp7_ = gee_tree_map_sub_entry_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp6_);
+	_tmp8_ = (GeeSortedSet*) _tmp7_;
+	_gee_tree_map_range_unref0 (_tmp6_);
+	result = _tmp8_;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_entry_set_real_tail_set (GeeAbstractSortedSet* base, GeeMapEntry* after) {
+	GeeTreeMapEntrySet * self;
+	GeeSortedSet* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	GeeMapEntry* _tmp2_;
+	gconstpointer _tmp3_;
+	gconstpointer _tmp4_;
+	GeeTreeMapRange* _tmp5_;
+	GeeTreeMapRange* _tmp6_;
+	GeeTreeMapSubEntrySet* _tmp7_;
+	GeeSortedSet* _tmp8_;
+	self = (GeeTreeMapEntrySet*) base;
+	g_return_val_if_fail (after != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_map;
+	_tmp2_ = after;
+	_tmp3_ = gee_map_entry_get_key (_tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = gee_tree_map_range_new_tail (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp1_, _tmp4_);
+	_tmp6_ = _tmp5_;
+	_tmp7_ = gee_tree_map_sub_entry_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp6_);
+	_tmp8_ = (GeeSortedSet*) _tmp7_;
+	_gee_tree_map_range_unref0 (_tmp6_);
+	result = _tmp8_;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_entry_set_real_sub_set (GeeAbstractSortedSet* base, GeeMapEntry* after, GeeMapEntry* before) {
+	GeeTreeMapEntrySet * self;
+	GeeSortedSet* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	GeeMapEntry* _tmp2_;
+	gconstpointer _tmp3_;
+	gconstpointer _tmp4_;
+	GeeMapEntry* _tmp5_;
+	gconstpointer _tmp6_;
+	gconstpointer _tmp7_;
+	GeeTreeMapRange* _tmp8_;
+	GeeTreeMapRange* _tmp9_;
+	GeeTreeMapSubEntrySet* _tmp10_;
+	GeeSortedSet* _tmp11_;
+	self = (GeeTreeMapEntrySet*) base;
+	g_return_val_if_fail (after != NULL, NULL);
+	g_return_val_if_fail (before != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_map;
+	_tmp2_ = after;
+	_tmp3_ = gee_map_entry_get_key (_tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = before;
+	_tmp6_ = gee_map_entry_get_key (_tmp5_);
+	_tmp7_ = _tmp6_;
+	_tmp8_ = gee_tree_map_range_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp1_, _tmp4_, _tmp7_);
+	_tmp9_ = _tmp8_;
+	_tmp10_ = gee_tree_map_sub_entry_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp9_);
+	_tmp11_ = (GeeSortedSet*) _tmp10_;
+	_gee_tree_map_range_unref0 (_tmp9_);
+	result = _tmp11_;
+	return result;
+}
+
+
+static GeeIterator* gee_tree_map_entry_set_real_iterator_at (GeeAbstractSortedSet* base, GeeMapEntry* item) {
+	GeeTreeMapEntrySet * self;
+	GeeIterator* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeMapEntry* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	GeeTreeMapNode* _tmp4_ = NULL;
+	GeeTreeMapNode* node;
+	gboolean _tmp5_ = FALSE;
+	GeeTreeMapNode* _tmp6_;
+	gboolean _tmp16_;
+	GeeTreeMap* _tmp17_;
+	GeeTreeMapNode* _tmp18_;
+	GeeTreeMapEntryIterator* _tmp19_;
+	self = (GeeTreeMapEntrySet*) base;
+	g_return_val_if_fail (item != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = item;
+	_tmp2_ = gee_map_entry_get_key (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = gee_tree_map_find_node (_tmp0_, _tmp3_);
+	node = _tmp4_;
+	_tmp6_ = node;
+	if (_tmp6_ == NULL) {
+		_tmp5_ = TRUE;
+	} else {
+		GeeTreeMap* _tmp7_;
+		GeeEqualDataFunc _tmp8_;
+		void* _tmp8__target;
+		GeeEqualDataFunc _tmp9_;
+		void* _tmp9__target;
+		GeeTreeMapNode* _tmp10_;
+		gconstpointer _tmp11_;
+		GeeMapEntry* _tmp12_;
+		gconstpointer _tmp13_;
+		gconstpointer _tmp14_;
+		gboolean _tmp15_ = FALSE;
+		_tmp7_ = self->priv->_map;
+		_tmp8_ = gee_tree_map_get_value_equal_func (_tmp7_, &_tmp8__target);
+		_tmp9_ = _tmp8_;
+		_tmp9__target = _tmp8__target;
+		_tmp10_ = node;
+		_tmp11_ = _tmp10_->value;
+		_tmp12_ = item;
+		_tmp13_ = gee_map_entry_get_value (_tmp12_);
+		_tmp14_ = _tmp13_;
+		_tmp15_ = _tmp9_ (_tmp11_, _tmp14_, _tmp9__target);
+		_tmp5_ = !_tmp15_;
+	}
+	_tmp16_ = _tmp5_;
+	if (_tmp16_) {
+		result = NULL;
+		return result;
+	}
+	_tmp17_ = self->priv->_map;
+	_tmp18_ = node;
+	_tmp19_ = gee_tree_map_entry_iterator_new_pointing (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp17_, _tmp18_);
+	result = (GeeIterator*) _tmp19_;
+	return result;
+}
+
+
+static GeeMapEntry* gee_tree_map_entry_set_real_lower (GeeAbstractSortedSet* base, GeeMapEntry* item) {
+	GeeTreeMapEntrySet * self;
+	GeeMapEntry* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeMapEntry* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	GeeTreeMapNode* _tmp4_ = NULL;
+	GeeTreeMapNode* l;
+	GeeMapEntry* _tmp5_ = NULL;
+	GeeTreeMapNode* _tmp6_;
+	self = (GeeTreeMapEntrySet*) base;
+	g_return_val_if_fail (item != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = item;
+	_tmp2_ = gee_map_entry_get_key (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = gee_tree_map_find_lower (_tmp0_, _tmp3_);
+	l = _tmp4_;
+	_tmp6_ = l;
+	if (_tmp6_ != NULL) {
+		GeeTreeMapNode* _tmp7_;
+		GeeMapEntry* _tmp8_ = NULL;
+		_tmp7_ = l;
+		_tmp8_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp7_);
+		_g_object_unref0 (_tmp5_);
+		_tmp5_ = _tmp8_;
+	} else {
+		_g_object_unref0 (_tmp5_);
+		_tmp5_ = NULL;
+	}
+	result = _tmp5_;
+	return result;
+}
+
+
+static GeeMapEntry* gee_tree_map_entry_set_real_higher (GeeAbstractSortedSet* base, GeeMapEntry* item) {
+	GeeTreeMapEntrySet * self;
+	GeeMapEntry* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeMapEntry* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	GeeTreeMapNode* _tmp4_ = NULL;
+	GeeTreeMapNode* l;
+	GeeMapEntry* _tmp5_ = NULL;
+	GeeTreeMapNode* _tmp6_;
+	self = (GeeTreeMapEntrySet*) base;
+	g_return_val_if_fail (item != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = item;
+	_tmp2_ = gee_map_entry_get_key (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = gee_tree_map_find_higher (_tmp0_, _tmp3_);
+	l = _tmp4_;
+	_tmp6_ = l;
+	if (_tmp6_ != NULL) {
+		GeeTreeMapNode* _tmp7_;
+		GeeMapEntry* _tmp8_ = NULL;
+		_tmp7_ = l;
+		_tmp8_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp7_);
+		_g_object_unref0 (_tmp5_);
+		_tmp5_ = _tmp8_;
+	} else {
+		_g_object_unref0 (_tmp5_);
+		_tmp5_ = NULL;
+	}
+	result = _tmp5_;
+	return result;
+}
+
+
+static GeeMapEntry* gee_tree_map_entry_set_real_floor (GeeAbstractSortedSet* base, GeeMapEntry* item) {
+	GeeTreeMapEntrySet * self;
+	GeeMapEntry* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeMapEntry* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	GeeTreeMapNode* _tmp4_ = NULL;
+	GeeTreeMapNode* l;
+	GeeMapEntry* _tmp5_ = NULL;
+	GeeTreeMapNode* _tmp6_;
+	self = (GeeTreeMapEntrySet*) base;
+	g_return_val_if_fail (item != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = item;
+	_tmp2_ = gee_map_entry_get_key (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = gee_tree_map_find_floor (_tmp0_, _tmp3_);
+	l = _tmp4_;
+	_tmp6_ = l;
+	if (_tmp6_ != NULL) {
+		GeeTreeMapNode* _tmp7_;
+		GeeMapEntry* _tmp8_ = NULL;
+		_tmp7_ = l;
+		_tmp8_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp7_);
+		_g_object_unref0 (_tmp5_);
+		_tmp5_ = _tmp8_;
+	} else {
+		_g_object_unref0 (_tmp5_);
+		_tmp5_ = NULL;
+	}
+	result = _tmp5_;
+	return result;
+}
+
+
+static GeeMapEntry* gee_tree_map_entry_set_real_ceil (GeeAbstractSortedSet* base, GeeMapEntry* item) {
+	GeeTreeMapEntrySet * self;
+	GeeMapEntry* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeMapEntry* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	GeeTreeMapNode* _tmp4_ = NULL;
+	GeeTreeMapNode* l;
+	GeeMapEntry* _tmp5_ = NULL;
+	GeeTreeMapNode* _tmp6_;
+	self = (GeeTreeMapEntrySet*) base;
+	g_return_val_if_fail (item != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = item;
+	_tmp2_ = gee_map_entry_get_key (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = gee_tree_map_find_ceil (_tmp0_, _tmp3_);
+	l = _tmp4_;
+	_tmp6_ = l;
+	if (_tmp6_ != NULL) {
+		GeeTreeMapNode* _tmp7_;
+		GeeMapEntry* _tmp8_ = NULL;
+		_tmp7_ = l;
+		_tmp8_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp7_);
+		_g_object_unref0 (_tmp5_);
+		_tmp5_ = _tmp8_;
+	} else {
+		_g_object_unref0 (_tmp5_);
+		_tmp5_ = NULL;
+	}
+	result = _tmp5_;
 	return result;
 }
 
@@ -3160,6 +8129,15 @@ static gint gee_tree_map_entry_set_real_get_size (GeeAbstractCollection* base) {
 }
 
 
+static gboolean gee_tree_map_entry_set_real_get_read_only (GeeAbstractCollection* base) {
+	gboolean result;
+	GeeTreeMapEntrySet* self;
+	self = (GeeTreeMapEntrySet*) base;
+	result = TRUE;
+	return result;
+}
+
+
 static void gee_tree_map_entry_set_class_init (GeeTreeMapEntrySetClass * klass) {
 	gee_tree_map_entry_set_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeTreeMapEntrySetPrivate));
@@ -3168,10 +8146,19 @@ static void gee_tree_map_entry_set_class_init (GeeTreeMapEntrySetClass * klass) 
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->clear = gee_tree_map_entry_set_real_clear;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove = gee_tree_map_entry_set_real_remove;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->contains = gee_tree_map_entry_set_real_contains;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->add_all = gee_tree_map_entry_set_real_add_all;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove_all = gee_tree_map_entry_set_real_remove_all;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->retain_all = gee_tree_map_entry_set_real_retain_all;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->first = gee_tree_map_entry_set_real_first;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->last = gee_tree_map_entry_set_real_last;
+	GEE_ABSTRACT_BIDIR_SORTED_SET_CLASS (klass)->bidir_iterator = gee_tree_map_entry_set_real_bidir_iterator;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->head_set = gee_tree_map_entry_set_real_head_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->tail_set = gee_tree_map_entry_set_real_tail_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->sub_set = gee_tree_map_entry_set_real_sub_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->iterator_at = gee_tree_map_entry_set_real_iterator_at;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->lower = gee_tree_map_entry_set_real_lower;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->higher = gee_tree_map_entry_set_real_higher;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->floor = gee_tree_map_entry_set_real_floor;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->ceil = gee_tree_map_entry_set_real_ceil;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_tree_map_entry_set_real_get_size;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_tree_map_entry_set_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_entry_set_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_entry_set_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_tree_map_entry_set_finalize;
@@ -3182,6 +8169,7 @@ static void gee_tree_map_entry_set_class_init (GeeTreeMapEntrySetClass * klass) 
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_ENTRY_SET_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_ENTRY_SET_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_ENTRY_SET_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_ENTRY_SET_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -3203,7 +8191,7 @@ static GType gee_tree_map_entry_set_get_type (void) {
 	if (g_once_init_enter (&gee_tree_map_entry_set_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapEntrySetClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_entry_set_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapEntrySet), 0, (GInstanceInitFunc) gee_tree_map_entry_set_instance_init, NULL };
 		GType gee_tree_map_entry_set_type_id;
-		gee_tree_map_entry_set_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_SET, "GeeTreeMapEntrySet", &g_define_type_info, 0);
+		gee_tree_map_entry_set_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, "GeeTreeMapEntrySet", &g_define_type_info, 0);
 		g_once_init_leave (&gee_tree_map_entry_set_type_id__volatile, gee_tree_map_entry_set_type_id);
 	}
 	return gee_tree_map_entry_set_type_id__volatile;
@@ -3216,6 +8204,9 @@ static void _vala_gee_tree_map_entry_set_get_property (GObject * object, guint p
 	switch (property_id) {
 		case GEE_TREE_MAP_ENTRY_SET_SIZE:
 		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
+		break;
+		case GEE_TREE_MAP_ENTRY_SET_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -3253,6 +8244,848 @@ static void _vala_gee_tree_map_entry_set_set_property (GObject * object, guint p
 }
 
 
+static GeeTreeMapSubEntrySet* gee_tree_map_sub_entry_set_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	GeeTreeMapSubEntrySet * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	self = (GeeTreeMapSubEntrySet*) gee_abstract_bidir_sorted_set_construct (object_type, GEE_MAP_TYPE_ENTRY, (GBoxedCopyFunc) g_object_ref, g_object_unref);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	_tmp0_ = map;
+	gee_tree_map_sub_entry_set_set_map (self, _tmp0_);
+	_tmp1_ = range;
+	gee_tree_map_sub_entry_set_set_range (self, _tmp1_);
+	return self;
+}
+
+
+static GeeTreeMapSubEntrySet* gee_tree_map_sub_entry_set_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	return gee_tree_map_sub_entry_set_construct (GEE_TREE_MAP_TYPE_SUB_ENTRY_SET, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range);
+}
+
+
+static GeeIterator* gee_tree_map_sub_entry_set_real_iterator (GeeAbstractCollection* base) {
+	GeeTreeMapSubEntrySet * self;
+	GeeIterator* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeTreeMapSubEntryIterator* _tmp2_;
+	self = (GeeTreeMapSubEntrySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = gee_tree_map_sub_entry_iterator_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp1_);
+	result = (GeeIterator*) _tmp2_;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_entry_set_real_add (GeeAbstractCollection* base, GeeMapEntry* entry) {
+	GeeTreeMapSubEntrySet * self;
+	gboolean result = FALSE;
+	self = (GeeTreeMapSubEntrySet*) base;
+	g_return_val_if_fail (entry != NULL, FALSE);
+	g_assert_not_reached ();
+	return result;
+}
+
+
+static void gee_tree_map_sub_entry_set_real_clear (GeeAbstractCollection* base) {
+	GeeTreeMapSubEntrySet * self;
+	self = (GeeTreeMapSubEntrySet*) base;
+	g_assert_not_reached ();
+}
+
+
+static gboolean gee_tree_map_sub_entry_set_real_remove (GeeAbstractCollection* base, GeeMapEntry* entry) {
+	GeeTreeMapSubEntrySet * self;
+	gboolean result = FALSE;
+	self = (GeeTreeMapSubEntrySet*) base;
+	g_return_val_if_fail (entry != NULL, FALSE);
+	g_assert_not_reached ();
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_entry_set_real_contains (GeeAbstractCollection* base, GeeMapEntry* entry) {
+	GeeTreeMapSubEntrySet * self;
+	gboolean result = FALSE;
+	gboolean _tmp0_ = FALSE;
+	GeeTreeMapRange* _tmp1_;
+	GeeMapEntry* _tmp2_;
+	gconstpointer _tmp3_;
+	gconstpointer _tmp4_;
+	gboolean _tmp5_ = FALSE;
+	gboolean _tmp14_;
+	self = (GeeTreeMapSubEntrySet*) base;
+	g_return_val_if_fail (entry != NULL, FALSE);
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = entry;
+	_tmp3_ = gee_map_entry_get_key (_tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = gee_tree_map_range_in_range (_tmp1_, _tmp4_);
+	if (_tmp5_) {
+		GeeTreeMap* _tmp6_;
+		GeeMapEntry* _tmp7_;
+		gconstpointer _tmp8_;
+		gconstpointer _tmp9_;
+		GeeMapEntry* _tmp10_;
+		gconstpointer _tmp11_;
+		gconstpointer _tmp12_;
+		gboolean _tmp13_ = FALSE;
+		_tmp6_ = self->priv->_map;
+		_tmp7_ = entry;
+		_tmp8_ = gee_map_entry_get_key (_tmp7_);
+		_tmp9_ = _tmp8_;
+		_tmp10_ = entry;
+		_tmp11_ = gee_map_entry_get_value (_tmp10_);
+		_tmp12_ = _tmp11_;
+		_tmp13_ = gee_abstract_map_has ((GeeAbstractMap*) _tmp6_, _tmp9_, _tmp12_);
+		_tmp0_ = _tmp13_;
+	} else {
+		_tmp0_ = FALSE;
+	}
+	_tmp14_ = _tmp0_;
+	result = _tmp14_;
+	return result;
+}
+
+
+static GeeBidirIterator* gee_tree_map_sub_entry_set_real_bidir_iterator (GeeAbstractBidirSortedSet* base) {
+	GeeTreeMapSubEntrySet * self;
+	GeeBidirIterator* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeTreeMapSubEntryIterator* _tmp2_;
+	self = (GeeTreeMapSubEntrySet*) base;
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = gee_tree_map_sub_entry_iterator_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp1_);
+	result = (GeeBidirIterator*) _tmp2_;
+	return result;
+}
+
+
+static GeeMapEntry* gee_tree_map_sub_entry_set_real_first (GeeAbstractSortedSet* base) {
+	GeeTreeMapSubEntrySet * self;
+	GeeMapEntry* result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	GeeTreeMapNode* _tmp1_ = NULL;
+	GeeTreeMapNode* _first;
+	GeeMapEntry* _tmp2_ = NULL;
+	self = (GeeTreeMapSubEntrySet*) base;
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = gee_tree_map_range_first (_tmp0_);
+	_first = _tmp1_;
+	_vala_assert (_first != NULL, "_first != null");
+	_tmp2_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _first);
+	result = _tmp2_;
+	return result;
+}
+
+
+static GeeMapEntry* gee_tree_map_sub_entry_set_real_last (GeeAbstractSortedSet* base) {
+	GeeTreeMapSubEntrySet * self;
+	GeeMapEntry* result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	GeeTreeMapNode* _tmp1_ = NULL;
+	GeeTreeMapNode* _last;
+	GeeMapEntry* _tmp2_ = NULL;
+	self = (GeeTreeMapSubEntrySet*) base;
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = gee_tree_map_range_last (_tmp0_);
+	_last = _tmp1_;
+	_vala_assert (_last != NULL, "_last != null");
+	_tmp2_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _last);
+	result = _tmp2_;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_sub_entry_set_real_head_set (GeeAbstractSortedSet* base, GeeMapEntry* before) {
+	GeeTreeMapSubEntrySet * self;
+	GeeSortedSet* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeMapEntry* _tmp2_;
+	gconstpointer _tmp3_;
+	gconstpointer _tmp4_;
+	GeeTreeMapRange* _tmp5_ = NULL;
+	GeeTreeMapRange* _tmp6_;
+	GeeTreeMapSubEntrySet* _tmp7_;
+	GeeSortedSet* _tmp8_;
+	self = (GeeTreeMapSubEntrySet*) base;
+	g_return_val_if_fail (before != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = before;
+	_tmp3_ = gee_map_entry_get_key (_tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = gee_tree_map_range_cut_tail (_tmp1_, _tmp4_);
+	_tmp6_ = _tmp5_;
+	_tmp7_ = gee_tree_map_sub_entry_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp6_);
+	_tmp8_ = (GeeSortedSet*) _tmp7_;
+	_gee_tree_map_range_unref0 (_tmp6_);
+	result = _tmp8_;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_sub_entry_set_real_tail_set (GeeAbstractSortedSet* base, GeeMapEntry* after) {
+	GeeTreeMapSubEntrySet * self;
+	GeeSortedSet* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeMapEntry* _tmp2_;
+	gconstpointer _tmp3_;
+	gconstpointer _tmp4_;
+	GeeTreeMapRange* _tmp5_ = NULL;
+	GeeTreeMapRange* _tmp6_;
+	GeeTreeMapSubEntrySet* _tmp7_;
+	GeeSortedSet* _tmp8_;
+	self = (GeeTreeMapSubEntrySet*) base;
+	g_return_val_if_fail (after != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = after;
+	_tmp3_ = gee_map_entry_get_key (_tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = gee_tree_map_range_cut_head (_tmp1_, _tmp4_);
+	_tmp6_ = _tmp5_;
+	_tmp7_ = gee_tree_map_sub_entry_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp6_);
+	_tmp8_ = (GeeSortedSet*) _tmp7_;
+	_gee_tree_map_range_unref0 (_tmp6_);
+	result = _tmp8_;
+	return result;
+}
+
+
+static GeeSortedSet* gee_tree_map_sub_entry_set_real_sub_set (GeeAbstractSortedSet* base, GeeMapEntry* after, GeeMapEntry* before) {
+	GeeTreeMapSubEntrySet * self;
+	GeeSortedSet* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeMapEntry* _tmp2_;
+	gconstpointer _tmp3_;
+	gconstpointer _tmp4_;
+	GeeMapEntry* _tmp5_;
+	gconstpointer _tmp6_;
+	gconstpointer _tmp7_;
+	GeeTreeMapRange* _tmp8_ = NULL;
+	GeeTreeMapRange* _tmp9_;
+	GeeTreeMapSubEntrySet* _tmp10_;
+	GeeSortedSet* _tmp11_;
+	self = (GeeTreeMapSubEntrySet*) base;
+	g_return_val_if_fail (after != NULL, NULL);
+	g_return_val_if_fail (before != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	_tmp1_ = self->priv->_range;
+	_tmp2_ = after;
+	_tmp3_ = gee_map_entry_get_key (_tmp2_);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = before;
+	_tmp6_ = gee_map_entry_get_key (_tmp5_);
+	_tmp7_ = _tmp6_;
+	_tmp8_ = gee_tree_map_range_cut (_tmp1_, _tmp4_, _tmp7_);
+	_tmp9_ = _tmp8_;
+	_tmp10_ = gee_tree_map_sub_entry_set_new (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp9_);
+	_tmp11_ = (GeeSortedSet*) _tmp10_;
+	_gee_tree_map_range_unref0 (_tmp9_);
+	result = _tmp11_;
+	return result;
+}
+
+
+static GeeIterator* gee_tree_map_sub_entry_set_real_iterator_at (GeeAbstractSortedSet* base, GeeMapEntry* entry) {
+	GeeTreeMapSubEntrySet * self;
+	GeeIterator* result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	GeeMapEntry* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	gboolean _tmp4_ = FALSE;
+	GeeTreeMap* _tmp5_;
+	GeeMapEntry* _tmp6_;
+	gconstpointer _tmp7_;
+	gconstpointer _tmp8_;
+	GeeTreeMapNode* _tmp9_ = NULL;
+	GeeTreeMapNode* n;
+	gboolean _tmp10_ = FALSE;
+	GeeTreeMapNode* _tmp11_;
+	gboolean _tmp21_;
+	GeeTreeMap* _tmp22_;
+	GeeTreeMapRange* _tmp23_;
+	GeeTreeMapNode* _tmp24_;
+	GeeTreeMapSubEntryIterator* _tmp25_;
+	self = (GeeTreeMapSubEntrySet*) base;
+	g_return_val_if_fail (entry != NULL, NULL);
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = entry;
+	_tmp2_ = gee_map_entry_get_key (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = gee_tree_map_range_in_range (_tmp0_, _tmp3_);
+	if (!_tmp4_) {
+		result = NULL;
+		return result;
+	}
+	_tmp5_ = self->priv->_map;
+	_tmp6_ = entry;
+	_tmp7_ = gee_map_entry_get_key (_tmp6_);
+	_tmp8_ = _tmp7_;
+	_tmp9_ = gee_tree_map_find_node (_tmp5_, _tmp8_);
+	n = _tmp9_;
+	_tmp11_ = n;
+	if (_tmp11_ == NULL) {
+		_tmp10_ = TRUE;
+	} else {
+		GeeTreeMap* _tmp12_;
+		GeeEqualDataFunc _tmp13_;
+		void* _tmp13__target;
+		GeeEqualDataFunc _tmp14_;
+		void* _tmp14__target;
+		GeeTreeMapNode* _tmp15_;
+		gconstpointer _tmp16_;
+		GeeMapEntry* _tmp17_;
+		gconstpointer _tmp18_;
+		gconstpointer _tmp19_;
+		gboolean _tmp20_ = FALSE;
+		_tmp12_ = self->priv->_map;
+		_tmp13_ = gee_tree_map_get_value_equal_func (_tmp12_, &_tmp13__target);
+		_tmp14_ = _tmp13_;
+		_tmp14__target = _tmp13__target;
+		_tmp15_ = n;
+		_tmp16_ = _tmp15_->value;
+		_tmp17_ = entry;
+		_tmp18_ = gee_map_entry_get_value (_tmp17_);
+		_tmp19_ = _tmp18_;
+		_tmp20_ = _tmp14_ (_tmp16_, _tmp19_, _tmp14__target);
+		_tmp10_ = !_tmp20_;
+	}
+	_tmp21_ = _tmp10_;
+	if (_tmp21_) {
+		result = NULL;
+		return result;
+	}
+	_tmp22_ = self->priv->_map;
+	_tmp23_ = self->priv->_range;
+	_tmp24_ = n;
+	_tmp25_ = gee_tree_map_sub_entry_iterator_new_pointing (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp22_, _tmp23_, _tmp24_);
+	result = (GeeIterator*) _tmp25_;
+	return result;
+}
+
+
+static GeeMapEntry* gee_tree_map_sub_entry_set_real_lower (GeeAbstractSortedSet* base, GeeMapEntry* entry) {
+	GeeTreeMapSubEntrySet * self;
+	GeeMapEntry* result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	GeeMapEntry* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	gint _tmp4_ = 0;
+	gint res;
+	gint _tmp5_;
+	GeeTreeMap* _tmp7_;
+	GeeMapEntry* _tmp8_;
+	gconstpointer _tmp9_;
+	gconstpointer _tmp10_;
+	GeeTreeMapNode* _tmp11_ = NULL;
+	GeeTreeMapNode* l;
+	GeeMapEntry* _tmp12_ = NULL;
+	gboolean _tmp13_ = FALSE;
+	GeeTreeMapNode* _tmp14_;
+	gboolean _tmp19_;
+	self = (GeeTreeMapSubEntrySet*) base;
+	g_return_val_if_fail (entry != NULL, NULL);
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = entry;
+	_tmp2_ = gee_map_entry_get_key (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = gee_tree_map_range_compare_range (_tmp0_, _tmp3_);
+	res = _tmp4_;
+	_tmp5_ = res;
+	if (_tmp5_ > 0) {
+		gpointer _tmp6_ = NULL;
+		_tmp6_ = gee_abstract_sorted_set_last ((GeeAbstractSortedSet*) self);
+		result = (GeeMapEntry*) _tmp6_;
+		return result;
+	}
+	_tmp7_ = self->priv->_map;
+	_tmp8_ = entry;
+	_tmp9_ = gee_map_entry_get_key (_tmp8_);
+	_tmp10_ = _tmp9_;
+	_tmp11_ = gee_tree_map_find_lower (_tmp7_, _tmp10_);
+	l = _tmp11_;
+	_tmp14_ = l;
+	if (_tmp14_ != NULL) {
+		GeeTreeMapRange* _tmp15_;
+		GeeTreeMapNode* _tmp16_;
+		gconstpointer _tmp17_;
+		gboolean _tmp18_ = FALSE;
+		_tmp15_ = self->priv->_range;
+		_tmp16_ = l;
+		_tmp17_ = _tmp16_->key;
+		_tmp18_ = gee_tree_map_range_in_range (_tmp15_, _tmp17_);
+		_tmp13_ = _tmp18_;
+	} else {
+		_tmp13_ = FALSE;
+	}
+	_tmp19_ = _tmp13_;
+	if (_tmp19_) {
+		GeeTreeMapNode* _tmp20_;
+		GeeMapEntry* _tmp21_ = NULL;
+		_tmp20_ = l;
+		_tmp21_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp20_);
+		_g_object_unref0 (_tmp12_);
+		_tmp12_ = _tmp21_;
+	} else {
+		_g_object_unref0 (_tmp12_);
+		_tmp12_ = NULL;
+	}
+	result = _tmp12_;
+	return result;
+}
+
+
+static GeeMapEntry* gee_tree_map_sub_entry_set_real_higher (GeeAbstractSortedSet* base, GeeMapEntry* entry) {
+	GeeTreeMapSubEntrySet * self;
+	GeeMapEntry* result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	GeeMapEntry* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	gint _tmp4_ = 0;
+	gint res;
+	gint _tmp5_;
+	GeeTreeMap* _tmp7_;
+	GeeMapEntry* _tmp8_;
+	gconstpointer _tmp9_;
+	gconstpointer _tmp10_;
+	GeeTreeMapNode* _tmp11_ = NULL;
+	GeeTreeMapNode* h;
+	GeeMapEntry* _tmp12_ = NULL;
+	gboolean _tmp13_ = FALSE;
+	GeeTreeMapNode* _tmp14_;
+	gboolean _tmp19_;
+	self = (GeeTreeMapSubEntrySet*) base;
+	g_return_val_if_fail (entry != NULL, NULL);
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = entry;
+	_tmp2_ = gee_map_entry_get_key (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = gee_tree_map_range_compare_range (_tmp0_, _tmp3_);
+	res = _tmp4_;
+	_tmp5_ = res;
+	if (_tmp5_ < 0) {
+		gpointer _tmp6_ = NULL;
+		_tmp6_ = gee_abstract_sorted_set_first ((GeeAbstractSortedSet*) self);
+		result = (GeeMapEntry*) _tmp6_;
+		return result;
+	}
+	_tmp7_ = self->priv->_map;
+	_tmp8_ = entry;
+	_tmp9_ = gee_map_entry_get_key (_tmp8_);
+	_tmp10_ = _tmp9_;
+	_tmp11_ = gee_tree_map_find_higher (_tmp7_, _tmp10_);
+	h = _tmp11_;
+	_tmp14_ = h;
+	if (_tmp14_ != NULL) {
+		GeeTreeMapRange* _tmp15_;
+		GeeTreeMapNode* _tmp16_;
+		gconstpointer _tmp17_;
+		gboolean _tmp18_ = FALSE;
+		_tmp15_ = self->priv->_range;
+		_tmp16_ = h;
+		_tmp17_ = _tmp16_->key;
+		_tmp18_ = gee_tree_map_range_in_range (_tmp15_, _tmp17_);
+		_tmp13_ = _tmp18_;
+	} else {
+		_tmp13_ = FALSE;
+	}
+	_tmp19_ = _tmp13_;
+	if (_tmp19_) {
+		GeeTreeMapNode* _tmp20_;
+		GeeMapEntry* _tmp21_ = NULL;
+		_tmp20_ = h;
+		_tmp21_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp20_);
+		_g_object_unref0 (_tmp12_);
+		_tmp12_ = _tmp21_;
+	} else {
+		_g_object_unref0 (_tmp12_);
+		_tmp12_ = NULL;
+	}
+	result = _tmp12_;
+	return result;
+}
+
+
+static GeeMapEntry* gee_tree_map_sub_entry_set_real_floor (GeeAbstractSortedSet* base, GeeMapEntry* entry) {
+	GeeTreeMapSubEntrySet * self;
+	GeeMapEntry* result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	GeeMapEntry* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	gint _tmp4_ = 0;
+	gint res;
+	gint _tmp5_;
+	GeeTreeMap* _tmp7_;
+	GeeMapEntry* _tmp8_;
+	gconstpointer _tmp9_;
+	gconstpointer _tmp10_;
+	GeeTreeMapNode* _tmp11_ = NULL;
+	GeeTreeMapNode* l;
+	GeeMapEntry* _tmp12_ = NULL;
+	gboolean _tmp13_ = FALSE;
+	GeeTreeMapNode* _tmp14_;
+	gboolean _tmp19_;
+	self = (GeeTreeMapSubEntrySet*) base;
+	g_return_val_if_fail (entry != NULL, NULL);
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = entry;
+	_tmp2_ = gee_map_entry_get_key (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = gee_tree_map_range_compare_range (_tmp0_, _tmp3_);
+	res = _tmp4_;
+	_tmp5_ = res;
+	if (_tmp5_ > 0) {
+		gpointer _tmp6_ = NULL;
+		_tmp6_ = gee_abstract_sorted_set_last ((GeeAbstractSortedSet*) self);
+		result = (GeeMapEntry*) _tmp6_;
+		return result;
+	}
+	_tmp7_ = self->priv->_map;
+	_tmp8_ = entry;
+	_tmp9_ = gee_map_entry_get_key (_tmp8_);
+	_tmp10_ = _tmp9_;
+	_tmp11_ = gee_tree_map_find_floor (_tmp7_, _tmp10_);
+	l = _tmp11_;
+	_tmp14_ = l;
+	if (_tmp14_ != NULL) {
+		GeeTreeMapRange* _tmp15_;
+		GeeTreeMapNode* _tmp16_;
+		gconstpointer _tmp17_;
+		gboolean _tmp18_ = FALSE;
+		_tmp15_ = self->priv->_range;
+		_tmp16_ = l;
+		_tmp17_ = _tmp16_->key;
+		_tmp18_ = gee_tree_map_range_in_range (_tmp15_, _tmp17_);
+		_tmp13_ = _tmp18_;
+	} else {
+		_tmp13_ = FALSE;
+	}
+	_tmp19_ = _tmp13_;
+	if (_tmp19_) {
+		GeeTreeMapNode* _tmp20_;
+		GeeMapEntry* _tmp21_ = NULL;
+		_tmp20_ = l;
+		_tmp21_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp20_);
+		_g_object_unref0 (_tmp12_);
+		_tmp12_ = _tmp21_;
+	} else {
+		_g_object_unref0 (_tmp12_);
+		_tmp12_ = NULL;
+	}
+	result = _tmp12_;
+	return result;
+}
+
+
+static GeeMapEntry* gee_tree_map_sub_entry_set_real_ceil (GeeAbstractSortedSet* base, GeeMapEntry* entry) {
+	GeeTreeMapSubEntrySet * self;
+	GeeMapEntry* result = NULL;
+	GeeTreeMapRange* _tmp0_;
+	GeeMapEntry* _tmp1_;
+	gconstpointer _tmp2_;
+	gconstpointer _tmp3_;
+	gint _tmp4_ = 0;
+	gint res;
+	gint _tmp5_;
+	GeeTreeMap* _tmp7_;
+	GeeMapEntry* _tmp8_;
+	gconstpointer _tmp9_;
+	gconstpointer _tmp10_;
+	GeeTreeMapNode* _tmp11_ = NULL;
+	GeeTreeMapNode* h;
+	GeeMapEntry* _tmp12_ = NULL;
+	gboolean _tmp13_ = FALSE;
+	GeeTreeMapNode* _tmp14_;
+	gboolean _tmp19_;
+	self = (GeeTreeMapSubEntrySet*) base;
+	g_return_val_if_fail (entry != NULL, NULL);
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = entry;
+	_tmp2_ = gee_map_entry_get_key (_tmp1_);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = gee_tree_map_range_compare_range (_tmp0_, _tmp3_);
+	res = _tmp4_;
+	_tmp5_ = res;
+	if (_tmp5_ < 0) {
+		gpointer _tmp6_ = NULL;
+		_tmp6_ = gee_abstract_sorted_set_first ((GeeAbstractSortedSet*) self);
+		result = (GeeMapEntry*) _tmp6_;
+		return result;
+	}
+	_tmp7_ = self->priv->_map;
+	_tmp8_ = entry;
+	_tmp9_ = gee_map_entry_get_key (_tmp8_);
+	_tmp10_ = _tmp9_;
+	_tmp11_ = gee_tree_map_find_ceil (_tmp7_, _tmp10_);
+	h = _tmp11_;
+	_tmp14_ = h;
+	if (_tmp14_ != NULL) {
+		GeeTreeMapRange* _tmp15_;
+		GeeTreeMapNode* _tmp16_;
+		gconstpointer _tmp17_;
+		gboolean _tmp18_ = FALSE;
+		_tmp15_ = self->priv->_range;
+		_tmp16_ = h;
+		_tmp17_ = _tmp16_->key;
+		_tmp18_ = gee_tree_map_range_in_range (_tmp15_, _tmp17_);
+		_tmp13_ = _tmp18_;
+	} else {
+		_tmp13_ = FALSE;
+	}
+	_tmp19_ = _tmp13_;
+	if (_tmp19_) {
+		GeeTreeMapNode* _tmp20_;
+		GeeMapEntry* _tmp21_ = NULL;
+		_tmp20_ = h;
+		_tmp21_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp20_);
+		_g_object_unref0 (_tmp12_);
+		_tmp12_ = _tmp21_;
+	} else {
+		_g_object_unref0 (_tmp12_);
+		_tmp12_ = NULL;
+	}
+	result = _tmp12_;
+	return result;
+}
+
+
+static GeeTreeMap* gee_tree_map_sub_entry_set_get_map (GeeTreeMapSubEntrySet* self) {
+	GeeTreeMap* result;
+	GeeTreeMap* _tmp0_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->_map;
+	result = _tmp0_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_entry_set_set_map (GeeTreeMapSubEntrySet* self, GeeTreeMap* value) {
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = value;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	_g_object_unref0 (self->priv->_map);
+	self->priv->_map = _tmp1_;
+}
+
+
+static GeeTreeMapRange* gee_tree_map_sub_entry_set_get_range (GeeTreeMapSubEntrySet* self) {
+	GeeTreeMapRange* result;
+	GeeTreeMapRange* _tmp0_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->_range;
+	result = _tmp0_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_entry_set_set_range (GeeTreeMapSubEntrySet* self, GeeTreeMapRange* value) {
+	GeeTreeMapRange* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = value;
+	_tmp1_ = _gee_tree_map_range_ref0 (_tmp0_);
+	_gee_tree_map_range_unref0 (self->priv->_range);
+	self->priv->_range = _tmp1_;
+}
+
+
+static gint gee_tree_map_sub_entry_set_real_get_size (GeeAbstractCollection* base) {
+	gint result;
+	GeeTreeMapSubEntrySet* self;
+	gint i;
+	GeeIterator* _tmp0_ = NULL;
+	GeeIterator* iterator;
+	gint _tmp4_;
+	self = (GeeTreeMapSubEntrySet*) base;
+	i = 0;
+	_tmp0_ = gee_abstract_collection_iterator ((GeeAbstractCollection*) self);
+	iterator = _tmp0_;
+	while (TRUE) {
+		GeeIterator* _tmp1_;
+		gboolean _tmp2_ = FALSE;
+		gint _tmp3_;
+		_tmp1_ = iterator;
+		_tmp2_ = gee_iterator_next (_tmp1_);
+		if (!_tmp2_) {
+			break;
+		}
+		_tmp3_ = i;
+		i = _tmp3_ + 1;
+	}
+	_tmp4_ = i;
+	result = _tmp4_;
+	_g_object_unref0 (iterator);
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_entry_set_real_get_read_only (GeeAbstractCollection* base) {
+	gboolean result;
+	GeeTreeMapSubEntrySet* self;
+	self = (GeeTreeMapSubEntrySet*) base;
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_entry_set_get_is_empty (GeeTreeMapSubEntrySet* self) {
+	gboolean result;
+	GeeTreeMapRange* _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp0_ = self->priv->_range;
+	_tmp1_ = gee_tree_map_range_empty_submap (_tmp0_);
+	result = _tmp1_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_entry_set_class_init (GeeTreeMapSubEntrySetClass * klass) {
+	gee_tree_map_sub_entry_set_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (GeeTreeMapSubEntrySetPrivate));
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->iterator = gee_tree_map_sub_entry_set_real_iterator;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->add = gee_tree_map_sub_entry_set_real_add;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->clear = gee_tree_map_sub_entry_set_real_clear;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove = gee_tree_map_sub_entry_set_real_remove;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->contains = gee_tree_map_sub_entry_set_real_contains;
+	GEE_ABSTRACT_BIDIR_SORTED_SET_CLASS (klass)->bidir_iterator = gee_tree_map_sub_entry_set_real_bidir_iterator;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->first = gee_tree_map_sub_entry_set_real_first;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->last = gee_tree_map_sub_entry_set_real_last;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->head_set = gee_tree_map_sub_entry_set_real_head_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->tail_set = gee_tree_map_sub_entry_set_real_tail_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->sub_set = gee_tree_map_sub_entry_set_real_sub_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->iterator_at = gee_tree_map_sub_entry_set_real_iterator_at;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->lower = gee_tree_map_sub_entry_set_real_lower;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->higher = gee_tree_map_sub_entry_set_real_higher;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->floor = gee_tree_map_sub_entry_set_real_floor;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->ceil = gee_tree_map_sub_entry_set_real_ceil;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_tree_map_sub_entry_set_real_get_size;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_tree_map_sub_entry_set_real_get_read_only;
+	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_sub_entry_set_get_property;
+	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_sub_entry_set_set_property;
+	G_OBJECT_CLASS (klass)->finalize = gee_tree_map_sub_entry_set_finalize;
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_SET_K_TYPE, g_param_spec_gtype ("k-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_SET_K_DUP_FUNC, g_param_spec_pointer ("k-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_SET_K_DESTROY_FUNC, g_param_spec_pointer ("k-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_SET_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_SET_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_SET_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_SET_MAP, g_param_spec_object ("map", "map", "map", GEE_TYPE_TREE_MAP, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_SET_RANGE, gee_tree_map_param_spec_range ("range", "range", "range", GEE_TREE_MAP_TYPE_RANGE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_SET_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_SET_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_SET_IS_EMPTY, g_param_spec_boolean ("is-empty", "is-empty", "is-empty", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static void gee_tree_map_sub_entry_set_instance_init (GeeTreeMapSubEntrySet * self) {
+	self->priv = GEE_TREE_MAP_SUB_ENTRY_SET_GET_PRIVATE (self);
+}
+
+
+static void gee_tree_map_sub_entry_set_finalize (GObject* obj) {
+	GeeTreeMapSubEntrySet * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (obj, GEE_TREE_MAP_TYPE_SUB_ENTRY_SET, GeeTreeMapSubEntrySet);
+	_g_object_unref0 (self->priv->_map);
+	_gee_tree_map_range_unref0 (self->priv->_range);
+	G_OBJECT_CLASS (gee_tree_map_sub_entry_set_parent_class)->finalize (obj);
+}
+
+
+static GType gee_tree_map_sub_entry_set_get_type (void) {
+	static volatile gsize gee_tree_map_sub_entry_set_type_id__volatile = 0;
+	if (g_once_init_enter (&gee_tree_map_sub_entry_set_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapSubEntrySetClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_sub_entry_set_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapSubEntrySet), 0, (GInstanceInitFunc) gee_tree_map_sub_entry_set_instance_init, NULL };
+		GType gee_tree_map_sub_entry_set_type_id;
+		gee_tree_map_sub_entry_set_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, "GeeTreeMapSubEntrySet", &g_define_type_info, 0);
+		g_once_init_leave (&gee_tree_map_sub_entry_set_type_id__volatile, gee_tree_map_sub_entry_set_type_id);
+	}
+	return gee_tree_map_sub_entry_set_type_id__volatile;
+}
+
+
+static void _vala_gee_tree_map_sub_entry_set_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubEntrySet * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_ENTRY_SET, GeeTreeMapSubEntrySet);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_ENTRY_SET_MAP:
+		g_value_set_object (value, gee_tree_map_sub_entry_set_get_map (self));
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_SET_RANGE:
+		gee_tree_map_value_set_range (value, gee_tree_map_sub_entry_set_get_range (self));
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_SET_SIZE:
+		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_SET_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_SET_IS_EMPTY:
+		g_value_set_boolean (value, gee_tree_map_sub_entry_set_get_is_empty (self));
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
+static void _vala_gee_tree_map_sub_entry_set_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubEntrySet * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_ENTRY_SET, GeeTreeMapSubEntrySet);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_ENTRY_SET_MAP:
+		gee_tree_map_sub_entry_set_set_map (self, g_value_get_object (value));
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_SET_RANGE:
+		gee_tree_map_sub_entry_set_set_range (self, gee_tree_map_value_get_range (value));
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_SET_K_TYPE:
+		self->priv->k_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_SET_K_DUP_FUNC:
+		self->priv->k_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_SET_K_DESTROY_FUNC:
+		self->priv->k_destroy_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_SET_V_TYPE:
+		self->priv->v_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_SET_V_DUP_FUNC:
+		self->priv->v_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_SET_V_DESTROY_FUNC:
+		self->priv->v_destroy_func = g_value_get_pointer (value);
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
 static GeeTreeMapNodeIterator* gee_tree_map_node_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map) {
 	GeeTreeMapNodeIterator * self = NULL;
 	GeeTreeMap* _tmp0_;
@@ -3280,6 +9113,40 @@ static GeeTreeMapNodeIterator* gee_tree_map_node_iterator_construct (GType objec
 
 static GeeTreeMapNodeIterator* gee_tree_map_node_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map) {
 	return gee_tree_map_node_iterator_construct (GEE_TREE_MAP_TYPE_NODE_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map);
+}
+
+
+static GeeTreeMapNodeIterator* gee_tree_map_node_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* current) {
+	GeeTreeMapNodeIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	GeeTreeMap* _tmp2_;
+	gint _tmp3_;
+	GeeTreeMapNode* _tmp4_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (current != NULL, NULL);
+	self = (GeeTreeMapNodeIterator*) g_object_new (object_type, NULL);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	_tmp0_ = map;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	_g_object_unref0 (self->_map);
+	self->_map = _tmp1_;
+	_tmp2_ = self->_map;
+	_tmp3_ = _tmp2_->priv->stamp;
+	self->stamp = _tmp3_;
+	_tmp4_ = current;
+	self->current = _tmp4_;
+	return self;
+}
+
+
+static GeeTreeMapNodeIterator* gee_tree_map_node_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* current) {
+	return gee_tree_map_node_iterator_construct_pointing (GEE_TREE_MAP_TYPE_NODE_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, current);
 }
 
 
@@ -3332,6 +9199,7 @@ static gboolean gee_tree_map_node_iterator_next (GeeTreeMapNodeIterator* self) {
 			_tmp12_ = self->_map;
 			_tmp13_ = _tmp12_->priv->first;
 			self->current = _tmp13_;
+			self->started = TRUE;
 			_tmp14_ = self->current;
 			result = _tmp14_ != NULL;
 			return result;
@@ -3662,9 +9530,83 @@ static void gee_tree_map_node_iterator_unset (GeeTreeMapNodeIterator* self) {
 }
 
 
+static GeeTreeMapNode* gee_tree_map_node_iterator_safe_next_get (GeeTreeMapNodeIterator* self) {
+	GeeTreeMapNode* result = NULL;
+	GeeTreeMapNode* _tmp0_ = NULL;
+	GeeTreeMapNode* _tmp1_;
+	GeeTreeMapNode* _tmp5_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp1_ = self->current;
+	if (_tmp1_ != NULL) {
+		GeeTreeMapNode* _tmp2_;
+		GeeTreeMapNode* _tmp3_;
+		_tmp2_ = self->current;
+		_tmp3_ = _tmp2_->next;
+		_tmp0_ = _tmp3_;
+	} else {
+		GeeTreeMapNode* _tmp4_;
+		_tmp4_ = self->_next;
+		_tmp0_ = _tmp4_;
+	}
+	_tmp5_ = _tmp0_;
+	result = _tmp5_;
+	return result;
+}
+
+
+static GeeTreeMapNode* gee_tree_map_node_iterator_safe_previous_get (GeeTreeMapNodeIterator* self) {
+	GeeTreeMapNode* result = NULL;
+	GeeTreeMapNode* _tmp0_ = NULL;
+	GeeTreeMapNode* _tmp1_;
+	GeeTreeMapNode* _tmp5_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp1_ = self->current;
+	if (_tmp1_ != NULL) {
+		GeeTreeMapNode* _tmp2_;
+		GeeTreeMapNode* _tmp3_;
+		_tmp2_ = self->current;
+		_tmp3_ = _tmp2_->prev;
+		_tmp0_ = _tmp3_;
+	} else {
+		GeeTreeMapNode* _tmp4_;
+		_tmp4_ = self->_prev;
+		_tmp0_ = _tmp4_;
+	}
+	_tmp5_ = _tmp0_;
+	result = _tmp5_;
+	return result;
+}
+
+
+static gboolean gee_tree_map_node_iterator_get_read_only (GeeTreeMapNodeIterator* self) {
+	g_return_val_if_fail (self != NULL, FALSE);
+	return GEE_TREE_MAP_NODE_ITERATOR_GET_CLASS (self)->get_read_only (self);
+}
+
+
+static gboolean gee_tree_map_node_iterator_real_get_read_only (GeeTreeMapNodeIterator* base) {
+	gboolean result;
+	GeeTreeMapNodeIterator* self;
+	self = base;
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean gee_tree_map_node_iterator_get_valid (GeeTreeMapNodeIterator* self) {
+	gboolean result;
+	GeeTreeMapNode* _tmp0_;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp0_ = self->current;
+	result = _tmp0_ != NULL;
+	return result;
+}
+
+
 static void gee_tree_map_node_iterator_class_init (GeeTreeMapNodeIteratorClass * klass) {
 	gee_tree_map_node_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeTreeMapNodeIteratorPrivate));
+	GEE_TREE_MAP_NODE_ITERATOR_CLASS (klass)->get_read_only = gee_tree_map_node_iterator_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_node_iterator_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_node_iterator_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_tree_map_node_iterator_finalize;
@@ -3674,11 +9616,14 @@ static void gee_tree_map_node_iterator_class_init (GeeTreeMapNodeIteratorClass *
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_NODE_ITERATOR_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_NODE_ITERATOR_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_NODE_ITERATOR_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_NODE_ITERATOR_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_NODE_ITERATOR_VALID, g_param_spec_boolean ("valid", "valid", "valid", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
 static void gee_tree_map_node_iterator_instance_init (GeeTreeMapNodeIterator * self) {
 	self->priv = GEE_TREE_MAP_NODE_ITERATOR_GET_PRIVATE (self);
+	self->started = FALSE;
 }
 
 
@@ -3706,6 +9651,12 @@ static void _vala_gee_tree_map_node_iterator_get_property (GObject * object, gui
 	GeeTreeMapNodeIterator * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_NODE_ITERATOR, GeeTreeMapNodeIterator);
 	switch (property_id) {
+		case GEE_TREE_MAP_NODE_ITERATOR_READ_ONLY:
+		g_value_set_boolean (value, gee_tree_map_node_iterator_get_read_only (self));
+		break;
+		case GEE_TREE_MAP_NODE_ITERATOR_VALID:
+		g_value_set_boolean (value, gee_tree_map_node_iterator_get_valid (self));
+		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
 		break;
@@ -3742,6 +9693,501 @@ static void _vala_gee_tree_map_node_iterator_set_property (GObject * object, gui
 }
 
 
+static GeeTreeMapSubNodeIterator* gee_tree_map_sub_node_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	GeeTreeMapSubNodeIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	GeeTreeMapRange* _tmp2_;
+	GeeTreeMapRange* _tmp3_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	self = (GeeTreeMapSubNodeIterator*) g_object_new (object_type, NULL);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	_tmp0_ = map;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	_g_object_unref0 (self->_map);
+	self->_map = _tmp1_;
+	_tmp2_ = range;
+	_tmp3_ = _gee_tree_map_range_ref0 (_tmp2_);
+	_gee_tree_map_range_unref0 (self->range);
+	self->range = _tmp3_;
+	return self;
+}
+
+
+static GeeTreeMapSubNodeIterator* gee_tree_map_sub_node_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	return gee_tree_map_sub_node_iterator_construct (GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range);
+}
+
+
+static GeeTreeMapSubNodeIterator* gee_tree_map_sub_node_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node) {
+	GeeTreeMapSubNodeIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMap* _tmp1_;
+	GeeTreeMapRange* _tmp2_;
+	GeeTreeMapRange* _tmp3_;
+	GeeTreeMap* _tmp4_;
+	GeeTreeMapNode* _tmp5_;
+	GeeTreeMapNodeIterator* _tmp6_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	g_return_val_if_fail (node != NULL, NULL);
+	self = (GeeTreeMapSubNodeIterator*) g_object_new (object_type, NULL);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	_tmp0_ = map;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	_g_object_unref0 (self->_map);
+	self->_map = _tmp1_;
+	_tmp2_ = range;
+	_tmp3_ = _gee_tree_map_range_ref0 (_tmp2_);
+	_gee_tree_map_range_unref0 (self->range);
+	self->range = _tmp3_;
+	_tmp4_ = self->_map;
+	_tmp5_ = node;
+	_tmp6_ = gee_tree_map_node_iterator_new_pointing (k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp4_, _tmp5_);
+	_g_object_unref0 (self->iterator);
+	self->iterator = _tmp6_;
+	return self;
+}
+
+
+static GeeTreeMapSubNodeIterator* gee_tree_map_sub_node_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node) {
+	return gee_tree_map_sub_node_iterator_construct_pointing (GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range, node);
+}
+
+
+static gboolean gee_tree_map_sub_node_iterator_next (GeeTreeMapSubNodeIterator* self) {
+	gboolean result = FALSE;
+	GeeTreeMapNodeIterator* _tmp0_;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp0_ = self->iterator;
+	if (_tmp0_ != NULL) {
+		GeeTreeMapNodeIterator* _tmp1_;
+		GeeTreeMapNode* _tmp2_ = NULL;
+		GeeTreeMapNode* node;
+		gboolean _tmp3_ = FALSE;
+		GeeTreeMapNode* _tmp4_;
+		gboolean _tmp9_;
+		_tmp1_ = self->iterator;
+		_tmp2_ = gee_tree_map_node_iterator_safe_next_get (_tmp1_);
+		node = _tmp2_;
+		_tmp4_ = node;
+		if (_tmp4_ != NULL) {
+			GeeTreeMapRange* _tmp5_;
+			GeeTreeMapNode* _tmp6_;
+			gconstpointer _tmp7_;
+			gboolean _tmp8_ = FALSE;
+			_tmp5_ = self->range;
+			_tmp6_ = node;
+			_tmp7_ = _tmp6_->key;
+			_tmp8_ = gee_tree_map_range_in_range (_tmp5_, _tmp7_);
+			_tmp3_ = _tmp8_;
+		} else {
+			_tmp3_ = FALSE;
+		}
+		_tmp9_ = _tmp3_;
+		if (_tmp9_) {
+			GeeTreeMapNodeIterator* _tmp10_;
+			gboolean _tmp11_ = FALSE;
+			_tmp10_ = self->iterator;
+			_tmp11_ = gee_tree_map_node_iterator_next (_tmp10_);
+			_vala_assert (_tmp11_, "iterator.next ()");
+			result = TRUE;
+			return result;
+		} else {
+			result = FALSE;
+			return result;
+		}
+	} else {
+		gboolean _tmp12_ = FALSE;
+		_tmp12_ = gee_tree_map_sub_node_iterator_first (self);
+		result = _tmp12_;
+		return result;
+	}
+}
+
+
+static gboolean gee_tree_map_sub_node_iterator_has_next (GeeTreeMapSubNodeIterator* self) {
+	gboolean result = FALSE;
+	GeeTreeMapNodeIterator* _tmp0_;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp0_ = self->iterator;
+	if (_tmp0_ != NULL) {
+		GeeTreeMapNodeIterator* _tmp1_;
+		GeeTreeMapNode* _tmp2_ = NULL;
+		GeeTreeMapNode* node;
+		gboolean _tmp3_ = FALSE;
+		GeeTreeMapNode* _tmp4_;
+		gboolean _tmp9_;
+		_tmp1_ = self->iterator;
+		_tmp2_ = gee_tree_map_node_iterator_safe_next_get (_tmp1_);
+		node = _tmp2_;
+		_tmp4_ = node;
+		if (_tmp4_ != NULL) {
+			GeeTreeMapRange* _tmp5_;
+			GeeTreeMapNode* _tmp6_;
+			gconstpointer _tmp7_;
+			gboolean _tmp8_ = FALSE;
+			_tmp5_ = self->range;
+			_tmp6_ = node;
+			_tmp7_ = _tmp6_->key;
+			_tmp8_ = gee_tree_map_range_in_range (_tmp5_, _tmp7_);
+			_tmp3_ = _tmp8_;
+		} else {
+			_tmp3_ = FALSE;
+		}
+		_tmp9_ = _tmp3_;
+		result = _tmp9_;
+		return result;
+	} else {
+		GeeTreeMapRange* _tmp10_;
+		GeeTreeMapNode* _tmp11_ = NULL;
+		_tmp10_ = self->range;
+		_tmp11_ = gee_tree_map_range_first (_tmp10_);
+		result = _tmp11_ != NULL;
+		return result;
+	}
+}
+
+
+static gboolean gee_tree_map_sub_node_iterator_real_first (GeeTreeMapSubNodeIterator* self) {
+	gboolean result = FALSE;
+	GeeTreeMapRange* _tmp0_;
+	GeeTreeMapNode* _tmp1_ = NULL;
+	GeeTreeMapNode* node;
+	GeeTreeMapNode* _tmp2_;
+	GeeTreeMapNode* _tmp3_;
+	GeeTreeMapNodeIterator* _tmp4_ = NULL;
+	_tmp0_ = self->range;
+	_tmp1_ = gee_tree_map_range_first (_tmp0_);
+	node = _tmp1_;
+	_tmp2_ = node;
+	if (_tmp2_ == NULL) {
+		result = FALSE;
+		return result;
+	}
+	_tmp3_ = node;
+	_tmp4_ = gee_tree_map_sub_node_iterator_iterator_pointing_at (self, _tmp3_);
+	_g_object_unref0 (self->iterator);
+	self->iterator = _tmp4_;
+	result = TRUE;
+	return result;
+}
+
+
+gboolean gee_tree_map_sub_node_iterator_first (GeeTreeMapSubNodeIterator* self) {
+	g_return_val_if_fail (self != NULL, FALSE);
+	return GEE_TREE_MAP_SUB_NODE_ITERATOR_GET_CLASS (self)->first (self);
+}
+
+
+static gboolean gee_tree_map_sub_node_iterator_previous (GeeTreeMapSubNodeIterator* self) {
+	gboolean result = FALSE;
+	GeeTreeMapNodeIterator* _tmp0_;
+	GeeTreeMapNode* node = NULL;
+	gboolean _tmp1_ = FALSE;
+	GeeTreeMapNodeIterator* _tmp2_;
+	GeeTreeMapNode* _tmp3_ = NULL;
+	GeeTreeMapNode* _tmp4_;
+	gboolean _tmp9_;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp0_ = self->iterator;
+	if (_tmp0_ == NULL) {
+		result = FALSE;
+		return result;
+	}
+	_tmp2_ = self->iterator;
+	_tmp3_ = gee_tree_map_node_iterator_safe_previous_get (_tmp2_);
+	node = _tmp3_;
+	_tmp4_ = node;
+	if (_tmp4_ != NULL) {
+		GeeTreeMapRange* _tmp5_;
+		GeeTreeMapNode* _tmp6_;
+		gconstpointer _tmp7_;
+		gboolean _tmp8_ = FALSE;
+		_tmp5_ = self->range;
+		_tmp6_ = node;
+		_tmp7_ = _tmp6_->key;
+		_tmp8_ = gee_tree_map_range_in_range (_tmp5_, _tmp7_);
+		_tmp1_ = _tmp8_;
+	} else {
+		_tmp1_ = FALSE;
+	}
+	_tmp9_ = _tmp1_;
+	if (_tmp9_) {
+		GeeTreeMapNodeIterator* _tmp10_;
+		gboolean _tmp11_ = FALSE;
+		_tmp10_ = self->iterator;
+		_tmp11_ = gee_tree_map_node_iterator_previous (_tmp10_);
+		_vala_assert (_tmp11_, "iterator.previous ()");
+		result = TRUE;
+		return result;
+	} else {
+		result = FALSE;
+		return result;
+	}
+}
+
+
+static gboolean gee_tree_map_sub_node_iterator_has_previous (GeeTreeMapSubNodeIterator* self) {
+	gboolean result = FALSE;
+	GeeTreeMapNodeIterator* _tmp0_;
+	GeeTreeMapNode* node = NULL;
+	gboolean _tmp1_ = FALSE;
+	GeeTreeMapNodeIterator* _tmp2_;
+	GeeTreeMapNode* _tmp3_ = NULL;
+	GeeTreeMapNode* _tmp4_;
+	gboolean _tmp9_;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp0_ = self->iterator;
+	if (_tmp0_ == NULL) {
+		result = FALSE;
+		return result;
+	}
+	_tmp2_ = self->iterator;
+	_tmp3_ = gee_tree_map_node_iterator_safe_previous_get (_tmp2_);
+	node = _tmp3_;
+	_tmp4_ = node;
+	if (_tmp4_ != NULL) {
+		GeeTreeMapRange* _tmp5_;
+		GeeTreeMapNode* _tmp6_;
+		gconstpointer _tmp7_;
+		gboolean _tmp8_ = FALSE;
+		_tmp5_ = self->range;
+		_tmp6_ = node;
+		_tmp7_ = _tmp6_->key;
+		_tmp8_ = gee_tree_map_range_in_range (_tmp5_, _tmp7_);
+		_tmp1_ = _tmp8_;
+	} else {
+		_tmp1_ = FALSE;
+	}
+	_tmp9_ = _tmp1_;
+	result = _tmp9_;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_node_iterator_real_last (GeeTreeMapSubNodeIterator* self) {
+	gboolean result = FALSE;
+	GeeTreeMapRange* _tmp0_;
+	GeeTreeMapNode* _tmp1_ = NULL;
+	GeeTreeMapNode* node;
+	GeeTreeMapNode* _tmp2_;
+	GeeTreeMapNode* _tmp3_;
+	GeeTreeMapNodeIterator* _tmp4_ = NULL;
+	_tmp0_ = self->range;
+	_tmp1_ = gee_tree_map_range_last (_tmp0_);
+	node = _tmp1_;
+	_tmp2_ = node;
+	if (_tmp2_ == NULL) {
+		result = FALSE;
+		return result;
+	}
+	_tmp3_ = node;
+	_tmp4_ = gee_tree_map_sub_node_iterator_iterator_pointing_at (self, _tmp3_);
+	_g_object_unref0 (self->iterator);
+	self->iterator = _tmp4_;
+	result = TRUE;
+	return result;
+}
+
+
+gboolean gee_tree_map_sub_node_iterator_last (GeeTreeMapSubNodeIterator* self) {
+	g_return_val_if_fail (self != NULL, FALSE);
+	return GEE_TREE_MAP_SUB_NODE_ITERATOR_GET_CLASS (self)->last (self);
+}
+
+
+static void gee_tree_map_sub_node_iterator_remove (GeeTreeMapSubNodeIterator* self) {
+	gboolean _tmp0_;
+	gboolean _tmp1_;
+	GeeTreeMapNodeIterator* _tmp2_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = gee_tree_map_sub_node_iterator_get_valid (self);
+	_tmp1_ = _tmp0_;
+	_vala_assert (_tmp1_, "valid");
+	_tmp2_ = self->iterator;
+	gee_tree_map_node_iterator_remove (_tmp2_);
+}
+
+
+static void gee_tree_map_sub_node_iterator_unset (GeeTreeMapSubNodeIterator* self) {
+	gboolean _tmp0_;
+	gboolean _tmp1_;
+	GeeTreeMapNodeIterator* _tmp2_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = gee_tree_map_sub_node_iterator_get_valid (self);
+	_tmp1_ = _tmp0_;
+	_vala_assert (_tmp1_, "valid");
+	_tmp2_ = self->iterator;
+	gee_tree_map_node_iterator_unset (_tmp2_);
+}
+
+
+static GeeTreeMapNodeIterator* gee_tree_map_sub_node_iterator_real_iterator_pointing_at (GeeTreeMapSubNodeIterator* self, GeeTreeMapNode* node) {
+	GeeTreeMapNodeIterator* result = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapNode* _tmp1_;
+	GeeTreeMapNodeIterator* _tmp2_;
+	g_return_val_if_fail (node != NULL, NULL);
+	_tmp0_ = self->_map;
+	_tmp1_ = node;
+	_tmp2_ = gee_tree_map_node_iterator_new_pointing (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp0_, _tmp1_);
+	result = _tmp2_;
+	return result;
+}
+
+
+GeeTreeMapNodeIterator* gee_tree_map_sub_node_iterator_iterator_pointing_at (GeeTreeMapSubNodeIterator* self, GeeTreeMapNode* node) {
+	g_return_val_if_fail (self != NULL, NULL);
+	return GEE_TREE_MAP_SUB_NODE_ITERATOR_GET_CLASS (self)->iterator_pointing_at (self, node);
+}
+
+
+static gboolean gee_tree_map_sub_node_iterator_get_read_only (GeeTreeMapSubNodeIterator* self) {
+	g_return_val_if_fail (self != NULL, FALSE);
+	return GEE_TREE_MAP_SUB_NODE_ITERATOR_GET_CLASS (self)->get_read_only (self);
+}
+
+
+static gboolean gee_tree_map_sub_node_iterator_real_get_read_only (GeeTreeMapSubNodeIterator* base) {
+	gboolean result;
+	GeeTreeMapSubNodeIterator* self;
+	self = base;
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_node_iterator_get_valid (GeeTreeMapSubNodeIterator* self) {
+	gboolean result;
+	gboolean _tmp0_ = FALSE;
+	GeeTreeMapNodeIterator* _tmp1_;
+	gboolean _tmp5_;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp1_ = self->iterator;
+	if (_tmp1_ != NULL) {
+		GeeTreeMapNodeIterator* _tmp2_;
+		gboolean _tmp3_;
+		gboolean _tmp4_;
+		_tmp2_ = self->iterator;
+		_tmp3_ = gee_tree_map_node_iterator_get_valid (_tmp2_);
+		_tmp4_ = _tmp3_;
+		_tmp0_ = _tmp4_;
+	} else {
+		_tmp0_ = FALSE;
+	}
+	_tmp5_ = _tmp0_;
+	result = _tmp5_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_node_iterator_class_init (GeeTreeMapSubNodeIteratorClass * klass) {
+	gee_tree_map_sub_node_iterator_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (GeeTreeMapSubNodeIteratorPrivate));
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_CLASS (klass)->first = gee_tree_map_sub_node_iterator_real_first;
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_CLASS (klass)->last = gee_tree_map_sub_node_iterator_real_last;
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_CLASS (klass)->iterator_pointing_at = gee_tree_map_sub_node_iterator_real_iterator_pointing_at;
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_CLASS (klass)->get_read_only = gee_tree_map_sub_node_iterator_real_get_read_only;
+	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_sub_node_iterator_get_property;
+	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_sub_node_iterator_set_property;
+	G_OBJECT_CLASS (klass)->finalize = gee_tree_map_sub_node_iterator_finalize;
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_NODE_ITERATOR_K_TYPE, g_param_spec_gtype ("k-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_NODE_ITERATOR_K_DUP_FUNC, g_param_spec_pointer ("k-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_NODE_ITERATOR_K_DESTROY_FUNC, g_param_spec_pointer ("k-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_NODE_ITERATOR_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_NODE_ITERATOR_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_NODE_ITERATOR_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_NODE_ITERATOR_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_NODE_ITERATOR_VALID, g_param_spec_boolean ("valid", "valid", "valid", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static void gee_tree_map_sub_node_iterator_instance_init (GeeTreeMapSubNodeIterator * self) {
+	self->priv = GEE_TREE_MAP_SUB_NODE_ITERATOR_GET_PRIVATE (self);
+	self->iterator = NULL;
+}
+
+
+static void gee_tree_map_sub_node_iterator_finalize (GObject* obj) {
+	GeeTreeMapSubNodeIterator * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (obj, GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, GeeTreeMapSubNodeIterator);
+	_g_object_unref0 (self->_map);
+	_gee_tree_map_range_unref0 (self->range);
+	_g_object_unref0 (self->iterator);
+	G_OBJECT_CLASS (gee_tree_map_sub_node_iterator_parent_class)->finalize (obj);
+}
+
+
+static GType gee_tree_map_sub_node_iterator_get_type (void) {
+	static volatile gsize gee_tree_map_sub_node_iterator_type_id__volatile = 0;
+	if (g_once_init_enter (&gee_tree_map_sub_node_iterator_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapSubNodeIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_sub_node_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapSubNodeIterator), 0, (GInstanceInitFunc) gee_tree_map_sub_node_iterator_instance_init, NULL };
+		GType gee_tree_map_sub_node_iterator_type_id;
+		gee_tree_map_sub_node_iterator_type_id = g_type_register_static (G_TYPE_OBJECT, "GeeTreeMapSubNodeIterator", &g_define_type_info, 0);
+		g_once_init_leave (&gee_tree_map_sub_node_iterator_type_id__volatile, gee_tree_map_sub_node_iterator_type_id);
+	}
+	return gee_tree_map_sub_node_iterator_type_id__volatile;
+}
+
+
+static void _vala_gee_tree_map_sub_node_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubNodeIterator * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, GeeTreeMapSubNodeIterator);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_NODE_ITERATOR_READ_ONLY:
+		g_value_set_boolean (value, gee_tree_map_sub_node_iterator_get_read_only (self));
+		break;
+		case GEE_TREE_MAP_SUB_NODE_ITERATOR_VALID:
+		g_value_set_boolean (value, gee_tree_map_sub_node_iterator_get_valid (self));
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
+static void _vala_gee_tree_map_sub_node_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubNodeIterator * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, GeeTreeMapSubNodeIterator);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_NODE_ITERATOR_K_TYPE:
+		self->priv->k_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_NODE_ITERATOR_K_DUP_FUNC:
+		self->priv->k_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_NODE_ITERATOR_K_DESTROY_FUNC:
+		self->priv->k_destroy_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_NODE_ITERATOR_V_TYPE:
+		self->priv->v_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_NODE_ITERATOR_V_DUP_FUNC:
+		self->priv->v_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_NODE_ITERATOR_V_DESTROY_FUNC:
+		self->priv->v_destroy_func = g_value_get_pointer (value);
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
 static GeeTreeMapKeyIterator* gee_tree_map_key_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map) {
 	GeeTreeMapKeyIterator * self = NULL;
 	GeeTreeMap* _tmp0_;
@@ -3760,6 +10206,30 @@ static GeeTreeMapKeyIterator* gee_tree_map_key_iterator_construct (GType object_
 
 static GeeTreeMapKeyIterator* gee_tree_map_key_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map) {
 	return gee_tree_map_key_iterator_construct (GEE_TREE_MAP_TYPE_KEY_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map);
+}
+
+
+static GeeTreeMapKeyIterator* gee_tree_map_key_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* current) {
+	GeeTreeMapKeyIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapNode* _tmp1_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (current != NULL, NULL);
+	_tmp0_ = map;
+	_tmp1_ = current;
+	self = (GeeTreeMapKeyIterator*) gee_tree_map_node_iterator_construct_pointing (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp0_, _tmp1_);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	return self;
+}
+
+
+static GeeTreeMapKeyIterator* gee_tree_map_key_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* current) {
+	return gee_tree_map_key_iterator_construct_pointing (GEE_TREE_MAP_TYPE_KEY_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, current);
 }
 
 
@@ -3788,6 +10258,98 @@ static gpointer gee_tree_map_key_iterator_real_get (GeeIterator* base) {
 }
 
 
+static gboolean gee_tree_map_key_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeTreeMapKeyIterator * self;
+	gboolean result = FALSE;
+	GeeTreeMapNode* _tmp0_;
+	self = (GeeTreeMapKeyIterator*) base;
+	_tmp0_ = ((GeeTreeMapNodeIterator*) self)->current;
+	if (_tmp0_ != NULL) {
+		GeeForallFunc _tmp1_;
+		void* _tmp1__target;
+		GeeTreeMapNode* _tmp2_;
+		gconstpointer _tmp3_;
+		gpointer _tmp4_;
+		gboolean _tmp5_ = FALSE;
+		GeeTreeMapNode* _tmp6_;
+		GeeTreeMapNode* _tmp7_;
+		_tmp1_ = f;
+		_tmp1__target = f_target;
+		_tmp2_ = ((GeeTreeMapNodeIterator*) self)->current;
+		_tmp3_ = _tmp2_->key;
+		_tmp4_ = ((_tmp3_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp3_) : ((gpointer) _tmp3_);
+		_tmp5_ = _tmp1_ (_tmp4_, _tmp1__target);
+		if (!_tmp5_) {
+			result = FALSE;
+			return result;
+		}
+		_tmp6_ = ((GeeTreeMapNodeIterator*) self)->current;
+		_tmp7_ = _tmp6_->next;
+		((GeeTreeMapNodeIterator*) self)->current = _tmp7_;
+	} else {
+		GeeTreeMapNode* _tmp8_;
+		_tmp8_ = ((GeeTreeMapNodeIterator*) self)->_next;
+		if (_tmp8_ == NULL) {
+			GeeTreeMap* _tmp9_;
+			GeeTreeMapNode* _tmp10_;
+			_tmp9_ = ((GeeTreeMapNodeIterator*) self)->_map;
+			_tmp10_ = _tmp9_->priv->first;
+			((GeeTreeMapNodeIterator*) self)->current = _tmp10_;
+			((GeeTreeMapNodeIterator*) self)->started = TRUE;
+		} else {
+			GeeTreeMapNode* _tmp11_;
+			GeeTreeMapNode* _tmp12_;
+			_tmp11_ = ((GeeTreeMapNodeIterator*) self)->_next;
+			((GeeTreeMapNodeIterator*) self)->current = _tmp11_;
+			_tmp12_ = ((GeeTreeMapNodeIterator*) self)->current;
+			if (_tmp12_ != NULL) {
+				((GeeTreeMapNodeIterator*) self)->_next = NULL;
+				((GeeTreeMapNodeIterator*) self)->_prev = NULL;
+			}
+		}
+	}
+	{
+		gboolean _tmp13_;
+		_tmp13_ = TRUE;
+		while (TRUE) {
+			gboolean _tmp14_;
+			GeeTreeMapNode* _tmp17_;
+			GeeForallFunc _tmp18_;
+			void* _tmp18__target;
+			GeeTreeMapNode* _tmp19_;
+			gconstpointer _tmp20_;
+			gpointer _tmp21_;
+			gboolean _tmp22_ = FALSE;
+			_tmp14_ = _tmp13_;
+			if (!_tmp14_) {
+				GeeTreeMapNode* _tmp15_;
+				GeeTreeMapNode* _tmp16_;
+				_tmp15_ = ((GeeTreeMapNodeIterator*) self)->current;
+				_tmp16_ = _tmp15_->next;
+				((GeeTreeMapNodeIterator*) self)->current = _tmp16_;
+			}
+			_tmp13_ = FALSE;
+			_tmp17_ = ((GeeTreeMapNodeIterator*) self)->current;
+			if (!(_tmp17_ != NULL)) {
+				break;
+			}
+			_tmp18_ = f;
+			_tmp18__target = f_target;
+			_tmp19_ = ((GeeTreeMapNodeIterator*) self)->current;
+			_tmp20_ = _tmp19_->key;
+			_tmp21_ = ((_tmp20_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp20_) : ((gpointer) _tmp20_);
+			_tmp22_ = _tmp18_ (_tmp21_, _tmp18__target);
+			if (!_tmp22_) {
+				result = FALSE;
+				return result;
+			}
+		}
+	}
+	result = TRUE;
+	return result;
+}
+
+
 static void gee_tree_map_key_iterator_class_init (GeeTreeMapKeyIteratorClass * klass) {
 	gee_tree_map_key_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeTreeMapKeyIteratorPrivate));
@@ -3802,20 +10364,64 @@ static void gee_tree_map_key_iterator_class_init (GeeTreeMapKeyIteratorClass * k
 }
 
 
+static GType gee_tree_map_key_iterator_gee_traversable_get_g_type (GeeTreeMapKeyIterator* self) {
+	return self->priv->k_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_key_iterator_gee_traversable_get_g_dup_func (GeeTreeMapKeyIterator* self) {
+	return self->priv->k_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_key_iterator_gee_traversable_get_g_destroy_func (GeeTreeMapKeyIterator* self) {
+	return self->priv->k_destroy_func;
+}
+
+
+static void gee_tree_map_key_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_tree_map_key_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_tree_map_key_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_tree_map_key_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_tree_map_key_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_tree_map_key_iterator_gee_traversable_get_g_destroy_func;
+}
+
+
 static void gee_tree_map_key_iterator_gee_iterator_interface_init (GeeIteratorIface * iface) {
 	gee_tree_map_key_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get = (gpointer (*)(GeeIterator*)) gee_tree_map_key_iterator_real_get;
 	iface->next = (gboolean (*)(GeeIterator*)) gee_tree_map_node_iterator_next;
 	iface->has_next = (gboolean (*)(GeeIterator*)) gee_tree_map_node_iterator_has_next;
-	iface->first = (gboolean (*)(GeeIterator*)) gee_tree_map_node_iterator_first;
 	iface->remove = (void (*)(GeeIterator*)) gee_tree_map_node_iterator_remove;
+	iface->get_valid = (gboolean (*) (GeeIterator *)) gee_tree_map_node_iterator_get_valid;
+	iface->get_read_only = (gboolean (*) (GeeIterator *)) gee_tree_map_node_iterator_get_read_only;
+}
+
+
+static GType gee_tree_map_key_iterator_gee_bidir_iterator_get_g_type (GeeTreeMapKeyIterator* self) {
+	return self->priv->k_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_key_iterator_gee_bidir_iterator_get_g_dup_func (GeeTreeMapKeyIterator* self) {
+	return self->priv->k_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_key_iterator_gee_bidir_iterator_get_g_destroy_func (GeeTreeMapKeyIterator* self) {
+	return self->priv->k_destroy_func;
 }
 
 
 static void gee_tree_map_key_iterator_gee_bidir_iterator_interface_init (GeeBidirIteratorIface * iface) {
 	gee_tree_map_key_iterator_gee_bidir_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get_g_type = (GType(*)(GeeBidirIterator*)) gee_tree_map_key_iterator_gee_bidir_iterator_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeBidirIterator*)) gee_tree_map_key_iterator_gee_bidir_iterator_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeBidirIterator*)) gee_tree_map_key_iterator_gee_bidir_iterator_get_g_destroy_func;
 	iface->previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_node_iterator_previous;
 	iface->has_previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_node_iterator_has_previous;
+	iface->first = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_node_iterator_first;
 	iface->last = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_node_iterator_last;
 }
 
@@ -3829,10 +10435,12 @@ static GType gee_tree_map_key_iterator_get_type (void) {
 	static volatile gsize gee_tree_map_key_iterator_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_tree_map_key_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapKeyIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_key_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapKeyIterator), 0, (GInstanceInitFunc) gee_tree_map_key_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_tree_map_key_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_tree_map_key_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_bidir_iterator_info = { (GInterfaceInitFunc) gee_tree_map_key_iterator_gee_bidir_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_tree_map_key_iterator_type_id;
 		gee_tree_map_key_iterator_type_id = g_type_register_static (GEE_TREE_MAP_TYPE_NODE_ITERATOR, "GeeTreeMapKeyIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_tree_map_key_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
 		g_type_add_interface_static (gee_tree_map_key_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
 		g_type_add_interface_static (gee_tree_map_key_iterator_type_id, GEE_TYPE_BIDIR_ITERATOR, &gee_bidir_iterator_info);
 		g_once_init_leave (&gee_tree_map_key_iterator_type_id__volatile, gee_tree_map_key_iterator_type_id);
@@ -3881,6 +10489,278 @@ static void _vala_gee_tree_map_key_iterator_set_property (GObject * object, guin
 }
 
 
+static GeeTreeMapSubKeyIterator* gee_tree_map_sub_key_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	GeeTreeMapSubKeyIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	_tmp0_ = map;
+	_tmp1_ = range;
+	self = (GeeTreeMapSubKeyIterator*) gee_tree_map_sub_node_iterator_construct (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp0_, _tmp1_);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	return self;
+}
+
+
+static GeeTreeMapSubKeyIterator* gee_tree_map_sub_key_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	return gee_tree_map_sub_key_iterator_construct (GEE_TREE_MAP_TYPE_SUB_KEY_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range);
+}
+
+
+static GeeTreeMapSubKeyIterator* gee_tree_map_sub_key_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node) {
+	GeeTreeMapSubKeyIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeTreeMapNode* _tmp2_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	g_return_val_if_fail (node != NULL, NULL);
+	_tmp0_ = map;
+	_tmp1_ = range;
+	_tmp2_ = node;
+	self = (GeeTreeMapSubKeyIterator*) gee_tree_map_sub_node_iterator_construct_pointing (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp0_, _tmp1_, _tmp2_);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	return self;
+}
+
+
+static GeeTreeMapSubKeyIterator* gee_tree_map_sub_key_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node) {
+	return gee_tree_map_sub_key_iterator_construct_pointing (GEE_TREE_MAP_TYPE_SUB_KEY_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range, node);
+}
+
+
+static gpointer gee_tree_map_sub_key_iterator_real_get (GeeIterator* base) {
+	GeeTreeMapSubKeyIterator * self;
+	gpointer result = NULL;
+	gboolean _tmp0_;
+	gboolean _tmp1_;
+	GeeTreeMapNodeIterator* _tmp2_;
+	GeeTreeMapNode* _tmp3_;
+	gconstpointer _tmp4_;
+	gpointer _tmp5_;
+	self = (GeeTreeMapSubKeyIterator*) base;
+	_tmp0_ = gee_iterator_get_valid ((GeeIterator*) self);
+	_tmp1_ = _tmp0_;
+	_vala_assert (_tmp1_, "valid");
+	_tmp2_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+	_tmp3_ = _tmp2_->current;
+	_tmp4_ = _tmp3_->key;
+	_tmp5_ = ((_tmp4_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp4_) : ((gpointer) _tmp4_);
+	result = _tmp5_;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_key_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeTreeMapSubKeyIterator * self;
+	gboolean result = FALSE;
+	gboolean _tmp0_;
+	gboolean _tmp1_;
+	self = (GeeTreeMapSubKeyIterator*) base;
+	_tmp0_ = gee_iterator_get_valid ((GeeIterator*) self);
+	_tmp1_ = _tmp0_;
+	if (_tmp1_) {
+		GeeForallFunc _tmp2_;
+		void* _tmp2__target;
+		GeeTreeMapNodeIterator* _tmp3_;
+		GeeTreeMapNode* _tmp4_;
+		gconstpointer _tmp5_;
+		gpointer _tmp6_;
+		gboolean _tmp7_ = FALSE;
+		_tmp2_ = f;
+		_tmp2__target = f_target;
+		_tmp3_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+		_tmp4_ = _tmp3_->current;
+		_tmp5_ = _tmp4_->key;
+		_tmp6_ = ((_tmp5_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp5_) : ((gpointer) _tmp5_);
+		_tmp7_ = _tmp2_ (_tmp6_, _tmp2__target);
+		if (!_tmp7_) {
+			result = FALSE;
+			return result;
+		}
+	}
+	while (TRUE) {
+		GeeTreeMapNodeIterator* _tmp8_;
+		gboolean _tmp9_ = FALSE;
+		GeeForallFunc _tmp10_;
+		void* _tmp10__target;
+		GeeTreeMapNodeIterator* _tmp11_;
+		GeeTreeMapNode* _tmp12_;
+		gconstpointer _tmp13_;
+		gpointer _tmp14_;
+		gboolean _tmp15_ = FALSE;
+		_tmp8_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+		_tmp9_ = gee_tree_map_node_iterator_next (_tmp8_);
+		if (!_tmp9_) {
+			break;
+		}
+		_tmp10_ = f;
+		_tmp10__target = f_target;
+		_tmp11_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+		_tmp12_ = _tmp11_->current;
+		_tmp13_ = _tmp12_->key;
+		_tmp14_ = ((_tmp13_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp13_) : ((gpointer) _tmp13_);
+		_tmp15_ = _tmp10_ (_tmp14_, _tmp10__target);
+		if (!_tmp15_) {
+			result = FALSE;
+			return result;
+		}
+	}
+	result = TRUE;
+	return result;
+}
+
+
+static void gee_tree_map_sub_key_iterator_class_init (GeeTreeMapSubKeyIteratorClass * klass) {
+	gee_tree_map_sub_key_iterator_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (GeeTreeMapSubKeyIteratorPrivate));
+	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_sub_key_iterator_get_property;
+	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_sub_key_iterator_set_property;
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_ITERATOR_K_TYPE, g_param_spec_gtype ("k-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_ITERATOR_K_DUP_FUNC, g_param_spec_pointer ("k-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_ITERATOR_K_DESTROY_FUNC, g_param_spec_pointer ("k-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_ITERATOR_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_ITERATOR_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_KEY_ITERATOR_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+}
+
+
+static GType gee_tree_map_sub_key_iterator_gee_traversable_get_g_type (GeeTreeMapSubKeyIterator* self) {
+	return self->priv->k_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_sub_key_iterator_gee_traversable_get_g_dup_func (GeeTreeMapSubKeyIterator* self) {
+	return self->priv->k_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_sub_key_iterator_gee_traversable_get_g_destroy_func (GeeTreeMapSubKeyIterator* self) {
+	return self->priv->k_destroy_func;
+}
+
+
+static void gee_tree_map_sub_key_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_tree_map_sub_key_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_tree_map_sub_key_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_tree_map_sub_key_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_tree_map_sub_key_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_tree_map_sub_key_iterator_gee_traversable_get_g_destroy_func;
+}
+
+
+static void gee_tree_map_sub_key_iterator_gee_iterator_interface_init (GeeIteratorIface * iface) {
+	gee_tree_map_sub_key_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get = (gpointer (*)(GeeIterator*)) gee_tree_map_sub_key_iterator_real_get;
+	iface->next = (gboolean (*)(GeeIterator*)) gee_tree_map_sub_node_iterator_next;
+	iface->has_next = (gboolean (*)(GeeIterator*)) gee_tree_map_sub_node_iterator_has_next;
+	iface->remove = (void (*)(GeeIterator*)) gee_tree_map_sub_node_iterator_remove;
+	iface->get_valid = (gboolean (*) (GeeIterator *)) gee_tree_map_sub_node_iterator_get_valid;
+	iface->get_read_only = (gboolean (*) (GeeIterator *)) gee_tree_map_sub_node_iterator_get_read_only;
+}
+
+
+static GType gee_tree_map_sub_key_iterator_gee_bidir_iterator_get_g_type (GeeTreeMapSubKeyIterator* self) {
+	return self->priv->k_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_sub_key_iterator_gee_bidir_iterator_get_g_dup_func (GeeTreeMapSubKeyIterator* self) {
+	return self->priv->k_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_sub_key_iterator_gee_bidir_iterator_get_g_destroy_func (GeeTreeMapSubKeyIterator* self) {
+	return self->priv->k_destroy_func;
+}
+
+
+static void gee_tree_map_sub_key_iterator_gee_bidir_iterator_interface_init (GeeBidirIteratorIface * iface) {
+	gee_tree_map_sub_key_iterator_gee_bidir_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get_g_type = (GType(*)(GeeBidirIterator*)) gee_tree_map_sub_key_iterator_gee_bidir_iterator_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeBidirIterator*)) gee_tree_map_sub_key_iterator_gee_bidir_iterator_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeBidirIterator*)) gee_tree_map_sub_key_iterator_gee_bidir_iterator_get_g_destroy_func;
+	iface->previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_sub_node_iterator_previous;
+	iface->has_previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_sub_node_iterator_has_previous;
+	iface->first = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_sub_node_iterator_first;
+	iface->last = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_sub_node_iterator_last;
+}
+
+
+static void gee_tree_map_sub_key_iterator_instance_init (GeeTreeMapSubKeyIterator * self) {
+	self->priv = GEE_TREE_MAP_SUB_KEY_ITERATOR_GET_PRIVATE (self);
+}
+
+
+static GType gee_tree_map_sub_key_iterator_get_type (void) {
+	static volatile gsize gee_tree_map_sub_key_iterator_type_id__volatile = 0;
+	if (g_once_init_enter (&gee_tree_map_sub_key_iterator_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapSubKeyIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_sub_key_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapSubKeyIterator), 0, (GInstanceInitFunc) gee_tree_map_sub_key_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_tree_map_sub_key_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_tree_map_sub_key_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		static const GInterfaceInfo gee_bidir_iterator_info = { (GInterfaceInitFunc) gee_tree_map_sub_key_iterator_gee_bidir_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		GType gee_tree_map_sub_key_iterator_type_id;
+		gee_tree_map_sub_key_iterator_type_id = g_type_register_static (GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, "GeeTreeMapSubKeyIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_tree_map_sub_key_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
+		g_type_add_interface_static (gee_tree_map_sub_key_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
+		g_type_add_interface_static (gee_tree_map_sub_key_iterator_type_id, GEE_TYPE_BIDIR_ITERATOR, &gee_bidir_iterator_info);
+		g_once_init_leave (&gee_tree_map_sub_key_iterator_type_id__volatile, gee_tree_map_sub_key_iterator_type_id);
+	}
+	return gee_tree_map_sub_key_iterator_type_id__volatile;
+}
+
+
+static void _vala_gee_tree_map_sub_key_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubKeyIterator * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_KEY_ITERATOR, GeeTreeMapSubKeyIterator);
+	switch (property_id) {
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
+static void _vala_gee_tree_map_sub_key_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubKeyIterator * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_KEY_ITERATOR, GeeTreeMapSubKeyIterator);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_KEY_ITERATOR_K_TYPE:
+		self->priv->k_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_KEY_ITERATOR_K_DUP_FUNC:
+		self->priv->k_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_KEY_ITERATOR_K_DESTROY_FUNC:
+		self->priv->k_destroy_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_KEY_ITERATOR_V_TYPE:
+		self->priv->v_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_KEY_ITERATOR_V_DUP_FUNC:
+		self->priv->v_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_KEY_ITERATOR_V_DESTROY_FUNC:
+		self->priv->v_destroy_func = g_value_get_pointer (value);
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
 static GeeTreeMapValueIterator* gee_tree_map_value_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map) {
 	GeeTreeMapValueIterator * self = NULL;
 	GeeTreeMap* _tmp0_;
@@ -3902,27 +10782,145 @@ static GeeTreeMapValueIterator* gee_tree_map_value_iterator_new (GType k_type, G
 }
 
 
+static GeeTreeMapValueIterator* gee_tree_map_value_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* current) {
+	GeeTreeMapValueIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapNode* _tmp1_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (current != NULL, NULL);
+	_tmp0_ = map;
+	_tmp1_ = current;
+	self = (GeeTreeMapValueIterator*) gee_tree_map_node_iterator_construct_pointing (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp0_, _tmp1_);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	return self;
+}
+
+
+static GeeTreeMapValueIterator* gee_tree_map_value_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* current) {
+	return gee_tree_map_value_iterator_construct_pointing (GEE_TREE_MAP_TYPE_VALUE_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, current);
+}
+
+
 static gpointer gee_tree_map_value_iterator_real_get (GeeIterator* base) {
 	GeeTreeMapValueIterator * self;
 	gpointer result = NULL;
 	gint _tmp0_;
 	GeeTreeMap* _tmp1_;
 	gint _tmp2_;
-	GeeTreeMapNode* _tmp3_;
-	GeeTreeMapNode* _tmp4_;
-	gconstpointer _tmp5_;
-	gpointer _tmp6_;
+	gboolean _tmp3_;
+	gboolean _tmp4_;
+	GeeTreeMapNode* _tmp5_;
+	gconstpointer _tmp6_;
+	gpointer _tmp7_;
 	self = (GeeTreeMapValueIterator*) base;
 	_tmp0_ = ((GeeTreeMapNodeIterator*) self)->stamp;
 	_tmp1_ = ((GeeTreeMapNodeIterator*) self)->_map;
 	_tmp2_ = _tmp1_->priv->stamp;
 	_vala_assert (_tmp0_ == _tmp2_, "stamp == _map.stamp");
-	_tmp3_ = ((GeeTreeMapNodeIterator*) self)->current;
-	_vala_assert (_tmp3_ != NULL, "current != null");
-	_tmp4_ = ((GeeTreeMapNodeIterator*) self)->current;
-	_tmp5_ = _tmp4_->value;
-	_tmp6_ = ((_tmp5_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp5_) : ((gpointer) _tmp5_);
-	result = _tmp6_;
+	_tmp3_ = gee_iterator_get_valid ((GeeIterator*) self);
+	_tmp4_ = _tmp3_;
+	_vala_assert (_tmp4_, "valid");
+	_tmp5_ = ((GeeTreeMapNodeIterator*) self)->current;
+	_tmp6_ = _tmp5_->value;
+	_tmp7_ = ((_tmp6_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp6_) : ((gpointer) _tmp6_);
+	result = _tmp7_;
+	return result;
+}
+
+
+static gboolean gee_tree_map_value_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeTreeMapValueIterator * self;
+	gboolean result = FALSE;
+	GeeTreeMapNode* _tmp0_;
+	self = (GeeTreeMapValueIterator*) base;
+	_tmp0_ = ((GeeTreeMapNodeIterator*) self)->current;
+	if (_tmp0_ != NULL) {
+		GeeForallFunc _tmp1_;
+		void* _tmp1__target;
+		GeeTreeMapNode* _tmp2_;
+		gconstpointer _tmp3_;
+		gpointer _tmp4_;
+		gboolean _tmp5_ = FALSE;
+		GeeTreeMapNode* _tmp6_;
+		GeeTreeMapNode* _tmp7_;
+		_tmp1_ = f;
+		_tmp1__target = f_target;
+		_tmp2_ = ((GeeTreeMapNodeIterator*) self)->current;
+		_tmp3_ = _tmp2_->key;
+		_tmp4_ = ((_tmp3_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp3_) : ((gpointer) _tmp3_);
+		_tmp5_ = _tmp1_ (_tmp4_, _tmp1__target);
+		if (!_tmp5_) {
+			result = FALSE;
+			return result;
+		}
+		_tmp6_ = ((GeeTreeMapNodeIterator*) self)->current;
+		_tmp7_ = _tmp6_->next;
+		((GeeTreeMapNodeIterator*) self)->current = _tmp7_;
+	} else {
+		GeeTreeMapNode* _tmp8_;
+		_tmp8_ = ((GeeTreeMapNodeIterator*) self)->_next;
+		if (_tmp8_ == NULL) {
+			GeeTreeMap* _tmp9_;
+			GeeTreeMapNode* _tmp10_;
+			_tmp9_ = ((GeeTreeMapNodeIterator*) self)->_map;
+			_tmp10_ = _tmp9_->priv->first;
+			((GeeTreeMapNodeIterator*) self)->current = _tmp10_;
+			((GeeTreeMapNodeIterator*) self)->started = TRUE;
+		} else {
+			GeeTreeMapNode* _tmp11_;
+			GeeTreeMapNode* _tmp12_;
+			_tmp11_ = ((GeeTreeMapNodeIterator*) self)->_next;
+			((GeeTreeMapNodeIterator*) self)->current = _tmp11_;
+			_tmp12_ = ((GeeTreeMapNodeIterator*) self)->current;
+			if (_tmp12_ != NULL) {
+				((GeeTreeMapNodeIterator*) self)->_next = NULL;
+				((GeeTreeMapNodeIterator*) self)->_prev = NULL;
+			}
+		}
+	}
+	{
+		gboolean _tmp13_;
+		_tmp13_ = TRUE;
+		while (TRUE) {
+			gboolean _tmp14_;
+			GeeTreeMapNode* _tmp17_;
+			GeeForallFunc _tmp18_;
+			void* _tmp18__target;
+			GeeTreeMapNode* _tmp19_;
+			gconstpointer _tmp20_;
+			gpointer _tmp21_;
+			gboolean _tmp22_ = FALSE;
+			_tmp14_ = _tmp13_;
+			if (!_tmp14_) {
+				GeeTreeMapNode* _tmp15_;
+				GeeTreeMapNode* _tmp16_;
+				_tmp15_ = ((GeeTreeMapNodeIterator*) self)->current;
+				_tmp16_ = _tmp15_->next;
+				((GeeTreeMapNodeIterator*) self)->current = _tmp16_;
+			}
+			_tmp13_ = FALSE;
+			_tmp17_ = ((GeeTreeMapNodeIterator*) self)->current;
+			if (!(_tmp17_ != NULL)) {
+				break;
+			}
+			_tmp18_ = f;
+			_tmp18__target = f_target;
+			_tmp19_ = ((GeeTreeMapNodeIterator*) self)->current;
+			_tmp20_ = _tmp19_->key;
+			_tmp21_ = ((_tmp20_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp20_) : ((gpointer) _tmp20_);
+			_tmp22_ = _tmp18_ (_tmp21_, _tmp18__target);
+			if (!_tmp22_) {
+				result = FALSE;
+				return result;
+			}
+		}
+	}
+	result = TRUE;
 	return result;
 }
 
@@ -3941,20 +10939,64 @@ static void gee_tree_map_value_iterator_class_init (GeeTreeMapValueIteratorClass
 }
 
 
+static GType gee_tree_map_value_iterator_gee_traversable_get_g_type (GeeTreeMapValueIterator* self) {
+	return self->priv->v_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_value_iterator_gee_traversable_get_g_dup_func (GeeTreeMapValueIterator* self) {
+	return self->priv->v_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_value_iterator_gee_traversable_get_g_destroy_func (GeeTreeMapValueIterator* self) {
+	return self->priv->v_destroy_func;
+}
+
+
+static void gee_tree_map_value_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_tree_map_value_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_tree_map_value_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_tree_map_value_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_tree_map_value_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_tree_map_value_iterator_gee_traversable_get_g_destroy_func;
+}
+
+
 static void gee_tree_map_value_iterator_gee_iterator_interface_init (GeeIteratorIface * iface) {
 	gee_tree_map_value_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get = (gpointer (*)(GeeIterator*)) gee_tree_map_value_iterator_real_get;
 	iface->next = (gboolean (*)(GeeIterator*)) gee_tree_map_node_iterator_next;
 	iface->has_next = (gboolean (*)(GeeIterator*)) gee_tree_map_node_iterator_has_next;
-	iface->first = (gboolean (*)(GeeIterator*)) gee_tree_map_node_iterator_first;
 	iface->remove = (void (*)(GeeIterator*)) gee_tree_map_node_iterator_remove;
+	iface->get_valid = (gboolean (*) (GeeIterator *)) gee_tree_map_node_iterator_get_valid;
+	iface->get_read_only = (gboolean (*) (GeeIterator *)) gee_tree_map_node_iterator_get_read_only;
+}
+
+
+static GType gee_tree_map_value_iterator_gee_bidir_iterator_get_g_type (GeeTreeMapValueIterator* self) {
+	return self->priv->v_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_value_iterator_gee_bidir_iterator_get_g_dup_func (GeeTreeMapValueIterator* self) {
+	return self->priv->v_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_value_iterator_gee_bidir_iterator_get_g_destroy_func (GeeTreeMapValueIterator* self) {
+	return self->priv->v_destroy_func;
 }
 
 
 static void gee_tree_map_value_iterator_gee_bidir_iterator_interface_init (GeeBidirIteratorIface * iface) {
 	gee_tree_map_value_iterator_gee_bidir_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get_g_type = (GType(*)(GeeBidirIterator*)) gee_tree_map_value_iterator_gee_bidir_iterator_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeBidirIterator*)) gee_tree_map_value_iterator_gee_bidir_iterator_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeBidirIterator*)) gee_tree_map_value_iterator_gee_bidir_iterator_get_g_destroy_func;
 	iface->previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_node_iterator_previous;
 	iface->has_previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_node_iterator_has_previous;
+	iface->first = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_node_iterator_first;
 	iface->last = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_node_iterator_last;
 }
 
@@ -3968,10 +11010,12 @@ static GType gee_tree_map_value_iterator_get_type (void) {
 	static volatile gsize gee_tree_map_value_iterator_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_tree_map_value_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapValueIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_value_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapValueIterator), 0, (GInstanceInitFunc) gee_tree_map_value_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_tree_map_value_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_tree_map_value_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_bidir_iterator_info = { (GInterfaceInitFunc) gee_tree_map_value_iterator_gee_bidir_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_tree_map_value_iterator_type_id;
 		gee_tree_map_value_iterator_type_id = g_type_register_static (GEE_TREE_MAP_TYPE_NODE_ITERATOR, "GeeTreeMapValueIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_tree_map_value_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
 		g_type_add_interface_static (gee_tree_map_value_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
 		g_type_add_interface_static (gee_tree_map_value_iterator_type_id, GEE_TYPE_BIDIR_ITERATOR, &gee_bidir_iterator_info);
 		g_once_init_leave (&gee_tree_map_value_iterator_type_id__volatile, gee_tree_map_value_iterator_type_id);
@@ -4020,6 +11064,278 @@ static void _vala_gee_tree_map_value_iterator_set_property (GObject * object, gu
 }
 
 
+static GeeTreeMapSubValueIterator* gee_tree_map_sub_value_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	GeeTreeMapSubValueIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	_tmp0_ = map;
+	_tmp1_ = range;
+	self = (GeeTreeMapSubValueIterator*) gee_tree_map_sub_node_iterator_construct (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp0_, _tmp1_);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	return self;
+}
+
+
+static GeeTreeMapSubValueIterator* gee_tree_map_sub_value_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	return gee_tree_map_sub_value_iterator_construct (GEE_TREE_MAP_TYPE_SUB_VALUE_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range);
+}
+
+
+static GeeTreeMapSubValueIterator* gee_tree_map_sub_value_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node) {
+	GeeTreeMapSubValueIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeTreeMapNode* _tmp2_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	g_return_val_if_fail (node != NULL, NULL);
+	_tmp0_ = map;
+	_tmp1_ = range;
+	_tmp2_ = node;
+	self = (GeeTreeMapSubValueIterator*) gee_tree_map_sub_node_iterator_construct_pointing (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp0_, _tmp1_, _tmp2_);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	return self;
+}
+
+
+static GeeTreeMapSubValueIterator* gee_tree_map_sub_value_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node) {
+	return gee_tree_map_sub_value_iterator_construct_pointing (GEE_TREE_MAP_TYPE_SUB_VALUE_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range, node);
+}
+
+
+static gpointer gee_tree_map_sub_value_iterator_real_get (GeeIterator* base) {
+	GeeTreeMapSubValueIterator * self;
+	gpointer result = NULL;
+	gboolean _tmp0_;
+	gboolean _tmp1_;
+	GeeTreeMapNodeIterator* _tmp2_;
+	GeeTreeMapNode* _tmp3_;
+	gconstpointer _tmp4_;
+	gpointer _tmp5_;
+	self = (GeeTreeMapSubValueIterator*) base;
+	_tmp0_ = gee_iterator_get_valid ((GeeIterator*) self);
+	_tmp1_ = _tmp0_;
+	_vala_assert (_tmp1_, "valid");
+	_tmp2_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+	_tmp3_ = _tmp2_->current;
+	_tmp4_ = _tmp3_->value;
+	_tmp5_ = ((_tmp4_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp4_) : ((gpointer) _tmp4_);
+	result = _tmp5_;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_value_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeTreeMapSubValueIterator * self;
+	gboolean result = FALSE;
+	gboolean _tmp0_;
+	gboolean _tmp1_;
+	self = (GeeTreeMapSubValueIterator*) base;
+	_tmp0_ = gee_iterator_get_valid ((GeeIterator*) self);
+	_tmp1_ = _tmp0_;
+	if (_tmp1_) {
+		GeeForallFunc _tmp2_;
+		void* _tmp2__target;
+		GeeTreeMapNodeIterator* _tmp3_;
+		GeeTreeMapNode* _tmp4_;
+		gconstpointer _tmp5_;
+		gpointer _tmp6_;
+		gboolean _tmp7_ = FALSE;
+		_tmp2_ = f;
+		_tmp2__target = f_target;
+		_tmp3_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+		_tmp4_ = _tmp3_->current;
+		_tmp5_ = _tmp4_->key;
+		_tmp6_ = ((_tmp5_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp5_) : ((gpointer) _tmp5_);
+		_tmp7_ = _tmp2_ (_tmp6_, _tmp2__target);
+		if (!_tmp7_) {
+			result = FALSE;
+			return result;
+		}
+	}
+	while (TRUE) {
+		GeeTreeMapNodeIterator* _tmp8_;
+		gboolean _tmp9_ = FALSE;
+		GeeForallFunc _tmp10_;
+		void* _tmp10__target;
+		GeeTreeMapNodeIterator* _tmp11_;
+		GeeTreeMapNode* _tmp12_;
+		gconstpointer _tmp13_;
+		gpointer _tmp14_;
+		gboolean _tmp15_ = FALSE;
+		_tmp8_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+		_tmp9_ = gee_tree_map_node_iterator_next (_tmp8_);
+		if (!_tmp9_) {
+			break;
+		}
+		_tmp10_ = f;
+		_tmp10__target = f_target;
+		_tmp11_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+		_tmp12_ = _tmp11_->current;
+		_tmp13_ = _tmp12_->key;
+		_tmp14_ = ((_tmp13_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp13_) : ((gpointer) _tmp13_);
+		_tmp15_ = _tmp10_ (_tmp14_, _tmp10__target);
+		if (!_tmp15_) {
+			result = FALSE;
+			return result;
+		}
+	}
+	result = TRUE;
+	return result;
+}
+
+
+static void gee_tree_map_sub_value_iterator_class_init (GeeTreeMapSubValueIteratorClass * klass) {
+	gee_tree_map_sub_value_iterator_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (GeeTreeMapSubValueIteratorPrivate));
+	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_sub_value_iterator_get_property;
+	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_sub_value_iterator_set_property;
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_ITERATOR_K_TYPE, g_param_spec_gtype ("k-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_ITERATOR_K_DUP_FUNC, g_param_spec_pointer ("k-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_ITERATOR_K_DESTROY_FUNC, g_param_spec_pointer ("k-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_ITERATOR_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_ITERATOR_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_VALUE_ITERATOR_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+}
+
+
+static GType gee_tree_map_sub_value_iterator_gee_traversable_get_g_type (GeeTreeMapSubValueIterator* self) {
+	return self->priv->v_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_sub_value_iterator_gee_traversable_get_g_dup_func (GeeTreeMapSubValueIterator* self) {
+	return self->priv->v_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_sub_value_iterator_gee_traversable_get_g_destroy_func (GeeTreeMapSubValueIterator* self) {
+	return self->priv->v_destroy_func;
+}
+
+
+static void gee_tree_map_sub_value_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_tree_map_sub_value_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_tree_map_sub_value_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_tree_map_sub_value_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_tree_map_sub_value_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_tree_map_sub_value_iterator_gee_traversable_get_g_destroy_func;
+}
+
+
+static void gee_tree_map_sub_value_iterator_gee_iterator_interface_init (GeeIteratorIface * iface) {
+	gee_tree_map_sub_value_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get = (gpointer (*)(GeeIterator*)) gee_tree_map_sub_value_iterator_real_get;
+	iface->next = (gboolean (*)(GeeIterator*)) gee_tree_map_sub_node_iterator_next;
+	iface->has_next = (gboolean (*)(GeeIterator*)) gee_tree_map_sub_node_iterator_has_next;
+	iface->remove = (void (*)(GeeIterator*)) gee_tree_map_sub_node_iterator_remove;
+	iface->get_valid = (gboolean (*) (GeeIterator *)) gee_tree_map_sub_node_iterator_get_valid;
+	iface->get_read_only = (gboolean (*) (GeeIterator *)) gee_tree_map_sub_node_iterator_get_read_only;
+}
+
+
+static GType gee_tree_map_sub_value_iterator_gee_bidir_iterator_get_g_type (GeeTreeMapSubValueIterator* self) {
+	return self->priv->v_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_sub_value_iterator_gee_bidir_iterator_get_g_dup_func (GeeTreeMapSubValueIterator* self) {
+	return self->priv->v_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_sub_value_iterator_gee_bidir_iterator_get_g_destroy_func (GeeTreeMapSubValueIterator* self) {
+	return self->priv->v_destroy_func;
+}
+
+
+static void gee_tree_map_sub_value_iterator_gee_bidir_iterator_interface_init (GeeBidirIteratorIface * iface) {
+	gee_tree_map_sub_value_iterator_gee_bidir_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get_g_type = (GType(*)(GeeBidirIterator*)) gee_tree_map_sub_value_iterator_gee_bidir_iterator_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeBidirIterator*)) gee_tree_map_sub_value_iterator_gee_bidir_iterator_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeBidirIterator*)) gee_tree_map_sub_value_iterator_gee_bidir_iterator_get_g_destroy_func;
+	iface->previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_sub_node_iterator_previous;
+	iface->has_previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_sub_node_iterator_has_previous;
+	iface->first = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_sub_node_iterator_first;
+	iface->last = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_sub_node_iterator_last;
+}
+
+
+static void gee_tree_map_sub_value_iterator_instance_init (GeeTreeMapSubValueIterator * self) {
+	self->priv = GEE_TREE_MAP_SUB_VALUE_ITERATOR_GET_PRIVATE (self);
+}
+
+
+static GType gee_tree_map_sub_value_iterator_get_type (void) {
+	static volatile gsize gee_tree_map_sub_value_iterator_type_id__volatile = 0;
+	if (g_once_init_enter (&gee_tree_map_sub_value_iterator_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapSubValueIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_sub_value_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapSubValueIterator), 0, (GInstanceInitFunc) gee_tree_map_sub_value_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_tree_map_sub_value_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_tree_map_sub_value_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		static const GInterfaceInfo gee_bidir_iterator_info = { (GInterfaceInitFunc) gee_tree_map_sub_value_iterator_gee_bidir_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		GType gee_tree_map_sub_value_iterator_type_id;
+		gee_tree_map_sub_value_iterator_type_id = g_type_register_static (GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, "GeeTreeMapSubValueIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_tree_map_sub_value_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
+		g_type_add_interface_static (gee_tree_map_sub_value_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
+		g_type_add_interface_static (gee_tree_map_sub_value_iterator_type_id, GEE_TYPE_BIDIR_ITERATOR, &gee_bidir_iterator_info);
+		g_once_init_leave (&gee_tree_map_sub_value_iterator_type_id__volatile, gee_tree_map_sub_value_iterator_type_id);
+	}
+	return gee_tree_map_sub_value_iterator_type_id__volatile;
+}
+
+
+static void _vala_gee_tree_map_sub_value_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubValueIterator * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_VALUE_ITERATOR, GeeTreeMapSubValueIterator);
+	switch (property_id) {
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
+static void _vala_gee_tree_map_sub_value_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubValueIterator * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_VALUE_ITERATOR, GeeTreeMapSubValueIterator);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_VALUE_ITERATOR_K_TYPE:
+		self->priv->k_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_ITERATOR_K_DUP_FUNC:
+		self->priv->k_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_ITERATOR_K_DESTROY_FUNC:
+		self->priv->k_destroy_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_ITERATOR_V_TYPE:
+		self->priv->v_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_ITERATOR_V_DUP_FUNC:
+		self->priv->v_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_VALUE_ITERATOR_V_DESTROY_FUNC:
+		self->priv->v_destroy_func = g_value_get_pointer (value);
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
 static GeeTreeMapEntryIterator* gee_tree_map_entry_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map) {
 	GeeTreeMapEntryIterator * self = NULL;
 	GeeTreeMap* _tmp0_;
@@ -4041,25 +11357,146 @@ static GeeTreeMapEntryIterator* gee_tree_map_entry_iterator_new (GType k_type, G
 }
 
 
+static GeeTreeMapEntryIterator* gee_tree_map_entry_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* node) {
+	GeeTreeMapEntryIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapNode* _tmp1_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (node != NULL, NULL);
+	_tmp0_ = map;
+	_tmp1_ = node;
+	self = (GeeTreeMapEntryIterator*) gee_tree_map_node_iterator_construct_pointing (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp0_, _tmp1_);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	return self;
+}
+
+
+static GeeTreeMapEntryIterator* gee_tree_map_entry_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapNode* node) {
+	return gee_tree_map_entry_iterator_construct_pointing (GEE_TREE_MAP_TYPE_ENTRY_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, node);
+}
+
+
 static GeeMapEntry* gee_tree_map_entry_iterator_real_get (GeeIterator* base) {
 	GeeTreeMapEntryIterator * self;
 	GeeMapEntry* result = NULL;
 	gint _tmp0_;
 	GeeTreeMap* _tmp1_;
 	gint _tmp2_;
-	GeeTreeMapNode* _tmp3_;
-	GeeTreeMapNode* _tmp4_;
-	GeeMapEntry* _tmp5_ = NULL;
+	gboolean _tmp3_;
+	gboolean _tmp4_;
+	GeeTreeMapNode* _tmp5_;
+	GeeMapEntry* _tmp6_ = NULL;
 	self = (GeeTreeMapEntryIterator*) base;
 	_tmp0_ = ((GeeTreeMapNodeIterator*) self)->stamp;
 	_tmp1_ = ((GeeTreeMapNodeIterator*) self)->_map;
 	_tmp2_ = _tmp1_->priv->stamp;
 	_vala_assert (_tmp0_ == _tmp2_, "stamp == _map.stamp");
-	_tmp3_ = ((GeeTreeMapNodeIterator*) self)->current;
-	_vala_assert (_tmp3_ != NULL, "current != null");
-	_tmp4_ = ((GeeTreeMapNodeIterator*) self)->current;
-	_tmp5_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp4_);
-	result = _tmp5_;
+	_tmp3_ = gee_iterator_get_valid ((GeeIterator*) self);
+	_tmp4_ = _tmp3_;
+	_vala_assert (_tmp4_, "valid");
+	_tmp5_ = ((GeeTreeMapNodeIterator*) self)->current;
+	_tmp6_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp5_);
+	result = _tmp6_;
+	return result;
+}
+
+
+static void gee_tree_map_entry_iterator_real_remove (GeeIterator* base) {
+	GeeTreeMapEntryIterator * self;
+	self = (GeeTreeMapEntryIterator*) base;
+	gee_tree_map_node_iterator_unset ((GeeTreeMapNodeIterator*) self);
+}
+
+
+static gboolean gee_tree_map_entry_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeTreeMapEntryIterator * self;
+	gboolean result = FALSE;
+	GeeTreeMapNode* _tmp0_;
+	self = (GeeTreeMapEntryIterator*) base;
+	_tmp0_ = ((GeeTreeMapNodeIterator*) self)->current;
+	if (_tmp0_ != NULL) {
+		GeeForallFunc _tmp1_;
+		void* _tmp1__target;
+		GeeTreeMapNode* _tmp2_;
+		GeeMapEntry* _tmp3_ = NULL;
+		gboolean _tmp4_ = FALSE;
+		GeeTreeMapNode* _tmp5_;
+		GeeTreeMapNode* _tmp6_;
+		_tmp1_ = f;
+		_tmp1__target = f_target;
+		_tmp2_ = ((GeeTreeMapNodeIterator*) self)->current;
+		_tmp3_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp2_);
+		_tmp4_ = _tmp1_ (_tmp3_, _tmp1__target);
+		if (!_tmp4_) {
+			result = FALSE;
+			return result;
+		}
+		_tmp5_ = ((GeeTreeMapNodeIterator*) self)->current;
+		_tmp6_ = _tmp5_->next;
+		((GeeTreeMapNodeIterator*) self)->current = _tmp6_;
+	} else {
+		GeeTreeMapNode* _tmp7_;
+		_tmp7_ = ((GeeTreeMapNodeIterator*) self)->_next;
+		if (_tmp7_ == NULL) {
+			GeeTreeMap* _tmp8_;
+			GeeTreeMapNode* _tmp9_;
+			_tmp8_ = ((GeeTreeMapNodeIterator*) self)->_map;
+			_tmp9_ = _tmp8_->priv->first;
+			((GeeTreeMapNodeIterator*) self)->current = _tmp9_;
+			((GeeTreeMapNodeIterator*) self)->started = TRUE;
+		} else {
+			GeeTreeMapNode* _tmp10_;
+			GeeTreeMapNode* _tmp11_;
+			_tmp10_ = ((GeeTreeMapNodeIterator*) self)->_next;
+			((GeeTreeMapNodeIterator*) self)->current = _tmp10_;
+			_tmp11_ = ((GeeTreeMapNodeIterator*) self)->current;
+			if (_tmp11_ != NULL) {
+				((GeeTreeMapNodeIterator*) self)->_next = NULL;
+				((GeeTreeMapNodeIterator*) self)->_prev = NULL;
+			}
+		}
+	}
+	{
+		gboolean _tmp12_;
+		_tmp12_ = TRUE;
+		while (TRUE) {
+			gboolean _tmp13_;
+			GeeTreeMapNode* _tmp16_;
+			GeeForallFunc _tmp17_;
+			void* _tmp17__target;
+			GeeTreeMapNode* _tmp18_;
+			GeeMapEntry* _tmp19_ = NULL;
+			gboolean _tmp20_ = FALSE;
+			_tmp13_ = _tmp12_;
+			if (!_tmp13_) {
+				GeeTreeMapNode* _tmp14_;
+				GeeTreeMapNode* _tmp15_;
+				_tmp14_ = ((GeeTreeMapNodeIterator*) self)->current;
+				_tmp15_ = _tmp14_->next;
+				((GeeTreeMapNodeIterator*) self)->current = _tmp15_;
+			}
+			_tmp12_ = FALSE;
+			_tmp16_ = ((GeeTreeMapNodeIterator*) self)->current;
+			if (!(_tmp16_ != NULL)) {
+				break;
+			}
+			_tmp17_ = f;
+			_tmp17__target = f_target;
+			_tmp18_ = ((GeeTreeMapNodeIterator*) self)->current;
+			_tmp19_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp18_);
+			_tmp20_ = _tmp17_ (_tmp19_, _tmp17__target);
+			if (!_tmp20_) {
+				result = FALSE;
+				return result;
+			}
+		}
+	}
+	result = TRUE;
 	return result;
 }
 
@@ -4078,20 +11515,64 @@ static void gee_tree_map_entry_iterator_class_init (GeeTreeMapEntryIteratorClass
 }
 
 
+static GType gee_tree_map_entry_iterator_gee_traversable_get_g_type (GeeTreeMapEntryIterator* self) {
+	return GEE_MAP_TYPE_ENTRY;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_entry_iterator_gee_traversable_get_g_dup_func (GeeTreeMapEntryIterator* self) {
+	return g_object_ref;
+}
+
+
+static GDestroyNotify gee_tree_map_entry_iterator_gee_traversable_get_g_destroy_func (GeeTreeMapEntryIterator* self) {
+	return g_object_unref;
+}
+
+
+static void gee_tree_map_entry_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_tree_map_entry_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_tree_map_entry_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_tree_map_entry_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_tree_map_entry_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_tree_map_entry_iterator_gee_traversable_get_g_destroy_func;
+}
+
+
 static void gee_tree_map_entry_iterator_gee_iterator_interface_init (GeeIteratorIface * iface) {
 	gee_tree_map_entry_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get = (gpointer (*)(GeeIterator*)) gee_tree_map_entry_iterator_real_get;
+	iface->remove = (void (*)(GeeIterator*)) gee_tree_map_entry_iterator_real_remove;
 	iface->next = (gboolean (*)(GeeIterator*)) gee_tree_map_node_iterator_next;
 	iface->has_next = (gboolean (*)(GeeIterator*)) gee_tree_map_node_iterator_has_next;
-	iface->first = (gboolean (*)(GeeIterator*)) gee_tree_map_node_iterator_first;
-	iface->remove = (void (*)(GeeIterator*)) gee_tree_map_node_iterator_remove;
+	iface->get_valid = (gboolean (*) (GeeIterator *)) gee_tree_map_node_iterator_get_valid;
+	iface->get_read_only = (gboolean (*) (GeeIterator *)) gee_tree_map_node_iterator_get_read_only;
+}
+
+
+static GType gee_tree_map_entry_iterator_gee_bidir_iterator_get_g_type (GeeTreeMapEntryIterator* self) {
+	return GEE_MAP_TYPE_ENTRY;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_entry_iterator_gee_bidir_iterator_get_g_dup_func (GeeTreeMapEntryIterator* self) {
+	return g_object_ref;
+}
+
+
+static GDestroyNotify gee_tree_map_entry_iterator_gee_bidir_iterator_get_g_destroy_func (GeeTreeMapEntryIterator* self) {
+	return g_object_unref;
 }
 
 
 static void gee_tree_map_entry_iterator_gee_bidir_iterator_interface_init (GeeBidirIteratorIface * iface) {
 	gee_tree_map_entry_iterator_gee_bidir_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get_g_type = (GType(*)(GeeBidirIterator*)) gee_tree_map_entry_iterator_gee_bidir_iterator_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeBidirIterator*)) gee_tree_map_entry_iterator_gee_bidir_iterator_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeBidirIterator*)) gee_tree_map_entry_iterator_gee_bidir_iterator_get_g_destroy_func;
 	iface->previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_node_iterator_previous;
 	iface->has_previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_node_iterator_has_previous;
+	iface->first = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_node_iterator_first;
 	iface->last = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_node_iterator_last;
 }
 
@@ -4105,10 +11586,12 @@ static GType gee_tree_map_entry_iterator_get_type (void) {
 	static volatile gsize gee_tree_map_entry_iterator_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_tree_map_entry_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapEntryIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_entry_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapEntryIterator), 0, (GInstanceInitFunc) gee_tree_map_entry_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_tree_map_entry_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_tree_map_entry_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_bidir_iterator_info = { (GInterfaceInitFunc) gee_tree_map_entry_iterator_gee_bidir_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_tree_map_entry_iterator_type_id;
 		gee_tree_map_entry_iterator_type_id = g_type_register_static (GEE_TREE_MAP_TYPE_NODE_ITERATOR, "GeeTreeMapEntryIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_tree_map_entry_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
 		g_type_add_interface_static (gee_tree_map_entry_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
 		g_type_add_interface_static (gee_tree_map_entry_iterator_type_id, GEE_TYPE_BIDIR_ITERATOR, &gee_bidir_iterator_info);
 		g_once_init_leave (&gee_tree_map_entry_iterator_type_id__volatile, gee_tree_map_entry_iterator_type_id);
@@ -4157,6 +11640,277 @@ static void _vala_gee_tree_map_entry_iterator_set_property (GObject * object, gu
 }
 
 
+static GeeTreeMapSubEntryIterator* gee_tree_map_sub_entry_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	GeeTreeMapSubEntryIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	_tmp0_ = map;
+	_tmp1_ = range;
+	self = (GeeTreeMapSubEntryIterator*) gee_tree_map_sub_node_iterator_construct (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp0_, _tmp1_);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	return self;
+}
+
+
+static GeeTreeMapSubEntryIterator* gee_tree_map_sub_entry_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	return gee_tree_map_sub_entry_iterator_construct (GEE_TREE_MAP_TYPE_SUB_ENTRY_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range);
+}
+
+
+static GeeTreeMapSubEntryIterator* gee_tree_map_sub_entry_iterator_construct_pointing (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node) {
+	GeeTreeMapSubEntryIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	GeeTreeMapNode* _tmp2_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	g_return_val_if_fail (node != NULL, NULL);
+	_tmp0_ = map;
+	_tmp1_ = range;
+	_tmp2_ = node;
+	self = (GeeTreeMapSubEntryIterator*) gee_tree_map_sub_node_iterator_construct_pointing (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp0_, _tmp1_, _tmp2_);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	return self;
+}
+
+
+static GeeTreeMapSubEntryIterator* gee_tree_map_sub_entry_iterator_new_pointing (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range, GeeTreeMapNode* node) {
+	return gee_tree_map_sub_entry_iterator_construct_pointing (GEE_TREE_MAP_TYPE_SUB_ENTRY_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range, node);
+}
+
+
+static GeeMapEntry* gee_tree_map_sub_entry_iterator_real_get (GeeIterator* base) {
+	GeeTreeMapSubEntryIterator * self;
+	GeeMapEntry* result = NULL;
+	GeeTreeMapNodeIterator* _tmp0_;
+	GeeTreeMapNodeIterator* _tmp1_;
+	GeeTreeMapNode* _tmp2_;
+	GeeMapEntry* _tmp3_ = NULL;
+	self = (GeeTreeMapSubEntryIterator*) base;
+	_tmp0_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+	_vala_assert (_tmp0_ != NULL, "iterator != null");
+	_tmp1_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+	_tmp2_ = _tmp1_->current;
+	_tmp3_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp2_);
+	result = _tmp3_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_entry_iterator_real_remove (GeeIterator* base) {
+	GeeTreeMapSubEntryIterator * self;
+	self = (GeeTreeMapSubEntryIterator*) base;
+	gee_tree_map_sub_node_iterator_unset ((GeeTreeMapSubNodeIterator*) self);
+}
+
+
+static gboolean gee_tree_map_sub_entry_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeTreeMapSubEntryIterator * self;
+	gboolean result = FALSE;
+	gboolean _tmp0_;
+	gboolean _tmp1_;
+	self = (GeeTreeMapSubEntryIterator*) base;
+	_tmp0_ = gee_iterator_get_valid ((GeeIterator*) self);
+	_tmp1_ = _tmp0_;
+	if (_tmp1_) {
+		GeeForallFunc _tmp2_;
+		void* _tmp2__target;
+		GeeTreeMapNodeIterator* _tmp3_;
+		GeeTreeMapNode* _tmp4_;
+		GeeMapEntry* _tmp5_ = NULL;
+		gboolean _tmp6_ = FALSE;
+		_tmp2_ = f;
+		_tmp2__target = f_target;
+		_tmp3_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+		_tmp4_ = _tmp3_->current;
+		_tmp5_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp4_);
+		_tmp6_ = _tmp2_ (_tmp5_, _tmp2__target);
+		if (!_tmp6_) {
+			result = FALSE;
+			return result;
+		}
+	}
+	while (TRUE) {
+		GeeTreeMapNodeIterator* _tmp7_;
+		gboolean _tmp8_ = FALSE;
+		GeeForallFunc _tmp9_;
+		void* _tmp9__target;
+		GeeTreeMapNodeIterator* _tmp10_;
+		GeeTreeMapNode* _tmp11_;
+		GeeMapEntry* _tmp12_ = NULL;
+		gboolean _tmp13_ = FALSE;
+		_tmp7_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+		_tmp8_ = gee_tree_map_node_iterator_next (_tmp7_);
+		if (!_tmp8_) {
+			break;
+		}
+		_tmp9_ = f;
+		_tmp9__target = f_target;
+		_tmp10_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+		_tmp11_ = _tmp10_->current;
+		_tmp12_ = gee_tree_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp11_);
+		_tmp13_ = _tmp9_ (_tmp12_, _tmp9__target);
+		if (!_tmp13_) {
+			result = FALSE;
+			return result;
+		}
+	}
+	result = TRUE;
+	return result;
+}
+
+
+static void gee_tree_map_sub_entry_iterator_class_init (GeeTreeMapSubEntryIteratorClass * klass) {
+	gee_tree_map_sub_entry_iterator_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (GeeTreeMapSubEntryIteratorPrivate));
+	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_sub_entry_iterator_get_property;
+	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_sub_entry_iterator_set_property;
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_ITERATOR_K_TYPE, g_param_spec_gtype ("k-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_ITERATOR_K_DUP_FUNC, g_param_spec_pointer ("k-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_ITERATOR_K_DESTROY_FUNC, g_param_spec_pointer ("k-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_ITERATOR_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_ITERATOR_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_ENTRY_ITERATOR_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+}
+
+
+static GType gee_tree_map_sub_entry_iterator_gee_traversable_get_g_type (GeeTreeMapSubEntryIterator* self) {
+	return GEE_MAP_TYPE_ENTRY;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_sub_entry_iterator_gee_traversable_get_g_dup_func (GeeTreeMapSubEntryIterator* self) {
+	return g_object_ref;
+}
+
+
+static GDestroyNotify gee_tree_map_sub_entry_iterator_gee_traversable_get_g_destroy_func (GeeTreeMapSubEntryIterator* self) {
+	return g_object_unref;
+}
+
+
+static void gee_tree_map_sub_entry_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_tree_map_sub_entry_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_tree_map_sub_entry_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_tree_map_sub_entry_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_tree_map_sub_entry_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_tree_map_sub_entry_iterator_gee_traversable_get_g_destroy_func;
+}
+
+
+static void gee_tree_map_sub_entry_iterator_gee_iterator_interface_init (GeeIteratorIface * iface) {
+	gee_tree_map_sub_entry_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get = (gpointer (*)(GeeIterator*)) gee_tree_map_sub_entry_iterator_real_get;
+	iface->remove = (void (*)(GeeIterator*)) gee_tree_map_sub_entry_iterator_real_remove;
+	iface->next = (gboolean (*)(GeeIterator*)) gee_tree_map_sub_node_iterator_next;
+	iface->has_next = (gboolean (*)(GeeIterator*)) gee_tree_map_sub_node_iterator_has_next;
+	iface->get_valid = (gboolean (*) (GeeIterator *)) gee_tree_map_sub_node_iterator_get_valid;
+	iface->get_read_only = (gboolean (*) (GeeIterator *)) gee_tree_map_sub_node_iterator_get_read_only;
+}
+
+
+static GType gee_tree_map_sub_entry_iterator_gee_bidir_iterator_get_g_type (GeeTreeMapSubEntryIterator* self) {
+	return GEE_MAP_TYPE_ENTRY;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_sub_entry_iterator_gee_bidir_iterator_get_g_dup_func (GeeTreeMapSubEntryIterator* self) {
+	return g_object_ref;
+}
+
+
+static GDestroyNotify gee_tree_map_sub_entry_iterator_gee_bidir_iterator_get_g_destroy_func (GeeTreeMapSubEntryIterator* self) {
+	return g_object_unref;
+}
+
+
+static void gee_tree_map_sub_entry_iterator_gee_bidir_iterator_interface_init (GeeBidirIteratorIface * iface) {
+	gee_tree_map_sub_entry_iterator_gee_bidir_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get_g_type = (GType(*)(GeeBidirIterator*)) gee_tree_map_sub_entry_iterator_gee_bidir_iterator_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeBidirIterator*)) gee_tree_map_sub_entry_iterator_gee_bidir_iterator_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeBidirIterator*)) gee_tree_map_sub_entry_iterator_gee_bidir_iterator_get_g_destroy_func;
+	iface->previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_sub_node_iterator_previous;
+	iface->has_previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_sub_node_iterator_has_previous;
+	iface->first = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_sub_node_iterator_first;
+	iface->last = (gboolean (*)(GeeBidirIterator*)) gee_tree_map_sub_node_iterator_last;
+}
+
+
+static void gee_tree_map_sub_entry_iterator_instance_init (GeeTreeMapSubEntryIterator * self) {
+	self->priv = GEE_TREE_MAP_SUB_ENTRY_ITERATOR_GET_PRIVATE (self);
+}
+
+
+static GType gee_tree_map_sub_entry_iterator_get_type (void) {
+	static volatile gsize gee_tree_map_sub_entry_iterator_type_id__volatile = 0;
+	if (g_once_init_enter (&gee_tree_map_sub_entry_iterator_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapSubEntryIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_sub_entry_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapSubEntryIterator), 0, (GInstanceInitFunc) gee_tree_map_sub_entry_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_tree_map_sub_entry_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_tree_map_sub_entry_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		static const GInterfaceInfo gee_bidir_iterator_info = { (GInterfaceInitFunc) gee_tree_map_sub_entry_iterator_gee_bidir_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		GType gee_tree_map_sub_entry_iterator_type_id;
+		gee_tree_map_sub_entry_iterator_type_id = g_type_register_static (GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, "GeeTreeMapSubEntryIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_tree_map_sub_entry_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
+		g_type_add_interface_static (gee_tree_map_sub_entry_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
+		g_type_add_interface_static (gee_tree_map_sub_entry_iterator_type_id, GEE_TYPE_BIDIR_ITERATOR, &gee_bidir_iterator_info);
+		g_once_init_leave (&gee_tree_map_sub_entry_iterator_type_id__volatile, gee_tree_map_sub_entry_iterator_type_id);
+	}
+	return gee_tree_map_sub_entry_iterator_type_id__volatile;
+}
+
+
+static void _vala_gee_tree_map_sub_entry_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubEntryIterator * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_ENTRY_ITERATOR, GeeTreeMapSubEntryIterator);
+	switch (property_id) {
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
+static void _vala_gee_tree_map_sub_entry_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubEntryIterator * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_ENTRY_ITERATOR, GeeTreeMapSubEntryIterator);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_ENTRY_ITERATOR_K_TYPE:
+		self->priv->k_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_ITERATOR_K_DUP_FUNC:
+		self->priv->k_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_ITERATOR_K_DESTROY_FUNC:
+		self->priv->k_destroy_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_ITERATOR_V_TYPE:
+		self->priv->v_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_ITERATOR_V_DUP_FUNC:
+		self->priv->v_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_ENTRY_ITERATOR_V_DESTROY_FUNC:
+		self->priv->v_destroy_func = g_value_get_pointer (value);
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
 static GeeTreeMapMapIterator* gee_tree_map_map_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map) {
 	GeeTreeMapMapIterator * self = NULL;
 	GeeTreeMap* _tmp0_;
@@ -4184,21 +11938,23 @@ static gpointer gee_tree_map_map_iterator_real_get_key (GeeMapIterator* base) {
 	gint _tmp0_;
 	GeeTreeMap* _tmp1_;
 	gint _tmp2_;
-	GeeTreeMapNode* _tmp3_;
-	GeeTreeMapNode* _tmp4_;
-	gconstpointer _tmp5_;
-	gpointer _tmp6_;
+	gboolean _tmp3_;
+	gboolean _tmp4_;
+	GeeTreeMapNode* _tmp5_;
+	gconstpointer _tmp6_;
+	gpointer _tmp7_;
 	self = (GeeTreeMapMapIterator*) base;
 	_tmp0_ = ((GeeTreeMapNodeIterator*) self)->stamp;
 	_tmp1_ = ((GeeTreeMapNodeIterator*) self)->_map;
 	_tmp2_ = _tmp1_->priv->stamp;
 	_vala_assert (_tmp0_ == _tmp2_, "stamp == _map.stamp");
-	_tmp3_ = ((GeeTreeMapNodeIterator*) self)->current;
-	_vala_assert (_tmp3_ != NULL, "current != null");
-	_tmp4_ = ((GeeTreeMapNodeIterator*) self)->current;
-	_tmp5_ = _tmp4_->key;
-	_tmp6_ = ((_tmp5_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp5_) : ((gpointer) _tmp5_);
-	result = _tmp6_;
+	_tmp3_ = gee_map_iterator_get_valid ((GeeMapIterator*) self);
+	_tmp4_ = _tmp3_;
+	_vala_assert (_tmp4_, "valid");
+	_tmp5_ = ((GeeTreeMapNodeIterator*) self)->current;
+	_tmp6_ = _tmp5_->key;
+	_tmp7_ = ((_tmp6_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp6_) : ((gpointer) _tmp6_);
+	result = _tmp7_;
 	return result;
 }
 
@@ -4209,21 +11965,23 @@ static gpointer gee_tree_map_map_iterator_real_get_value (GeeMapIterator* base) 
 	gint _tmp0_;
 	GeeTreeMap* _tmp1_;
 	gint _tmp2_;
-	GeeTreeMapNode* _tmp3_;
-	GeeTreeMapNode* _tmp4_;
-	gconstpointer _tmp5_;
-	gpointer _tmp6_;
+	gboolean _tmp3_;
+	gboolean _tmp4_;
+	GeeTreeMapNode* _tmp5_;
+	gconstpointer _tmp6_;
+	gpointer _tmp7_;
 	self = (GeeTreeMapMapIterator*) base;
 	_tmp0_ = ((GeeTreeMapNodeIterator*) self)->stamp;
 	_tmp1_ = ((GeeTreeMapNodeIterator*) self)->_map;
 	_tmp2_ = _tmp1_->priv->stamp;
 	_vala_assert (_tmp0_ == _tmp2_, "stamp == _map.stamp");
-	_tmp3_ = ((GeeTreeMapNodeIterator*) self)->current;
-	_vala_assert (_tmp3_ != NULL, "current != null");
-	_tmp4_ = ((GeeTreeMapNodeIterator*) self)->current;
-	_tmp5_ = _tmp4_->value;
-	_tmp6_ = ((_tmp5_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp5_) : ((gpointer) _tmp5_);
-	result = _tmp6_;
+	_tmp3_ = gee_map_iterator_get_valid ((GeeMapIterator*) self);
+	_tmp4_ = _tmp3_;
+	_vala_assert (_tmp4_, "valid");
+	_tmp5_ = ((GeeTreeMapNodeIterator*) self)->current;
+	_tmp6_ = _tmp5_->value;
+	_tmp7_ = ((_tmp6_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp6_) : ((gpointer) _tmp6_);
+	result = _tmp7_;
 	return result;
 }
 
@@ -4233,28 +11991,49 @@ static void gee_tree_map_map_iterator_real_set_value (GeeMapIterator* base, gcon
 	gint _tmp0_;
 	GeeTreeMap* _tmp1_;
 	gint _tmp2_;
-	GeeTreeMapNode* _tmp3_;
-	GeeTreeMapNode* _tmp4_;
-	gconstpointer _tmp5_;
-	gpointer _tmp6_;
+	gboolean _tmp3_;
+	gboolean _tmp4_;
+	GeeTreeMapNode* _tmp5_;
+	gconstpointer _tmp6_;
+	gpointer _tmp7_;
 	self = (GeeTreeMapMapIterator*) base;
 	_tmp0_ = ((GeeTreeMapNodeIterator*) self)->stamp;
 	_tmp1_ = ((GeeTreeMapNodeIterator*) self)->_map;
 	_tmp2_ = _tmp1_->priv->stamp;
 	_vala_assert (_tmp0_ == _tmp2_, "stamp == _map.stamp");
-	_tmp3_ = ((GeeTreeMapNodeIterator*) self)->current;
-	_vala_assert (_tmp3_ != NULL, "current != null");
-	_tmp4_ = ((GeeTreeMapNodeIterator*) self)->current;
-	_tmp5_ = value;
-	_tmp6_ = ((_tmp5_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp5_) : ((gpointer) _tmp5_);
-	((_tmp4_->value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_tmp4_->value = (self->priv->v_destroy_func (_tmp4_->value), NULL));
-	_tmp4_->value = _tmp6_;
+	_tmp3_ = gee_map_iterator_get_valid ((GeeMapIterator*) self);
+	_tmp4_ = _tmp3_;
+	_vala_assert (_tmp4_, "valid");
+	_tmp5_ = ((GeeTreeMapNodeIterator*) self)->current;
+	_tmp6_ = value;
+	_tmp7_ = ((_tmp6_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp6_) : ((gpointer) _tmp6_);
+	((_tmp5_->value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_tmp5_->value = (self->priv->v_destroy_func (_tmp5_->value), NULL));
+	_tmp5_->value = _tmp7_;
+}
+
+
+static gboolean gee_tree_map_map_iterator_real_get_read_only (GeeTreeMapNodeIterator* base) {
+	gboolean result;
+	GeeTreeMapMapIterator* self;
+	self = (GeeTreeMapMapIterator*) base;
+	result = FALSE;
+	return result;
+}
+
+
+static gboolean gee_tree_map_map_iterator_real_get_mutable (GeeMapIterator* base) {
+	gboolean result;
+	GeeTreeMapMapIterator* self;
+	self = (GeeTreeMapMapIterator*) base;
+	result = TRUE;
+	return result;
 }
 
 
 static void gee_tree_map_map_iterator_class_init (GeeTreeMapMapIteratorClass * klass) {
 	gee_tree_map_map_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeTreeMapMapIteratorPrivate));
+	GEE_TREE_MAP_NODE_ITERATOR_CLASS (klass)->get_read_only = gee_tree_map_map_iterator_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_map_iterator_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_map_iterator_set_property;
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_MAP_ITERATOR_K_TYPE, g_param_spec_gtype ("k-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
@@ -4263,6 +12042,38 @@ static void gee_tree_map_map_iterator_class_init (GeeTreeMapMapIteratorClass * k
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_MAP_ITERATOR_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_MAP_ITERATOR_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_MAP_ITERATOR_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_MAP_ITERATOR_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_MAP_ITERATOR_MUTABLE, g_param_spec_boolean ("mutable", "mutable", "mutable", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static GType gee_tree_map_map_iterator_gee_map_iterator_get_k_type (GeeTreeMapMapIterator* self) {
+	return self->priv->k_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_map_iterator_gee_map_iterator_get_k_dup_func (GeeTreeMapMapIterator* self) {
+	return self->priv->k_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_map_iterator_gee_map_iterator_get_k_destroy_func (GeeTreeMapMapIterator* self) {
+	return self->priv->k_destroy_func;
+}
+
+
+static GType gee_tree_map_map_iterator_gee_map_iterator_get_v_type (GeeTreeMapMapIterator* self) {
+	return self->priv->v_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_map_iterator_gee_map_iterator_get_v_dup_func (GeeTreeMapMapIterator* self) {
+	return self->priv->v_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_map_iterator_gee_map_iterator_get_v_destroy_func (GeeTreeMapMapIterator* self) {
+	return self->priv->v_destroy_func;
 }
 
 
@@ -4271,10 +12082,63 @@ static void gee_tree_map_map_iterator_gee_map_iterator_interface_init (GeeMapIte
 	iface->get_key = (gpointer (*)(GeeMapIterator*)) gee_tree_map_map_iterator_real_get_key;
 	iface->get_value = (gpointer (*)(GeeMapIterator*)) gee_tree_map_map_iterator_real_get_value;
 	iface->set_value = (void (*)(GeeMapIterator*, gconstpointer)) gee_tree_map_map_iterator_real_set_value;
+	iface->get_k_type = (GType(*)(GeeMapIterator*)) gee_tree_map_map_iterator_gee_map_iterator_get_k_type;
+	iface->get_k_dup_func = (GBoxedCopyFunc(*)(GeeMapIterator*)) gee_tree_map_map_iterator_gee_map_iterator_get_k_dup_func;
+	iface->get_k_destroy_func = (GDestroyNotify(*)(GeeMapIterator*)) gee_tree_map_map_iterator_gee_map_iterator_get_k_destroy_func;
+	iface->get_v_type = (GType(*)(GeeMapIterator*)) gee_tree_map_map_iterator_gee_map_iterator_get_v_type;
+	iface->get_v_dup_func = (GBoxedCopyFunc(*)(GeeMapIterator*)) gee_tree_map_map_iterator_gee_map_iterator_get_v_dup_func;
+	iface->get_v_destroy_func = (GDestroyNotify(*)(GeeMapIterator*)) gee_tree_map_map_iterator_gee_map_iterator_get_v_destroy_func;
 	iface->next = (gboolean (*)(GeeMapIterator*)) gee_tree_map_node_iterator_next;
 	iface->has_next = (gboolean (*)(GeeMapIterator*)) gee_tree_map_node_iterator_has_next;
-	iface->first = (gboolean (*)(GeeMapIterator*)) gee_tree_map_node_iterator_first;
 	iface->unset = (void (*)(GeeMapIterator*)) gee_tree_map_node_iterator_unset;
+	iface->get_read_only = gee_tree_map_map_iterator_real_get_read_only;
+	iface->get_mutable = gee_tree_map_map_iterator_real_get_mutable;
+	iface->get_valid = (gboolean (*) (GeeMapIterator *)) gee_tree_map_node_iterator_get_valid;
+}
+
+
+static GType gee_tree_map_map_iterator_gee_bidir_map_iterator_get_k_type (GeeTreeMapMapIterator* self) {
+	return self->priv->k_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_map_iterator_gee_bidir_map_iterator_get_k_dup_func (GeeTreeMapMapIterator* self) {
+	return self->priv->k_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_map_iterator_gee_bidir_map_iterator_get_k_destroy_func (GeeTreeMapMapIterator* self) {
+	return self->priv->k_destroy_func;
+}
+
+
+static GType gee_tree_map_map_iterator_gee_bidir_map_iterator_get_v_type (GeeTreeMapMapIterator* self) {
+	return self->priv->v_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_map_iterator_gee_bidir_map_iterator_get_v_dup_func (GeeTreeMapMapIterator* self) {
+	return self->priv->v_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_map_iterator_gee_bidir_map_iterator_get_v_destroy_func (GeeTreeMapMapIterator* self) {
+	return self->priv->v_destroy_func;
+}
+
+
+static void gee_tree_map_map_iterator_gee_bidir_map_iterator_interface_init (GeeBidirMapIteratorIface * iface) {
+	gee_tree_map_map_iterator_gee_bidir_map_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get_k_type = (GType(*)(GeeBidirMapIterator*)) gee_tree_map_map_iterator_gee_bidir_map_iterator_get_k_type;
+	iface->get_k_dup_func = (GBoxedCopyFunc(*)(GeeBidirMapIterator*)) gee_tree_map_map_iterator_gee_bidir_map_iterator_get_k_dup_func;
+	iface->get_k_destroy_func = (GDestroyNotify(*)(GeeBidirMapIterator*)) gee_tree_map_map_iterator_gee_bidir_map_iterator_get_k_destroy_func;
+	iface->get_v_type = (GType(*)(GeeBidirMapIterator*)) gee_tree_map_map_iterator_gee_bidir_map_iterator_get_v_type;
+	iface->get_v_dup_func = (GBoxedCopyFunc(*)(GeeBidirMapIterator*)) gee_tree_map_map_iterator_gee_bidir_map_iterator_get_v_dup_func;
+	iface->get_v_destroy_func = (GDestroyNotify(*)(GeeBidirMapIterator*)) gee_tree_map_map_iterator_gee_bidir_map_iterator_get_v_destroy_func;
+	iface->previous = (gboolean (*)(GeeBidirMapIterator*)) gee_tree_map_node_iterator_previous;
+	iface->has_previous = (gboolean (*)(GeeBidirMapIterator*)) gee_tree_map_node_iterator_has_previous;
+	iface->first = (gboolean (*)(GeeBidirMapIterator*)) gee_tree_map_node_iterator_first;
+	iface->last = (gboolean (*)(GeeBidirMapIterator*)) gee_tree_map_node_iterator_last;
 }
 
 
@@ -4288,9 +12152,11 @@ static GType gee_tree_map_map_iterator_get_type (void) {
 	if (g_once_init_enter (&gee_tree_map_map_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapMapIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_map_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapMapIterator), 0, (GInstanceInitFunc) gee_tree_map_map_iterator_instance_init, NULL };
 		static const GInterfaceInfo gee_map_iterator_info = { (GInterfaceInitFunc) gee_tree_map_map_iterator_gee_map_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		static const GInterfaceInfo gee_bidir_map_iterator_info = { (GInterfaceInitFunc) gee_tree_map_map_iterator_gee_bidir_map_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_tree_map_map_iterator_type_id;
 		gee_tree_map_map_iterator_type_id = g_type_register_static (GEE_TREE_MAP_TYPE_NODE_ITERATOR, "GeeTreeMapMapIterator", &g_define_type_info, 0);
 		g_type_add_interface_static (gee_tree_map_map_iterator_type_id, GEE_TYPE_MAP_ITERATOR, &gee_map_iterator_info);
+		g_type_add_interface_static (gee_tree_map_map_iterator_type_id, GEE_TYPE_BIDIR_MAP_ITERATOR, &gee_bidir_map_iterator_info);
 		g_once_init_leave (&gee_tree_map_map_iterator_type_id__volatile, gee_tree_map_map_iterator_type_id);
 	}
 	return gee_tree_map_map_iterator_type_id__volatile;
@@ -4301,6 +12167,12 @@ static void _vala_gee_tree_map_map_iterator_get_property (GObject * object, guin
 	GeeTreeMapMapIterator * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_MAP_ITERATOR, GeeTreeMapMapIterator);
 	switch (property_id) {
+		case GEE_TREE_MAP_MAP_ITERATOR_READ_ONLY:
+		g_value_set_boolean (value, gee_tree_map_node_iterator_get_read_only ((GeeTreeMapNodeIterator*) self));
+		break;
+		case GEE_TREE_MAP_MAP_ITERATOR_MUTABLE:
+		g_value_set_boolean (value, gee_map_iterator_get_mutable ((GeeMapIterator*) self));
+		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
 		break;
@@ -4337,6 +12209,292 @@ static void _vala_gee_tree_map_map_iterator_set_property (GObject * object, guin
 }
 
 
+static GeeTreeMapSubMapIterator* gee_tree_map_sub_map_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	GeeTreeMapSubMapIterator * self = NULL;
+	GeeTreeMap* _tmp0_;
+	GeeTreeMapRange* _tmp1_;
+	g_return_val_if_fail (map != NULL, NULL);
+	g_return_val_if_fail (range != NULL, NULL);
+	_tmp0_ = map;
+	_tmp1_ = range;
+	self = (GeeTreeMapSubMapIterator*) gee_tree_map_sub_node_iterator_construct (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func, _tmp0_, _tmp1_);
+	self->priv->k_type = k_type;
+	self->priv->k_dup_func = k_dup_func;
+	self->priv->k_destroy_func = k_destroy_func;
+	self->priv->v_type = v_type;
+	self->priv->v_dup_func = v_dup_func;
+	self->priv->v_destroy_func = v_destroy_func;
+	return self;
+}
+
+
+static GeeTreeMapSubMapIterator* gee_tree_map_sub_map_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeTreeMap* map, GeeTreeMapRange* range) {
+	return gee_tree_map_sub_map_iterator_construct (GEE_TREE_MAP_TYPE_SUB_MAP_ITERATOR, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, map, range);
+}
+
+
+static gpointer gee_tree_map_sub_map_iterator_real_get_key (GeeMapIterator* base) {
+	GeeTreeMapSubMapIterator * self;
+	gpointer result = NULL;
+	gboolean _tmp0_;
+	gboolean _tmp1_;
+	GeeTreeMapNodeIterator* _tmp2_;
+	GeeTreeMapNode* _tmp3_;
+	gconstpointer _tmp4_;
+	gpointer _tmp5_;
+	self = (GeeTreeMapSubMapIterator*) base;
+	_tmp0_ = gee_map_iterator_get_valid ((GeeMapIterator*) self);
+	_tmp1_ = _tmp0_;
+	_vala_assert (_tmp1_, "valid");
+	_tmp2_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+	_tmp3_ = _tmp2_->current;
+	_tmp4_ = _tmp3_->key;
+	_tmp5_ = ((_tmp4_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp4_) : ((gpointer) _tmp4_);
+	result = _tmp5_;
+	return result;
+}
+
+
+static gpointer gee_tree_map_sub_map_iterator_real_get_value (GeeMapIterator* base) {
+	GeeTreeMapSubMapIterator * self;
+	gpointer result = NULL;
+	gboolean _tmp0_;
+	gboolean _tmp1_;
+	GeeTreeMapNodeIterator* _tmp2_;
+	GeeTreeMapNode* _tmp3_;
+	gconstpointer _tmp4_;
+	gpointer _tmp5_;
+	self = (GeeTreeMapSubMapIterator*) base;
+	_tmp0_ = gee_map_iterator_get_valid ((GeeMapIterator*) self);
+	_tmp1_ = _tmp0_;
+	_vala_assert (_tmp1_, "valid");
+	_tmp2_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+	_tmp3_ = _tmp2_->current;
+	_tmp4_ = _tmp3_->value;
+	_tmp5_ = ((_tmp4_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp4_) : ((gpointer) _tmp4_);
+	result = _tmp5_;
+	return result;
+}
+
+
+static void gee_tree_map_sub_map_iterator_real_set_value (GeeMapIterator* base, gconstpointer value) {
+	GeeTreeMapSubMapIterator * self;
+	gboolean _tmp0_;
+	gboolean _tmp1_;
+	GeeTreeMapNodeIterator* _tmp2_;
+	GeeTreeMapNode* _tmp3_;
+	gconstpointer _tmp4_;
+	gpointer _tmp5_;
+	self = (GeeTreeMapSubMapIterator*) base;
+	_tmp0_ = gee_map_iterator_get_valid ((GeeMapIterator*) self);
+	_tmp1_ = _tmp0_;
+	_vala_assert (_tmp1_, "valid");
+	_tmp2_ = ((GeeTreeMapSubNodeIterator*) self)->iterator;
+	_tmp3_ = _tmp2_->current;
+	_tmp4_ = value;
+	_tmp5_ = ((_tmp4_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp4_) : ((gpointer) _tmp4_);
+	((_tmp3_->value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_tmp3_->value = (self->priv->v_destroy_func (_tmp3_->value), NULL));
+	_tmp3_->value = _tmp5_;
+}
+
+
+static gboolean gee_tree_map_sub_map_iterator_real_get_read_only (GeeTreeMapSubNodeIterator* base) {
+	gboolean result;
+	GeeTreeMapSubMapIterator* self;
+	self = (GeeTreeMapSubMapIterator*) base;
+	result = FALSE;
+	return result;
+}
+
+
+static gboolean gee_tree_map_sub_map_iterator_real_get_mutable (GeeMapIterator* base) {
+	gboolean result;
+	GeeTreeMapSubMapIterator* self;
+	self = (GeeTreeMapSubMapIterator*) base;
+	result = TRUE;
+	return result;
+}
+
+
+static void gee_tree_map_sub_map_iterator_class_init (GeeTreeMapSubMapIteratorClass * klass) {
+	gee_tree_map_sub_map_iterator_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (GeeTreeMapSubMapIteratorPrivate));
+	GEE_TREE_MAP_SUB_NODE_ITERATOR_CLASS (klass)->get_read_only = gee_tree_map_sub_map_iterator_real_get_read_only;
+	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_sub_map_iterator_get_property;
+	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_sub_map_iterator_set_property;
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_ITERATOR_K_TYPE, g_param_spec_gtype ("k-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_ITERATOR_K_DUP_FUNC, g_param_spec_pointer ("k-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_ITERATOR_K_DESTROY_FUNC, g_param_spec_pointer ("k-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_ITERATOR_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_ITERATOR_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_ITERATOR_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_ITERATOR_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SUB_MAP_ITERATOR_MUTABLE, g_param_spec_boolean ("mutable", "mutable", "mutable", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static GType gee_tree_map_sub_map_iterator_gee_map_iterator_get_k_type (GeeTreeMapSubMapIterator* self) {
+	return self->priv->k_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_sub_map_iterator_gee_map_iterator_get_k_dup_func (GeeTreeMapSubMapIterator* self) {
+	return self->priv->k_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_sub_map_iterator_gee_map_iterator_get_k_destroy_func (GeeTreeMapSubMapIterator* self) {
+	return self->priv->k_destroy_func;
+}
+
+
+static GType gee_tree_map_sub_map_iterator_gee_map_iterator_get_v_type (GeeTreeMapSubMapIterator* self) {
+	return self->priv->v_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_sub_map_iterator_gee_map_iterator_get_v_dup_func (GeeTreeMapSubMapIterator* self) {
+	return self->priv->v_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_sub_map_iterator_gee_map_iterator_get_v_destroy_func (GeeTreeMapSubMapIterator* self) {
+	return self->priv->v_destroy_func;
+}
+
+
+static void gee_tree_map_sub_map_iterator_gee_map_iterator_interface_init (GeeMapIteratorIface * iface) {
+	gee_tree_map_sub_map_iterator_gee_map_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get_key = (gpointer (*)(GeeMapIterator*)) gee_tree_map_sub_map_iterator_real_get_key;
+	iface->get_value = (gpointer (*)(GeeMapIterator*)) gee_tree_map_sub_map_iterator_real_get_value;
+	iface->set_value = (void (*)(GeeMapIterator*, gconstpointer)) gee_tree_map_sub_map_iterator_real_set_value;
+	iface->get_k_type = (GType(*)(GeeMapIterator*)) gee_tree_map_sub_map_iterator_gee_map_iterator_get_k_type;
+	iface->get_k_dup_func = (GBoxedCopyFunc(*)(GeeMapIterator*)) gee_tree_map_sub_map_iterator_gee_map_iterator_get_k_dup_func;
+	iface->get_k_destroy_func = (GDestroyNotify(*)(GeeMapIterator*)) gee_tree_map_sub_map_iterator_gee_map_iterator_get_k_destroy_func;
+	iface->get_v_type = (GType(*)(GeeMapIterator*)) gee_tree_map_sub_map_iterator_gee_map_iterator_get_v_type;
+	iface->get_v_dup_func = (GBoxedCopyFunc(*)(GeeMapIterator*)) gee_tree_map_sub_map_iterator_gee_map_iterator_get_v_dup_func;
+	iface->get_v_destroy_func = (GDestroyNotify(*)(GeeMapIterator*)) gee_tree_map_sub_map_iterator_gee_map_iterator_get_v_destroy_func;
+	iface->next = (gboolean (*)(GeeMapIterator*)) gee_tree_map_sub_node_iterator_next;
+	iface->has_next = (gboolean (*)(GeeMapIterator*)) gee_tree_map_sub_node_iterator_has_next;
+	iface->unset = (void (*)(GeeMapIterator*)) gee_tree_map_sub_node_iterator_unset;
+	iface->get_read_only = gee_tree_map_sub_map_iterator_real_get_read_only;
+	iface->get_mutable = gee_tree_map_sub_map_iterator_real_get_mutable;
+	iface->get_valid = (gboolean (*) (GeeMapIterator *)) gee_tree_map_sub_node_iterator_get_valid;
+}
+
+
+static GType gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_get_k_type (GeeTreeMapSubMapIterator* self) {
+	return self->priv->k_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_get_k_dup_func (GeeTreeMapSubMapIterator* self) {
+	return self->priv->k_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_get_k_destroy_func (GeeTreeMapSubMapIterator* self) {
+	return self->priv->k_destroy_func;
+}
+
+
+static GType gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_get_v_type (GeeTreeMapSubMapIterator* self) {
+	return self->priv->v_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_get_v_dup_func (GeeTreeMapSubMapIterator* self) {
+	return self->priv->v_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_get_v_destroy_func (GeeTreeMapSubMapIterator* self) {
+	return self->priv->v_destroy_func;
+}
+
+
+static void gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_interface_init (GeeBidirMapIteratorIface * iface) {
+	gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get_k_type = (GType(*)(GeeBidirMapIterator*)) gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_get_k_type;
+	iface->get_k_dup_func = (GBoxedCopyFunc(*)(GeeBidirMapIterator*)) gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_get_k_dup_func;
+	iface->get_k_destroy_func = (GDestroyNotify(*)(GeeBidirMapIterator*)) gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_get_k_destroy_func;
+	iface->get_v_type = (GType(*)(GeeBidirMapIterator*)) gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_get_v_type;
+	iface->get_v_dup_func = (GBoxedCopyFunc(*)(GeeBidirMapIterator*)) gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_get_v_dup_func;
+	iface->get_v_destroy_func = (GDestroyNotify(*)(GeeBidirMapIterator*)) gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_get_v_destroy_func;
+	iface->previous = (gboolean (*)(GeeBidirMapIterator*)) gee_tree_map_sub_node_iterator_previous;
+	iface->has_previous = (gboolean (*)(GeeBidirMapIterator*)) gee_tree_map_sub_node_iterator_has_previous;
+	iface->first = (gboolean (*)(GeeBidirMapIterator*)) gee_tree_map_sub_node_iterator_first;
+	iface->last = (gboolean (*)(GeeBidirMapIterator*)) gee_tree_map_sub_node_iterator_last;
+}
+
+
+static void gee_tree_map_sub_map_iterator_instance_init (GeeTreeMapSubMapIterator * self) {
+	self->priv = GEE_TREE_MAP_SUB_MAP_ITERATOR_GET_PRIVATE (self);
+}
+
+
+static GType gee_tree_map_sub_map_iterator_get_type (void) {
+	static volatile gsize gee_tree_map_sub_map_iterator_type_id__volatile = 0;
+	if (g_once_init_enter (&gee_tree_map_sub_map_iterator_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapSubMapIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_sub_map_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMapSubMapIterator), 0, (GInstanceInitFunc) gee_tree_map_sub_map_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_map_iterator_info = { (GInterfaceInitFunc) gee_tree_map_sub_map_iterator_gee_map_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		static const GInterfaceInfo gee_bidir_map_iterator_info = { (GInterfaceInitFunc) gee_tree_map_sub_map_iterator_gee_bidir_map_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		GType gee_tree_map_sub_map_iterator_type_id;
+		gee_tree_map_sub_map_iterator_type_id = g_type_register_static (GEE_TREE_MAP_TYPE_SUB_NODE_ITERATOR, "GeeTreeMapSubMapIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_tree_map_sub_map_iterator_type_id, GEE_TYPE_MAP_ITERATOR, &gee_map_iterator_info);
+		g_type_add_interface_static (gee_tree_map_sub_map_iterator_type_id, GEE_TYPE_BIDIR_MAP_ITERATOR, &gee_bidir_map_iterator_info);
+		g_once_init_leave (&gee_tree_map_sub_map_iterator_type_id__volatile, gee_tree_map_sub_map_iterator_type_id);
+	}
+	return gee_tree_map_sub_map_iterator_type_id__volatile;
+}
+
+
+static void _vala_gee_tree_map_sub_map_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubMapIterator * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_MAP_ITERATOR, GeeTreeMapSubMapIterator);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_MAP_ITERATOR_READ_ONLY:
+		g_value_set_boolean (value, gee_tree_map_sub_node_iterator_get_read_only ((GeeTreeMapSubNodeIterator*) self));
+		break;
+		case GEE_TREE_MAP_SUB_MAP_ITERATOR_MUTABLE:
+		g_value_set_boolean (value, gee_map_iterator_get_mutable ((GeeMapIterator*) self));
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
+static void _vala_gee_tree_map_sub_map_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec) {
+	GeeTreeMapSubMapIterator * self;
+	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_MAP_TYPE_SUB_MAP_ITERATOR, GeeTreeMapSubMapIterator);
+	switch (property_id) {
+		case GEE_TREE_MAP_SUB_MAP_ITERATOR_K_TYPE:
+		self->priv->k_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_MAP_ITERATOR_K_DUP_FUNC:
+		self->priv->k_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_MAP_ITERATOR_K_DESTROY_FUNC:
+		self->priv->k_destroy_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_MAP_ITERATOR_V_TYPE:
+		self->priv->v_type = g_value_get_gtype (value);
+		break;
+		case GEE_TREE_MAP_SUB_MAP_ITERATOR_V_DUP_FUNC:
+		self->priv->v_dup_func = g_value_get_pointer (value);
+		break;
+		case GEE_TREE_MAP_SUB_MAP_ITERATOR_V_DESTROY_FUNC:
+		self->priv->v_destroy_func = g_value_get_pointer (value);
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
 static void gee_tree_map_class_init (GeeTreeMapClass * klass) {
 	gee_tree_map_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeTreeMapPrivate));
@@ -4346,11 +12504,18 @@ static void gee_tree_map_class_init (GeeTreeMapClass * klass) {
 	GEE_ABSTRACT_MAP_CLASS (klass)->set = gee_tree_map_real_set;
 	GEE_ABSTRACT_MAP_CLASS (klass)->unset = gee_tree_map_real_unset;
 	GEE_ABSTRACT_MAP_CLASS (klass)->clear = gee_tree_map_real_clear;
+	GEE_ABSTRACT_SORTED_MAP_CLASS (klass)->head_map = gee_tree_map_real_head_map;
+	GEE_ABSTRACT_SORTED_MAP_CLASS (klass)->tail_map = gee_tree_map_real_tail_map;
+	GEE_ABSTRACT_SORTED_MAP_CLASS (klass)->sub_map = gee_tree_map_real_sub_map;
 	GEE_ABSTRACT_MAP_CLASS (klass)->map_iterator = gee_tree_map_real_map_iterator;
+	GEE_ABSTRACT_BIDIR_SORTED_MAP_CLASS (klass)->bidir_map_iterator = gee_tree_map_real_bidir_map_iterator;
 	GEE_ABSTRACT_MAP_CLASS (klass)->get_size = gee_tree_map_real_get_size;
+	GEE_ABSTRACT_MAP_CLASS (klass)->get_read_only = gee_tree_map_real_get_read_only;
 	GEE_ABSTRACT_MAP_CLASS (klass)->get_keys = gee_tree_map_real_get_keys;
 	GEE_ABSTRACT_MAP_CLASS (klass)->get_values = gee_tree_map_real_get_values;
 	GEE_ABSTRACT_MAP_CLASS (klass)->get_entries = gee_tree_map_real_get_entries;
+	GEE_ABSTRACT_SORTED_MAP_CLASS (klass)->get_ascending_keys = gee_tree_map_real_get_ascending_keys;
+	GEE_ABSTRACT_SORTED_MAP_CLASS (klass)->get_ascending_entries = gee_tree_map_real_get_ascending_entries;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_map_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_map_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_tree_map_finalize;
@@ -4364,6 +12529,7 @@ static void gee_tree_map_class_init (GeeTreeMapClass * klass) {
 	 * {@inheritDoc}
 	 */
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	/**
 	 * {@inheritDoc}
 	 */
@@ -4377,13 +12543,13 @@ static void gee_tree_map_class_init (GeeTreeMapClass * klass) {
 	 */
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_ENTRIES, g_param_spec_object ("entries", "entries", "entries", GEE_TYPE_SET, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	/**
-	 * The keys' comparator function.
+	 * {@inheritDoc}
 	 */
-	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_KEY_COMPARE_FUNC, g_param_spec_pointer ("key-compare-func", "key-compare-func", "key-compare-func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_ASCENDING_KEYS, g_param_spec_object ("ascending-keys", "ascending-keys", "ascending-keys", GEE_TYPE_SORTED_SET, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	/**
-	 * The values' equality testing function.
+	 * {@inheritDoc}
 	 */
-	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_VALUE_EQUAL_FUNC, g_param_spec_pointer ("value-equal-func", "value-equal-func", "value-equal-func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MAP_ASCENDING_ENTRIES, g_param_spec_object ("ascending-entries", "ascending-entries", "ascending-entries", GEE_TYPE_SORTED_SET, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -4400,6 +12566,15 @@ static void gee_tree_map_instance_init (GeeTreeMap * self) {
 static void gee_tree_map_finalize (GObject* obj) {
 	GeeTreeMap * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (obj, GEE_TYPE_TREE_MAP, GeeTreeMap);
+	gee_abstract_map_clear ((GeeAbstractMap*) self);
+	(self->priv->_key_compare_func_target_destroy_notify == NULL) ? NULL : (self->priv->_key_compare_func_target_destroy_notify (self->priv->_key_compare_func_target), NULL);
+	self->priv->_key_compare_func = NULL;
+	self->priv->_key_compare_func_target = NULL;
+	self->priv->_key_compare_func_target_destroy_notify = NULL;
+	(self->priv->_value_equal_func_target_destroy_notify == NULL) ? NULL : (self->priv->_value_equal_func_target_destroy_notify (self->priv->_value_equal_func_target), NULL);
+	self->priv->_value_equal_func = NULL;
+	self->priv->_value_equal_func_target = NULL;
+	self->priv->_value_equal_func_target_destroy_notify = NULL;
 	_gee_tree_map_node_free0 (self->priv->root);
 	G_OBJECT_CLASS (gee_tree_map_parent_class)->finalize (obj);
 }
@@ -4419,7 +12594,7 @@ GType gee_tree_map_get_type (void) {
 	if (g_once_init_enter (&gee_tree_map_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeMapClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_map_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeMap), 0, (GInstanceInitFunc) gee_tree_map_instance_init, NULL };
 		GType gee_tree_map_type_id;
-		gee_tree_map_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_MAP, "GeeTreeMap", &g_define_type_info, 0);
+		gee_tree_map_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP, "GeeTreeMap", &g_define_type_info, 0);
 		g_once_init_leave (&gee_tree_map_type_id__volatile, gee_tree_map_type_id);
 	}
 	return gee_tree_map_type_id__volatile;
@@ -4433,6 +12608,9 @@ static void _vala_gee_tree_map_get_property (GObject * object, guint property_id
 		case GEE_TREE_MAP_SIZE:
 		g_value_set_int (value, gee_abstract_map_get_size ((GeeAbstractMap*) self));
 		break;
+		case GEE_TREE_MAP_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_map_get_read_only ((GeeAbstractMap*) self));
+		break;
 		case GEE_TREE_MAP_KEYS:
 		g_value_take_object (value, gee_abstract_map_get_keys ((GeeAbstractMap*) self));
 		break;
@@ -4442,11 +12620,11 @@ static void _vala_gee_tree_map_get_property (GObject * object, guint property_id
 		case GEE_TREE_MAP_ENTRIES:
 		g_value_take_object (value, gee_abstract_map_get_entries ((GeeAbstractMap*) self));
 		break;
-		case GEE_TREE_MAP_KEY_COMPARE_FUNC:
-		g_value_set_pointer (value, gee_tree_map_get_key_compare_func (self));
+		case GEE_TREE_MAP_ASCENDING_KEYS:
+		g_value_take_object (value, gee_abstract_sorted_map_get_ascending_keys ((GeeAbstractSortedMap*) self));
 		break;
-		case GEE_TREE_MAP_VALUE_EQUAL_FUNC:
-		g_value_set_pointer (value, gee_tree_map_get_value_equal_func (self));
+		case GEE_TREE_MAP_ASCENDING_ENTRIES:
+		g_value_take_object (value, gee_abstract_sorted_map_get_ascending_entries ((GeeAbstractSortedMap*) self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -4459,12 +12637,6 @@ static void _vala_gee_tree_map_set_property (GObject * object, guint property_id
 	GeeTreeMap * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TYPE_TREE_MAP, GeeTreeMap);
 	switch (property_id) {
-		case GEE_TREE_MAP_KEY_COMPARE_FUNC:
-		gee_tree_map_set_key_compare_func (self, g_value_get_pointer (value));
-		break;
-		case GEE_TREE_MAP_VALUE_EQUAL_FUNC:
-		gee_tree_map_set_value_equal_func (self, g_value_get_pointer (value));
-		break;
 		case GEE_TREE_MAP_K_TYPE:
 		self->priv->k_type = g_value_get_gtype (value);
 		break;

@@ -24,6 +24,11 @@
 
 using GLib;
 
+namespace Gee {
+	public delegate uint HashDataFunc<T> (T v);
+	public delegate bool EqualDataFunc<T> (T a, T b);
+}
+
 /**
  * Hash table implementation of the {@link Set} interface.
  *
@@ -40,16 +45,25 @@ public class Gee.HashSet<G> : AbstractSet<G> {
 	public override int size {
 		get { return _nnodes; }
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public override bool read_only {
+		get { return false; }
+	}
 
 	/**
 	 * The elements' hash function.
 	 */
-	public HashFunc hash_func { private set; get; }
+	[CCode (notify = false)]
+	public HashDataFunc<G> hash_func { private set; get; }
 
 	/**
 	 * The elements' equality testing function.
 	 */
-	public EqualFunc equal_func { private set; get; }
+	[CCode (notify = false)]
+	public EqualDataFunc<G> equal_func { private set; get; }
 
 	private int _array_size;
 	private int _nnodes;
@@ -70,7 +84,7 @@ public class Gee.HashSet<G> : AbstractSet<G> {
 	 * @param hash_func an optional hash function
 	 * @param equal_func an optional equality testing function
 	 */
-	public HashSet (HashFunc? hash_func = null, EqualFunc? equal_func = null) {
+	public HashSet (owned HashDataFunc<G>? hash_func = null, owned EqualDataFunc<G>? equal_func = null) {
 		if (hash_func == null) {
 			hash_func = Functions.get_hash_func_for (typeof (G));
 		}
@@ -208,7 +222,7 @@ public class Gee.HashSet<G> : AbstractSet<G> {
 		}
 	}
 
-	private class Iterator<G> : Object, Gee.Iterator<G> {
+	private class Iterator<G> : Object, Traversable<G>, Gee.Iterator<G> {
 		private HashSet<G> _set;
 		private int _index = -1;
 		private weak Node<G> _node;
@@ -247,16 +261,6 @@ public class Gee.HashSet<G> : AbstractSet<G> {
 			return (_next != null);
 		}
 
-		public bool first () {
-			assert (_stamp == _set._stamp);
-			if (_set.size == 0) {
-				return false;
-			}
-			_index = -1;
-			_next = null;
-			return next ();
-		}
-
 		public new G get () {
 			assert (_stamp == _set._stamp);
 			assert (_node != null);
@@ -270,6 +274,40 @@ public class Gee.HashSet<G> : AbstractSet<G> {
 			_set.remove_helper (_node.key);
 			_node = null;
 			_stamp = _set._stamp;
+		}
+		
+		public bool read_only {
+			get {
+				return false;
+			}
+		}
+		
+		public bool valid {
+			get {
+				return _node != null;
+			}
+		}
+
+		public bool foreach (ForallFunc<G> f) {
+			assert (_stamp == _set._stamp);
+			if (_node != null) {
+				if (!f (_node.key)) {
+					return false;
+				}
+			}
+			while (_index + 1 < _set._array_size || _next != null) {
+				if (_next != null) {
+					_node = _next;
+					if (!f (_node.key)) {
+						return false;
+					}
+					_next = _node.next;
+				} else {
+					_index++;
+					_next = _set._nodes[_index];
+				}
+			}
+			return false;
 		}
 	}
 }

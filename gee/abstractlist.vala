@@ -66,40 +66,6 @@ public abstract class Gee.AbstractList<G> : Gee.AbstractCollection<G>, List<G> {
 	 */
 	public abstract List<G>? slice (int start, int stop);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public virtual G first () {
-		return get (0);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public virtual G last () {
-		return get (size - 1);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public virtual void insert_all (int index, Collection<G> collection) {
-		foreach (G item in collection) {
-			insert(index, item);
-			index++;
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void sort (CompareFunc? compare = null) {
-		if (compare == null) {
-			compare = Functions.get_compare_func_for (typeof (G));
-		}
-		TimSort.sort<G> (this, compare);
-	}
-
 	private weak List<G> _read_only_view;
 
 	/**
@@ -116,4 +82,16 @@ public abstract class Gee.AbstractList<G> : Gee.AbstractCollection<G>, List<G> {
 			return instance;
 		}
 	}
+
+	// Future-proofing
+	internal new virtual void reserved0() {}
+	internal new virtual void reserved1() {}
+	internal new virtual void reserved2() {}
+	internal new virtual void reserved3() {}
+	internal new virtual void reserved4() {}
+	internal new virtual void reserved5() {}
+	internal new virtual void reserved6() {}
+	internal new virtual void reserved7() {}
+	internal new virtual void reserved8() {}
+	internal new virtual void reserved9() {}
 }

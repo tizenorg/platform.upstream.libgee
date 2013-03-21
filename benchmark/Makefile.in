@@ -54,7 +54,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/Makefile.decl
+	$(top_srcdir)/Makefile.decl benchmark.c benchmarks_vala.stamp \
+	benchmarksorts.c
 noinst_PROGRAMS = benchmarks$(EXEEXT)
 subdir = benchmark
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -70,16 +71,18 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
 am__objects_1 =
-am__objects_2 = benchmark.$(OBJEXT) benchmarksorts.$(OBJEXT) \
-	mergesort.$(OBJEXT) $(am__objects_1)
-am_benchmarks_OBJECTS = $(am__objects_2)
+am_benchmarks_OBJECTS = benchmarks-benchmark.$(OBJEXT) \
+	benchmarks-benchmarksorts.$(OBJEXT) $(am__objects_1)
 benchmarks_OBJECTS = $(am_benchmarks_OBJECTS)
 am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) ../gee/libgee.la
-benchmarks_DEPENDENCIES = $(am__DEPENDENCIES_2)
+benchmarks_DEPENDENCIES = $(am__DEPENDENCIES_1) ../gee/libgee-0.8.la \
+	$(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
+benchmarks_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(benchmarks_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -103,6 +106,13 @@ LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD  " $@;
+VALACOMPILE = $(VALAC) $(AM_VALAFLAGS) $(VALAFLAGS)
+LTVALACOMPILE = $(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(VALAC) $(AM_VALAFLAGS) \
+	$(VALAFLAGS)
+AM_V_VALAC = $(am__v_VALAC_@AM_V@)
+am__v_VALAC_ = $(am__v_VALAC_@AM_DEFAULT_V@)
+am__v_VALAC_0 = @echo "  VALAC " $@;
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN   " $@;
@@ -255,34 +265,37 @@ GTESTER = gtester
 GTESTER_REPORT = gtester-report
 
 # initialize variables for unconditional += appending
-EXTRA_DIST = $(benchmarks_VALASOURCES)
+EXTRA_DIST = 
 TEST_PROGS = 
+
+# useful constants
 NULL = 
-AM_CPPFLAGS = \
+benchmarks_SOURCES = \
+	benchmark.vala \
+	benchmarksorts.vala \
+	$(NULL)
+
+benchmarks_VALAFLAGS = \
+	--basedir $(top_srcdir) \
+	--vapidir $(top_srcdir)/gee \
+	--pkg gee-internals-0.8 \
+	$(NULL)
+
+benchmarks_CPPFLAGS = \
 	-I$(top_srcdir)/gee \
 	$(GLIB_CFLAGS) \
 	$(NULL)
 
-AM_LDFLAGS = \
-	-lm
-
-progs_ldadd = $(GLIB_LIBS) ../gee/libgee.la
-BUILT_SOURCES = benchmarks.vala.stamp
-benchmarks_VALASOURCES = \
-	benchmark.vala \
-	benchmarksorts.vala \
-	mergesort.vala \
+benchmarks_LDADD = \
+	$(GLIB_LIBS) \
+	../gee/libgee-0.8.la \
 	$(NULL)
 
-benchmarks_SOURCES = benchmarks.vala.stamp $(benchmarks_VALASOURCES:.vala=.c)
-benchmarks_LDADD = $(progs_ldadd)
-MAINTAINERCLEANFILES = \
-	$(benchmarks_VALASOURCES:.vala=.c) \
-	benchmarks.vala.stamp \
+benchmarks_LDFLAGS = \
+	-lm \
 	$(NULL)
 
-all: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) all-am
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -328,7 +341,7 @@ clean-noinstPROGRAMS:
 	rm -f $$list
 benchmarks$(EXEEXT): $(benchmarks_OBJECTS) $(benchmarks_DEPENDENCIES) $(EXTRA_benchmarks_DEPENDENCIES) 
 	@rm -f benchmarks$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(benchmarks_OBJECTS) $(benchmarks_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(benchmarks_LINK) $(benchmarks_OBJECTS) $(benchmarks_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -336,9 +349,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/benchmark.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/benchmarksorts.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mergesort.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/benchmarks-benchmark.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/benchmarks-benchmarksorts.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -360,6 +372,48 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+benchmarks-benchmark.o: benchmark.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(benchmarks_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT benchmarks-benchmark.o -MD -MP -MF $(DEPDIR)/benchmarks-benchmark.Tpo -c -o benchmarks-benchmark.o `test -f 'benchmark.c' || echo '$(srcdir)/'`benchmark.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/benchmarks-benchmark.Tpo $(DEPDIR)/benchmarks-benchmark.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='benchmark.c' object='benchmarks-benchmark.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(benchmarks_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o benchmarks-benchmark.o `test -f 'benchmark.c' || echo '$(srcdir)/'`benchmark.c
+
+benchmarks-benchmark.obj: benchmark.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(benchmarks_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT benchmarks-benchmark.obj -MD -MP -MF $(DEPDIR)/benchmarks-benchmark.Tpo -c -o benchmarks-benchmark.obj `if test -f 'benchmark.c'; then $(CYGPATH_W) 'benchmark.c'; else $(CYGPATH_W) '$(srcdir)/benchmark.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/benchmarks-benchmark.Tpo $(DEPDIR)/benchmarks-benchmark.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='benchmark.c' object='benchmarks-benchmark.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(benchmarks_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o benchmarks-benchmark.obj `if test -f 'benchmark.c'; then $(CYGPATH_W) 'benchmark.c'; else $(CYGPATH_W) '$(srcdir)/benchmark.c'; fi`
+
+benchmarks-benchmarksorts.o: benchmarksorts.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(benchmarks_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT benchmarks-benchmarksorts.o -MD -MP -MF $(DEPDIR)/benchmarks-benchmarksorts.Tpo -c -o benchmarks-benchmarksorts.o `test -f 'benchmarksorts.c' || echo '$(srcdir)/'`benchmarksorts.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/benchmarks-benchmarksorts.Tpo $(DEPDIR)/benchmarks-benchmarksorts.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='benchmarksorts.c' object='benchmarks-benchmarksorts.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(benchmarks_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o benchmarks-benchmarksorts.o `test -f 'benchmarksorts.c' || echo '$(srcdir)/'`benchmarksorts.c
+
+benchmarks-benchmarksorts.obj: benchmarksorts.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(benchmarks_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT benchmarks-benchmarksorts.obj -MD -MP -MF $(DEPDIR)/benchmarks-benchmarksorts.Tpo -c -o benchmarks-benchmarksorts.obj `if test -f 'benchmarksorts.c'; then $(CYGPATH_W) 'benchmarksorts.c'; else $(CYGPATH_W) '$(srcdir)/benchmarksorts.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/benchmarks-benchmarksorts.Tpo $(DEPDIR)/benchmarks-benchmarksorts.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='benchmarksorts.c' object='benchmarks-benchmarksorts.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(benchmarks_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o benchmarks-benchmarksorts.obj `if test -f 'benchmarksorts.c'; then $(CYGPATH_W) 'benchmarksorts.c'; else $(CYGPATH_W) '$(srcdir)/benchmarksorts.c'; fi`
+$(srcdir)/benchmark.c: $(srcdir)/benchmarks_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/benchmarks_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/benchmarks_vala.stamp; \
+	fi
+$(srcdir)/benchmarksorts.c: $(srcdir)/benchmarks_vala.stamp
+	@if test -f $@; then :; else rm -f $(srcdir)/benchmarks_vala.stamp; fi
+	@if test -f $@; then :; else \
+	  $(MAKE) $(AM_MAKEFLAGS) $(srcdir)/benchmarks_vala.stamp; \
+	fi
+$(srcdir)/benchmarks_vala.stamp: benchmark.vala benchmarksorts.vala
+	$(AM_V_at)rm -f $@ && echo stamp > $@-t
+	$(AM_V_VALAC)$(am__cd) $(srcdir) && $(VALAC) $(benchmarks_VALAFLAGS) $(VALAFLAGS) -C benchmark.vala benchmarksorts.vala
+	$(AM_V_at)mv -f $@-t $@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -451,12 +505,10 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-local
-check: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) check-am
+check: check-am
 all-am: Makefile $(PROGRAMS)
 installdirs:
-install: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) install-am
+install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -486,8 +538,9 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
-	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+	-rm -f benchmark.c
+	-rm -f benchmarks_vala.stamp
+	-rm -f benchmarksorts.c
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-noinstPROGRAMS \
@@ -559,7 +612,7 @@ ps-am:
 
 uninstall-am:
 
-.MAKE: all check check-am install install-am install-strip
+.MAKE: check-am install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am check-local clean \
 	clean-generic clean-libtool clean-noinstPROGRAMS ctags \
@@ -624,10 +677,6 @@ test-report perf-report full-report:	${TEST_PROGS}
 .PHONY: test test-report perf-report full-report
 # run make test as part of make check
 check-local: test
-	$(NULL)
-benchmarks.vala.stamp: $(benchmarks_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir $(top_srcdir)/gee --pkg gee-internals-1.0 $^
-	touch $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

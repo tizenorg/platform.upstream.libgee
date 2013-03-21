@@ -47,4 +47,16 @@ public abstract class Gee.AbstractSet<G> : Gee.AbstractCollection<G>, Set<G> {
 			return instance;
 		}
 	}
+
+	// Future-proofing
+	internal new virtual void reserved0() {}
+	internal new virtual void reserved1() {}
+	internal new virtual void reserved2() {}
+	internal new virtual void reserved3() {}
+	internal new virtual void reserved4() {}
+	internal new virtual void reserved5() {}
+	internal new virtual void reserved6() {}
+	internal new virtual void reserved7() {}
+	internal new virtual void reserved8() {}
+	internal new virtual void reserved9() {}
 }

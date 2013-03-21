@@ -215,7 +215,7 @@ build_vendor = @build_vendor@
 builddir = @builddir@
 datadir = @datadir@
 datarootdir = @datarootdir@
-docdir = $(datadir)/devhelp/references/gee-1.0
+docdir = $(datadir)/devhelp/references/gee-0.8
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 host = @host@
@@ -252,27 +252,29 @@ GTESTER_REPORT = gtester-report
 # initialize variables for unconditional += appending
 EXTRA_DIST = index.wiki $(NULL)
 TEST_PROGS = 
+
+# useful constants
 NULL = 
 SRC_DIR = $(top_srcdir)/gee
-innerdocdir = $(datadir)/devhelp/references/gee-1.0/gee-1.0
-imgdir = $(datadir)/devhelp/references/gee-1.0/gee-1.0/img
+innerdocdir = $(datadir)/devhelp/references/gee-0.8/gee-0.8
+imgdir = $(datadir)/devhelp/references/gee-0.8/gee-0.8/img
 doc_data = \
-	gee-1.0/*.css \
-	gee-1.0/*.png \
+	gee-0.8/*.css \
+	gee-0.8/*.png \
 	$(NULL)
 
 doc_DATA = \
-	gee-1.0/index.html \
+	gee-0.8/index.html \
 	$(doc_data) \
 	$(NULL)
 
 innerdoc_DATA = \
-	gee-1.0/gee-1.0/index.htm \
-	gee-1.0/gee-1.0/*.html \
+	gee-0.8/gee-0.8/index.htm \
+	gee-0.8/gee-0.8/*.html \
 	$(NULL)
 
 img_DATA = \
-	gee-1.0/gee-1.0/img/*.png \
+	gee-0.8/gee-0.8/img/*.png \
 	$(NULL)
 
 all: all-am
@@ -585,10 +587,10 @@ test-report perf-report full-report:	${TEST_PROGS}
 # run make test as part of make check
 check-local: test
 
-$(doc_data) $(innerdoc_DATA) $(img_DATA): gee-1.0/index.html
+$(doc_data) $(innerdoc_DATA) $(img_DATA): gee-0.8/index.html
 
-gee-1.0/index.html:
-	$(VALADOC) -o gee-1.0/ --wiki ./ --force -b $(top_srcdir) $(SRC_DIR)/*.vala
+gee-0.8/index.html:
+	$(VALADOC) -o gee-0.8/ --wiki ./ --force -b $(top_srcdir) $(SRC_DIR)/*.vala
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

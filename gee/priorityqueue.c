@@ -4,6 +4,7 @@
 /* priorityqueue.vala
  *
  * Copyright (C) 2009  Didier Villevalois
+ * Copyright (C) 2012  Maciej Piechotka
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,13 +30,25 @@
 #include <gobject/gvaluecollector.h>
 
 
-#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
-#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
-#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
-#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+#define GEE_TYPE_TRAVERSABLE (gee_traversable_get_type ())
+#define GEE_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversable))
+#define GEE_IS_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_TRAVERSABLE))
+#define GEE_TRAVERSABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversableIface))
 
-typedef struct _GeeIterable GeeIterable;
-typedef struct _GeeIterableIface GeeIterableIface;
+typedef struct _GeeTraversable GeeTraversable;
+typedef struct _GeeTraversableIface GeeTraversableIface;
+
+#define GEE_TRAVERSABLE_TYPE_STREAM (gee_traversable_stream_get_type ())
+
+#define GEE_TYPE_LAZY (gee_lazy_get_type ())
+#define GEE_LAZY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LAZY, GeeLazy))
+#define GEE_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_LAZY, GeeLazyClass))
+#define GEE_IS_LAZY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LAZY))
+#define GEE_IS_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_LAZY))
+#define GEE_LAZY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_LAZY, GeeLazyClass))
+
+typedef struct _GeeLazy GeeLazy;
+typedef struct _GeeLazyClass GeeLazyClass;
 
 #define GEE_TYPE_ITERATOR (gee_iterator_get_type ())
 #define GEE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERATOR, GeeIterator))
@@ -44,6 +57,14 @@ typedef struct _GeeIterableIface GeeIterableIface;
 
 typedef struct _GeeIterator GeeIterator;
 typedef struct _GeeIteratorIface GeeIteratorIface;
+
+#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
+#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
+#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
+#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+
+typedef struct _GeeIterable GeeIterable;
+typedef struct _GeeIterableIface GeeIterableIface;
 
 #define GEE_TYPE_COLLECTION (gee_collection_get_type ())
 #define GEE_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_COLLECTION, GeeCollection))
@@ -123,18 +144,9 @@ typedef struct _GeePriorityQueueType1NodeClass GeePriorityQueueType1NodeClass;
 
 typedef struct _GeePriorityQueueType2Node GeePriorityQueueType2Node;
 typedef struct _GeePriorityQueueType2NodeClass GeePriorityQueueType2NodeClass;
-
-#define GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR (gee_priority_queue_node_pair_get_type ())
-#define GEE_PRIORITY_QUEUE_NODE_PAIR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR, GeePriorityQueueNodePair))
-#define GEE_PRIORITY_QUEUE_NODE_PAIR_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR, GeePriorityQueueNodePairClass))
-#define GEE_PRIORITY_QUEUE_IS_NODE_PAIR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR))
-#define GEE_PRIORITY_QUEUE_IS_NODE_PAIR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR))
-#define GEE_PRIORITY_QUEUE_NODE_PAIR_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR, GeePriorityQueueNodePairClass))
-
 typedef struct _GeePriorityQueueNodePair GeePriorityQueueNodePair;
-typedef struct _GeePriorityQueueNodePairClass GeePriorityQueueNodePairClass;
 #define _gee_priority_queue_node_unref0(var) ((var == NULL) ? NULL : (var = (gee_priority_queue_node_unref (var), NULL)))
-#define _gee_priority_queue_node_pair_unref0(var) ((var == NULL) ? NULL : (var = (gee_priority_queue_node_pair_unref (var), NULL)))
+#define _gee_priority_queue_node_pair_free0(var) ((var == NULL) ? NULL : (var = (gee_priority_queue_node_pair_free (var), NULL)))
 typedef struct _GeePriorityQueueNodePrivate GeePriorityQueueNodePrivate;
 typedef struct _GeePriorityQueueType1NodePrivate GeePriorityQueueType1NodePrivate;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
@@ -148,7 +160,6 @@ typedef struct _GeePriorityQueueType1NodePrivate GeePriorityQueueType1NodePrivat
 
 typedef struct _GeePriorityQueueIterator GeePriorityQueueIterator;
 typedef struct _GeePriorityQueueIteratorClass GeePriorityQueueIteratorClass;
-typedef struct _GeePriorityQueueNodePairPrivate GeePriorityQueueNodePairPrivate;
 #define _g_destroy_func0(var) (((var == NULL) || (g_destroy_func == NULL)) ? NULL : (var = (g_destroy_func (var), NULL)))
 typedef struct _GeePriorityQueueParamSpecNode GeePriorityQueueParamSpecNode;
 typedef struct _GeePriorityQueueType2NodePrivate GeePriorityQueueType2NodePrivate;
@@ -163,27 +174,58 @@ typedef struct _GeePriorityQueueType2NodePrivate GeePriorityQueueType2NodePrivat
 typedef struct _GeePriorityQueueDummyNode GeePriorityQueueDummyNode;
 typedef struct _GeePriorityQueueDummyNodeClass GeePriorityQueueDummyNodeClass;
 typedef struct _GeePriorityQueueDummyNodePrivate GeePriorityQueueDummyNodePrivate;
-typedef struct _GeePriorityQueueParamSpecNodePair GeePriorityQueueParamSpecNodePair;
 typedef struct _GeePriorityQueueIteratorPrivate GeePriorityQueueIteratorPrivate;
 #define _vala_assert(expr, msg) if G_LIKELY (expr) ; else g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
 
+typedef gboolean (*GeeForallFunc) (gpointer g, void* user_data);
+typedef enum  {
+	GEE_TRAVERSABLE_STREAM_YIELD,
+	GEE_TRAVERSABLE_STREAM_CONTINUE,
+	GEE_TRAVERSABLE_STREAM_END
+} GeeTraversableStream;
+
+typedef GeeTraversableStream (*GeeStreamFunc) (GeeTraversableStream state, GeeLazy* g, GeeLazy** lazy, void* user_data);
 struct _GeeIteratorIface {
 	GTypeInterface parent_iface;
 	gboolean (*next) (GeeIterator* self);
 	gboolean (*has_next) (GeeIterator* self);
-	gboolean (*first) (GeeIterator* self);
 	gpointer (*get) (GeeIterator* self);
 	void (*remove) (GeeIterator* self);
+	gboolean (*get_valid) (GeeIterator* self);
+	gboolean (*get_read_only) (GeeIterator* self);
+};
+
+typedef gpointer (*GeeFoldFunc) (gpointer g, gpointer a, void* user_data);
+typedef gpointer (*GeeMapFunc) (gpointer g, void* user_data);
+typedef gboolean (*GeePredicate) (gconstpointer g, void* user_data);
+struct _GeeTraversableIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeTraversable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeTraversable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeTraversable* self);
+	gboolean (*foreach) (GeeTraversable* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	gpointer (*fold) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*map) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+	GeeIterator* (*scan) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*filter) (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+	GeeIterator* (*chop) (GeeTraversable* self, gint offset, gint length);
+	GType (*get_element_type) (GeeTraversable* self);
 };
 
 struct _GeeIterableIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeIterable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeIterable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeIterable* self);
 	GeeIterator* (*iterator) (GeeIterable* self);
-	GType (*get_element_type) (GeeIterable* self);
 };
 
 struct _GeeCollectionIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeCollection* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeCollection* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeCollection* self);
 	gboolean (*contains) (GeeCollection* self, gconstpointer item);
 	gboolean (*add) (GeeCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeCollection* self, gconstpointer item);
@@ -195,6 +237,7 @@ struct _GeeCollectionIface {
 	gpointer* (*to_array) (GeeCollection* self, int* result_length1);
 	gint (*get_size) (GeeCollection* self);
 	gboolean (*get_is_empty) (GeeCollection* self);
+	gboolean (*get_read_only) (GeeCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeCollection* self);
 };
 
@@ -209,19 +252,28 @@ struct _GeeAbstractCollectionClass {
 	gboolean (*add) (GeeAbstractCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeAbstractCollection* self, gconstpointer item);
 	void (*clear) (GeeAbstractCollection* self);
-	gpointer* (*to_array) (GeeAbstractCollection* self, int* result_length1);
-	gboolean (*add_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*contains_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*remove_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*retain_all) (GeeAbstractCollection* self, GeeCollection* collection);
 	GeeIterator* (*iterator) (GeeAbstractCollection* self);
+	gboolean (*foreach) (GeeAbstractCollection* self, GeeForallFunc f, void* f_target);
+	void (*reserved0) (GeeAbstractCollection* self);
+	void (*reserved1) (GeeAbstractCollection* self);
+	void (*reserved2) (GeeAbstractCollection* self);
+	void (*reserved3) (GeeAbstractCollection* self);
+	void (*reserved4) (GeeAbstractCollection* self);
+	void (*reserved5) (GeeAbstractCollection* self);
+	void (*reserved6) (GeeAbstractCollection* self);
+	void (*reserved7) (GeeAbstractCollection* self);
+	void (*reserved8) (GeeAbstractCollection* self);
+	void (*reserved9) (GeeAbstractCollection* self);
 	gint (*get_size) (GeeAbstractCollection* self);
-	gboolean (*get_is_empty) (GeeAbstractCollection* self);
+	gboolean (*get_read_only) (GeeAbstractCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeAbstractCollection* self);
 };
 
 struct _GeeQueueIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeQueue* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeQueue* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeQueue* self);
 	gboolean (*offer) (GeeQueue* self, gconstpointer element);
 	gpointer (*peek) (GeeQueue* self);
 	gpointer (*poll) (GeeQueue* self);
@@ -238,10 +290,18 @@ struct _GeeAbstractQueue {
 
 struct _GeeAbstractQueueClass {
 	GeeAbstractCollectionClass parent_class;
-	gboolean (*offer) (GeeAbstractQueue* self, gconstpointer element);
 	gpointer (*peek) (GeeAbstractQueue* self);
 	gpointer (*poll) (GeeAbstractQueue* self);
-	gint (*drain) (GeeAbstractQueue* self, GeeCollection* recipient, gint amount);
+	void (*reserved0) (GeeAbstractQueue* self);
+	void (*reserved1) (GeeAbstractQueue* self);
+	void (*reserved2) (GeeAbstractQueue* self);
+	void (*reserved3) (GeeAbstractQueue* self);
+	void (*reserved4) (GeeAbstractQueue* self);
+	void (*reserved5) (GeeAbstractQueue* self);
+	void (*reserved6) (GeeAbstractQueue* self);
+	void (*reserved7) (GeeAbstractQueue* self);
+	void (*reserved8) (GeeAbstractQueue* self);
+	void (*reserved9) (GeeAbstractQueue* self);
 	gint (*get_capacity) (GeeAbstractQueue* self);
 	gint (*get_remaining_capacity) (GeeAbstractQueue* self);
 	gboolean (*get_is_full) (GeeAbstractQueue* self);
@@ -260,7 +320,9 @@ struct _GeePriorityQueuePrivate {
 	GType g_type;
 	GBoxedCopyFunc g_dup_func;
 	GDestroyNotify g_destroy_func;
-	GCompareFunc _compare_func;
+	GCompareDataFunc _compare_func;
+	gpointer _compare_func_target;
+	GDestroyNotify _compare_func_target_destroy_notify;
 	gint _size;
 	gint _stamp;
 	GeePriorityQueueType1Node* _r;
@@ -318,18 +380,10 @@ struct _GeePriorityQueueType1NodeClass {
 };
 
 struct _GeePriorityQueueNodePair {
-	GTypeInstance parent_instance;
-	volatile int ref_count;
-	GeePriorityQueueNodePairPrivate * priv;
 	GeePriorityQueueNodePair* lp_prev;
 	GeePriorityQueueNodePair* lp_next;
 	GeePriorityQueueType1Node* node1;
 	GeePriorityQueueType1Node* node2;
-};
-
-struct _GeePriorityQueueNodePairClass {
-	GTypeClass parent_class;
-	void (*finalize) (GeePriorityQueueNodePair *self);
 };
 
 struct _GeePriorityQueueNodePrivate {
@@ -378,16 +432,6 @@ struct _GeePriorityQueueDummyNodePrivate {
 	GDestroyNotify g_destroy_func;
 };
 
-struct _GeePriorityQueueNodePairPrivate {
-	GType g_type;
-	GBoxedCopyFunc g_dup_func;
-	GDestroyNotify g_destroy_func;
-};
-
-struct _GeePriorityQueueParamSpecNodePair {
-	GParamSpec parent_instance;
-};
-
 struct _GeePriorityQueueIterator {
 	GObject parent_instance;
 	GeePriorityQueueIteratorPrivate * priv;
@@ -413,11 +457,20 @@ static gpointer gee_priority_queue_node_parent_class = NULL;
 static gpointer gee_priority_queue_type1_node_parent_class = NULL;
 static gpointer gee_priority_queue_type2_node_parent_class = NULL;
 static gpointer gee_priority_queue_dummy_node_parent_class = NULL;
-static gpointer gee_priority_queue_node_pair_parent_class = NULL;
 static gpointer gee_priority_queue_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_priority_queue_iterator_gee_traversable_parent_iface = NULL;
 static GeeIteratorIface* gee_priority_queue_iterator_gee_iterator_parent_iface = NULL;
 
+GType gee_traversable_stream_get_type (void) G_GNUC_CONST;
+gpointer gee_lazy_ref (gpointer instance);
+void gee_lazy_unref (gpointer instance);
+GParamSpec* gee_param_spec_lazy (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void gee_value_set_lazy (GValue* value, gpointer v_object);
+void gee_value_take_lazy (GValue* value, gpointer v_object);
+gpointer gee_value_get_lazy (const GValue* value);
+GType gee_lazy_get_type (void) G_GNUC_CONST;
 GType gee_iterator_get_type (void) G_GNUC_CONST;
+GType gee_traversable_get_type (void) G_GNUC_CONST;
 GType gee_iterable_get_type (void) G_GNUC_CONST;
 GType gee_collection_get_type (void) G_GNUC_CONST;
 GType gee_abstract_collection_get_type (void) G_GNUC_CONST;
@@ -433,31 +486,25 @@ static gpointer gee_priority_queue_value_get_node (const GValue* value) G_GNUC_U
 static GType gee_priority_queue_node_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
 static GType gee_priority_queue_type1_node_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
 static GType gee_priority_queue_type2_node_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
-static gpointer gee_priority_queue_node_pair_ref (gpointer instance);
-static void gee_priority_queue_node_pair_unref (gpointer instance);
-static GParamSpec* gee_priority_queue_param_spec_node_pair (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags) G_GNUC_UNUSED;
-static void gee_priority_queue_value_set_node_pair (GValue* value, gpointer v_object) G_GNUC_UNUSED;
-static void gee_priority_queue_value_take_node_pair (GValue* value, gpointer v_object) G_GNUC_UNUSED;
-static gpointer gee_priority_queue_value_get_node_pair (const GValue* value) G_GNUC_UNUSED;
-static GType gee_priority_queue_node_pair_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
+static void gee_priority_queue_node_pair_free (GeePriorityQueueNodePair* self);
 #define GEE_PRIORITY_QUEUE_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TYPE_PRIORITY_QUEUE, GeePriorityQueuePrivate))
 enum  {
 	GEE_PRIORITY_QUEUE_DUMMY_PROPERTY,
 	GEE_PRIORITY_QUEUE_G_TYPE,
 	GEE_PRIORITY_QUEUE_G_DUP_FUNC,
 	GEE_PRIORITY_QUEUE_G_DESTROY_FUNC,
-	GEE_PRIORITY_QUEUE_COMPARE_FUNC,
 	GEE_PRIORITY_QUEUE_CAPACITY,
 	GEE_PRIORITY_QUEUE_REMAINING_CAPACITY,
 	GEE_PRIORITY_QUEUE_IS_FULL,
+	GEE_PRIORITY_QUEUE_READ_ONLY,
 	GEE_PRIORITY_QUEUE_SIZE
 };
-GeePriorityQueue* gee_priority_queue_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func);
-GeePriorityQueue* gee_priority_queue_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func);
+GeePriorityQueue* gee_priority_queue_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
+GeePriorityQueue* gee_priority_queue_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
 GeeAbstractQueue* gee_abstract_queue_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
-GCompareFunc gee_functions_get_compare_func_for (GType t);
-static void gee_priority_queue_set_compare_func (GeePriorityQueue* self, GCompareFunc value);
-static gboolean gee_priority_queue_real_offer (GeeAbstractQueue* base, gconstpointer element);
+GCompareDataFunc gee_functions_get_compare_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+static void gee_priority_queue_set_compare_func (GeePriorityQueue* self, GCompareDataFunc value, gpointer value_target);
+gboolean gee_priority_queue_offer (GeePriorityQueue* self, gconstpointer element);
 static GeePriorityQueueType1Node* gee_priority_queue_type1_node_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gconstpointer data, GeePriorityQueueNode** head, GeePriorityQueueNode** tail);
 static GeePriorityQueueType1Node* gee_priority_queue_type1_node_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gconstpointer data, GeePriorityQueueNode** head, GeePriorityQueueNode** tail);
 static GeePriorityQueueType2Node* gee_priority_queue_type2_node_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, gconstpointer data, GeePriorityQueueNode** head, GeePriorityQueueNode** tail);
@@ -473,16 +520,15 @@ static void _gee_priority_queue_remove_type1_node (GeePriorityQueue* self, GeePr
 static void _gee_priority_queue_add_in_r_prime (GeePriorityQueue* self, GeePriorityQueueType1Node* node);
 static void _gee_priority_queue_adjust (GeePriorityQueue* self, GeePriorityQueueType1Node* p1, GeePriorityQueueType1Node* p2);
 static gboolean _gee_priority_queue_check_linkable (GeePriorityQueue* self);
-static gint gee_priority_queue_real_drain (GeeAbstractQueue* base, GeeCollection* recipient, gint amount);
+gint gee_priority_queue_drain (GeePriorityQueue* self, GeeCollection* recipient, gint amount);
 gboolean gee_collection_add (GeeCollection* self, gconstpointer item);
 gpointer gee_abstract_queue_poll (GeeAbstractQueue* self);
 static gboolean gee_priority_queue_real_contains (GeeAbstractCollection* base, gconstpointer item);
 GeeIterator* gee_abstract_collection_iterator (GeeAbstractCollection* self);
 gboolean gee_iterator_next (GeeIterator* self);
 gpointer gee_iterator_get (GeeIterator* self);
-GCompareFunc gee_priority_queue_get_compare_func (GeePriorityQueue* self);
+GCompareDataFunc gee_priority_queue_get_compare_func (GeePriorityQueue* self, gpointer* result_target);
 static gboolean gee_priority_queue_real_add (GeeAbstractCollection* base, gconstpointer item);
-gboolean gee_abstract_queue_offer (GeeAbstractQueue* self, gconstpointer element);
 static gboolean gee_priority_queue_real_remove (GeeAbstractCollection* base, gconstpointer item);
 static GeePriorityQueueIterator* gee_priority_queue_iterator_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeePriorityQueue* queue);
 static GeePriorityQueueIterator* gee_priority_queue_iterator_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeePriorityQueue* queue);
@@ -494,11 +540,11 @@ static void _gee_priority_queue_link (GeePriorityQueue* self, GeePriorityQueueTy
 static inline gint gee_priority_queue_node_degree (GeePriorityQueueNode* self);
 static void _gee_priority_queue_add_to (GeePriorityQueue* self, GeePriorityQueueType1Node* node, GeePriorityQueueType1Node* parent);
 static GeePriorityQueueNode* _gee_priority_queue_re_insert (GeePriorityQueue* self, GeePriorityQueueType1Node* n);
-static void _gee_priority_queue_delete (GeePriorityQueue* self, GeePriorityQueueNode* n, GeePriorityQueueNode** prev);
+static void _gee_priority_queue_delete (GeePriorityQueue* self, GeePriorityQueueNode* n);
 static void _gee_priority_queue_decrease_key (GeePriorityQueue* self, GeePriorityQueueNode* n);
 static inline void gee_priority_queue_type1_node_add (GeePriorityQueueType1Node* self, GeePriorityQueueType1Node* node);
-static GeePriorityQueueNodePair* gee_priority_queue_node_pair_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeePriorityQueueType1Node* node1, GeePriorityQueueType1Node* node2);
-static GeePriorityQueueNodePair* gee_priority_queue_node_pair_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeePriorityQueueType1Node* node1, GeePriorityQueueType1Node* node2);
+static GeePriorityQueueNodePair* gee_priority_queue_node_pair_new (GeePriorityQueueType1Node* node1, GeePriorityQueueType1Node* node2);
+static GeePriorityQueueNodePair* gee_priority_queue_node_pair_new (GeePriorityQueueType1Node* node1, GeePriorityQueueType1Node* node2);
 static void _gee_priority_queue_updated_degree (GeePriorityQueue* self, GeePriorityQueueType1Node* node, gboolean child_removed);
 static inline void gee_priority_queue_type1_node_remove (GeePriorityQueueType1Node* self);
 #define GEE_QUEUE_UNBOUNDED_CAPACITY (-1)
@@ -524,31 +570,32 @@ enum  {
 };
 static GeePriorityQueueDummyNode* gee_priority_queue_dummy_node_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeePriorityQueueNode** prev_next, GeePriorityQueueNode** next_prev, GeePriorityQueueNode* iter_prev, GeePriorityQueueNode* iter_next);
 static GeePriorityQueueDummyNode* gee_priority_queue_dummy_node_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeePriorityQueueNode** prev_next, GeePriorityQueueNode** next_prev, GeePriorityQueueNode* iter_prev, GeePriorityQueueNode* iter_next);
-#define GEE_PRIORITY_QUEUE_NODE_PAIR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR, GeePriorityQueueNodePairPrivate))
-enum  {
-	GEE_PRIORITY_QUEUE_NODE_PAIR_DUMMY_PROPERTY
-};
-static void gee_priority_queue_node_pair_finalize (GeePriorityQueueNodePair* obj);
+static void gee_priority_queue_node_pair_instance_init (GeePriorityQueueNodePair * self);
 #define GEE_PRIORITY_QUEUE_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_PRIORITY_QUEUE_TYPE_ITERATOR, GeePriorityQueueIteratorPrivate))
 enum  {
 	GEE_PRIORITY_QUEUE_ITERATOR_DUMMY_PROPERTY,
 	GEE_PRIORITY_QUEUE_ITERATOR_G_TYPE,
 	GEE_PRIORITY_QUEUE_ITERATOR_G_DUP_FUNC,
-	GEE_PRIORITY_QUEUE_ITERATOR_G_DESTROY_FUNC
+	GEE_PRIORITY_QUEUE_ITERATOR_G_DESTROY_FUNC,
+	GEE_PRIORITY_QUEUE_ITERATOR_READ_ONLY,
+	GEE_PRIORITY_QUEUE_ITERATOR_VALID
 };
 static gboolean gee_priority_queue_iterator_real_next (GeeIterator* base);
 static inline GeePriorityQueueNode* _gee_priority_queue_iterator_get_next_node (GeePriorityQueueIterator* self);
 static gboolean gee_priority_queue_iterator_real_has_next (GeeIterator* base);
-static gboolean gee_priority_queue_iterator_real_first (GeeIterator* base);
 static gpointer gee_priority_queue_iterator_real_get (GeeIterator* base);
 static void gee_priority_queue_iterator_real_remove (GeeIterator* base);
+static gboolean gee_priority_queue_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
 static void gee_priority_queue_iterator_finalize (GObject* obj);
+gboolean gee_iterator_get_read_only (GeeIterator* self);
+gboolean gee_iterator_get_valid (GeeIterator* self);
 static void _vala_gee_priority_queue_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_priority_queue_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 static void gee_priority_queue_finalize (GObject* obj);
 gint gee_abstract_queue_get_capacity (GeeAbstractQueue* self);
 gint gee_abstract_queue_get_remaining_capacity (GeeAbstractQueue* self);
 gboolean gee_abstract_queue_get_is_full (GeeAbstractQueue* self);
+gboolean gee_abstract_collection_get_read_only (GeeAbstractCollection* self);
 gint gee_abstract_collection_get_size (GeeAbstractCollection* self);
 static void _vala_gee_priority_queue_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_priority_queue_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
@@ -564,28 +611,44 @@ static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify 
  *
  * @param compare_func an optional element comparator function
  */
-GeePriorityQueue* gee_priority_queue_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func) {
+GeePriorityQueue* gee_priority_queue_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify) {
 	GeePriorityQueue * self = NULL;
-	GCompareFunc _tmp0_;
-	GCompareFunc _tmp2_;
+	GCompareDataFunc _tmp0_;
+	void* _tmp0__target;
+	GCompareDataFunc _tmp4_;
+	void* _tmp4__target;
 	self = (GeePriorityQueue*) gee_abstract_queue_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
 	self->priv->g_type = g_type;
 	self->priv->g_dup_func = g_dup_func;
 	self->priv->g_destroy_func = g_destroy_func;
 	_tmp0_ = compare_func;
+	_tmp0__target = compare_func_target;
 	if (_tmp0_ == NULL) {
-		GCompareFunc _tmp1_ = NULL;
-		_tmp1_ = gee_functions_get_compare_func_for (g_type);
-		compare_func = _tmp1_;
+		void* _tmp1_ = NULL;
+		GDestroyNotify _tmp2_ = NULL;
+		GCompareDataFunc _tmp3_ = NULL;
+		_tmp3_ = gee_functions_get_compare_func_for (g_type, &_tmp1_, &_tmp2_);
+		(compare_func_target_destroy_notify == NULL) ? NULL : (compare_func_target_destroy_notify (compare_func_target), NULL);
+		compare_func = NULL;
+		compare_func_target = NULL;
+		compare_func_target_destroy_notify = NULL;
+		compare_func = _tmp3_;
+		compare_func_target = _tmp1_;
+		compare_func_target_destroy_notify = _tmp2_;
 	}
-	_tmp2_ = compare_func;
-	gee_priority_queue_set_compare_func (self, _tmp2_);
+	_tmp4_ = compare_func;
+	_tmp4__target = compare_func_target;
+	gee_priority_queue_set_compare_func (self, _tmp4_, _tmp4__target);
+	(compare_func_target_destroy_notify == NULL) ? NULL : (compare_func_target_destroy_notify (compare_func_target), NULL);
+	compare_func = NULL;
+	compare_func_target = NULL;
+	compare_func_target_destroy_notify = NULL;
 	return self;
 }
 
 
-GeePriorityQueue* gee_priority_queue_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func) {
-	return gee_priority_queue_construct (GEE_TYPE_PRIORITY_QUEUE, g_type, g_dup_func, g_destroy_func, compare_func);
+GeePriorityQueue* gee_priority_queue_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify) {
+	return gee_priority_queue_construct (GEE_TYPE_PRIORITY_QUEUE, g_type, g_dup_func, g_destroy_func, compare_func, compare_func_target, compare_func_target_destroy_notify);
 }
 
 
@@ -597,13 +660,12 @@ static gpointer _gee_priority_queue_node_ref0 (gpointer self) {
 }
 
 
-static gboolean gee_priority_queue_real_offer (GeeAbstractQueue* base, gconstpointer element) {
-	GeePriorityQueue * self;
+gboolean gee_priority_queue_offer (GeePriorityQueue* self, gconstpointer element) {
 	gboolean result = FALSE;
 	GeePriorityQueueType1Node* _tmp0_;
 	gint _tmp21_;
 	gint _tmp22_;
-	self = (GeePriorityQueue*) base;
+	g_return_val_if_fail (self != NULL, FALSE);
 	_tmp0_ = self->priv->_r;
 	if (_tmp0_ == NULL) {
 		gconstpointer _tmp1_;
@@ -731,8 +793,7 @@ static gpointer gee_priority_queue_real_poll (GeeAbstractQueue* base) {
 	GeePriorityQueueType1Node* _tmp52_;
 	GeePriorityQueueType1Node* _tmp53_;
 	GeePriorityQueueType1Node* _tmp62_;
-	GeePriorityQueueType1Node* _tmp65_;
-	GeePriorityQueueType1Node* _tmp66_;
+	GeePriorityQueueType1Node* _tmp63_;
 	self = (GeePriorityQueue*) base;
 	_tmp0_ = self->priv->_r;
 	if (_tmp0_ == NULL) {
@@ -907,21 +968,12 @@ static gpointer gee_priority_queue_real_poll (GeeAbstractQueue* base) {
 		_gee_priority_queue_node_unref0 (next);
 	}
 	_tmp62_ = self->priv->_p;
-	if (_tmp62_ == NULL) {
-		GeePriorityQueueType1Node* _tmp63_;
-		GeePriorityQueueType1Node* _tmp64_;
-		_tmp63_ = self->priv->_r;
-		_tmp64_ = _gee_priority_queue_node_ref0 (_tmp63_);
-		_gee_priority_queue_node_unref0 (self->priv->_p);
-		self->priv->_p = _tmp64_;
-	}
-	_tmp65_ = self->priv->_p;
-	_tmp66_ = self->priv->_p;
-	_gee_priority_queue_adjust (self, _tmp65_, _tmp66_);
+	_tmp63_ = self->priv->_p;
+	_gee_priority_queue_adjust (self, _tmp62_, _tmp63_);
 	while (TRUE) {
-		gboolean _tmp67_ = FALSE;
-		_tmp67_ = _gee_priority_queue_check_linkable (self);
-		if (!_tmp67_) {
+		gboolean _tmp64_ = FALSE;
+		_tmp64_ = _gee_priority_queue_check_linkable (self);
+		if (!_tmp64_) {
 			break;
 		}
 	}
@@ -935,12 +987,11 @@ static gpointer gee_priority_queue_real_poll (GeeAbstractQueue* base) {
 /**
  * {@inheritDoc}
  */
-static gint gee_priority_queue_real_drain (GeeAbstractQueue* base, GeeCollection* recipient, gint amount) {
-	GeePriorityQueue * self;
+gint gee_priority_queue_drain (GeePriorityQueue* self, GeeCollection* recipient, gint amount) {
 	gint result = 0;
 	gint _tmp0_;
 	gint _tmp11_;
-	self = (GeePriorityQueue*) base;
+	g_return_val_if_fail (self != NULL, 0);
 	g_return_val_if_fail (recipient != NULL, 0);
 	_tmp0_ = amount;
 	if (_tmp0_ == (-1)) {
@@ -1011,8 +1062,10 @@ static gboolean gee_priority_queue_real_contains (GeeAbstractCollection* base, g
 			GeeIterator* _tmp3_;
 			gpointer _tmp4_ = NULL;
 			gpointer an_item;
-			GCompareFunc _tmp5_;
-			GCompareFunc _tmp6_;
+			GCompareDataFunc _tmp5_;
+			void* _tmp5__target;
+			GCompareDataFunc _tmp6_;
+			void* _tmp6__target;
 			gconstpointer _tmp7_;
 			gconstpointer _tmp8_;
 			gint _tmp9_ = 0;
@@ -1024,11 +1077,12 @@ static gboolean gee_priority_queue_real_contains (GeeAbstractCollection* base, g
 			_tmp3_ = _an_item_it;
 			_tmp4_ = gee_iterator_get (_tmp3_);
 			an_item = _tmp4_;
-			_tmp5_ = gee_priority_queue_get_compare_func (self);
+			_tmp5_ = gee_priority_queue_get_compare_func (self, &_tmp5__target);
 			_tmp6_ = _tmp5_;
+			_tmp6__target = _tmp5__target;
 			_tmp7_ = item;
 			_tmp8_ = an_item;
-			_tmp9_ = _tmp6_ (_tmp7_, _tmp8_);
+			_tmp9_ = _tmp6_ (_tmp7_, _tmp8_, _tmp6__target);
 			if (_tmp9_ == 0) {
 				result = TRUE;
 				((an_item == NULL) || (self->priv->g_destroy_func == NULL)) ? NULL : (an_item = (self->priv->g_destroy_func (an_item), NULL));
@@ -1054,7 +1108,7 @@ static gboolean gee_priority_queue_real_add (GeeAbstractCollection* base, gconst
 	gboolean _tmp1_ = FALSE;
 	self = (GeePriorityQueue*) base;
 	_tmp0_ = item;
-	_tmp1_ = gee_abstract_queue_offer ((GeeAbstractQueue*) self, _tmp0_);
+	_tmp1_ = gee_priority_queue_offer (self, _tmp0_);
 	result = _tmp1_;
 	return result;
 }
@@ -1077,8 +1131,10 @@ static gboolean gee_priority_queue_real_remove (GeeAbstractCollection* base, gco
 		GeePriorityQueueIterator* _tmp3_;
 		gpointer _tmp4_ = NULL;
 		gpointer an_item;
-		GCompareFunc _tmp5_;
-		GCompareFunc _tmp6_;
+		GCompareDataFunc _tmp5_;
+		void* _tmp5__target;
+		GCompareDataFunc _tmp6_;
+		void* _tmp6__target;
 		gconstpointer _tmp7_;
 		gconstpointer _tmp8_;
 		gint _tmp9_ = 0;
@@ -1090,11 +1146,12 @@ static gboolean gee_priority_queue_real_remove (GeeAbstractCollection* base, gco
 		_tmp3_ = iterator;
 		_tmp4_ = gee_iterator_get ((GeeIterator*) _tmp3_);
 		an_item = _tmp4_;
-		_tmp5_ = gee_priority_queue_get_compare_func (self);
+		_tmp5_ = gee_priority_queue_get_compare_func (self, &_tmp5__target);
 		_tmp6_ = _tmp5_;
+		_tmp6__target = _tmp5__target;
 		_tmp7_ = item;
 		_tmp8_ = an_item;
-		_tmp9_ = _tmp6_ (_tmp7_, _tmp8_);
+		_tmp9_ = _tmp6_ (_tmp7_, _tmp8_, _tmp6__target);
 		if (_tmp9_ == 0) {
 			GeePriorityQueueIterator* _tmp10_;
 			_tmp10_ = iterator;
@@ -1136,9 +1193,8 @@ static void gee_priority_queue_real_clear (GeeAbstractCollection* base) {
 	self->priv->_a = _tmp0_;
 	self->priv->_a_length1 = 0;
 	self->priv->__a_size_ = self->priv->_a_length1;
-	_gee_priority_queue_node_pair_unref0 (self->priv->_lp_head);
+	_gee_priority_queue_node_pair_free0 (self->priv->_lp_head);
 	self->priv->_lp_head = NULL;
-	_gee_priority_queue_node_pair_unref0 (self->priv->_lp_tail);
 	self->priv->_lp_tail = NULL;
 	_tmp1_ = g_new0 (gboolean, 0);
 	self->priv->_b = (g_free (self->priv->_b), NULL);
@@ -1189,20 +1245,23 @@ static inline gint _gee_priority_queue_compare (GeePriorityQueue* self, GeePrior
 			result = 1;
 			return result;
 		} else {
-			GCompareFunc _tmp4_;
-			GCompareFunc _tmp5_;
+			GCompareDataFunc _tmp4_;
+			void* _tmp4__target;
+			GCompareDataFunc _tmp5_;
+			void* _tmp5__target;
 			GeePriorityQueueNode* _tmp6_;
 			gconstpointer _tmp7_;
 			GeePriorityQueueNode* _tmp8_;
 			gconstpointer _tmp9_;
 			gint _tmp10_ = 0;
-			_tmp4_ = gee_priority_queue_get_compare_func (self);
+			_tmp4_ = gee_priority_queue_get_compare_func (self, &_tmp4__target);
 			_tmp5_ = _tmp4_;
+			_tmp5__target = _tmp4__target;
 			_tmp6_ = node1;
 			_tmp7_ = _tmp6_->data;
 			_tmp8_ = node2;
 			_tmp9_ = _tmp8_->data;
-			_tmp10_ = _tmp5_ (_tmp7_, _tmp9_);
+			_tmp10_ = _tmp5_ (_tmp7_, _tmp9_, _tmp5__target);
 			result = _tmp10_;
 			return result;
 		}
@@ -1706,11 +1765,6 @@ static void _gee_priority_queue_add (GeePriorityQueue* self, GeePriorityQueueTyp
 }
 
 
-static gpointer _gee_priority_queue_node_pair_ref0 (gpointer self) {
-	return self ? gee_priority_queue_node_pair_ref (self) : NULL;
-}
-
-
 static gboolean _gee_priority_queue_check_linkable (GeePriorityQueue* self) {
 	gboolean result = FALSE;
 	GeePriorityQueueNodePair* _tmp0_;
@@ -1718,26 +1772,23 @@ static gboolean _gee_priority_queue_check_linkable (GeePriorityQueue* self) {
 	_tmp0_ = self->priv->_lp_head;
 	if (_tmp0_ != NULL) {
 		GeePriorityQueueNodePair* _tmp1_;
-		GeePriorityQueueNodePair* _tmp2_;
 		GeePriorityQueueNodePair* pair;
-		GeePriorityQueueNodePair* _tmp3_;
+		GeePriorityQueueNodePair* _tmp2_;
+		GeePriorityQueueType1Node* _tmp3_;
 		GeePriorityQueueType1Node* _tmp4_;
-		GeePriorityQueueType1Node* _tmp5_;
-		GeePriorityQueueNodePair* _tmp6_;
+		GeePriorityQueueNodePair* _tmp5_;
+		GeePriorityQueueType1Node* _tmp6_;
 		GeePriorityQueueType1Node* _tmp7_;
-		GeePriorityQueueType1Node* _tmp8_;
 		_tmp1_ = self->priv->_lp_head;
-		_tmp2_ = _gee_priority_queue_node_pair_ref0 (_tmp1_);
-		pair = _tmp2_;
-		_tmp3_ = pair;
-		_tmp4_ = _tmp3_->node1;
-		_tmp5_ = _gee_priority_queue_node_ref0 (_tmp4_);
-		_tmp6_ = pair;
-		_tmp7_ = _tmp6_->node2;
-		_tmp8_ = _gee_priority_queue_node_ref0 (_tmp7_);
-		_gee_priority_queue_link (self, _tmp5_, _tmp8_);
+		pair = _tmp1_;
+		_tmp2_ = pair;
+		_tmp3_ = _tmp2_->node1;
+		_tmp4_ = _gee_priority_queue_node_ref0 (_tmp3_);
+		_tmp5_ = pair;
+		_tmp6_ = _tmp5_->node2;
+		_tmp7_ = _gee_priority_queue_node_ref0 (_tmp6_);
+		_gee_priority_queue_link (self, _tmp4_, _tmp7_);
 		result = TRUE;
-		_gee_priority_queue_node_pair_unref0 (pair);
 		return result;
 	}
 	result = FALSE;
@@ -1850,8 +1901,7 @@ static void _gee_priority_queue_adjust (GeePriorityQueue* self, GeePriorityQueue
 }
 
 
-static void _gee_priority_queue_delete (GeePriorityQueue* self, GeePriorityQueueNode* n, GeePriorityQueueNode** prev) {
-	GeePriorityQueueNode* _vala_prev = NULL;
+static void _gee_priority_queue_delete (GeePriorityQueue* self, GeePriorityQueueNode* n) {
 	GeePriorityQueueNode* _tmp0_;
 	gpointer _tmp1_ = NULL;
 	gpointer _tmp2_;
@@ -1862,9 +1912,6 @@ static void _gee_priority_queue_delete (GeePriorityQueue* self, GeePriorityQueue
 	_tmp1_ = gee_abstract_queue_poll ((GeeAbstractQueue*) self);
 	_tmp2_ = _tmp1_;
 	((_tmp2_ == NULL) || (self->priv->g_destroy_func == NULL)) ? NULL : (_tmp2_ = (self->priv->g_destroy_func (_tmp2_), NULL));
-	if (prev) {
-		*prev = _vala_prev;
-	}
 }
 
 
@@ -1977,12 +2024,12 @@ static void _gee_priority_queue_add_in_r_prime (GeePriorityQueue* self, GeePrior
 	gint _tmp49__length1;
 	gint _tmp50_;
 	GeePriorityQueueType1Node* _tmp51_;
-	GeePriorityQueueType1Node** _tmp85_;
-	gint _tmp85__length1;
-	gint _tmp86_;
-	GeePriorityQueueType1Node* _tmp87_;
-	GeePriorityQueueType1Node* _tmp88_;
-	GeePriorityQueueType1Node* _tmp89_;
+	GeePriorityQueueType1Node** _tmp82_;
+	gint _tmp82__length1;
+	gint _tmp83_;
+	GeePriorityQueueType1Node* _tmp84_;
+	GeePriorityQueueType1Node* _tmp85_;
+	GeePriorityQueueType1Node* _tmp86_;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (node != NULL);
 	_tmp0_ = node;
@@ -2154,14 +2201,14 @@ static void _gee_priority_queue_add_in_r_prime (GeePriorityQueue* self, GeePrior
 			GeePriorityQueueType1Node* _tmp65_;
 			GeePriorityQueueNodePair* _tmp66_;
 			GeePriorityQueueNodePair* _tmp67_;
-			gboolean* _tmp79_;
-			gint _tmp79__length1;
-			gint _tmp80_;
-			gboolean _tmp81_;
+			gboolean* _tmp76_;
+			gint _tmp76__length1;
+			gint _tmp77_;
+			gboolean _tmp78_;
 			_tmp58_ = node;
 			_tmp59_ = node;
 			_tmp60_ = _tmp59_->brothers_next;
-			_tmp61_ = gee_priority_queue_node_pair_new (self->priv->g_type, (GBoxedCopyFunc) self->priv->g_dup_func, self->priv->g_destroy_func, _tmp58_, _tmp60_);
+			_tmp61_ = gee_priority_queue_node_pair_new (_tmp58_, _tmp60_);
 			pair = _tmp61_;
 			_tmp62_ = node;
 			_tmp63_ = _tmp62_->brothers_next;
@@ -2174,63 +2221,57 @@ static void _gee_priority_queue_add_in_r_prime (GeePriorityQueue* self, GeePrior
 			if (_tmp67_ == NULL) {
 				GeePriorityQueueNodePair* _tmp68_;
 				GeePriorityQueueNodePair* _tmp69_;
+				_tmp68_ = pair;
+				self->priv->_lp_tail = _tmp68_;
+				_tmp69_ = pair;
+				pair = NULL;
+				_gee_priority_queue_node_pair_free0 (self->priv->_lp_head);
+				self->priv->_lp_head = _tmp69_;
+			} else {
 				GeePriorityQueueNodePair* _tmp70_;
 				GeePriorityQueueNodePair* _tmp71_;
-				_tmp68_ = pair;
-				_tmp69_ = _gee_priority_queue_node_pair_ref0 (_tmp68_);
-				_gee_priority_queue_node_pair_unref0 (self->priv->_lp_head);
-				self->priv->_lp_head = _tmp69_;
-				_tmp70_ = pair;
-				_tmp71_ = _gee_priority_queue_node_pair_ref0 (_tmp70_);
-				_gee_priority_queue_node_pair_unref0 (self->priv->_lp_tail);
-				self->priv->_lp_tail = _tmp71_;
-			} else {
 				GeePriorityQueueNodePair* _tmp72_;
 				GeePriorityQueueNodePair* _tmp73_;
 				GeePriorityQueueNodePair* _tmp74_;
 				GeePriorityQueueNodePair* _tmp75_;
-				GeePriorityQueueNodePair* _tmp76_;
-				GeePriorityQueueNodePair* _tmp77_;
-				GeePriorityQueueNodePair* _tmp78_;
-				_tmp72_ = pair;
-				_tmp73_ = self->priv->_lp_tail;
-				_tmp72_->lp_prev = _tmp73_;
+				_tmp70_ = pair;
+				_tmp71_ = self->priv->_lp_tail;
+				_tmp70_->lp_prev = _tmp71_;
+				_tmp72_ = self->priv->_lp_tail;
+				_tmp73_ = pair;
+				pair = NULL;
+				_gee_priority_queue_node_pair_free0 (_tmp72_->lp_next);
+				_tmp72_->lp_next = _tmp73_;
 				_tmp74_ = self->priv->_lp_tail;
-				_tmp75_ = pair;
-				_tmp76_ = _gee_priority_queue_node_pair_ref0 (_tmp75_);
-				_gee_priority_queue_node_pair_unref0 (_tmp74_->lp_next);
-				_tmp74_->lp_next = _tmp76_;
-				_tmp77_ = pair;
-				_tmp78_ = _gee_priority_queue_node_pair_ref0 (_tmp77_);
-				_gee_priority_queue_node_pair_unref0 (self->priv->_lp_tail);
-				self->priv->_lp_tail = _tmp78_;
+				_tmp75_ = _tmp74_->lp_next;
+				self->priv->_lp_tail = _tmp75_;
 			}
+			_tmp76_ = self->priv->_b;
+			_tmp76__length1 = self->priv->_b_length1;
+			_tmp77_ = degree;
+			_tmp76_[_tmp77_] = FALSE;
+			_tmp78_ = _tmp76_[_tmp77_];
+			_gee_priority_queue_node_pair_free0 (pair);
+		} else {
+			gboolean* _tmp79_;
+			gint _tmp79__length1;
+			gint _tmp80_;
+			gboolean _tmp81_;
 			_tmp79_ = self->priv->_b;
 			_tmp79__length1 = self->priv->_b_length1;
 			_tmp80_ = degree;
-			_tmp79_[_tmp80_] = FALSE;
+			_tmp79_[_tmp80_] = TRUE;
 			_tmp81_ = _tmp79_[_tmp80_];
-			_gee_priority_queue_node_pair_unref0 (pair);
-		} else {
-			gboolean* _tmp82_;
-			gint _tmp82__length1;
-			gint _tmp83_;
-			gboolean _tmp84_;
-			_tmp82_ = self->priv->_b;
-			_tmp82__length1 = self->priv->_b_length1;
-			_tmp83_ = degree;
-			_tmp82_[_tmp83_] = TRUE;
-			_tmp84_ = _tmp82_[_tmp83_];
 		}
 	}
-	_tmp85_ = self->priv->_a;
-	_tmp85__length1 = self->priv->_a_length1;
-	_tmp86_ = degree;
-	_tmp87_ = node;
-	_tmp88_ = _gee_priority_queue_node_ref0 (_tmp87_);
-	_gee_priority_queue_node_unref0 (_tmp85_[_tmp86_]);
-	_tmp85_[_tmp86_] = _tmp88_;
-	_tmp89_ = _tmp85_[_tmp86_];
+	_tmp82_ = self->priv->_a;
+	_tmp82__length1 = self->priv->_a_length1;
+	_tmp83_ = degree;
+	_tmp84_ = node;
+	_tmp85_ = _gee_priority_queue_node_ref0 (_tmp84_);
+	_gee_priority_queue_node_unref0 (_tmp82_[_tmp83_]);
+	_tmp82_[_tmp83_] = _tmp85_;
+	_tmp86_ = _tmp82_[_tmp83_];
 	_gee_priority_queue_node_unref0 (insertion_point);
 }
 
@@ -2241,8 +2282,8 @@ static void _gee_priority_queue_remove_type1_node (GeePriorityQueue* self, GeePr
 	GeePriorityQueueType2Node* _tmp2_;
 	GeePriorityQueueType1Node* _tmp55_;
 	GeePriorityQueueType1Node* _tmp56_;
-	GeePriorityQueueType1Node* _tmp57_;
-	gboolean _tmp58_;
+	GeePriorityQueueType1Node* _tmp59_;
+	gboolean _tmp60_;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (node != NULL);
 	_tmp0_ = node;
@@ -2400,65 +2441,69 @@ static void _gee_priority_queue_remove_type1_node (GeePriorityQueue* self, GeePr
 	_tmp55_ = node;
 	_tmp56_ = self->priv->_p;
 	if (_tmp55_ == _tmp56_) {
+		GeePriorityQueueType1Node* _tmp57_;
+		GeePriorityQueueType1Node* _tmp58_;
+		_tmp57_ = self->priv->_r;
+		_tmp58_ = _gee_priority_queue_node_ref0 (_tmp57_);
 		_gee_priority_queue_node_unref0 (self->priv->_p);
-		self->priv->_p = NULL;
+		self->priv->_p = _tmp58_;
 	}
-	_tmp57_ = node;
-	gee_priority_queue_type1_node_remove (_tmp57_);
-	_tmp58_ = with_iteration;
-	if (_tmp58_) {
-		GeePriorityQueueType1Node* _tmp59_;
-		GeePriorityQueueNode* _tmp60_;
-		GeePriorityQueueType1Node* _tmp69_;
-		GeePriorityQueueNode* _tmp70_;
-		_tmp59_ = node;
-		_tmp60_ = ((GeePriorityQueueNode*) _tmp59_)->iter_prev;
-		if (_tmp60_ != NULL) {
-			GeePriorityQueueType1Node* _tmp61_;
-			GeePriorityQueueNode* _tmp62_;
+	_tmp59_ = node;
+	gee_priority_queue_type1_node_remove (_tmp59_);
+	_tmp60_ = with_iteration;
+	if (_tmp60_) {
+		GeePriorityQueueType1Node* _tmp61_;
+		GeePriorityQueueNode* _tmp62_;
+		GeePriorityQueueType1Node* _tmp71_;
+		GeePriorityQueueNode* _tmp72_;
+		_tmp61_ = node;
+		_tmp62_ = ((GeePriorityQueueNode*) _tmp61_)->iter_prev;
+		if (_tmp62_ != NULL) {
 			GeePriorityQueueType1Node* _tmp63_;
 			GeePriorityQueueNode* _tmp64_;
-			_tmp61_ = node;
-			_tmp62_ = ((GeePriorityQueueNode*) _tmp61_)->iter_prev;
+			GeePriorityQueueType1Node* _tmp65_;
+			GeePriorityQueueNode* _tmp66_;
 			_tmp63_ = node;
-			_tmp64_ = ((GeePriorityQueueNode*) _tmp63_)->iter_next;
-			_tmp62_->iter_next = _tmp64_;
+			_tmp64_ = ((GeePriorityQueueNode*) _tmp63_)->iter_prev;
+			_tmp65_ = node;
+			_tmp66_ = ((GeePriorityQueueNode*) _tmp65_)->iter_next;
+			_tmp64_->iter_next = _tmp66_;
 		} else {
-			GeePriorityQueueNode* _tmp65_;
-			GeePriorityQueueType1Node* _tmp66_;
-			_tmp65_ = self->priv->_iter_head;
-			_tmp66_ = node;
-			if (_tmp65_ == G_TYPE_CHECK_INSTANCE_CAST (_tmp66_, GEE_PRIORITY_QUEUE_TYPE_NODE, GeePriorityQueueNode)) {
-				GeePriorityQueueType1Node* _tmp67_;
-				GeePriorityQueueNode* _tmp68_;
-				_tmp67_ = node;
-				_tmp68_ = ((GeePriorityQueueNode*) _tmp67_)->iter_next;
-				self->priv->_iter_head = _tmp68_;
+			GeePriorityQueueNode* _tmp67_;
+			GeePriorityQueueType1Node* _tmp68_;
+			_tmp67_ = self->priv->_iter_head;
+			_tmp68_ = node;
+			if (_tmp67_ == G_TYPE_CHECK_INSTANCE_CAST (_tmp68_, GEE_PRIORITY_QUEUE_TYPE_NODE, GeePriorityQueueNode)) {
+				GeePriorityQueueType1Node* _tmp69_;
+				GeePriorityQueueNode* _tmp70_;
+				_tmp69_ = node;
+				_tmp70_ = ((GeePriorityQueueNode*) _tmp69_)->iter_next;
+				self->priv->_iter_head = _tmp70_;
 			}
 		}
-		_tmp69_ = node;
-		_tmp70_ = ((GeePriorityQueueNode*) _tmp69_)->iter_next;
-		if (_tmp70_ != NULL) {
-			GeePriorityQueueType1Node* _tmp71_;
-			GeePriorityQueueNode* _tmp72_;
+		_tmp71_ = node;
+		_tmp72_ = ((GeePriorityQueueNode*) _tmp71_)->iter_next;
+		if (_tmp72_ != NULL) {
 			GeePriorityQueueType1Node* _tmp73_;
 			GeePriorityQueueNode* _tmp74_;
-			_tmp71_ = node;
-			_tmp72_ = ((GeePriorityQueueNode*) _tmp71_)->iter_next;
+			GeePriorityQueueType1Node* _tmp75_;
+			GeePriorityQueueNode* _tmp76_;
 			_tmp73_ = node;
-			_tmp74_ = ((GeePriorityQueueNode*) _tmp73_)->iter_prev;
-			_tmp72_->iter_prev = _tmp74_;
+			_tmp74_ = ((GeePriorityQueueNode*) _tmp73_)->iter_next;
+			_tmp75_ = node;
+			_tmp76_ = ((GeePriorityQueueNode*) _tmp75_)->iter_prev;
+			_tmp74_->iter_prev = _tmp76_;
 		} else {
-			GeePriorityQueueNode* _tmp75_;
-			GeePriorityQueueType1Node* _tmp76_;
-			_tmp75_ = self->priv->_iter_tail;
-			_tmp76_ = node;
-			if (_tmp75_ == G_TYPE_CHECK_INSTANCE_CAST (_tmp76_, GEE_PRIORITY_QUEUE_TYPE_NODE, GeePriorityQueueNode)) {
-				GeePriorityQueueType1Node* _tmp77_;
-				GeePriorityQueueNode* _tmp78_;
-				_tmp77_ = node;
-				_tmp78_ = ((GeePriorityQueueNode*) _tmp77_)->iter_prev;
-				self->priv->_iter_tail = _tmp78_;
+			GeePriorityQueueNode* _tmp77_;
+			GeePriorityQueueType1Node* _tmp78_;
+			_tmp77_ = self->priv->_iter_tail;
+			_tmp78_ = node;
+			if (_tmp77_ == G_TYPE_CHECK_INSTANCE_CAST (_tmp78_, GEE_PRIORITY_QUEUE_TYPE_NODE, GeePriorityQueueNode)) {
+				GeePriorityQueueType1Node* _tmp79_;
+				GeePriorityQueueNode* _tmp80_;
+				_tmp79_ = node;
+				_tmp80_ = ((GeePriorityQueueNode*) _tmp79_)->iter_prev;
+				self->priv->_iter_tail = _tmp80_;
 			}
 		}
 	}
@@ -2469,289 +2514,305 @@ static void _gee_priority_queue_updated_degree (GeePriorityQueue* self, GeePrior
 	GeePriorityQueueType1Node* _tmp0_;
 	gint _tmp1_ = 0;
 	gint degree;
-	gboolean _tmp2_ = FALSE;
-	gboolean _tmp3_;
-	gboolean _tmp7_;
-	gboolean* _tmp19_;
-	gint _tmp19__length1;
-	gint _tmp20_;
-	gboolean* _tmp21_;
-	gint _tmp21__length1;
-	gint _tmp22_;
-	gboolean _tmp23_;
-	gboolean _tmp24_;
-	GeePriorityQueueType1Node** _tmp25_;
+	gint _tmp2_;
+	GeePriorityQueueType1Node** _tmp3_;
+	gint _tmp3__length1;
+	gboolean _tmp8_ = FALSE;
+	gboolean _tmp9_;
+	gboolean _tmp13_;
+	gboolean* _tmp25_;
 	gint _tmp25__length1;
 	gint _tmp26_;
-	GeePriorityQueueType1Node* _tmp27_;
-	GeePriorityQueueType1Node* _tmp28_;
-	GeePriorityQueueType1Node* _tmp58_;
-	GeePriorityQueueNodePair* _tmp59_;
+	gboolean* _tmp27_;
+	gint _tmp27__length1;
+	gint _tmp28_;
+	gboolean _tmp29_;
+	gboolean _tmp30_;
+	GeePriorityQueueType1Node** _tmp31_;
+	gint _tmp31__length1;
+	gint _tmp32_;
+	GeePriorityQueueType1Node* _tmp33_;
+	GeePriorityQueueType1Node* _tmp34_;
+	GeePriorityQueueType1Node* _tmp64_;
+	GeePriorityQueueNodePair* _tmp65_;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (node != NULL);
 	_tmp0_ = node;
 	_tmp1_ = gee_priority_queue_node_degree ((GeePriorityQueueNode*) _tmp0_);
 	degree = _tmp1_;
-	_tmp3_ = child_removed;
-	if (_tmp3_) {
-		GeePriorityQueueType1Node** _tmp4_;
-		gint _tmp4__length1;
-		gint _tmp5_;
-		GeePriorityQueueType1Node* _tmp6_;
-		_tmp4_ = self->priv->_a;
-		_tmp4__length1 = self->priv->_a_length1;
-		_tmp5_ = degree;
-		_tmp6_ = _tmp4_[_tmp5_ - 1];
-		_tmp2_ = _tmp6_ == NULL;
-	} else {
-		_tmp2_ = FALSE;
+	_tmp2_ = degree;
+	_tmp3_ = self->priv->_a;
+	_tmp3__length1 = self->priv->_a_length1;
+	if (_tmp2_ >= _tmp3__length1) {
+		gint _tmp4_;
+		gint _tmp5_ = 0;
+		gint _tmp6_;
+		gint _tmp7_ = 0;
+		_tmp4_ = degree;
+		_tmp5_ = _tmp4_ + 1;
+		self->priv->_a = g_renew (GeePriorityQueueType1Node*, self->priv->_a, _tmp4_ + 1);
+		(_tmp5_ > self->priv->_a_length1) ? memset (self->priv->_a + self->priv->_a_length1, 0, sizeof (GeePriorityQueueType1Node*) * (_tmp5_ - self->priv->_a_length1)) : NULL;
+		self->priv->_a_length1 = _tmp5_;
+		self->priv->__a_size_ = _tmp5_;
+		_tmp6_ = degree;
+		_tmp7_ = _tmp6_ + 1;
+		self->priv->_b = g_renew (gboolean, self->priv->_b, _tmp6_ + 1);
+		(_tmp7_ > self->priv->_b_length1) ? memset (self->priv->_b + self->priv->_b_length1, 0, sizeof (gboolean) * (_tmp7_ - self->priv->_b_length1)) : NULL;
+		self->priv->_b_length1 = _tmp7_;
+		self->priv->__b_size_ = _tmp7_;
 	}
-	_tmp7_ = _tmp2_;
-	if (_tmp7_) {
-		GeePriorityQueueType1Node** _tmp8_;
-		gint _tmp8__length1;
-		gint _tmp9_;
-		GeePriorityQueueType1Node* _tmp10_;
-		GeePriorityQueueType1Node* _tmp11_;
+	_tmp9_ = child_removed;
+	if (_tmp9_) {
+		GeePriorityQueueType1Node** _tmp10_;
+		gint _tmp10__length1;
+		gint _tmp11_;
 		GeePriorityQueueType1Node* _tmp12_;
-		gboolean* _tmp13_;
-		gint _tmp13__length1;
-		gint _tmp14_;
-		gboolean* _tmp15_;
-		gint _tmp15__length1;
-		gint _tmp16_;
-		gboolean _tmp17_;
-		gboolean _tmp18_;
-		_tmp8_ = self->priv->_a;
-		_tmp8__length1 = self->priv->_a_length1;
-		_tmp9_ = degree;
-		_tmp10_ = node;
-		_tmp11_ = _gee_priority_queue_node_ref0 (_tmp10_);
-		_gee_priority_queue_node_unref0 (_tmp8_[_tmp9_ - 1]);
-		_tmp8_[_tmp9_ - 1] = _tmp11_;
-		_tmp12_ = _tmp8_[_tmp9_ - 1];
-		_tmp13_ = self->priv->_b;
-		_tmp13__length1 = self->priv->_b_length1;
-		_tmp14_ = degree;
-		_tmp15_ = self->priv->_b;
-		_tmp15__length1 = self->priv->_b_length1;
-		_tmp16_ = degree;
-		_tmp17_ = _tmp15_[_tmp16_ - 1];
-		_tmp13_[_tmp14_ - 1] = !_tmp17_;
-		_tmp18_ = _tmp13_[_tmp14_ - 1];
+		_tmp10_ = self->priv->_a;
+		_tmp10__length1 = self->priv->_a_length1;
+		_tmp11_ = degree;
+		_tmp12_ = _tmp10_[_tmp11_ - 1];
+		_tmp8_ = _tmp12_ == NULL;
+	} else {
+		_tmp8_ = FALSE;
 	}
-	_tmp19_ = self->priv->_b;
-	_tmp19__length1 = self->priv->_b_length1;
-	_tmp20_ = degree;
-	_tmp21_ = self->priv->_b;
-	_tmp21__length1 = self->priv->_b_length1;
-	_tmp22_ = degree;
-	_tmp23_ = _tmp21_[_tmp22_];
-	_tmp19_[_tmp20_] = !_tmp23_;
-	_tmp24_ = _tmp19_[_tmp20_];
-	_tmp25_ = self->priv->_a;
-	_tmp25__length1 = self->priv->_a_length1;
+	_tmp13_ = _tmp8_;
+	if (_tmp13_) {
+		GeePriorityQueueType1Node** _tmp14_;
+		gint _tmp14__length1;
+		gint _tmp15_;
+		GeePriorityQueueType1Node* _tmp16_;
+		GeePriorityQueueType1Node* _tmp17_;
+		GeePriorityQueueType1Node* _tmp18_;
+		gboolean* _tmp19_;
+		gint _tmp19__length1;
+		gint _tmp20_;
+		gboolean* _tmp21_;
+		gint _tmp21__length1;
+		gint _tmp22_;
+		gboolean _tmp23_;
+		gboolean _tmp24_;
+		_tmp14_ = self->priv->_a;
+		_tmp14__length1 = self->priv->_a_length1;
+		_tmp15_ = degree;
+		_tmp16_ = node;
+		_tmp17_ = _gee_priority_queue_node_ref0 (_tmp16_);
+		_gee_priority_queue_node_unref0 (_tmp14_[_tmp15_ - 1]);
+		_tmp14_[_tmp15_ - 1] = _tmp17_;
+		_tmp18_ = _tmp14_[_tmp15_ - 1];
+		_tmp19_ = self->priv->_b;
+		_tmp19__length1 = self->priv->_b_length1;
+		_tmp20_ = degree;
+		_tmp21_ = self->priv->_b;
+		_tmp21__length1 = self->priv->_b_length1;
+		_tmp22_ = degree;
+		_tmp23_ = _tmp21_[_tmp22_ - 1];
+		_tmp19_[_tmp20_ - 1] = !_tmp23_;
+		_tmp24_ = _tmp19_[_tmp20_ - 1];
+	}
+	_tmp25_ = self->priv->_b;
+	_tmp25__length1 = self->priv->_b_length1;
 	_tmp26_ = degree;
-	_tmp27_ = _tmp25_[_tmp26_];
-	_tmp28_ = node;
-	if (_tmp27_ == _tmp28_) {
-		GeePriorityQueueType1Node* _tmp29_;
-		GeePriorityQueueType1Node* _tmp30_;
-		GeePriorityQueueType1Node* _tmp31_;
+	_tmp27_ = self->priv->_b;
+	_tmp27__length1 = self->priv->_b_length1;
+	_tmp28_ = degree;
+	_tmp29_ = _tmp27_[_tmp28_];
+	_tmp25_[_tmp26_] = !_tmp29_;
+	_tmp30_ = _tmp25_[_tmp26_];
+	_tmp31_ = self->priv->_a;
+	_tmp31__length1 = self->priv->_a_length1;
+	_tmp32_ = degree;
+	_tmp33_ = _tmp31_[_tmp32_];
+	_tmp34_ = node;
+	if (_tmp33_ == _tmp34_) {
+		GeePriorityQueueType1Node* _tmp35_;
+		GeePriorityQueueType1Node* _tmp36_;
+		GeePriorityQueueType1Node* _tmp37_;
 		GeePriorityQueueType1Node* next;
-		gboolean _tmp32_ = FALSE;
-		GeePriorityQueueType1Node* _tmp33_;
-		gboolean _tmp37_;
-		_tmp29_ = node;
-		_tmp30_ = _tmp29_->brothers_next;
-		_tmp31_ = _gee_priority_queue_node_ref0 (_tmp30_);
-		next = _tmp31_;
-		_tmp33_ = next;
-		if (_tmp33_ != NULL) {
-			GeePriorityQueueType1Node* _tmp34_;
-			gint _tmp35_ = 0;
-			gint _tmp36_;
-			_tmp34_ = next;
-			_tmp35_ = gee_priority_queue_node_degree ((GeePriorityQueueNode*) _tmp34_);
-			_tmp36_ = degree;
-			_tmp32_ = _tmp35_ == _tmp36_;
-		} else {
-			_tmp32_ = FALSE;
-		}
-		_tmp37_ = _tmp32_;
-		if (_tmp37_) {
-			GeePriorityQueueType1Node** _tmp38_;
-			gint _tmp38__length1;
-			gint _tmp39_;
+		gboolean _tmp38_ = FALSE;
+		GeePriorityQueueType1Node* _tmp39_;
+		gboolean _tmp43_;
+		_tmp35_ = node;
+		_tmp36_ = _tmp35_->brothers_next;
+		_tmp37_ = _gee_priority_queue_node_ref0 (_tmp36_);
+		next = _tmp37_;
+		_tmp39_ = next;
+		if (_tmp39_ != NULL) {
 			GeePriorityQueueType1Node* _tmp40_;
-			GeePriorityQueueType1Node* _tmp41_;
-			GeePriorityQueueType1Node* _tmp42_;
-			_tmp38_ = self->priv->_a;
-			_tmp38__length1 = self->priv->_a_length1;
-			_tmp39_ = degree;
+			gint _tmp41_ = 0;
+			gint _tmp42_;
 			_tmp40_ = next;
-			_tmp41_ = _gee_priority_queue_node_ref0 (_tmp40_);
-			_gee_priority_queue_node_unref0 (_tmp38_[_tmp39_]);
-			_tmp38_[_tmp39_] = _tmp41_;
-			_tmp42_ = _tmp38_[_tmp39_];
+			_tmp41_ = gee_priority_queue_node_degree ((GeePriorityQueueNode*) _tmp40_);
+			_tmp42_ = degree;
+			_tmp38_ = _tmp41_ == _tmp42_;
 		} else {
-			GeePriorityQueueType1Node** _tmp43_;
-			gint _tmp43__length1;
-			gint _tmp44_;
-			GeePriorityQueueType1Node* _tmp45_;
-			GeePriorityQueueType1Node** _tmp46_;
-			gint _tmp46__length1;
+			_tmp38_ = FALSE;
+		}
+		_tmp43_ = _tmp38_;
+		if (_tmp43_) {
+			GeePriorityQueueType1Node** _tmp44_;
+			gint _tmp44__length1;
+			gint _tmp45_;
+			GeePriorityQueueType1Node* _tmp46_;
+			GeePriorityQueueType1Node* _tmp47_;
+			GeePriorityQueueType1Node* _tmp48_;
+			_tmp44_ = self->priv->_a;
+			_tmp44__length1 = self->priv->_a_length1;
+			_tmp45_ = degree;
+			_tmp46_ = next;
+			_tmp47_ = _gee_priority_queue_node_ref0 (_tmp46_);
+			_gee_priority_queue_node_unref0 (_tmp44_[_tmp45_]);
+			_tmp44_[_tmp45_] = _tmp47_;
+			_tmp48_ = _tmp44_[_tmp45_];
+		} else {
+			GeePriorityQueueType1Node** _tmp49_;
+			gint _tmp49__length1;
+			gint _tmp50_;
+			GeePriorityQueueType1Node* _tmp51_;
+			GeePriorityQueueType1Node** _tmp52_;
+			gint _tmp52__length1;
 			gint i;
-			gint _tmp54_;
-			gint _tmp55_ = 0;
-			gint _tmp56_;
-			gint _tmp57_ = 0;
-			_tmp43_ = self->priv->_a;
-			_tmp43__length1 = self->priv->_a_length1;
-			_tmp44_ = degree;
-			_gee_priority_queue_node_unref0 (_tmp43_[_tmp44_]);
-			_tmp43_[_tmp44_] = NULL;
-			_tmp45_ = _tmp43_[_tmp44_];
-			_tmp46_ = self->priv->_a;
-			_tmp46__length1 = self->priv->_a_length1;
-			i = _tmp46__length1 - 1;
+			gint _tmp60_;
+			gint _tmp61_ = 0;
+			gint _tmp62_;
+			gint _tmp63_ = 0;
+			_tmp49_ = self->priv->_a;
+			_tmp49__length1 = self->priv->_a_length1;
+			_tmp50_ = degree;
+			_gee_priority_queue_node_unref0 (_tmp49_[_tmp50_]);
+			_tmp49_[_tmp50_] = NULL;
+			_tmp51_ = _tmp49_[_tmp50_];
+			_tmp52_ = self->priv->_a;
+			_tmp52__length1 = self->priv->_a_length1;
+			i = _tmp52__length1 - 1;
 			while (TRUE) {
-				gboolean _tmp47_ = FALSE;
-				gint _tmp48_;
-				gboolean _tmp52_;
-				gint _tmp53_;
-				_tmp48_ = i;
-				if (_tmp48_ >= 0) {
-					GeePriorityQueueType1Node** _tmp49_;
-					gint _tmp49__length1;
-					gint _tmp50_;
-					GeePriorityQueueType1Node* _tmp51_;
-					_tmp49_ = self->priv->_a;
-					_tmp49__length1 = self->priv->_a_length1;
-					_tmp50_ = i;
-					_tmp51_ = _tmp49_[_tmp50_];
-					_tmp47_ = _tmp51_ == NULL;
+				gboolean _tmp53_ = FALSE;
+				gint _tmp54_;
+				gboolean _tmp58_;
+				gint _tmp59_;
+				_tmp54_ = i;
+				if (_tmp54_ >= 0) {
+					GeePriorityQueueType1Node** _tmp55_;
+					gint _tmp55__length1;
+					gint _tmp56_;
+					GeePriorityQueueType1Node* _tmp57_;
+					_tmp55_ = self->priv->_a;
+					_tmp55__length1 = self->priv->_a_length1;
+					_tmp56_ = i;
+					_tmp57_ = _tmp55_[_tmp56_];
+					_tmp53_ = _tmp57_ == NULL;
 				} else {
-					_tmp47_ = FALSE;
+					_tmp53_ = FALSE;
 				}
-				_tmp52_ = _tmp47_;
-				if (!_tmp52_) {
+				_tmp58_ = _tmp53_;
+				if (!_tmp58_) {
 					break;
 				}
-				_tmp53_ = i;
-				i = _tmp53_ - 1;
+				_tmp59_ = i;
+				i = _tmp59_ - 1;
 			}
-			_tmp54_ = i;
-			_tmp55_ = _tmp54_ + 1;
-			self->priv->_a = g_renew (GeePriorityQueueType1Node*, self->priv->_a, _tmp54_ + 1);
-			(_tmp55_ > self->priv->_a_length1) ? memset (self->priv->_a + self->priv->_a_length1, 0, sizeof (GeePriorityQueueType1Node*) * (_tmp55_ - self->priv->_a_length1)) : NULL;
-			self->priv->_a_length1 = _tmp55_;
-			self->priv->__a_size_ = _tmp55_;
-			_tmp56_ = i;
-			_tmp57_ = _tmp56_ + 1;
-			self->priv->_b = g_renew (gboolean, self->priv->_b, _tmp56_ + 1);
-			(_tmp57_ > self->priv->_b_length1) ? memset (self->priv->_b + self->priv->_b_length1, 0, sizeof (gboolean) * (_tmp57_ - self->priv->_b_length1)) : NULL;
-			self->priv->_b_length1 = _tmp57_;
-			self->priv->__b_size_ = _tmp57_;
+			_tmp60_ = i;
+			_tmp61_ = _tmp60_ + 1;
+			self->priv->_a = g_renew (GeePriorityQueueType1Node*, self->priv->_a, _tmp60_ + 1);
+			(_tmp61_ > self->priv->_a_length1) ? memset (self->priv->_a + self->priv->_a_length1, 0, sizeof (GeePriorityQueueType1Node*) * (_tmp61_ - self->priv->_a_length1)) : NULL;
+			self->priv->_a_length1 = _tmp61_;
+			self->priv->__a_size_ = _tmp61_;
+			_tmp62_ = i;
+			_tmp63_ = _tmp62_ + 1;
+			self->priv->_b = g_renew (gboolean, self->priv->_b, _tmp62_ + 1);
+			(_tmp63_ > self->priv->_b_length1) ? memset (self->priv->_b + self->priv->_b_length1, 0, sizeof (gboolean) * (_tmp63_ - self->priv->_b_length1)) : NULL;
+			self->priv->_b_length1 = _tmp63_;
+			self->priv->__b_size_ = _tmp63_;
 		}
 		_gee_priority_queue_node_unref0 (next);
 	}
-	_tmp58_ = node;
-	_tmp59_ = _tmp58_->pair;
-	if (_tmp59_ != NULL) {
-		GeePriorityQueueType1Node* _tmp60_;
-		GeePriorityQueueNodePair* _tmp61_;
-		GeePriorityQueueNodePair* _tmp62_;
-		GeePriorityQueueNodePair* pair;
-		GeePriorityQueueType1Node* _tmp63_ = NULL;
-		GeePriorityQueueNodePair* _tmp64_;
-		GeePriorityQueueType1Node* _tmp65_;
+	_tmp64_ = node;
+	_tmp65_ = _tmp64_->pair;
+	if (_tmp65_ != NULL) {
 		GeePriorityQueueType1Node* _tmp66_;
+		GeePriorityQueueNodePair* _tmp67_;
+		GeePriorityQueueNodePair* pair;
+		GeePriorityQueueType1Node* _tmp68_ = NULL;
+		GeePriorityQueueNodePair* _tmp69_;
+		GeePriorityQueueType1Node* _tmp70_;
 		GeePriorityQueueType1Node* _tmp71_;
-		GeePriorityQueueType1Node* _tmp72_;
+		GeePriorityQueueType1Node* _tmp76_;
+		GeePriorityQueueType1Node* _tmp77_;
 		GeePriorityQueueType1Node* other;
-		GeePriorityQueueType1Node* _tmp73_;
-		GeePriorityQueueType1Node* _tmp74_;
-		GeePriorityQueueNodePair* _tmp75_;
-		GeePriorityQueueNodePair* _tmp76_;
-		GeePriorityQueueNodePair* _tmp85_;
-		GeePriorityQueueNodePair* _tmp86_;
-		_tmp60_ = node;
-		_tmp61_ = _tmp60_->pair;
-		_tmp62_ = _gee_priority_queue_node_pair_ref0 (_tmp61_);
-		pair = _tmp62_;
-		_tmp64_ = pair;
-		_tmp65_ = _tmp64_->node1;
+		GeePriorityQueueType1Node* _tmp78_;
+		GeePriorityQueueType1Node* _tmp79_;
+		GeePriorityQueueNodePair* _tmp80_;
+		GeePriorityQueueNodePair* _tmp81_;
+		GeePriorityQueueNodePair* _tmp88_;
+		GeePriorityQueueNodePair* _tmp89_;
 		_tmp66_ = node;
-		if (_tmp65_ == _tmp66_) {
-			GeePriorityQueueNodePair* _tmp67_;
-			GeePriorityQueueType1Node* _tmp68_;
-			_tmp67_ = pair;
-			_tmp68_ = _tmp67_->node2;
-			_tmp63_ = _tmp68_;
+		_tmp67_ = _tmp66_->pair;
+		pair = _tmp67_;
+		_tmp69_ = pair;
+		_tmp70_ = _tmp69_->node1;
+		_tmp71_ = node;
+		if (_tmp70_ == _tmp71_) {
+			GeePriorityQueueNodePair* _tmp72_;
+			GeePriorityQueueType1Node* _tmp73_;
+			_tmp72_ = pair;
+			_tmp73_ = _tmp72_->node2;
+			_tmp68_ = _tmp73_;
 		} else {
-			GeePriorityQueueNodePair* _tmp69_;
-			GeePriorityQueueType1Node* _tmp70_;
-			_tmp69_ = pair;
-			_tmp70_ = _tmp69_->node1;
-			_tmp63_ = _tmp70_;
+			GeePriorityQueueNodePair* _tmp74_;
+			GeePriorityQueueType1Node* _tmp75_;
+			_tmp74_ = pair;
+			_tmp75_ = _tmp74_->node1;
+			_tmp68_ = _tmp75_;
 		}
-		_tmp71_ = _tmp63_;
-		_tmp72_ = _gee_priority_queue_node_ref0 (_tmp71_);
-		other = _tmp72_;
-		_tmp73_ = node;
-		_tmp73_->pair = NULL;
-		_tmp74_ = other;
-		_tmp74_->pair = NULL;
-		_tmp75_ = pair;
-		_tmp76_ = _tmp75_->lp_prev;
-		if (_tmp76_ != NULL) {
-			GeePriorityQueueNodePair* _tmp77_;
-			GeePriorityQueueNodePair* _tmp78_;
-			GeePriorityQueueNodePair* _tmp79_;
-			GeePriorityQueueNodePair* _tmp80_;
-			GeePriorityQueueNodePair* _tmp81_;
-			_tmp77_ = pair;
-			_tmp78_ = _tmp77_->lp_prev;
-			_tmp79_ = pair;
-			_tmp80_ = _tmp79_->lp_next;
-			_tmp81_ = _gee_priority_queue_node_pair_ref0 (_tmp80_);
-			_gee_priority_queue_node_pair_unref0 (_tmp78_->lp_next);
-			_tmp78_->lp_next = _tmp81_;
-		} else {
+		_tmp76_ = _tmp68_;
+		_tmp77_ = _gee_priority_queue_node_ref0 (_tmp76_);
+		other = _tmp77_;
+		_tmp78_ = node;
+		_tmp78_->pair = NULL;
+		_tmp79_ = other;
+		_tmp79_->pair = NULL;
+		_tmp80_ = pair;
+		_tmp81_ = _tmp80_->lp_next;
+		if (_tmp81_ != NULL) {
 			GeePriorityQueueNodePair* _tmp82_;
 			GeePriorityQueueNodePair* _tmp83_;
 			GeePriorityQueueNodePair* _tmp84_;
+			GeePriorityQueueNodePair* _tmp85_;
 			_tmp82_ = pair;
 			_tmp83_ = _tmp82_->lp_next;
-			_tmp84_ = _gee_priority_queue_node_pair_ref0 (_tmp83_);
-			_gee_priority_queue_node_pair_unref0 (self->priv->_lp_head);
-			self->priv->_lp_head = _tmp84_;
-		}
-		_tmp85_ = pair;
-		_tmp86_ = _tmp85_->lp_next;
-		if (_tmp86_ != NULL) {
-			GeePriorityQueueNodePair* _tmp87_;
-			GeePriorityQueueNodePair* _tmp88_;
-			GeePriorityQueueNodePair* _tmp89_;
-			GeePriorityQueueNodePair* _tmp90_;
-			_tmp87_ = pair;
-			_tmp88_ = _tmp87_->lp_next;
-			_tmp89_ = pair;
-			_tmp90_ = _tmp89_->lp_prev;
-			_tmp88_->lp_prev = _tmp90_;
+			_tmp84_ = pair;
+			_tmp85_ = _tmp84_->lp_prev;
+			_tmp83_->lp_prev = _tmp85_;
 		} else {
+			GeePriorityQueueNodePair* _tmp86_;
+			GeePriorityQueueNodePair* _tmp87_;
+			_tmp86_ = pair;
+			_tmp87_ = _tmp86_->lp_prev;
+			self->priv->_lp_tail = _tmp87_;
+		}
+		_tmp88_ = pair;
+		_tmp89_ = _tmp88_->lp_prev;
+		if (_tmp89_ != NULL) {
+			GeePriorityQueueNodePair* _tmp90_;
 			GeePriorityQueueNodePair* _tmp91_;
 			GeePriorityQueueNodePair* _tmp92_;
 			GeePriorityQueueNodePair* _tmp93_;
-			_tmp91_ = pair;
-			_tmp92_ = _tmp91_->lp_prev;
-			_tmp93_ = _gee_priority_queue_node_pair_ref0 (_tmp92_);
-			_gee_priority_queue_node_pair_unref0 (self->priv->_lp_tail);
-			self->priv->_lp_tail = _tmp93_;
+			_tmp90_ = pair;
+			_tmp91_ = _tmp90_->lp_prev;
+			_tmp92_ = pair;
+			_tmp93_ = _tmp92_->lp_next;
+			_tmp92_->lp_next = NULL;
+			_gee_priority_queue_node_pair_free0 (_tmp91_->lp_next);
+			_tmp91_->lp_next = _tmp93_;
+		} else {
+			GeePriorityQueueNodePair* _tmp94_;
+			GeePriorityQueueNodePair* _tmp95_;
+			_tmp94_ = pair;
+			_tmp95_ = _tmp94_->lp_next;
+			_tmp94_->lp_next = NULL;
+			_gee_priority_queue_node_pair_free0 (self->priv->_lp_head);
+			self->priv->_lp_head = _tmp95_;
 		}
 		_gee_priority_queue_node_unref0 (other);
-		_gee_priority_queue_node_pair_unref0 (pair);
 	}
 }
 
@@ -2829,22 +2890,36 @@ static void _gee_priority_queue_remove_type2_node (GeePriorityQueue* self, GeePr
 }
 
 
-GCompareFunc gee_priority_queue_get_compare_func (GeePriorityQueue* self) {
-	GCompareFunc result;
-	GCompareFunc _tmp0_;
+GCompareDataFunc gee_priority_queue_get_compare_func (GeePriorityQueue* self, gpointer* result_target) {
+	GCompareDataFunc result;
+	GCompareDataFunc _tmp0_;
+	void* _tmp0__target;
+	GCompareDataFunc _tmp1_;
+	void* _tmp1__target;
 	g_return_val_if_fail (self != NULL, NULL);
 	_tmp0_ = self->priv->_compare_func;
-	result = _tmp0_;
+	_tmp0__target = self->priv->_compare_func_target;
+	_tmp1_ = _tmp0_;
+	_tmp1__target = _tmp0__target;
+	*result_target = _tmp1__target;
+	result = _tmp1_;
 	return result;
 }
 
 
-static void gee_priority_queue_set_compare_func (GeePriorityQueue* self, GCompareFunc value) {
-	GCompareFunc _tmp0_;
+static void gee_priority_queue_set_compare_func (GeePriorityQueue* self, GCompareDataFunc value, gpointer value_target) {
+	GCompareDataFunc _tmp0_;
+	void* _tmp0__target;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = value;
+	_tmp0__target = value_target;
+	(self->priv->_compare_func_target_destroy_notify == NULL) ? NULL : (self->priv->_compare_func_target_destroy_notify (self->priv->_compare_func_target), NULL);
+	self->priv->_compare_func = NULL;
+	self->priv->_compare_func_target = NULL;
+	self->priv->_compare_func_target_destroy_notify = NULL;
 	self->priv->_compare_func = _tmp0_;
-	g_object_notify ((GObject *) self, "compare-func");
+	self->priv->_compare_func_target = _tmp0__target;
+	self->priv->_compare_func_target_destroy_notify = NULL;
 }
 
 
@@ -2867,6 +2942,15 @@ static gint gee_priority_queue_real_get_remaining_capacity (GeeAbstractQueue* ba
 
 
 static gboolean gee_priority_queue_real_get_is_full (GeeAbstractQueue* base) {
+	gboolean result;
+	GeePriorityQueue* self;
+	self = (GeePriorityQueue*) base;
+	result = FALSE;
+	return result;
+}
+
+
+static gboolean gee_priority_queue_real_get_read_only (GeeAbstractCollection* base) {
 	gboolean result;
 	GeePriorityQueue* self;
 	self = (GeePriorityQueue*) base;
@@ -3340,200 +3424,33 @@ static GType gee_priority_queue_dummy_node_get_type (void) {
 }
 
 
-static GeePriorityQueueNodePair* gee_priority_queue_node_pair_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeePriorityQueueType1Node* node1, GeePriorityQueueType1Node* node2) {
-	GeePriorityQueueNodePair* self = NULL;
+static GeePriorityQueueNodePair* gee_priority_queue_node_pair_new (GeePriorityQueueType1Node* node1, GeePriorityQueueType1Node* node2) {
+	GeePriorityQueueNodePair* self;
 	GeePriorityQueueType1Node* _tmp0_;
 	GeePriorityQueueType1Node* _tmp1_;
-	GeePriorityQueueType1Node* _tmp2_;
-	GeePriorityQueueType1Node* _tmp3_;
 	g_return_val_if_fail (node1 != NULL, NULL);
 	g_return_val_if_fail (node2 != NULL, NULL);
-	self = (GeePriorityQueueNodePair*) g_type_create_instance (object_type);
-	self->priv->g_type = g_type;
-	self->priv->g_dup_func = g_dup_func;
-	self->priv->g_destroy_func = g_destroy_func;
+	self = g_slice_new0 (GeePriorityQueueNodePair);
+	gee_priority_queue_node_pair_instance_init (self);
 	_tmp0_ = node1;
-	_tmp1_ = _gee_priority_queue_node_ref0 (_tmp0_);
-	_gee_priority_queue_node_unref0 (self->node1);
-	self->node1 = _tmp1_;
-	_tmp2_ = node2;
-	_tmp3_ = _gee_priority_queue_node_ref0 (_tmp2_);
-	_gee_priority_queue_node_unref0 (self->node2);
-	self->node2 = _tmp3_;
+	self->node1 = _tmp0_;
+	_tmp1_ = node2;
+	self->node2 = _tmp1_;
 	return self;
 }
 
 
-static GeePriorityQueueNodePair* gee_priority_queue_node_pair_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeePriorityQueueType1Node* node1, GeePriorityQueueType1Node* node2) {
-	return gee_priority_queue_node_pair_construct (GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR, g_type, g_dup_func, g_destroy_func, node1, node2);
-}
-
-
-static void gee_priority_queue_value_node_pair_init (GValue* value) {
-	value->data[0].v_pointer = NULL;
-}
-
-
-static void gee_priority_queue_value_node_pair_free_value (GValue* value) {
-	if (value->data[0].v_pointer) {
-		gee_priority_queue_node_pair_unref (value->data[0].v_pointer);
-	}
-}
-
-
-static void gee_priority_queue_value_node_pair_copy_value (const GValue* src_value, GValue* dest_value) {
-	if (src_value->data[0].v_pointer) {
-		dest_value->data[0].v_pointer = gee_priority_queue_node_pair_ref (src_value->data[0].v_pointer);
-	} else {
-		dest_value->data[0].v_pointer = NULL;
-	}
-}
-
-
-static gpointer gee_priority_queue_value_node_pair_peek_pointer (const GValue* value) {
-	return value->data[0].v_pointer;
-}
-
-
-static gchar* gee_priority_queue_value_node_pair_collect_value (GValue* value, guint n_collect_values, GTypeCValue* collect_values, guint collect_flags) {
-	if (collect_values[0].v_pointer) {
-		GeePriorityQueueNodePair* object;
-		object = collect_values[0].v_pointer;
-		if (object->parent_instance.g_class == NULL) {
-			return g_strconcat ("invalid unclassed object pointer for value type `", G_VALUE_TYPE_NAME (value), "'", NULL);
-		} else if (!g_value_type_compatible (G_TYPE_FROM_INSTANCE (object), G_VALUE_TYPE (value))) {
-			return g_strconcat ("invalid object type `", g_type_name (G_TYPE_FROM_INSTANCE (object)), "' for value type `", G_VALUE_TYPE_NAME (value), "'", NULL);
-		}
-		value->data[0].v_pointer = gee_priority_queue_node_pair_ref (object);
-	} else {
-		value->data[0].v_pointer = NULL;
-	}
-	return NULL;
-}
-
-
-static gchar* gee_priority_queue_value_node_pair_lcopy_value (const GValue* value, guint n_collect_values, GTypeCValue* collect_values, guint collect_flags) {
-	GeePriorityQueueNodePair** object_p;
-	object_p = collect_values[0].v_pointer;
-	if (!object_p) {
-		return g_strdup_printf ("value location for `%s' passed as NULL", G_VALUE_TYPE_NAME (value));
-	}
-	if (!value->data[0].v_pointer) {
-		*object_p = NULL;
-	} else if (collect_flags & G_VALUE_NOCOPY_CONTENTS) {
-		*object_p = value->data[0].v_pointer;
-	} else {
-		*object_p = gee_priority_queue_node_pair_ref (value->data[0].v_pointer);
-	}
-	return NULL;
-}
-
-
-static GParamSpec* gee_priority_queue_param_spec_node_pair (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags) {
-	GeePriorityQueueParamSpecNodePair* spec;
-	g_return_val_if_fail (g_type_is_a (object_type, GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR), NULL);
-	spec = g_param_spec_internal (G_TYPE_PARAM_OBJECT, name, nick, blurb, flags);
-	G_PARAM_SPEC (spec)->value_type = object_type;
-	return G_PARAM_SPEC (spec);
-}
-
-
-static gpointer gee_priority_queue_value_get_node_pair (const GValue* value) {
-	g_return_val_if_fail (G_TYPE_CHECK_VALUE_TYPE (value, GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR), NULL);
-	return value->data[0].v_pointer;
-}
-
-
-static void gee_priority_queue_value_set_node_pair (GValue* value, gpointer v_object) {
-	GeePriorityQueueNodePair* old;
-	g_return_if_fail (G_TYPE_CHECK_VALUE_TYPE (value, GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR));
-	old = value->data[0].v_pointer;
-	if (v_object) {
-		g_return_if_fail (G_TYPE_CHECK_INSTANCE_TYPE (v_object, GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR));
-		g_return_if_fail (g_value_type_compatible (G_TYPE_FROM_INSTANCE (v_object), G_VALUE_TYPE (value)));
-		value->data[0].v_pointer = v_object;
-		gee_priority_queue_node_pair_ref (value->data[0].v_pointer);
-	} else {
-		value->data[0].v_pointer = NULL;
-	}
-	if (old) {
-		gee_priority_queue_node_pair_unref (old);
-	}
-}
-
-
-static void gee_priority_queue_value_take_node_pair (GValue* value, gpointer v_object) {
-	GeePriorityQueueNodePair* old;
-	g_return_if_fail (G_TYPE_CHECK_VALUE_TYPE (value, GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR));
-	old = value->data[0].v_pointer;
-	if (v_object) {
-		g_return_if_fail (G_TYPE_CHECK_INSTANCE_TYPE (v_object, GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR));
-		g_return_if_fail (g_value_type_compatible (G_TYPE_FROM_INSTANCE (v_object), G_VALUE_TYPE (value)));
-		value->data[0].v_pointer = v_object;
-	} else {
-		value->data[0].v_pointer = NULL;
-	}
-	if (old) {
-		gee_priority_queue_node_pair_unref (old);
-	}
-}
-
-
-static void gee_priority_queue_node_pair_class_init (GeePriorityQueueNodePairClass * klass) {
-	gee_priority_queue_node_pair_parent_class = g_type_class_peek_parent (klass);
-	GEE_PRIORITY_QUEUE_NODE_PAIR_CLASS (klass)->finalize = gee_priority_queue_node_pair_finalize;
-	g_type_class_add_private (klass, sizeof (GeePriorityQueueNodePairPrivate));
-}
-
-
 static void gee_priority_queue_node_pair_instance_init (GeePriorityQueueNodePair * self) {
-	self->priv = GEE_PRIORITY_QUEUE_NODE_PAIR_GET_PRIVATE (self);
 	self->lp_prev = NULL;
 	self->lp_next = NULL;
 	self->node1 = NULL;
 	self->node2 = NULL;
-	self->ref_count = 1;
 }
 
 
-static void gee_priority_queue_node_pair_finalize (GeePriorityQueueNodePair* obj) {
-	GeePriorityQueueNodePair * self;
-	self = G_TYPE_CHECK_INSTANCE_CAST (obj, GEE_PRIORITY_QUEUE_TYPE_NODE_PAIR, GeePriorityQueueNodePair);
-	_gee_priority_queue_node_pair_unref0 (self->lp_next);
-	_gee_priority_queue_node_unref0 (self->node1);
-	_gee_priority_queue_node_unref0 (self->node2);
-}
-
-
-static GType gee_priority_queue_node_pair_get_type (void) {
-	static volatile gsize gee_priority_queue_node_pair_type_id__volatile = 0;
-	if (g_once_init_enter (&gee_priority_queue_node_pair_type_id__volatile)) {
-		static const GTypeValueTable g_define_type_value_table = { gee_priority_queue_value_node_pair_init, gee_priority_queue_value_node_pair_free_value, gee_priority_queue_value_node_pair_copy_value, gee_priority_queue_value_node_pair_peek_pointer, "p", gee_priority_queue_value_node_pair_collect_value, "p", gee_priority_queue_value_node_pair_lcopy_value };
-		static const GTypeInfo g_define_type_info = { sizeof (GeePriorityQueueNodePairClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_priority_queue_node_pair_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeePriorityQueueNodePair), 0, (GInstanceInitFunc) gee_priority_queue_node_pair_instance_init, &g_define_type_value_table };
-		static const GTypeFundamentalInfo g_define_type_fundamental_info = { (G_TYPE_FLAG_CLASSED | G_TYPE_FLAG_INSTANTIATABLE | G_TYPE_FLAG_DERIVABLE | G_TYPE_FLAG_DEEP_DERIVABLE) };
-		GType gee_priority_queue_node_pair_type_id;
-		gee_priority_queue_node_pair_type_id = g_type_register_fundamental (g_type_fundamental_next (), "GeePriorityQueueNodePair", &g_define_type_info, &g_define_type_fundamental_info, 0);
-		g_once_init_leave (&gee_priority_queue_node_pair_type_id__volatile, gee_priority_queue_node_pair_type_id);
-	}
-	return gee_priority_queue_node_pair_type_id__volatile;
-}
-
-
-static gpointer gee_priority_queue_node_pair_ref (gpointer instance) {
-	GeePriorityQueueNodePair* self;
-	self = instance;
-	g_atomic_int_inc (&self->ref_count);
-	return instance;
-}
-
-
-static void gee_priority_queue_node_pair_unref (gpointer instance) {
-	GeePriorityQueueNodePair* self;
-	self = instance;
-	if (g_atomic_int_dec_and_test (&self->ref_count)) {
-		GEE_PRIORITY_QUEUE_NODE_PAIR_GET_CLASS (self)->finalize (self);
-		g_type_free_instance ((GTypeInstance *) self);
-	}
+static void gee_priority_queue_node_pair_free (GeePriorityQueueNodePair* self) {
+	_gee_priority_queue_node_pair_free0 (self->lp_next);
+	g_slice_free (GeePriorityQueueNodePair, self);
 }
 
 
@@ -3644,30 +3561,6 @@ static inline GeePriorityQueueNode* _gee_priority_queue_iterator_get_next_node (
 }
 
 
-static gboolean gee_priority_queue_iterator_real_first (GeeIterator* base) {
-	GeePriorityQueueIterator * self;
-	gboolean result = FALSE;
-	gint _tmp0_;
-	GeePriorityQueue* _tmp1_;
-	gint _tmp2_;
-	GeePriorityQueue* _tmp3_;
-	GeePriorityQueueNode* _tmp4_;
-	GeePriorityQueueNode* _tmp5_;
-	self = (GeePriorityQueueIterator*) base;
-	_tmp0_ = self->priv->stamp;
-	_tmp1_ = self->priv->queue;
-	_tmp2_ = _tmp1_->priv->_stamp;
-	_vala_assert (_tmp0_ == _tmp2_, "stamp == queue._stamp");
-	_tmp3_ = self->priv->queue;
-	_tmp4_ = _tmp3_->priv->_iter_head;
-	self->priv->position = _tmp4_;
-	self->priv->previous = NULL;
-	_tmp5_ = self->priv->position;
-	result = _tmp5_ != NULL;
-	return result;
-}
-
-
 static gpointer gee_priority_queue_iterator_real_get (GeeIterator* base) {
 	GeePriorityQueueIterator * self;
 	gpointer result = NULL;
@@ -3751,7 +3644,7 @@ static void gee_priority_queue_iterator_real_remove (GeeIterator* base) {
 	}
 	_tmp14_ = self->priv->queue;
 	_tmp15_ = self->priv->position;
-	_gee_priority_queue_delete (_tmp14_, _tmp15_, NULL);
+	_gee_priority_queue_delete (_tmp14_, _tmp15_);
 	self->priv->position = NULL;
 	_tmp16_ = self->priv->previous;
 	if (_tmp16_ != NULL) {
@@ -3806,6 +3699,107 @@ static void gee_priority_queue_iterator_real_remove (GeeIterator* base) {
 }
 
 
+static gboolean gee_priority_queue_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeePriorityQueueIterator * self;
+	gboolean result = FALSE;
+	GeePriorityQueueNode* _tmp0_;
+	GeeForallFunc _tmp8_;
+	void* _tmp8__target;
+	GeePriorityQueueNode* _tmp9_;
+	gconstpointer _tmp10_;
+	gpointer _tmp11_;
+	gboolean _tmp12_ = FALSE;
+	self = (GeePriorityQueueIterator*) base;
+	_tmp0_ = self->priv->position;
+	if (_tmp0_ == NULL) {
+		GeePriorityQueueNode* _tmp1_ = NULL;
+		GeePriorityQueueNode* _tmp2_;
+		GeePriorityQueueNode* _tmp7_;
+		_tmp2_ = self->priv->previous;
+		if (_tmp2_ != NULL) {
+			GeePriorityQueueNode* _tmp3_;
+			GeePriorityQueueNode* _tmp4_;
+			_tmp3_ = self->priv->previous;
+			_tmp4_ = _tmp3_->iter_next;
+			_tmp1_ = _tmp4_;
+		} else {
+			GeePriorityQueue* _tmp5_;
+			GeePriorityQueueNode* _tmp6_;
+			_tmp5_ = self->priv->queue;
+			_tmp6_ = _tmp5_->priv->_iter_head;
+			_tmp1_ = _tmp6_;
+		}
+		_tmp7_ = _tmp1_;
+		self->priv->position = _tmp7_;
+	}
+	_tmp8_ = f;
+	_tmp8__target = f_target;
+	_tmp9_ = self->priv->position;
+	_tmp10_ = _tmp9_->data;
+	_tmp11_ = ((_tmp10_ != NULL) && (self->priv->g_dup_func != NULL)) ? self->priv->g_dup_func ((gpointer) _tmp10_) : ((gpointer) _tmp10_);
+	_tmp12_ = _tmp8_ (_tmp11_, _tmp8__target);
+	if (!_tmp12_) {
+		result = FALSE;
+		return result;
+	}
+	while (TRUE) {
+		GeePriorityQueueNode* _tmp13_;
+		GeePriorityQueueNode* _tmp14_;
+		GeePriorityQueueNode* _tmp15_;
+		GeePriorityQueueNode* _tmp16_;
+		GeePriorityQueueNode* _tmp17_;
+		GeeForallFunc _tmp18_;
+		void* _tmp18__target;
+		GeePriorityQueueNode* _tmp19_;
+		gconstpointer _tmp20_;
+		gpointer _tmp21_;
+		gboolean _tmp22_ = FALSE;
+		_tmp13_ = self->priv->position;
+		_tmp14_ = _tmp13_->iter_next;
+		if (!(_tmp14_ != NULL)) {
+			break;
+		}
+		_tmp15_ = self->priv->position;
+		self->priv->previous = _tmp15_;
+		_tmp16_ = self->priv->position;
+		_tmp17_ = _tmp16_->iter_next;
+		self->priv->position = _tmp17_;
+		_tmp18_ = f;
+		_tmp18__target = f_target;
+		_tmp19_ = self->priv->position;
+		_tmp20_ = _tmp19_->data;
+		_tmp21_ = ((_tmp20_ != NULL) && (self->priv->g_dup_func != NULL)) ? self->priv->g_dup_func ((gpointer) _tmp20_) : ((gpointer) _tmp20_);
+		_tmp22_ = _tmp18_ (_tmp21_, _tmp18__target);
+		if (!_tmp22_) {
+			result = FALSE;
+			return result;
+		}
+	}
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean gee_priority_queue_iterator_real_get_read_only (GeeIterator* base) {
+	gboolean result;
+	GeePriorityQueueIterator* self;
+	self = (GeePriorityQueueIterator*) base;
+	result = FALSE;
+	return result;
+}
+
+
+static gboolean gee_priority_queue_iterator_real_get_valid (GeeIterator* base) {
+	gboolean result;
+	GeePriorityQueueIterator* self;
+	GeePriorityQueueNode* _tmp0_;
+	self = (GeePriorityQueueIterator*) base;
+	_tmp0_ = self->priv->position;
+	result = _tmp0_ != NULL;
+	return result;
+}
+
+
 static void gee_priority_queue_iterator_class_init (GeePriorityQueueIteratorClass * klass) {
 	gee_priority_queue_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeePriorityQueueIteratorPrivate));
@@ -3815,6 +3809,32 @@ static void gee_priority_queue_iterator_class_init (GeePriorityQueueIteratorClas
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_PRIORITY_QUEUE_ITERATOR_G_TYPE, g_param_spec_gtype ("g-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_PRIORITY_QUEUE_ITERATOR_G_DUP_FUNC, g_param_spec_pointer ("g-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_PRIORITY_QUEUE_ITERATOR_G_DESTROY_FUNC, g_param_spec_pointer ("g-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_PRIORITY_QUEUE_ITERATOR_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_PRIORITY_QUEUE_ITERATOR_VALID, g_param_spec_boolean ("valid", "valid", "valid", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static GType gee_priority_queue_iterator_gee_traversable_get_g_type (GeePriorityQueueIterator* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_priority_queue_iterator_gee_traversable_get_g_dup_func (GeePriorityQueueIterator* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_priority_queue_iterator_gee_traversable_get_g_destroy_func (GeePriorityQueueIterator* self) {
+	return self->priv->g_destroy_func;
+}
+
+
+static void gee_priority_queue_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_priority_queue_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_priority_queue_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_priority_queue_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_priority_queue_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_priority_queue_iterator_gee_traversable_get_g_destroy_func;
 }
 
 
@@ -3822,9 +3842,10 @@ static void gee_priority_queue_iterator_gee_iterator_interface_init (GeeIterator
 	gee_priority_queue_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->next = (gboolean (*)(GeeIterator*)) gee_priority_queue_iterator_real_next;
 	iface->has_next = (gboolean (*)(GeeIterator*)) gee_priority_queue_iterator_real_has_next;
-	iface->first = (gboolean (*)(GeeIterator*)) gee_priority_queue_iterator_real_first;
 	iface->get = (gpointer (*)(GeeIterator*)) gee_priority_queue_iterator_real_get;
 	iface->remove = (void (*)(GeeIterator*)) gee_priority_queue_iterator_real_remove;
+	iface->get_read_only = gee_priority_queue_iterator_real_get_read_only;
+	iface->get_valid = gee_priority_queue_iterator_real_get_valid;
 }
 
 
@@ -3845,9 +3866,11 @@ static GType gee_priority_queue_iterator_get_type (void) {
 	static volatile gsize gee_priority_queue_iterator_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_priority_queue_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeePriorityQueueIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_priority_queue_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeePriorityQueueIterator), 0, (GInstanceInitFunc) gee_priority_queue_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_priority_queue_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_priority_queue_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_priority_queue_iterator_type_id;
 		gee_priority_queue_iterator_type_id = g_type_register_static (G_TYPE_OBJECT, "GeePriorityQueueIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_priority_queue_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
 		g_type_add_interface_static (gee_priority_queue_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
 		g_once_init_leave (&gee_priority_queue_iterator_type_id__volatile, gee_priority_queue_iterator_type_id);
 	}
@@ -3859,6 +3882,12 @@ static void _vala_gee_priority_queue_iterator_get_property (GObject * object, gu
 	GeePriorityQueueIterator * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_PRIORITY_QUEUE_TYPE_ITERATOR, GeePriorityQueueIterator);
 	switch (property_id) {
+		case GEE_PRIORITY_QUEUE_ITERATOR_READ_ONLY:
+		g_value_set_boolean (value, gee_iterator_get_read_only ((GeeIterator*) self));
+		break;
+		case GEE_PRIORITY_QUEUE_ITERATOR_VALID:
+		g_value_set_boolean (value, gee_iterator_get_valid ((GeeIterator*) self));
+		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
 		break;
@@ -3889,10 +3918,8 @@ static void _vala_gee_priority_queue_iterator_set_property (GObject * object, gu
 static void gee_priority_queue_class_init (GeePriorityQueueClass * klass) {
 	gee_priority_queue_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeePriorityQueuePrivate));
-	GEE_ABSTRACT_QUEUE_CLASS (klass)->offer = gee_priority_queue_real_offer;
 	GEE_ABSTRACT_QUEUE_CLASS (klass)->peek = gee_priority_queue_real_peek;
 	GEE_ABSTRACT_QUEUE_CLASS (klass)->poll = gee_priority_queue_real_poll;
-	GEE_ABSTRACT_QUEUE_CLASS (klass)->drain = gee_priority_queue_real_drain;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->contains = gee_priority_queue_real_contains;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->add = gee_priority_queue_real_add;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove = gee_priority_queue_real_remove;
@@ -3901,6 +3928,7 @@ static void gee_priority_queue_class_init (GeePriorityQueueClass * klass) {
 	GEE_ABSTRACT_QUEUE_CLASS (klass)->get_capacity = gee_priority_queue_real_get_capacity;
 	GEE_ABSTRACT_QUEUE_CLASS (klass)->get_remaining_capacity = gee_priority_queue_real_get_remaining_capacity;
 	GEE_ABSTRACT_QUEUE_CLASS (klass)->get_is_full = gee_priority_queue_real_get_is_full;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_priority_queue_real_get_read_only;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_priority_queue_real_get_size;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_priority_queue_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_priority_queue_set_property;
@@ -3908,10 +3936,6 @@ static void gee_priority_queue_class_init (GeePriorityQueueClass * klass) {
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_PRIORITY_QUEUE_G_TYPE, g_param_spec_gtype ("g-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_PRIORITY_QUEUE_G_DUP_FUNC, g_param_spec_pointer ("g-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_PRIORITY_QUEUE_G_DESTROY_FUNC, g_param_spec_pointer ("g-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
-	/**
-	 * The elements' comparator function.
-	 */
-	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_PRIORITY_QUEUE_COMPARE_FUNC, g_param_spec_pointer ("compare-func", "compare-func", "compare-func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	/**
 	 * {@inheritDoc}
 	 */
@@ -3924,6 +3948,10 @@ static void gee_priority_queue_class_init (GeePriorityQueueClass * klass) {
 	 * {@inheritDoc}
 	 */
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_PRIORITY_QUEUE_IS_FULL, g_param_spec_boolean ("is-full", "is-full", "is-full", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	/**
+	 * {@inheritDoc}
+	 */
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_PRIORITY_QUEUE_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	/**
 	 * {@inheritDoc}
 	 */
@@ -3962,14 +3990,17 @@ static void gee_priority_queue_instance_init (GeePriorityQueue * self) {
 static void gee_priority_queue_finalize (GObject* obj) {
 	GeePriorityQueue * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (obj, GEE_TYPE_PRIORITY_QUEUE, GeePriorityQueue);
+	(self->priv->_compare_func_target_destroy_notify == NULL) ? NULL : (self->priv->_compare_func_target_destroy_notify (self->priv->_compare_func_target), NULL);
+	self->priv->_compare_func = NULL;
+	self->priv->_compare_func_target = NULL;
+	self->priv->_compare_func_target_destroy_notify = NULL;
 	_gee_priority_queue_node_unref0 (self->priv->_r);
 	_gee_priority_queue_node_unref0 (self->priv->_r_prime);
 	_gee_priority_queue_node_unref0 (self->priv->_lm_head);
 	_gee_priority_queue_node_unref0 (self->priv->_lm_tail);
 	_gee_priority_queue_node_unref0 (self->priv->_p);
 	self->priv->_a = (_vala_array_free (self->priv->_a, self->priv->_a_length1, (GDestroyNotify) gee_priority_queue_node_unref), NULL);
-	_gee_priority_queue_node_pair_unref0 (self->priv->_lp_head);
-	_gee_priority_queue_node_pair_unref0 (self->priv->_lp_tail);
+	_gee_priority_queue_node_pair_free0 (self->priv->_lp_head);
 	self->priv->_b = (g_free (self->priv->_b), NULL);
 	_gee_priority_queue_node_unref0 (self->priv->_ll_head);
 	_gee_priority_queue_node_unref0 (self->priv->_ll_tail);
@@ -4012,9 +4043,6 @@ static void _vala_gee_priority_queue_get_property (GObject * object, guint prope
 	GeePriorityQueue * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TYPE_PRIORITY_QUEUE, GeePriorityQueue);
 	switch (property_id) {
-		case GEE_PRIORITY_QUEUE_COMPARE_FUNC:
-		g_value_set_pointer (value, gee_priority_queue_get_compare_func (self));
-		break;
 		case GEE_PRIORITY_QUEUE_CAPACITY:
 		g_value_set_int (value, gee_abstract_queue_get_capacity ((GeeAbstractQueue*) self));
 		break;
@@ -4023,6 +4051,9 @@ static void _vala_gee_priority_queue_get_property (GObject * object, guint prope
 		break;
 		case GEE_PRIORITY_QUEUE_IS_FULL:
 		g_value_set_boolean (value, gee_abstract_queue_get_is_full ((GeeAbstractQueue*) self));
+		break;
+		case GEE_PRIORITY_QUEUE_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
 		break;
 		case GEE_PRIORITY_QUEUE_SIZE:
 		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
@@ -4038,9 +4069,6 @@ static void _vala_gee_priority_queue_set_property (GObject * object, guint prope
 	GeePriorityQueue * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TYPE_PRIORITY_QUEUE, GeePriorityQueue);
 	switch (property_id) {
-		case GEE_PRIORITY_QUEUE_COMPARE_FUNC:
-		gee_priority_queue_set_compare_func (self, g_value_get_pointer (value));
-		break;
 		case GEE_PRIORITY_QUEUE_G_TYPE:
 		self->priv->g_type = g_value_get_gtype (value);
 		break;

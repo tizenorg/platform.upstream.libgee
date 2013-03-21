@@ -25,12 +25,8 @@ using GLib;
 /**
  * An object that can provide an {@link Iterator}.
  */
-public interface Gee.Iterable<G> : Object {
-	/**
-	 * The type of the elements in this collection.
-	 */
-	public abstract Type element_type { get; }
-
+[GenericAccessors]
+public interface Gee.Iterable<G> : Object, Traversable<G> {
 	/**
 	 * Returns a {@link Iterator} that can be used for simple iteration over a
 	 * collection.

@@ -23,6 +23,8 @@
 /**
  * This interface defines a total ordering among instances of each class
  * implementing it.
+ *
+ * @see Hashable
  */
 public interface Gee.Comparable<G> : Object {
 	/**

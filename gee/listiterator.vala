@@ -23,17 +23,11 @@
 /**
  * A list iterator. This supports bi-directionnal and index-based iteration.
  */
-public interface Gee.ListIterator<G> : Gee.BidirIterator<G> {
+public interface Gee.ListIterator<G> : Gee.Iterator<G> {
 	/**
 	 * Sets the current item in the iteration to the specified new item.
 	 */
 	public abstract void set (G item);
-
-	/**
-	 * Inserts the specified item before the current item in the iteration. The
-	 * cursor is let to point to the current item.
-	 */
-	public abstract void insert (G item);
 
 	/**
 	 * Adds the specified item after the current item in the iteration. The

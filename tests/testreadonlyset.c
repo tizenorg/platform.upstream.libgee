@@ -135,7 +135,7 @@ static void read_only_set_tests_real_set_up (GeeTestCase* base) {
 	GeeCollection* _tmp1_;
 	GeeCollection* _tmp2_ = NULL;
 	self = (ReadOnlySetTests*) base;
-	_tmp0_ = gee_hash_set_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL);
+	_tmp0_ = gee_hash_set_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL, NULL, NULL, NULL);
 	_g_object_unref0 (((ReadOnlyCollectionTests*) self)->test_collection);
 	((ReadOnlyCollectionTests*) self)->test_collection = (GeeCollection*) _tmp0_;
 	_tmp1_ = ((ReadOnlyCollectionTests*) self)->test_collection;

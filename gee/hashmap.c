@@ -29,13 +29,25 @@
 #include <glib-object.h>
 
 
-#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
-#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
-#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
-#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+#define GEE_TYPE_TRAVERSABLE (gee_traversable_get_type ())
+#define GEE_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversable))
+#define GEE_IS_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_TRAVERSABLE))
+#define GEE_TRAVERSABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversableIface))
 
-typedef struct _GeeIterable GeeIterable;
-typedef struct _GeeIterableIface GeeIterableIface;
+typedef struct _GeeTraversable GeeTraversable;
+typedef struct _GeeTraversableIface GeeTraversableIface;
+
+#define GEE_TRAVERSABLE_TYPE_STREAM (gee_traversable_stream_get_type ())
+
+#define GEE_TYPE_LAZY (gee_lazy_get_type ())
+#define GEE_LAZY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LAZY, GeeLazy))
+#define GEE_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_LAZY, GeeLazyClass))
+#define GEE_IS_LAZY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LAZY))
+#define GEE_IS_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_LAZY))
+#define GEE_LAZY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_LAZY, GeeLazyClass))
+
+typedef struct _GeeLazy GeeLazy;
+typedef struct _GeeLazyClass GeeLazyClass;
 
 #define GEE_TYPE_ITERATOR (gee_iterator_get_type ())
 #define GEE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERATOR, GeeIterator))
@@ -44,6 +56,14 @@ typedef struct _GeeIterableIface GeeIterableIface;
 
 typedef struct _GeeIterator GeeIterator;
 typedef struct _GeeIteratorIface GeeIteratorIface;
+
+#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
+#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
+#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
+#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+
+typedef struct _GeeIterable GeeIterable;
+typedef struct _GeeIterableIface GeeIterableIface;
 
 #define GEE_TYPE_MAP (gee_map_get_type ())
 #define GEE_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_MAP, GeeMap))
@@ -235,34 +255,78 @@ typedef struct _GeeHashMapValueIteratorPrivate GeeHashMapValueIteratorPrivate;
 typedef struct _GeeHashMapEntryIteratorPrivate GeeHashMapEntryIteratorPrivate;
 #define _vala_assert(expr, msg) if G_LIKELY (expr) ; else g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
 
+typedef gboolean (*GeeForallFunc) (gpointer g, void* user_data);
+typedef enum  {
+	GEE_TRAVERSABLE_STREAM_YIELD,
+	GEE_TRAVERSABLE_STREAM_CONTINUE,
+	GEE_TRAVERSABLE_STREAM_END
+} GeeTraversableStream;
+
+typedef GeeTraversableStream (*GeeStreamFunc) (GeeTraversableStream state, GeeLazy* g, GeeLazy** lazy, void* user_data);
 struct _GeeIteratorIface {
 	GTypeInterface parent_iface;
 	gboolean (*next) (GeeIterator* self);
 	gboolean (*has_next) (GeeIterator* self);
-	gboolean (*first) (GeeIterator* self);
 	gpointer (*get) (GeeIterator* self);
 	void (*remove) (GeeIterator* self);
+	gboolean (*get_valid) (GeeIterator* self);
+	gboolean (*get_read_only) (GeeIterator* self);
+};
+
+typedef gpointer (*GeeFoldFunc) (gpointer g, gpointer a, void* user_data);
+typedef gpointer (*GeeMapFunc) (gpointer g, void* user_data);
+typedef gboolean (*GeePredicate) (gconstpointer g, void* user_data);
+struct _GeeTraversableIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeTraversable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeTraversable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeTraversable* self);
+	gboolean (*foreach) (GeeTraversable* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	gpointer (*fold) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*map) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+	GeeIterator* (*scan) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*filter) (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+	GeeIterator* (*chop) (GeeTraversable* self, gint offset, gint length);
+	GType (*get_element_type) (GeeTraversable* self);
 };
 
 struct _GeeIterableIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeIterable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeIterable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeIterable* self);
 	GeeIterator* (*iterator) (GeeIterable* self);
-	GType (*get_element_type) (GeeIterable* self);
 };
 
+typedef gpointer (*GeeFoldMapFunc) (gconstpointer k, gconstpointer v, gpointer a, void* user_data);
+typedef gboolean (*GeeForallMapFunc) (gconstpointer k, gconstpointer v, void* user_data);
 struct _GeeMapIteratorIface {
 	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeMapIterator* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeMapIterator* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeMapIterator* self);
+	GType (*get_v_type) (GeeMapIterator* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeMapIterator* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeMapIterator* self);
 	gboolean (*next) (GeeMapIterator* self);
 	gboolean (*has_next) (GeeMapIterator* self);
-	gboolean (*first) (GeeMapIterator* self);
 	gpointer (*get_key) (GeeMapIterator* self);
 	gpointer (*get_value) (GeeMapIterator* self);
 	void (*set_value) (GeeMapIterator* self, gconstpointer value);
 	void (*unset) (GeeMapIterator* self);
+	gpointer (*fold) (GeeMapIterator* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldMapFunc f, void* f_target, gpointer seed);
+	gboolean (*foreach) (GeeMapIterator* self, GeeForallMapFunc f, void* f_target);
+	gboolean (*get_valid) (GeeMapIterator* self);
+	gboolean (*get_mutable) (GeeMapIterator* self);
+	gboolean (*get_read_only) (GeeMapIterator* self);
 };
 
 struct _GeeCollectionIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeCollection* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeCollection* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeCollection* self);
 	gboolean (*contains) (GeeCollection* self, gconstpointer item);
 	gboolean (*add) (GeeCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeCollection* self, gconstpointer item);
@@ -274,38 +338,43 @@ struct _GeeCollectionIface {
 	gpointer* (*to_array) (GeeCollection* self, int* result_length1);
 	gint (*get_size) (GeeCollection* self);
 	gboolean (*get_is_empty) (GeeCollection* self);
+	gboolean (*get_read_only) (GeeCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeCollection* self);
 };
 
 struct _GeeSetIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeSet* self);
 	GeeSet* (*get_read_only_view) (GeeSet* self);
 };
 
 struct _GeeMapIface {
 	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeMap* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeMap* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeMap* self);
+	GType (*get_v_type) (GeeMap* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeMap* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeMap* self);
 	gboolean (*has_key) (GeeMap* self, gconstpointer key);
-	gboolean (*contains) (GeeMap* self, gconstpointer key);
 	gboolean (*has) (GeeMap* self, gconstpointer key, gconstpointer value);
 	gpointer (*get) (GeeMap* self, gconstpointer key);
 	void (*set) (GeeMap* self, gconstpointer key, gconstpointer value);
 	gboolean (*unset) (GeeMap* self, gconstpointer key, gpointer* value);
-	gboolean (*remove) (GeeMap* self, gconstpointer key, gpointer* value);
 	void (*clear) (GeeMap* self);
 	GeeMapIterator* (*map_iterator) (GeeMap* self);
 	void (*set_all) (GeeMap* self, GeeMap* map);
 	gboolean (*unset_all) (GeeMap* self, GeeMap* map);
-	gboolean (*remove_all) (GeeMap* self, GeeMap* map);
 	gboolean (*has_all) (GeeMap* self, GeeMap* map);
-	gboolean (*contains_all) (GeeMap* self, GeeMap* map);
 	gint (*get_size) (GeeMap* self);
 	gboolean (*get_is_empty) (GeeMap* self);
+	gboolean (*get_read_only) (GeeMap* self);
 	GeeSet* (*get_keys) (GeeMap* self);
 	GeeCollection* (*get_values) (GeeMap* self);
 	GeeSet* (*get_entries) (GeeMap* self);
 	GeeMap* (*get_read_only_view) (GeeMap* self);
-	GType (*get_key_type) (GeeMap* self);
-	GType (*get_value_type) (GeeMap* self);
 };
 
 struct _GeeAbstractMap {
@@ -322,11 +391,20 @@ struct _GeeAbstractMapClass {
 	gboolean (*unset) (GeeAbstractMap* self, gconstpointer key, gpointer* value);
 	GeeMapIterator* (*map_iterator) (GeeAbstractMap* self);
 	void (*clear) (GeeAbstractMap* self);
-	void (*set_all) (GeeAbstractMap* self, GeeMap* map);
-	gboolean (*unset_all) (GeeAbstractMap* self, GeeMap* map);
-	gboolean (*has_all) (GeeAbstractMap* self, GeeMap* map);
+	gboolean (*foreach) (GeeAbstractMap* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeAbstractMap* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	void (*reserved0) (GeeAbstractMap* self);
+	void (*reserved1) (GeeAbstractMap* self);
+	void (*reserved2) (GeeAbstractMap* self);
+	void (*reserved3) (GeeAbstractMap* self);
+	void (*reserved4) (GeeAbstractMap* self);
+	void (*reserved5) (GeeAbstractMap* self);
+	void (*reserved6) (GeeAbstractMap* self);
+	void (*reserved7) (GeeAbstractMap* self);
+	void (*reserved8) (GeeAbstractMap* self);
+	void (*reserved9) (GeeAbstractMap* self);
 	gint (*get_size) (GeeAbstractMap* self);
-	gboolean (*get_is_empty) (GeeAbstractMap* self);
+	gboolean (*get_read_only) (GeeAbstractMap* self);
 	GeeSet* (*get_keys) (GeeAbstractMap* self);
 	GeeCollection* (*get_values) (GeeAbstractMap* self);
 	GeeSet* (*get_entries) (GeeAbstractMap* self);
@@ -342,6 +420,8 @@ struct _GeeHashMapClass {
 	GeeAbstractMapClass parent_class;
 };
 
+typedef guint (*GeeHashDataFunc) (gconstpointer v, void* user_data);
+typedef gboolean (*GeeEqualDataFunc) (gconstpointer a, gconstpointer b, void* user_data);
 struct _GeeHashMapPrivate {
 	GType k_type;
 	GBoxedCopyFunc k_dup_func;
@@ -349,9 +429,15 @@ struct _GeeHashMapPrivate {
 	GType v_type;
 	GBoxedCopyFunc v_dup_func;
 	GDestroyNotify v_destroy_func;
-	GHashFunc _key_hash_func;
-	GEqualFunc _key_equal_func;
-	GEqualFunc _value_equal_func;
+	GeeHashDataFunc _key_hash_func;
+	gpointer _key_hash_func_target;
+	GDestroyNotify _key_hash_func_target_destroy_notify;
+	GeeEqualDataFunc _key_equal_func;
+	gpointer _key_equal_func_target;
+	GDestroyNotify _key_equal_func_target_destroy_notify;
+	GeeEqualDataFunc _value_equal_func;
+	gpointer _value_equal_func_target;
+	GDestroyNotify _value_equal_func_target_destroy_notify;
 	gint _array_size;
 	gint _nnodes;
 	GeeHashMapNode** _nodes;
@@ -381,6 +467,7 @@ struct _GeeMapEntryClass {
 	gconstpointer (*get_key) (GeeMapEntry* self);
 	gconstpointer (*get_value) (GeeMapEntry* self);
 	void (*set_value) (GeeMapEntry* self, gconstpointer value);
+	gboolean (*get_read_only) (GeeMapEntry* self);
 };
 
 struct _GeeHashMapEntry {
@@ -413,14 +500,20 @@ struct _GeeAbstractCollectionClass {
 	gboolean (*add) (GeeAbstractCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeAbstractCollection* self, gconstpointer item);
 	void (*clear) (GeeAbstractCollection* self);
-	gpointer* (*to_array) (GeeAbstractCollection* self, int* result_length1);
-	gboolean (*add_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*contains_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*remove_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*retain_all) (GeeAbstractCollection* self, GeeCollection* collection);
 	GeeIterator* (*iterator) (GeeAbstractCollection* self);
+	gboolean (*foreach) (GeeAbstractCollection* self, GeeForallFunc f, void* f_target);
+	void (*reserved0) (GeeAbstractCollection* self);
+	void (*reserved1) (GeeAbstractCollection* self);
+	void (*reserved2) (GeeAbstractCollection* self);
+	void (*reserved3) (GeeAbstractCollection* self);
+	void (*reserved4) (GeeAbstractCollection* self);
+	void (*reserved5) (GeeAbstractCollection* self);
+	void (*reserved6) (GeeAbstractCollection* self);
+	void (*reserved7) (GeeAbstractCollection* self);
+	void (*reserved8) (GeeAbstractCollection* self);
+	void (*reserved9) (GeeAbstractCollection* self);
 	gint (*get_size) (GeeAbstractCollection* self);
-	gboolean (*get_is_empty) (GeeAbstractCollection* self);
+	gboolean (*get_read_only) (GeeAbstractCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeAbstractCollection* self);
 };
 
@@ -431,6 +524,16 @@ struct _GeeAbstractSet {
 
 struct _GeeAbstractSetClass {
 	GeeAbstractCollectionClass parent_class;
+	void (*reserved0) (GeeAbstractSet* self);
+	void (*reserved1) (GeeAbstractSet* self);
+	void (*reserved2) (GeeAbstractSet* self);
+	void (*reserved3) (GeeAbstractSet* self);
+	void (*reserved4) (GeeAbstractSet* self);
+	void (*reserved5) (GeeAbstractSet* self);
+	void (*reserved6) (GeeAbstractSet* self);
+	void (*reserved7) (GeeAbstractSet* self);
+	void (*reserved8) (GeeAbstractSet* self);
+	void (*reserved9) (GeeAbstractSet* self);
 	GeeSet* (*get_read_only_view) (GeeAbstractSet* self);
 };
 
@@ -495,6 +598,7 @@ struct _GeeHashMapNodeIterator {
 	GObject parent_instance;
 	GeeHashMapNodeIteratorPrivate * priv;
 	GeeHashMap* _map;
+	gint _index;
 	GeeHashMapNode* _node;
 	GeeHashMapNode* _next;
 	gint _stamp;
@@ -502,6 +606,7 @@ struct _GeeHashMapNodeIterator {
 
 struct _GeeHashMapNodeIteratorClass {
 	GObjectClass parent_class;
+	gboolean (*get_read_only) (GeeHashMapNodeIterator* self);
 };
 
 struct _GeeHashMapNodeIteratorPrivate {
@@ -511,7 +616,6 @@ struct _GeeHashMapNodeIteratorPrivate {
 	GType v_type;
 	GBoxedCopyFunc v_dup_func;
 	GDestroyNotify v_destroy_func;
-	gint _index;
 };
 
 struct _GeeHashMapKeyIterator {
@@ -594,15 +698,27 @@ static gpointer gee_hash_map_value_collection_parent_class = NULL;
 static gpointer gee_hash_map_entry_set_parent_class = NULL;
 static gpointer gee_hash_map_node_iterator_parent_class = NULL;
 static gpointer gee_hash_map_key_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_hash_map_key_iterator_gee_traversable_parent_iface = NULL;
 static GeeIteratorIface* gee_hash_map_key_iterator_gee_iterator_parent_iface = NULL;
 static gpointer gee_hash_map_map_iterator_parent_class = NULL;
 static GeeMapIteratorIface* gee_hash_map_map_iterator_gee_map_iterator_parent_iface = NULL;
 static gpointer gee_hash_map_value_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_hash_map_value_iterator_gee_traversable_parent_iface = NULL;
 static GeeIteratorIface* gee_hash_map_value_iterator_gee_iterator_parent_iface = NULL;
 static gpointer gee_hash_map_entry_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_hash_map_entry_iterator_gee_traversable_parent_iface = NULL;
 static GeeIteratorIface* gee_hash_map_entry_iterator_gee_iterator_parent_iface = NULL;
 
+GType gee_traversable_stream_get_type (void) G_GNUC_CONST;
+gpointer gee_lazy_ref (gpointer instance);
+void gee_lazy_unref (gpointer instance);
+GParamSpec* gee_param_spec_lazy (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void gee_value_set_lazy (GValue* value, gpointer v_object);
+void gee_value_take_lazy (GValue* value, gpointer v_object);
+gpointer gee_value_get_lazy (const GValue* value);
+GType gee_lazy_get_type (void) G_GNUC_CONST;
 GType gee_iterator_get_type (void) G_GNUC_CONST;
+GType gee_traversable_get_type (void) G_GNUC_CONST;
 GType gee_iterable_get_type (void) G_GNUC_CONST;
 GType gee_map_iterator_get_type (void) G_GNUC_CONST;
 GType gee_collection_get_type (void) G_GNUC_CONST;
@@ -622,30 +738,28 @@ enum  {
 	GEE_HASH_MAP_V_DUP_FUNC,
 	GEE_HASH_MAP_V_DESTROY_FUNC,
 	GEE_HASH_MAP_SIZE,
+	GEE_HASH_MAP_READ_ONLY,
 	GEE_HASH_MAP_KEYS,
 	GEE_HASH_MAP_VALUES,
-	GEE_HASH_MAP_ENTRIES,
-	GEE_HASH_MAP_KEY_HASH_FUNC,
-	GEE_HASH_MAP_KEY_EQUAL_FUNC,
-	GEE_HASH_MAP_VALUE_EQUAL_FUNC
+	GEE_HASH_MAP_ENTRIES
 };
 void gee_abstract_map_clear (GeeAbstractMap* self);
 #define GEE_HASH_MAP_MIN_SIZE 11
 #define GEE_HASH_MAP_MAX_SIZE 13845163
-GeeHashMap* gee_hash_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GHashFunc key_hash_func, GEqualFunc key_equal_func, GEqualFunc value_equal_func);
-GeeHashMap* gee_hash_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GHashFunc key_hash_func, GEqualFunc key_equal_func, GEqualFunc value_equal_func);
+GeeHashMap* gee_hash_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashDataFunc key_hash_func, void* key_hash_func_target, GDestroyNotify key_hash_func_target_destroy_notify, GeeEqualDataFunc key_equal_func, void* key_equal_func_target, GDestroyNotify key_equal_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
+GeeHashMap* gee_hash_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashDataFunc key_hash_func, void* key_hash_func_target, GDestroyNotify key_hash_func_target_destroy_notify, GeeEqualDataFunc key_equal_func, void* key_equal_func_target, GDestroyNotify key_equal_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
 GeeAbstractMap* gee_abstract_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func);
-GHashFunc gee_functions_get_hash_func_for (GType t);
-GEqualFunc gee_functions_get_equal_func_for (GType t);
-static void gee_hash_map_set_key_hash_func (GeeHashMap* self, GHashFunc value);
-static void gee_hash_map_set_key_equal_func (GeeHashMap* self, GEqualFunc value);
-static void gee_hash_map_set_value_equal_func (GeeHashMap* self, GEqualFunc value);
+GeeHashDataFunc gee_functions_get_hash_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+GeeEqualDataFunc gee_functions_get_equal_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+static void gee_hash_map_set_key_hash_func (GeeHashMap* self, GeeHashDataFunc value, gpointer value_target);
+static void gee_hash_map_set_key_equal_func (GeeHashMap* self, GeeEqualDataFunc value, gpointer value_target);
+static void gee_hash_map_set_value_equal_func (GeeHashMap* self, GeeEqualDataFunc value, gpointer value_target);
 static GeeHashMapNode** gee_hash_map_lookup_node (GeeHashMap* self, gconstpointer key);
-GHashFunc gee_hash_map_get_key_hash_func (GeeHashMap* self);
-GEqualFunc gee_hash_map_get_key_equal_func (GeeHashMap* self);
+GeeHashDataFunc gee_hash_map_get_key_hash_func (GeeHashMap* self, gpointer* result_target);
+GeeEqualDataFunc gee_hash_map_get_key_equal_func (GeeHashMap* self, gpointer* result_target);
 static gboolean gee_hash_map_real_has_key (GeeAbstractMap* base, gconstpointer key);
 static gboolean gee_hash_map_real_has (GeeAbstractMap* base, gconstpointer key, gconstpointer value);
-GEqualFunc gee_hash_map_get_value_equal_func (GeeHashMap* self);
+GeeEqualDataFunc gee_hash_map_get_value_equal_func (GeeHashMap* self, gpointer* result_target);
 static gpointer gee_hash_map_real_get (GeeAbstractMap* base, gconstpointer key);
 static void gee_hash_map_real_set (GeeAbstractMap* base, gconstpointer key, gconstpointer value);
 static GeeHashMapNode* gee_hash_map_node_new (gpointer k, gpointer v, guint hash);
@@ -682,7 +796,8 @@ enum  {
 	GEE_HASH_MAP_ENTRY_V_DUP_FUNC,
 	GEE_HASH_MAP_ENTRY_V_DESTROY_FUNC,
 	GEE_HASH_MAP_ENTRY_KEY,
-	GEE_HASH_MAP_ENTRY_VALUE
+	GEE_HASH_MAP_ENTRY_VALUE,
+	GEE_HASH_MAP_ENTRY_READ_ONLY
 };
 static GeeMapEntry* gee_hash_map_entry_entry_for (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashMapNode* node);
 static GeeHashMapEntry* gee_hash_map_entry_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashMapNode* node);
@@ -691,6 +806,7 @@ GeeMapEntry* gee_map_entry_construct (GType object_type, GType k_type, GBoxedCop
 static void gee_hash_map_entry_finalize (GObject* obj);
 gconstpointer gee_map_entry_get_key (GeeMapEntry* self);
 gconstpointer gee_map_entry_get_value (GeeMapEntry* self);
+gboolean gee_map_entry_get_read_only (GeeMapEntry* self);
 static void _vala_gee_hash_map_entry_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 void gee_map_entry_set_value (GeeMapEntry* self, gconstpointer value);
 static void _vala_gee_hash_map_entry_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
@@ -703,7 +819,8 @@ enum  {
 	GEE_HASH_MAP_KEY_SET_V_TYPE,
 	GEE_HASH_MAP_KEY_SET_V_DUP_FUNC,
 	GEE_HASH_MAP_KEY_SET_V_DESTROY_FUNC,
-	GEE_HASH_MAP_KEY_SET_SIZE
+	GEE_HASH_MAP_KEY_SET_SIZE,
+	GEE_HASH_MAP_KEY_SET_READ_ONLY
 };
 GeeAbstractSet* gee_abstract_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
 static GeeIterator* gee_hash_map_key_set_real_iterator (GeeAbstractCollection* base);
@@ -715,12 +832,13 @@ static void gee_hash_map_key_set_real_clear (GeeAbstractCollection* base);
 static gboolean gee_hash_map_key_set_real_remove (GeeAbstractCollection* base, gconstpointer key);
 static gboolean gee_hash_map_key_set_real_contains (GeeAbstractCollection* base, gconstpointer key);
 gboolean gee_abstract_map_has_key (GeeAbstractMap* self, gconstpointer key);
-static gboolean gee_hash_map_key_set_real_add_all (GeeAbstractCollection* base, GeeCollection* collection);
-static gboolean gee_hash_map_key_set_real_remove_all (GeeAbstractCollection* base, GeeCollection* collection);
-static gboolean gee_hash_map_key_set_real_retain_all (GeeAbstractCollection* base, GeeCollection* collection);
+static gboolean gee_hash_map_key_set_add_all (GeeHashMapKeySet* self, GeeCollection* collection);
+static gboolean gee_hash_map_key_set_remove_all (GeeHashMapKeySet* self, GeeCollection* collection);
+static gboolean gee_hash_map_key_set_retain_all (GeeHashMapKeySet* self, GeeCollection* collection);
 gint gee_abstract_map_get_size (GeeAbstractMap* self);
 static void gee_hash_map_key_set_finalize (GObject* obj);
 gint gee_abstract_collection_get_size (GeeAbstractCollection* self);
+gboolean gee_abstract_collection_get_read_only (GeeAbstractCollection* self);
 static void _vala_gee_hash_map_key_set_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_hash_map_key_set_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 #define GEE_HASH_MAP_VALUE_COLLECTION_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_HASH_MAP_TYPE_VALUE_COLLECTION, GeeHashMapValueCollectionPrivate))
@@ -732,7 +850,8 @@ enum  {
 	GEE_HASH_MAP_VALUE_COLLECTION_V_TYPE,
 	GEE_HASH_MAP_VALUE_COLLECTION_V_DUP_FUNC,
 	GEE_HASH_MAP_VALUE_COLLECTION_V_DESTROY_FUNC,
-	GEE_HASH_MAP_VALUE_COLLECTION_SIZE
+	GEE_HASH_MAP_VALUE_COLLECTION_SIZE,
+	GEE_HASH_MAP_VALUE_COLLECTION_READ_ONLY
 };
 GeeAbstractCollection* gee_abstract_collection_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
 static GeeIterator* gee_hash_map_value_collection_real_iterator (GeeAbstractCollection* base);
@@ -746,9 +865,9 @@ static gboolean gee_hash_map_value_collection_real_contains (GeeAbstractCollecti
 GeeIterator* gee_abstract_collection_iterator (GeeAbstractCollection* self);
 gboolean gee_iterator_next (GeeIterator* self);
 gpointer gee_iterator_get (GeeIterator* self);
-static gboolean gee_hash_map_value_collection_real_add_all (GeeAbstractCollection* base, GeeCollection* collection);
-static gboolean gee_hash_map_value_collection_real_remove_all (GeeAbstractCollection* base, GeeCollection* collection);
-static gboolean gee_hash_map_value_collection_real_retain_all (GeeAbstractCollection* base, GeeCollection* collection);
+static gboolean gee_hash_map_value_collection_add_all (GeeHashMapValueCollection* self, GeeCollection* collection);
+static gboolean gee_hash_map_value_collection_remove_all (GeeHashMapValueCollection* self, GeeCollection* collection);
+static gboolean gee_hash_map_value_collection_retain_all (GeeHashMapValueCollection* self, GeeCollection* collection);
 static void gee_hash_map_value_collection_finalize (GObject* obj);
 static void _vala_gee_hash_map_value_collection_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_hash_map_value_collection_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
@@ -761,7 +880,8 @@ enum  {
 	GEE_HASH_MAP_ENTRY_SET_V_TYPE,
 	GEE_HASH_MAP_ENTRY_SET_V_DUP_FUNC,
 	GEE_HASH_MAP_ENTRY_SET_V_DESTROY_FUNC,
-	GEE_HASH_MAP_ENTRY_SET_SIZE
+	GEE_HASH_MAP_ENTRY_SET_SIZE,
+	GEE_HASH_MAP_ENTRY_SET_READ_ONLY
 };
 static GeeIterator* gee_hash_map_entry_set_real_iterator (GeeAbstractCollection* base);
 static GeeHashMapEntryIterator* gee_hash_map_entry_iterator_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashMap* map);
@@ -772,9 +892,9 @@ static void gee_hash_map_entry_set_real_clear (GeeAbstractCollection* base);
 static gboolean gee_hash_map_entry_set_real_remove (GeeAbstractCollection* base, GeeMapEntry* entry);
 static gboolean gee_hash_map_entry_set_real_contains (GeeAbstractCollection* base, GeeMapEntry* entry);
 gboolean gee_abstract_map_has (GeeAbstractMap* self, gconstpointer key, gconstpointer value);
-static gboolean gee_hash_map_entry_set_real_add_all (GeeAbstractCollection* base, GeeCollection* entries);
-static gboolean gee_hash_map_entry_set_real_remove_all (GeeAbstractCollection* base, GeeCollection* entries);
-static gboolean gee_hash_map_entry_set_real_retain_all (GeeAbstractCollection* base, GeeCollection* entries);
+static gboolean gee_hash_map_entry_set_add_all (GeeHashMapEntrySet* self, GeeCollection* entries);
+static gboolean gee_hash_map_entry_set_remove_all (GeeHashMapEntrySet* self, GeeCollection* entries);
+static gboolean gee_hash_map_entry_set_retain_all (GeeHashMapEntrySet* self, GeeCollection* entries);
 static void gee_hash_map_entry_set_finalize (GObject* obj);
 static void _vala_gee_hash_map_entry_set_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_hash_map_entry_set_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
@@ -786,12 +906,15 @@ enum  {
 	GEE_HASH_MAP_NODE_ITERATOR_K_DESTROY_FUNC,
 	GEE_HASH_MAP_NODE_ITERATOR_V_TYPE,
 	GEE_HASH_MAP_NODE_ITERATOR_V_DUP_FUNC,
-	GEE_HASH_MAP_NODE_ITERATOR_V_DESTROY_FUNC
+	GEE_HASH_MAP_NODE_ITERATOR_V_DESTROY_FUNC,
+	GEE_HASH_MAP_NODE_ITERATOR_READ_ONLY,
+	GEE_HASH_MAP_NODE_ITERATOR_VALID
 };
 static GeeHashMapNodeIterator* gee_hash_map_node_iterator_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashMap* map);
 static gboolean gee_hash_map_node_iterator_next (GeeHashMapNodeIterator* self);
 static gboolean gee_hash_map_node_iterator_has_next (GeeHashMapNodeIterator* self);
-static gboolean gee_hash_map_node_iterator_first (GeeHashMapNodeIterator* self);
+static gboolean gee_hash_map_node_iterator_get_read_only (GeeHashMapNodeIterator* self);
+static gboolean gee_hash_map_node_iterator_get_valid (GeeHashMapNodeIterator* self);
 static void gee_hash_map_node_iterator_finalize (GObject* obj);
 static void _vala_gee_hash_map_node_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_hash_map_node_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
@@ -807,6 +930,7 @@ enum  {
 };
 static gpointer gee_hash_map_key_iterator_real_get (GeeIterator* base);
 static void gee_hash_map_key_iterator_real_remove (GeeIterator* base);
+static gboolean gee_hash_map_key_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
 static void _vala_gee_hash_map_key_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_hash_map_key_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 #define GEE_HASH_MAP_MAP_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_HASH_MAP_TYPE_MAP_ITERATOR, GeeHashMapMapIteratorPrivate))
@@ -817,15 +941,17 @@ enum  {
 	GEE_HASH_MAP_MAP_ITERATOR_K_DESTROY_FUNC,
 	GEE_HASH_MAP_MAP_ITERATOR_V_TYPE,
 	GEE_HASH_MAP_MAP_ITERATOR_V_DUP_FUNC,
-	GEE_HASH_MAP_MAP_ITERATOR_V_DESTROY_FUNC
+	GEE_HASH_MAP_MAP_ITERATOR_V_DESTROY_FUNC,
+	GEE_HASH_MAP_MAP_ITERATOR_MUTABLE,
+	GEE_HASH_MAP_MAP_ITERATOR_READ_ONLY
 };
 static gpointer gee_hash_map_map_iterator_real_get_key (GeeMapIterator* base);
 static void gee_hash_map_map_iterator_real_unset (GeeMapIterator* base);
 gboolean gee_map_iterator_has_next (GeeMapIterator* self);
-gboolean gee_abstract_map_unset (GeeAbstractMap* self, gconstpointer key, gpointer* value);
 static gpointer gee_hash_map_map_iterator_real_get_value (GeeMapIterator* base);
 static void gee_hash_map_map_iterator_real_set_value (GeeMapIterator* base, gconstpointer value);
 void gee_abstract_map_set (GeeAbstractMap* self, gconstpointer key, gconstpointer value);
+gboolean gee_map_iterator_get_mutable (GeeMapIterator* self);
 static void _vala_gee_hash_map_map_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_hash_map_map_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 #define GEE_HASH_MAP_VALUE_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_HASH_MAP_TYPE_VALUE_ITERATOR, GeeHashMapValueIteratorPrivate))
@@ -840,6 +966,7 @@ enum  {
 };
 static gpointer gee_hash_map_value_iterator_real_get (GeeIterator* base);
 static void gee_hash_map_value_iterator_real_remove (GeeIterator* base);
+static gboolean gee_hash_map_value_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
 static void _vala_gee_hash_map_value_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_hash_map_value_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 #define GEE_HASH_MAP_ENTRY_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_HASH_MAP_TYPE_ENTRY_ITERATOR, GeeHashMapEntryIteratorPrivate))
@@ -854,9 +981,11 @@ enum  {
 };
 static GeeMapEntry* gee_hash_map_entry_iterator_real_get (GeeIterator* base);
 static void gee_hash_map_entry_iterator_real_remove (GeeIterator* base);
+static gboolean gee_hash_map_entry_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
 static void _vala_gee_hash_map_entry_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_hash_map_entry_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 static void gee_hash_map_finalize (GObject* obj);
+gboolean gee_abstract_map_get_read_only (GeeAbstractMap* self);
 GeeSet* gee_abstract_map_get_keys (GeeAbstractMap* self);
 GeeCollection* gee_abstract_map_get_values (GeeAbstractMap* self);
 GeeSet* gee_abstract_map_get_entries (GeeAbstractMap* self);
@@ -876,16 +1005,22 @@ static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify 
  * @param key_equal_func an optional key equality testing function
  * @param value_equal_func an optional value equality testing function
  */
-GeeHashMap* gee_hash_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GHashFunc key_hash_func, GEqualFunc key_equal_func, GEqualFunc value_equal_func) {
+GeeHashMap* gee_hash_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashDataFunc key_hash_func, void* key_hash_func_target, GDestroyNotify key_hash_func_target_destroy_notify, GeeEqualDataFunc key_equal_func, void* key_equal_func_target, GDestroyNotify key_equal_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify) {
 	GeeHashMap * self = NULL;
-	GHashFunc _tmp0_;
-	GEqualFunc _tmp2_;
-	GEqualFunc _tmp4_;
-	GHashFunc _tmp6_;
-	GEqualFunc _tmp7_;
-	GEqualFunc _tmp8_;
-	gint _tmp9_;
-	GeeHashMapNode** _tmp10_ = NULL;
+	GeeHashDataFunc _tmp0_;
+	void* _tmp0__target;
+	GeeEqualDataFunc _tmp4_;
+	void* _tmp4__target;
+	GeeEqualDataFunc _tmp8_;
+	void* _tmp8__target;
+	GeeHashDataFunc _tmp12_;
+	void* _tmp12__target;
+	GeeEqualDataFunc _tmp13_;
+	void* _tmp13__target;
+	GeeEqualDataFunc _tmp14_;
+	void* _tmp14__target;
+	gint _tmp15_;
+	GeeHashMapNode** _tmp16_ = NULL;
 	self = (GeeHashMap*) gee_abstract_map_construct (object_type, k_type, (GBoxedCopyFunc) k_dup_func, k_destroy_func, v_type, (GBoxedCopyFunc) v_dup_func, v_destroy_func);
 	self->priv->k_type = k_type;
 	self->priv->k_dup_func = k_dup_func;
@@ -894,49 +1029,93 @@ GeeHashMap* gee_hash_map_construct (GType object_type, GType k_type, GBoxedCopyF
 	self->priv->v_dup_func = v_dup_func;
 	self->priv->v_destroy_func = v_destroy_func;
 	_tmp0_ = key_hash_func;
+	_tmp0__target = key_hash_func_target;
 	if (_tmp0_ == NULL) {
-		GHashFunc _tmp1_ = NULL;
-		_tmp1_ = gee_functions_get_hash_func_for (k_type);
-		key_hash_func = _tmp1_;
+		void* _tmp1_ = NULL;
+		GDestroyNotify _tmp2_ = NULL;
+		GeeHashDataFunc _tmp3_ = NULL;
+		_tmp3_ = gee_functions_get_hash_func_for (k_type, &_tmp1_, &_tmp2_);
+		(key_hash_func_target_destroy_notify == NULL) ? NULL : (key_hash_func_target_destroy_notify (key_hash_func_target), NULL);
+		key_hash_func = NULL;
+		key_hash_func_target = NULL;
+		key_hash_func_target_destroy_notify = NULL;
+		key_hash_func = _tmp3_;
+		key_hash_func_target = _tmp1_;
+		key_hash_func_target_destroy_notify = _tmp2_;
 	}
-	_tmp2_ = key_equal_func;
-	if (_tmp2_ == NULL) {
-		GEqualFunc _tmp3_ = NULL;
-		_tmp3_ = gee_functions_get_equal_func_for (k_type);
-		key_equal_func = _tmp3_;
-	}
-	_tmp4_ = value_equal_func;
+	_tmp4_ = key_equal_func;
+	_tmp4__target = key_equal_func_target;
 	if (_tmp4_ == NULL) {
-		GEqualFunc _tmp5_ = NULL;
-		_tmp5_ = gee_functions_get_equal_func_for (v_type);
-		value_equal_func = _tmp5_;
+		void* _tmp5_ = NULL;
+		GDestroyNotify _tmp6_ = NULL;
+		GeeEqualDataFunc _tmp7_ = NULL;
+		_tmp7_ = gee_functions_get_equal_func_for (k_type, &_tmp5_, &_tmp6_);
+		(key_equal_func_target_destroy_notify == NULL) ? NULL : (key_equal_func_target_destroy_notify (key_equal_func_target), NULL);
+		key_equal_func = NULL;
+		key_equal_func_target = NULL;
+		key_equal_func_target_destroy_notify = NULL;
+		key_equal_func = _tmp7_;
+		key_equal_func_target = _tmp5_;
+		key_equal_func_target_destroy_notify = _tmp6_;
 	}
-	_tmp6_ = key_hash_func;
-	gee_hash_map_set_key_hash_func (self, _tmp6_);
-	_tmp7_ = key_equal_func;
-	gee_hash_map_set_key_equal_func (self, _tmp7_);
 	_tmp8_ = value_equal_func;
-	gee_hash_map_set_value_equal_func (self, _tmp8_);
+	_tmp8__target = value_equal_func_target;
+	if (_tmp8_ == NULL) {
+		void* _tmp9_ = NULL;
+		GDestroyNotify _tmp10_ = NULL;
+		GeeEqualDataFunc _tmp11_ = NULL;
+		_tmp11_ = gee_functions_get_equal_func_for (v_type, &_tmp9_, &_tmp10_);
+		(value_equal_func_target_destroy_notify == NULL) ? NULL : (value_equal_func_target_destroy_notify (value_equal_func_target), NULL);
+		value_equal_func = NULL;
+		value_equal_func_target = NULL;
+		value_equal_func_target_destroy_notify = NULL;
+		value_equal_func = _tmp11_;
+		value_equal_func_target = _tmp9_;
+		value_equal_func_target_destroy_notify = _tmp10_;
+	}
+	_tmp12_ = key_hash_func;
+	_tmp12__target = key_hash_func_target;
+	gee_hash_map_set_key_hash_func (self, _tmp12_, _tmp12__target);
+	_tmp13_ = key_equal_func;
+	_tmp13__target = key_equal_func_target;
+	gee_hash_map_set_key_equal_func (self, _tmp13_, _tmp13__target);
+	_tmp14_ = value_equal_func;
+	_tmp14__target = value_equal_func_target;
+	gee_hash_map_set_value_equal_func (self, _tmp14_, _tmp14__target);
 	self->priv->_array_size = GEE_HASH_MAP_MIN_SIZE;
-	_tmp9_ = self->priv->_array_size;
-	_tmp10_ = g_new0 (GeeHashMapNode*, _tmp9_ + 1);
+	_tmp15_ = self->priv->_array_size;
+	_tmp16_ = g_new0 (GeeHashMapNode*, _tmp15_ + 1);
 	self->priv->_nodes = (_vala_array_free (self->priv->_nodes, self->priv->_nodes_length1, (GDestroyNotify) gee_hash_map_node_free), NULL);
-	self->priv->_nodes = _tmp10_;
-	self->priv->_nodes_length1 = _tmp9_;
+	self->priv->_nodes = _tmp16_;
+	self->priv->_nodes_length1 = _tmp15_;
 	self->priv->__nodes_size_ = self->priv->_nodes_length1;
+	(key_hash_func_target_destroy_notify == NULL) ? NULL : (key_hash_func_target_destroy_notify (key_hash_func_target), NULL);
+	key_hash_func = NULL;
+	key_hash_func_target = NULL;
+	key_hash_func_target_destroy_notify = NULL;
+	(key_equal_func_target_destroy_notify == NULL) ? NULL : (key_equal_func_target_destroy_notify (key_equal_func_target), NULL);
+	key_equal_func = NULL;
+	key_equal_func_target = NULL;
+	key_equal_func_target_destroy_notify = NULL;
+	(value_equal_func_target_destroy_notify == NULL) ? NULL : (value_equal_func_target_destroy_notify (value_equal_func_target), NULL);
+	value_equal_func = NULL;
+	value_equal_func_target = NULL;
+	value_equal_func_target_destroy_notify = NULL;
 	return self;
 }
 
 
-GeeHashMap* gee_hash_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GHashFunc key_hash_func, GEqualFunc key_equal_func, GEqualFunc value_equal_func) {
-	return gee_hash_map_construct (GEE_TYPE_HASH_MAP, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, key_hash_func, key_equal_func, value_equal_func);
+GeeHashMap* gee_hash_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GeeHashDataFunc key_hash_func, void* key_hash_func_target, GDestroyNotify key_hash_func_target_destroy_notify, GeeEqualDataFunc key_equal_func, void* key_equal_func_target, GDestroyNotify key_equal_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify) {
+	return gee_hash_map_construct (GEE_TYPE_HASH_MAP, k_type, k_dup_func, k_destroy_func, v_type, v_dup_func, v_destroy_func, key_hash_func, key_hash_func_target, key_hash_func_target_destroy_notify, key_equal_func, key_equal_func_target, key_equal_func_target_destroy_notify, value_equal_func, value_equal_func_target, value_equal_func_target_destroy_notify);
 }
 
 
 static GeeHashMapNode** gee_hash_map_lookup_node (GeeHashMap* self, gconstpointer key) {
 	GeeHashMapNode** result = NULL;
-	GHashFunc _tmp0_;
-	GHashFunc _tmp1_;
+	GeeHashDataFunc _tmp0_;
+	void* _tmp0__target;
+	GeeHashDataFunc _tmp1_;
+	void* _tmp1__target;
 	gconstpointer _tmp2_;
 	guint _tmp3_ = 0U;
 	guint hash_value;
@@ -947,10 +1126,11 @@ static GeeHashMapNode** gee_hash_map_lookup_node (GeeHashMap* self, gconstpointe
 	GeeHashMapNode** node;
 	GeeHashMapNode** _tmp22_;
 	g_return_val_if_fail (self != NULL, NULL);
-	_tmp0_ = gee_hash_map_get_key_hash_func (self);
+	_tmp0_ = gee_hash_map_get_key_hash_func (self, &_tmp0__target);
 	_tmp1_ = _tmp0_;
+	_tmp1__target = _tmp0__target;
 	_tmp2_ = key;
-	_tmp3_ = _tmp1_ (_tmp2_);
+	_tmp3_ = _tmp1_ (_tmp2_, _tmp1__target);
 	hash_value = _tmp3_;
 	_tmp4_ = self->priv->_nodes;
 	_tmp4__length1 = self->priv->_nodes_length1;
@@ -975,18 +1155,21 @@ static GeeHashMapNode** gee_hash_map_lookup_node (GeeHashMap* self, gconstpointe
 			if (_tmp10_ != _tmp12_) {
 				_tmp9_ = TRUE;
 			} else {
-				GEqualFunc _tmp13_;
-				GEqualFunc _tmp14_;
+				GeeEqualDataFunc _tmp13_;
+				void* _tmp13__target;
+				GeeEqualDataFunc _tmp14_;
+				void* _tmp14__target;
 				GeeHashMapNode** _tmp15_;
 				gconstpointer _tmp16_;
 				gconstpointer _tmp17_;
 				gboolean _tmp18_ = FALSE;
-				_tmp13_ = gee_hash_map_get_key_equal_func (self);
+				_tmp13_ = gee_hash_map_get_key_equal_func (self, &_tmp13__target);
 				_tmp14_ = _tmp13_;
+				_tmp14__target = _tmp13__target;
 				_tmp15_ = node;
 				_tmp16_ = (*_tmp15_)->key;
 				_tmp17_ = key;
-				_tmp18_ = _tmp14_ (_tmp16_, _tmp17_);
+				_tmp18_ = _tmp14_ (_tmp16_, _tmp17_, _tmp14__target);
 				_tmp9_ = !_tmp18_;
 			}
 			_tmp19_ = _tmp9_;
@@ -1043,18 +1226,21 @@ static gboolean gee_hash_map_real_has (GeeAbstractMap* base, gconstpointer key, 
 	node = _tmp1_;
 	_tmp3_ = node;
 	if ((*_tmp3_) != NULL) {
-		GEqualFunc _tmp4_;
-		GEqualFunc _tmp5_;
+		GeeEqualDataFunc _tmp4_;
+		void* _tmp4__target;
+		GeeEqualDataFunc _tmp5_;
+		void* _tmp5__target;
 		GeeHashMapNode** _tmp6_;
 		gconstpointer _tmp7_;
 		gconstpointer _tmp8_;
 		gboolean _tmp9_ = FALSE;
-		_tmp4_ = gee_hash_map_get_value_equal_func (self);
+		_tmp4_ = gee_hash_map_get_value_equal_func (self, &_tmp4__target);
 		_tmp5_ = _tmp4_;
+		_tmp5__target = _tmp4__target;
 		_tmp6_ = node;
 		_tmp7_ = (*_tmp6_)->value;
 		_tmp8_ = value;
-		_tmp9_ = _tmp5_ (_tmp7_, _tmp8_);
+		_tmp9_ = _tmp5_ (_tmp7_, _tmp8_, _tmp5__target);
 		_tmp2_ = _tmp9_;
 	} else {
 		_tmp2_ = FALSE;
@@ -1121,8 +1307,10 @@ static void gee_hash_map_real_set (GeeAbstractMap* base, gconstpointer key, gcon
 		(((*_tmp3_)->value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : ((*_tmp3_)->value = (self->priv->v_destroy_func ((*_tmp3_)->value), NULL));
 		(*_tmp3_)->value = _tmp5_;
 	} else {
-		GHashFunc _tmp6_;
-		GHashFunc _tmp7_;
+		GeeHashDataFunc _tmp6_;
+		void* _tmp6__target;
+		GeeHashDataFunc _tmp7_;
+		void* _tmp7__target;
 		gconstpointer _tmp8_;
 		guint _tmp9_ = 0U;
 		guint hash_value;
@@ -1135,10 +1323,11 @@ static void gee_hash_map_real_set (GeeAbstractMap* base, gconstpointer key, gcon
 		GeeHashMapNode* _tmp16_;
 		GeeHashMapNode* _tmp17_;
 		gint _tmp18_;
-		_tmp6_ = gee_hash_map_get_key_hash_func (self);
+		_tmp6_ = gee_hash_map_get_key_hash_func (self, &_tmp6__target);
 		_tmp7_ = _tmp6_;
+		_tmp7__target = _tmp6__target;
 		_tmp8_ = key;
-		_tmp9_ = _tmp7_ (_tmp8_);
+		_tmp9_ = _tmp7_ (_tmp8_, _tmp7__target);
 		hash_value = _tmp9_;
 		_tmp10_ = node;
 		_tmp11_ = key;
@@ -1296,6 +1485,8 @@ static inline gboolean gee_hash_map_unset_helper (GeeHashMap* self, gconstpointe
 		GeeHashMapNode** _tmp3_;
 		GeeHashMapNode* _tmp4_;
 		GeeHashMapNode* next;
+		GeeHashMapNode** _tmp5_;
+		gpointer _tmp6_;
 		GeeHashMapNode** _tmp7_;
 		GeeHashMapNode** _tmp8_;
 		GeeHashMapNode** _tmp9_;
@@ -1308,15 +1499,11 @@ static inline gboolean gee_hash_map_unset_helper (GeeHashMap* self, gconstpointe
 		_tmp4_ = (*_tmp3_)->next;
 		(*_tmp3_)->next = NULL;
 		next = _tmp4_;
-		if ((&_vala_value) != NULL) {
-			GeeHashMapNode** _tmp5_;
-			gpointer _tmp6_;
-			_tmp5_ = node;
-			_tmp6_ = (*_tmp5_)->value;
-			(*_tmp5_)->value = NULL;
-			((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
-			_vala_value = _tmp6_;
-		}
+		_tmp5_ = node;
+		_tmp6_ = (*_tmp5_)->value;
+		(*_tmp5_)->value = NULL;
+		((_vala_value == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_vala_value = (self->priv->v_destroy_func (_vala_value), NULL));
+		_vala_value = _tmp6_;
 		_tmp7_ = node;
 		(((*_tmp7_)->key == NULL) || (self->priv->k_destroy_func == NULL)) ? NULL : ((*_tmp7_)->key = (self->priv->k_destroy_func ((*_tmp7_)->key), NULL));
 		(*_tmp7_)->key = NULL;
@@ -1547,6 +1734,15 @@ static gint gee_hash_map_real_get_size (GeeAbstractMap* base) {
 }
 
 
+static gboolean gee_hash_map_real_get_read_only (GeeAbstractMap* base) {
+	gboolean result;
+	GeeHashMap* self;
+	self = (GeeHashMap*) base;
+	result = FALSE;
+	return result;
+}
+
+
 static gpointer _g_object_ref0 (gpointer self) {
 	return self ? g_object_ref (self) : NULL;
 }
@@ -1639,60 +1835,102 @@ static GeeSet* gee_hash_map_real_get_entries (GeeAbstractMap* base) {
 }
 
 
-GHashFunc gee_hash_map_get_key_hash_func (GeeHashMap* self) {
-	GHashFunc result;
-	GHashFunc _tmp0_;
+GeeHashDataFunc gee_hash_map_get_key_hash_func (GeeHashMap* self, gpointer* result_target) {
+	GeeHashDataFunc result;
+	GeeHashDataFunc _tmp0_;
+	void* _tmp0__target;
+	GeeHashDataFunc _tmp1_;
+	void* _tmp1__target;
 	g_return_val_if_fail (self != NULL, NULL);
 	_tmp0_ = self->priv->_key_hash_func;
-	result = _tmp0_;
+	_tmp0__target = self->priv->_key_hash_func_target;
+	_tmp1_ = _tmp0_;
+	_tmp1__target = _tmp0__target;
+	*result_target = _tmp1__target;
+	result = _tmp1_;
 	return result;
 }
 
 
-static void gee_hash_map_set_key_hash_func (GeeHashMap* self, GHashFunc value) {
-	GHashFunc _tmp0_;
+static void gee_hash_map_set_key_hash_func (GeeHashMap* self, GeeHashDataFunc value, gpointer value_target) {
+	GeeHashDataFunc _tmp0_;
+	void* _tmp0__target;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = value;
+	_tmp0__target = value_target;
+	(self->priv->_key_hash_func_target_destroy_notify == NULL) ? NULL : (self->priv->_key_hash_func_target_destroy_notify (self->priv->_key_hash_func_target), NULL);
+	self->priv->_key_hash_func = NULL;
+	self->priv->_key_hash_func_target = NULL;
+	self->priv->_key_hash_func_target_destroy_notify = NULL;
 	self->priv->_key_hash_func = _tmp0_;
-	g_object_notify ((GObject *) self, "key-hash-func");
+	self->priv->_key_hash_func_target = _tmp0__target;
+	self->priv->_key_hash_func_target_destroy_notify = NULL;
 }
 
 
-GEqualFunc gee_hash_map_get_key_equal_func (GeeHashMap* self) {
-	GEqualFunc result;
-	GEqualFunc _tmp0_;
+GeeEqualDataFunc gee_hash_map_get_key_equal_func (GeeHashMap* self, gpointer* result_target) {
+	GeeEqualDataFunc result;
+	GeeEqualDataFunc _tmp0_;
+	void* _tmp0__target;
+	GeeEqualDataFunc _tmp1_;
+	void* _tmp1__target;
 	g_return_val_if_fail (self != NULL, NULL);
 	_tmp0_ = self->priv->_key_equal_func;
-	result = _tmp0_;
+	_tmp0__target = self->priv->_key_equal_func_target;
+	_tmp1_ = _tmp0_;
+	_tmp1__target = _tmp0__target;
+	*result_target = _tmp1__target;
+	result = _tmp1_;
 	return result;
 }
 
 
-static void gee_hash_map_set_key_equal_func (GeeHashMap* self, GEqualFunc value) {
-	GEqualFunc _tmp0_;
+static void gee_hash_map_set_key_equal_func (GeeHashMap* self, GeeEqualDataFunc value, gpointer value_target) {
+	GeeEqualDataFunc _tmp0_;
+	void* _tmp0__target;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = value;
+	_tmp0__target = value_target;
+	(self->priv->_key_equal_func_target_destroy_notify == NULL) ? NULL : (self->priv->_key_equal_func_target_destroy_notify (self->priv->_key_equal_func_target), NULL);
+	self->priv->_key_equal_func = NULL;
+	self->priv->_key_equal_func_target = NULL;
+	self->priv->_key_equal_func_target_destroy_notify = NULL;
 	self->priv->_key_equal_func = _tmp0_;
-	g_object_notify ((GObject *) self, "key-equal-func");
+	self->priv->_key_equal_func_target = _tmp0__target;
+	self->priv->_key_equal_func_target_destroy_notify = NULL;
 }
 
 
-GEqualFunc gee_hash_map_get_value_equal_func (GeeHashMap* self) {
-	GEqualFunc result;
-	GEqualFunc _tmp0_;
+GeeEqualDataFunc gee_hash_map_get_value_equal_func (GeeHashMap* self, gpointer* result_target) {
+	GeeEqualDataFunc result;
+	GeeEqualDataFunc _tmp0_;
+	void* _tmp0__target;
+	GeeEqualDataFunc _tmp1_;
+	void* _tmp1__target;
 	g_return_val_if_fail (self != NULL, NULL);
 	_tmp0_ = self->priv->_value_equal_func;
-	result = _tmp0_;
+	_tmp0__target = self->priv->_value_equal_func_target;
+	_tmp1_ = _tmp0_;
+	_tmp1__target = _tmp0__target;
+	*result_target = _tmp1__target;
+	result = _tmp1_;
 	return result;
 }
 
 
-static void gee_hash_map_set_value_equal_func (GeeHashMap* self, GEqualFunc value) {
-	GEqualFunc _tmp0_;
+static void gee_hash_map_set_value_equal_func (GeeHashMap* self, GeeEqualDataFunc value, gpointer value_target) {
+	GeeEqualDataFunc _tmp0_;
+	void* _tmp0__target;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = value;
+	_tmp0__target = value_target;
+	(self->priv->_value_equal_func_target_destroy_notify == NULL) ? NULL : (self->priv->_value_equal_func_target_destroy_notify (self->priv->_value_equal_func_target), NULL);
+	self->priv->_value_equal_func = NULL;
+	self->priv->_value_equal_func_target = NULL;
+	self->priv->_value_equal_func_target_destroy_notify = NULL;
 	self->priv->_value_equal_func = _tmp0_;
-	g_object_notify ((GObject *) self, "value-equal-func");
+	self->priv->_value_equal_func_target = _tmp0__target;
+	self->priv->_value_equal_func_target_destroy_notify = NULL;
 }
 
 
@@ -1827,12 +2065,22 @@ static void gee_hash_map_entry_real_set_value (GeeMapEntry* base, gconstpointer 
 }
 
 
+static gboolean gee_hash_map_entry_real_get_read_only (GeeMapEntry* base) {
+	gboolean result;
+	GeeHashMapEntry* self;
+	self = (GeeHashMapEntry*) base;
+	result = FALSE;
+	return result;
+}
+
+
 static void gee_hash_map_entry_class_init (GeeHashMapEntryClass * klass) {
 	gee_hash_map_entry_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeHashMapEntryPrivate));
 	GEE_MAP_ENTRY_CLASS (klass)->get_key = gee_hash_map_entry_real_get_key;
 	GEE_MAP_ENTRY_CLASS (klass)->get_value = gee_hash_map_entry_real_get_value;
 	GEE_MAP_ENTRY_CLASS (klass)->set_value = gee_hash_map_entry_real_set_value;
+	GEE_MAP_ENTRY_CLASS (klass)->get_read_only = gee_hash_map_entry_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_hash_map_entry_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_hash_map_entry_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_hash_map_entry_finalize;
@@ -1844,6 +2092,7 @@ static void gee_hash_map_entry_class_init (GeeHashMapEntryClass * klass) {
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_ENTRY_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_ENTRY_KEY, g_param_spec_pointer ("key", "key", "key", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_ENTRY_VALUE, g_param_spec_pointer ("value", "value", "value", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE | G_PARAM_WRITABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_ENTRY_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -1880,6 +2129,9 @@ static void _vala_gee_hash_map_entry_get_property (GObject * object, guint prope
 		break;
 		case GEE_HASH_MAP_ENTRY_VALUE:
 		g_value_set_pointer (value, gee_map_entry_get_value ((GeeMapEntry*) self));
+		break;
+		case GEE_HASH_MAP_ENTRY_READ_ONLY:
+		g_value_set_boolean (value, gee_map_entry_get_read_only ((GeeMapEntry*) self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -1998,30 +2250,27 @@ static gboolean gee_hash_map_key_set_real_contains (GeeAbstractCollection* base,
 }
 
 
-static gboolean gee_hash_map_key_set_real_add_all (GeeAbstractCollection* base, GeeCollection* collection) {
-	GeeHashMapKeySet * self;
+static gboolean gee_hash_map_key_set_add_all (GeeHashMapKeySet* self, GeeCollection* collection) {
 	gboolean result = FALSE;
-	self = (GeeHashMapKeySet*) base;
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (collection != NULL, FALSE);
 	g_assert_not_reached ();
 	return result;
 }
 
 
-static gboolean gee_hash_map_key_set_real_remove_all (GeeAbstractCollection* base, GeeCollection* collection) {
-	GeeHashMapKeySet * self;
+static gboolean gee_hash_map_key_set_remove_all (GeeHashMapKeySet* self, GeeCollection* collection) {
 	gboolean result = FALSE;
-	self = (GeeHashMapKeySet*) base;
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (collection != NULL, FALSE);
 	g_assert_not_reached ();
 	return result;
 }
 
 
-static gboolean gee_hash_map_key_set_real_retain_all (GeeAbstractCollection* base, GeeCollection* collection) {
-	GeeHashMapKeySet * self;
+static gboolean gee_hash_map_key_set_retain_all (GeeHashMapKeySet* self, GeeCollection* collection) {
 	gboolean result = FALSE;
-	self = (GeeHashMapKeySet*) base;
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (collection != NULL, FALSE);
 	g_assert_not_reached ();
 	return result;
@@ -2043,6 +2292,15 @@ static gint gee_hash_map_key_set_real_get_size (GeeAbstractCollection* base) {
 }
 
 
+static gboolean gee_hash_map_key_set_real_get_read_only (GeeAbstractCollection* base) {
+	gboolean result;
+	GeeHashMapKeySet* self;
+	self = (GeeHashMapKeySet*) base;
+	result = TRUE;
+	return result;
+}
+
+
 static void gee_hash_map_key_set_class_init (GeeHashMapKeySetClass * klass) {
 	gee_hash_map_key_set_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeHashMapKeySetPrivate));
@@ -2051,10 +2309,8 @@ static void gee_hash_map_key_set_class_init (GeeHashMapKeySetClass * klass) {
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->clear = gee_hash_map_key_set_real_clear;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove = gee_hash_map_key_set_real_remove;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->contains = gee_hash_map_key_set_real_contains;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->add_all = gee_hash_map_key_set_real_add_all;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove_all = gee_hash_map_key_set_real_remove_all;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->retain_all = gee_hash_map_key_set_real_retain_all;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_hash_map_key_set_real_get_size;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_hash_map_key_set_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_hash_map_key_set_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_hash_map_key_set_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_hash_map_key_set_finalize;
@@ -2065,6 +2321,7 @@ static void gee_hash_map_key_set_class_init (GeeHashMapKeySetClass * klass) {
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_KEY_SET_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_KEY_SET_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_KEY_SET_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_KEY_SET_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -2099,6 +2356,9 @@ static void _vala_gee_hash_map_key_set_get_property (GObject * object, guint pro
 	switch (property_id) {
 		case GEE_HASH_MAP_KEY_SET_SIZE:
 		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
+		break;
+		case GEE_HASH_MAP_KEY_SET_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -2211,8 +2471,10 @@ static gboolean gee_hash_map_value_collection_real_contains (GeeAbstractCollecti
 		GeeIterator* _tmp1_;
 		gboolean _tmp2_ = FALSE;
 		GeeHashMap* _tmp3_;
-		GEqualFunc _tmp4_;
-		GEqualFunc _tmp5_;
+		GeeEqualDataFunc _tmp4_;
+		void* _tmp4__target;
+		GeeEqualDataFunc _tmp5_;
+		void* _tmp5__target;
 		GeeIterator* _tmp6_;
 		gpointer _tmp7_ = NULL;
 		gpointer _tmp8_;
@@ -2225,13 +2487,14 @@ static gboolean gee_hash_map_value_collection_real_contains (GeeAbstractCollecti
 			break;
 		}
 		_tmp3_ = self->priv->_map;
-		_tmp4_ = gee_hash_map_get_value_equal_func (_tmp3_);
+		_tmp4_ = gee_hash_map_get_value_equal_func (_tmp3_, &_tmp4__target);
 		_tmp5_ = _tmp4_;
+		_tmp5__target = _tmp4__target;
 		_tmp6_ = it;
 		_tmp7_ = gee_iterator_get (_tmp6_);
 		_tmp8_ = _tmp7_;
 		_tmp9_ = value;
-		_tmp10_ = _tmp5_ (_tmp8_, _tmp9_);
+		_tmp10_ = _tmp5_ (_tmp8_, _tmp9_, _tmp5__target);
 		_tmp11_ = _tmp10_;
 		((_tmp8_ == NULL) || (self->priv->v_destroy_func == NULL)) ? NULL : (_tmp8_ = (self->priv->v_destroy_func (_tmp8_), NULL));
 		if (_tmp11_) {
@@ -2246,30 +2509,27 @@ static gboolean gee_hash_map_value_collection_real_contains (GeeAbstractCollecti
 }
 
 
-static gboolean gee_hash_map_value_collection_real_add_all (GeeAbstractCollection* base, GeeCollection* collection) {
-	GeeHashMapValueCollection * self;
+static gboolean gee_hash_map_value_collection_add_all (GeeHashMapValueCollection* self, GeeCollection* collection) {
 	gboolean result = FALSE;
-	self = (GeeHashMapValueCollection*) base;
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (collection != NULL, FALSE);
 	g_assert_not_reached ();
 	return result;
 }
 
 
-static gboolean gee_hash_map_value_collection_real_remove_all (GeeAbstractCollection* base, GeeCollection* collection) {
-	GeeHashMapValueCollection * self;
+static gboolean gee_hash_map_value_collection_remove_all (GeeHashMapValueCollection* self, GeeCollection* collection) {
 	gboolean result = FALSE;
-	self = (GeeHashMapValueCollection*) base;
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (collection != NULL, FALSE);
 	g_assert_not_reached ();
 	return result;
 }
 
 
-static gboolean gee_hash_map_value_collection_real_retain_all (GeeAbstractCollection* base, GeeCollection* collection) {
-	GeeHashMapValueCollection * self;
+static gboolean gee_hash_map_value_collection_retain_all (GeeHashMapValueCollection* self, GeeCollection* collection) {
 	gboolean result = FALSE;
-	self = (GeeHashMapValueCollection*) base;
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (collection != NULL, FALSE);
 	g_assert_not_reached ();
 	return result;
@@ -2291,6 +2551,15 @@ static gint gee_hash_map_value_collection_real_get_size (GeeAbstractCollection* 
 }
 
 
+static gboolean gee_hash_map_value_collection_real_get_read_only (GeeAbstractCollection* base) {
+	gboolean result;
+	GeeHashMapValueCollection* self;
+	self = (GeeHashMapValueCollection*) base;
+	result = TRUE;
+	return result;
+}
+
+
 static void gee_hash_map_value_collection_class_init (GeeHashMapValueCollectionClass * klass) {
 	gee_hash_map_value_collection_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeHashMapValueCollectionPrivate));
@@ -2299,10 +2568,8 @@ static void gee_hash_map_value_collection_class_init (GeeHashMapValueCollectionC
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->clear = gee_hash_map_value_collection_real_clear;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove = gee_hash_map_value_collection_real_remove;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->contains = gee_hash_map_value_collection_real_contains;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->add_all = gee_hash_map_value_collection_real_add_all;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove_all = gee_hash_map_value_collection_real_remove_all;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->retain_all = gee_hash_map_value_collection_real_retain_all;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_hash_map_value_collection_real_get_size;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_hash_map_value_collection_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_hash_map_value_collection_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_hash_map_value_collection_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_hash_map_value_collection_finalize;
@@ -2313,6 +2580,7 @@ static void gee_hash_map_value_collection_class_init (GeeHashMapValueCollectionC
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_VALUE_COLLECTION_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_VALUE_COLLECTION_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_VALUE_COLLECTION_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_VALUE_COLLECTION_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -2347,6 +2615,9 @@ static void _vala_gee_hash_map_value_collection_get_property (GObject * object, 
 	switch (property_id) {
 		case GEE_HASH_MAP_VALUE_COLLECTION_SIZE:
 		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
+		break;
+		case GEE_HASH_MAP_VALUE_COLLECTION_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -2475,30 +2746,27 @@ static gboolean gee_hash_map_entry_set_real_contains (GeeAbstractCollection* bas
 }
 
 
-static gboolean gee_hash_map_entry_set_real_add_all (GeeAbstractCollection* base, GeeCollection* entries) {
-	GeeHashMapEntrySet * self;
+static gboolean gee_hash_map_entry_set_add_all (GeeHashMapEntrySet* self, GeeCollection* entries) {
 	gboolean result = FALSE;
-	self = (GeeHashMapEntrySet*) base;
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (entries != NULL, FALSE);
 	g_assert_not_reached ();
 	return result;
 }
 
 
-static gboolean gee_hash_map_entry_set_real_remove_all (GeeAbstractCollection* base, GeeCollection* entries) {
-	GeeHashMapEntrySet * self;
+static gboolean gee_hash_map_entry_set_remove_all (GeeHashMapEntrySet* self, GeeCollection* entries) {
 	gboolean result = FALSE;
-	self = (GeeHashMapEntrySet*) base;
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (entries != NULL, FALSE);
 	g_assert_not_reached ();
 	return result;
 }
 
 
-static gboolean gee_hash_map_entry_set_real_retain_all (GeeAbstractCollection* base, GeeCollection* entries) {
-	GeeHashMapEntrySet * self;
+static gboolean gee_hash_map_entry_set_retain_all (GeeHashMapEntrySet* self, GeeCollection* entries) {
 	gboolean result = FALSE;
-	self = (GeeHashMapEntrySet*) base;
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (entries != NULL, FALSE);
 	g_assert_not_reached ();
 	return result;
@@ -2520,6 +2788,15 @@ static gint gee_hash_map_entry_set_real_get_size (GeeAbstractCollection* base) {
 }
 
 
+static gboolean gee_hash_map_entry_set_real_get_read_only (GeeAbstractCollection* base) {
+	gboolean result;
+	GeeHashMapEntrySet* self;
+	self = (GeeHashMapEntrySet*) base;
+	result = TRUE;
+	return result;
+}
+
+
 static void gee_hash_map_entry_set_class_init (GeeHashMapEntrySetClass * klass) {
 	gee_hash_map_entry_set_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeHashMapEntrySetPrivate));
@@ -2528,10 +2805,8 @@ static void gee_hash_map_entry_set_class_init (GeeHashMapEntrySetClass * klass) 
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->clear = gee_hash_map_entry_set_real_clear;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove = gee_hash_map_entry_set_real_remove;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->contains = gee_hash_map_entry_set_real_contains;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->add_all = gee_hash_map_entry_set_real_add_all;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove_all = gee_hash_map_entry_set_real_remove_all;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->retain_all = gee_hash_map_entry_set_real_retain_all;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_hash_map_entry_set_real_get_size;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_hash_map_entry_set_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_hash_map_entry_set_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_hash_map_entry_set_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_hash_map_entry_set_finalize;
@@ -2542,6 +2817,7 @@ static void gee_hash_map_entry_set_class_init (GeeHashMapEntrySetClass * klass) 
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_ENTRY_SET_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_ENTRY_SET_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_ENTRY_SET_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_ENTRY_SET_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -2576,6 +2852,9 @@ static void _vala_gee_hash_map_entry_set_get_property (GObject * object, guint p
 	switch (property_id) {
 		case GEE_HASH_MAP_ENTRY_SET_SIZE:
 		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
+		break;
+		case GEE_HASH_MAP_ENTRY_SET_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -2706,7 +2985,7 @@ static gboolean gee_hash_map_node_iterator_has_next (GeeHashMapNodeIterator* sel
 				gint _tmp10_;
 				GeeHashMap* _tmp11_;
 				gint _tmp12_;
-				_tmp10_ = self->priv->_index;
+				_tmp10_ = self->_index;
 				_tmp11_ = self->_map;
 				_tmp12_ = _tmp11_->priv->_array_size;
 				_tmp8_ = (_tmp10_ + 1) < _tmp12_;
@@ -2717,12 +2996,12 @@ static gboolean gee_hash_map_node_iterator_has_next (GeeHashMapNodeIterator* sel
 			if (!_tmp13_) {
 				break;
 			}
-			_tmp14_ = self->priv->_index;
-			self->priv->_index = _tmp14_ + 1;
+			_tmp14_ = self->_index;
+			self->_index = _tmp14_ + 1;
 			_tmp15_ = self->_map;
 			_tmp16_ = _tmp15_->priv->_nodes;
 			_tmp16__length1 = _tmp15_->priv->_nodes_length1;
-			_tmp17_ = self->priv->_index;
+			_tmp17_ = self->_index;
 			_tmp18_ = _tmp16_[_tmp17_];
 			self->_next = _tmp18_;
 		}
@@ -2733,31 +3012,27 @@ static gboolean gee_hash_map_node_iterator_has_next (GeeHashMapNodeIterator* sel
 }
 
 
-static gboolean gee_hash_map_node_iterator_first (GeeHashMapNodeIterator* self) {
-	gboolean result = FALSE;
-	gint _tmp0_;
-	GeeHashMap* _tmp1_;
-	gint _tmp2_;
-	GeeHashMap* _tmp3_;
-	gint _tmp4_;
-	gint _tmp5_;
-	gboolean _tmp6_ = FALSE;
+static gboolean gee_hash_map_node_iterator_get_read_only (GeeHashMapNodeIterator* self) {
 	g_return_val_if_fail (self != NULL, FALSE);
-	_tmp0_ = self->_stamp;
-	_tmp1_ = self->_map;
-	_tmp2_ = _tmp1_->priv->_stamp;
-	_vala_assert (_tmp0_ == _tmp2_, "_stamp == _map._stamp");
-	_tmp3_ = self->_map;
-	_tmp4_ = gee_abstract_map_get_size ((GeeMap*) _tmp3_);
-	_tmp5_ = _tmp4_;
-	if (_tmp5_ == 0) {
-		result = FALSE;
-		return result;
-	}
-	self->priv->_index = -1;
-	self->_next = NULL;
-	_tmp6_ = gee_hash_map_node_iterator_next (self);
-	result = _tmp6_;
+	return GEE_HASH_MAP_NODE_ITERATOR_GET_CLASS (self)->get_read_only (self);
+}
+
+
+static gboolean gee_hash_map_node_iterator_real_get_read_only (GeeHashMapNodeIterator* base) {
+	gboolean result;
+	GeeHashMapNodeIterator* self;
+	self = base;
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean gee_hash_map_node_iterator_get_valid (GeeHashMapNodeIterator* self) {
+	gboolean result;
+	GeeHashMapNode* _tmp0_;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp0_ = self->_node;
+	result = _tmp0_ != NULL;
 	return result;
 }
 
@@ -2765,6 +3040,7 @@ static gboolean gee_hash_map_node_iterator_first (GeeHashMapNodeIterator* self) 
 static void gee_hash_map_node_iterator_class_init (GeeHashMapNodeIteratorClass * klass) {
 	gee_hash_map_node_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeHashMapNodeIteratorPrivate));
+	GEE_HASH_MAP_NODE_ITERATOR_CLASS (klass)->get_read_only = gee_hash_map_node_iterator_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_hash_map_node_iterator_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_hash_map_node_iterator_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_hash_map_node_iterator_finalize;
@@ -2774,12 +3050,14 @@ static void gee_hash_map_node_iterator_class_init (GeeHashMapNodeIteratorClass *
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_NODE_ITERATOR_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_NODE_ITERATOR_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_NODE_ITERATOR_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_NODE_ITERATOR_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_NODE_ITERATOR_VALID, g_param_spec_boolean ("valid", "valid", "valid", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
 static void gee_hash_map_node_iterator_instance_init (GeeHashMapNodeIterator * self) {
 	self->priv = GEE_HASH_MAP_NODE_ITERATOR_GET_PRIVATE (self);
-	self->priv->_index = -1;
+	self->_index = -1;
 }
 
 
@@ -2807,6 +3085,12 @@ static void _vala_gee_hash_map_node_iterator_get_property (GObject * object, gui
 	GeeHashMapNodeIterator * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_HASH_MAP_TYPE_NODE_ITERATOR, GeeHashMapNodeIterator);
 	switch (property_id) {
+		case GEE_HASH_MAP_NODE_ITERATOR_READ_ONLY:
+		g_value_set_boolean (value, gee_hash_map_node_iterator_get_read_only (self));
+		break;
+		case GEE_HASH_MAP_NODE_ITERATOR_VALID:
+		g_value_set_boolean (value, gee_hash_map_node_iterator_get_valid (self));
+		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
 		break;
@@ -2896,6 +3180,100 @@ static void gee_hash_map_key_iterator_real_remove (GeeIterator* base) {
 }
 
 
+static gboolean gee_hash_map_key_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeHashMapKeyIterator * self;
+	gboolean result = FALSE;
+	GeeHashMapNode* _tmp0_;
+	self = (GeeHashMapKeyIterator*) base;
+	_tmp0_ = ((GeeHashMapNodeIterator*) self)->_node;
+	if (_tmp0_ != NULL) {
+		GeeForallFunc _tmp1_;
+		void* _tmp1__target;
+		GeeHashMapNode* _tmp2_;
+		gconstpointer _tmp3_;
+		gpointer _tmp4_;
+		gboolean _tmp5_ = FALSE;
+		GeeHashMapNode* _tmp6_;
+		_tmp1_ = f;
+		_tmp1__target = f_target;
+		_tmp2_ = ((GeeHashMapNodeIterator*) self)->_node;
+		_tmp3_ = _tmp2_->key;
+		_tmp4_ = ((_tmp3_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp3_) : ((gpointer) _tmp3_);
+		_tmp5_ = _tmp1_ (_tmp4_, _tmp1__target);
+		if (!_tmp5_) {
+			result = FALSE;
+			return result;
+		}
+		_tmp6_ = ((GeeHashMapNodeIterator*) self)->_next;
+		if (_tmp6_ == NULL) {
+			GeeHashMapNode* _tmp7_;
+			GeeHashMapNode* _tmp8_;
+			_tmp7_ = ((GeeHashMapNodeIterator*) self)->_node;
+			_tmp8_ = _tmp7_->next;
+			((GeeHashMapNodeIterator*) self)->_next = _tmp8_;
+		}
+	}
+	while (TRUE) {
+		gint _tmp18_;
+		GeeHashMap* _tmp19_;
+		gint _tmp20_;
+		while (TRUE) {
+			GeeHashMapNode* _tmp9_;
+			GeeHashMapNode* _tmp10_;
+			GeeForallFunc _tmp11_;
+			void* _tmp11__target;
+			GeeHashMapNode* _tmp12_;
+			gconstpointer _tmp13_;
+			gpointer _tmp14_;
+			gboolean _tmp15_ = FALSE;
+			GeeHashMapNode* _tmp16_;
+			GeeHashMapNode* _tmp17_;
+			_tmp9_ = ((GeeHashMapNodeIterator*) self)->_next;
+			if (!(_tmp9_ != NULL)) {
+				break;
+			}
+			_tmp10_ = ((GeeHashMapNodeIterator*) self)->_next;
+			((GeeHashMapNodeIterator*) self)->_node = _tmp10_;
+			_tmp11_ = f;
+			_tmp11__target = f_target;
+			_tmp12_ = ((GeeHashMapNodeIterator*) self)->_node;
+			_tmp13_ = _tmp12_->key;
+			_tmp14_ = ((_tmp13_ != NULL) && (self->priv->k_dup_func != NULL)) ? self->priv->k_dup_func ((gpointer) _tmp13_) : ((gpointer) _tmp13_);
+			_tmp15_ = _tmp11_ (_tmp14_, _tmp11__target);
+			if (!_tmp15_) {
+				result = FALSE;
+				return result;
+			}
+			_tmp16_ = ((GeeHashMapNodeIterator*) self)->_next;
+			_tmp17_ = _tmp16_->next;
+			((GeeHashMapNodeIterator*) self)->_next = _tmp17_;
+		}
+		_tmp18_ = ((GeeHashMapNodeIterator*) self)->_index;
+		_tmp19_ = ((GeeHashMapNodeIterator*) self)->_map;
+		_tmp20_ = _tmp19_->priv->_array_size;
+		if ((_tmp18_ + 1) < _tmp20_) {
+			GeeHashMap* _tmp21_;
+			GeeHashMapNode** _tmp22_;
+			gint _tmp22__length1;
+			gint _tmp23_;
+			gint _tmp24_;
+			GeeHashMapNode* _tmp25_;
+			_tmp21_ = ((GeeHashMapNodeIterator*) self)->_map;
+			_tmp22_ = _tmp21_->priv->_nodes;
+			_tmp22__length1 = _tmp21_->priv->_nodes_length1;
+			_tmp23_ = ((GeeHashMapNodeIterator*) self)->_index;
+			((GeeHashMapNodeIterator*) self)->_index = _tmp23_ + 1;
+			_tmp24_ = ((GeeHashMapNodeIterator*) self)->_index;
+			_tmp25_ = _tmp22_[_tmp24_];
+			((GeeHashMapNodeIterator*) self)->_next = _tmp25_;
+		} else {
+			result = TRUE;
+			return result;
+		}
+	}
+}
+
+
 static void gee_hash_map_key_iterator_class_init (GeeHashMapKeyIteratorClass * klass) {
 	gee_hash_map_key_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeHashMapKeyIteratorPrivate));
@@ -2910,13 +3288,38 @@ static void gee_hash_map_key_iterator_class_init (GeeHashMapKeyIteratorClass * k
 }
 
 
+static GType gee_hash_map_key_iterator_gee_traversable_get_g_type (GeeHashMapKeyIterator* self) {
+	return self->priv->k_type;
+}
+
+
+static GBoxedCopyFunc gee_hash_map_key_iterator_gee_traversable_get_g_dup_func (GeeHashMapKeyIterator* self) {
+	return self->priv->k_dup_func;
+}
+
+
+static GDestroyNotify gee_hash_map_key_iterator_gee_traversable_get_g_destroy_func (GeeHashMapKeyIterator* self) {
+	return self->priv->k_destroy_func;
+}
+
+
+static void gee_hash_map_key_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_hash_map_key_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_hash_map_key_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_hash_map_key_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_hash_map_key_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_hash_map_key_iterator_gee_traversable_get_g_destroy_func;
+}
+
+
 static void gee_hash_map_key_iterator_gee_iterator_interface_init (GeeIteratorIface * iface) {
 	gee_hash_map_key_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get = (gpointer (*)(GeeIterator*)) gee_hash_map_key_iterator_real_get;
 	iface->remove = (void (*)(GeeIterator*)) gee_hash_map_key_iterator_real_remove;
 	iface->next = (gboolean (*)(GeeIterator*)) gee_hash_map_node_iterator_next;
 	iface->has_next = (gboolean (*)(GeeIterator*)) gee_hash_map_node_iterator_has_next;
-	iface->first = (gboolean (*)(GeeIterator*)) gee_hash_map_node_iterator_first;
+	iface->get_valid = (gboolean (*) (GeeIterator *)) gee_hash_map_node_iterator_get_valid;
+	iface->get_read_only = (gboolean (*) (GeeIterator *)) gee_hash_map_node_iterator_get_read_only;
 }
 
 
@@ -2929,9 +3332,11 @@ static GType gee_hash_map_key_iterator_get_type (void) {
 	static volatile gsize gee_hash_map_key_iterator_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_hash_map_key_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeHashMapKeyIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_hash_map_key_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeHashMapKeyIterator), 0, (GInstanceInitFunc) gee_hash_map_key_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_hash_map_key_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_hash_map_key_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_hash_map_key_iterator_type_id;
 		gee_hash_map_key_iterator_type_id = g_type_register_static (GEE_HASH_MAP_TYPE_NODE_ITERATOR, "GeeHashMapKeyIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_hash_map_key_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
 		g_type_add_interface_static (gee_hash_map_key_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
 		g_once_init_leave (&gee_hash_map_key_iterator_type_id__volatile, gee_hash_map_key_iterator_type_id);
 	}
@@ -3047,7 +3452,7 @@ static void gee_hash_map_map_iterator_real_unset (GeeMapIterator* base) {
 	_tmp4_ = ((GeeHashMapNodeIterator*) self)->_map;
 	_tmp5_ = ((GeeHashMapNodeIterator*) self)->_node;
 	_tmp6_ = _tmp5_->key;
-	gee_abstract_map_unset ((GeeAbstractMap*) _tmp4_, _tmp6_, NULL);
+	gee_hash_map_unset_helper (_tmp4_, _tmp6_, NULL);
 	((GeeHashMapNodeIterator*) self)->_node = NULL;
 	_tmp7_ = ((GeeHashMapNodeIterator*) self)->_map;
 	_tmp8_ = _tmp7_->priv->_stamp;
@@ -3110,9 +3515,28 @@ static void gee_hash_map_map_iterator_real_set_value (GeeMapIterator* base, gcon
 }
 
 
+static gboolean gee_hash_map_map_iterator_real_get_mutable (GeeMapIterator* base) {
+	gboolean result;
+	GeeHashMapMapIterator* self;
+	self = (GeeHashMapMapIterator*) base;
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean gee_hash_map_map_iterator_real_get_read_only (GeeHashMapNodeIterator* base) {
+	gboolean result;
+	GeeHashMapMapIterator* self;
+	self = (GeeHashMapMapIterator*) base;
+	result = FALSE;
+	return result;
+}
+
+
 static void gee_hash_map_map_iterator_class_init (GeeHashMapMapIteratorClass * klass) {
 	gee_hash_map_map_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeHashMapMapIteratorPrivate));
+	GEE_HASH_MAP_NODE_ITERATOR_CLASS (klass)->get_read_only = gee_hash_map_map_iterator_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_hash_map_map_iterator_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_hash_map_map_iterator_set_property;
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_MAP_ITERATOR_K_TYPE, g_param_spec_gtype ("k-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
@@ -3121,6 +3545,38 @@ static void gee_hash_map_map_iterator_class_init (GeeHashMapMapIteratorClass * k
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_MAP_ITERATOR_V_TYPE, g_param_spec_gtype ("v-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_MAP_ITERATOR_V_DUP_FUNC, g_param_spec_pointer ("v-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_MAP_ITERATOR_V_DESTROY_FUNC, g_param_spec_pointer ("v-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_MAP_ITERATOR_MUTABLE, g_param_spec_boolean ("mutable", "mutable", "mutable", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_MAP_ITERATOR_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static GType gee_hash_map_map_iterator_gee_map_iterator_get_k_type (GeeHashMapMapIterator* self) {
+	return self->priv->k_type;
+}
+
+
+static GBoxedCopyFunc gee_hash_map_map_iterator_gee_map_iterator_get_k_dup_func (GeeHashMapMapIterator* self) {
+	return self->priv->k_dup_func;
+}
+
+
+static GDestroyNotify gee_hash_map_map_iterator_gee_map_iterator_get_k_destroy_func (GeeHashMapMapIterator* self) {
+	return self->priv->k_destroy_func;
+}
+
+
+static GType gee_hash_map_map_iterator_gee_map_iterator_get_v_type (GeeHashMapMapIterator* self) {
+	return self->priv->v_type;
+}
+
+
+static GBoxedCopyFunc gee_hash_map_map_iterator_gee_map_iterator_get_v_dup_func (GeeHashMapMapIterator* self) {
+	return self->priv->v_dup_func;
+}
+
+
+static GDestroyNotify gee_hash_map_map_iterator_gee_map_iterator_get_v_destroy_func (GeeHashMapMapIterator* self) {
+	return self->priv->v_destroy_func;
 }
 
 
@@ -3130,9 +3586,17 @@ static void gee_hash_map_map_iterator_gee_map_iterator_interface_init (GeeMapIte
 	iface->unset = (void (*)(GeeMapIterator*)) gee_hash_map_map_iterator_real_unset;
 	iface->get_value = (gpointer (*)(GeeMapIterator*)) gee_hash_map_map_iterator_real_get_value;
 	iface->set_value = (void (*)(GeeMapIterator*, gconstpointer)) gee_hash_map_map_iterator_real_set_value;
+	iface->get_k_type = (GType(*)(GeeMapIterator*)) gee_hash_map_map_iterator_gee_map_iterator_get_k_type;
+	iface->get_k_dup_func = (GBoxedCopyFunc(*)(GeeMapIterator*)) gee_hash_map_map_iterator_gee_map_iterator_get_k_dup_func;
+	iface->get_k_destroy_func = (GDestroyNotify(*)(GeeMapIterator*)) gee_hash_map_map_iterator_gee_map_iterator_get_k_destroy_func;
+	iface->get_v_type = (GType(*)(GeeMapIterator*)) gee_hash_map_map_iterator_gee_map_iterator_get_v_type;
+	iface->get_v_dup_func = (GBoxedCopyFunc(*)(GeeMapIterator*)) gee_hash_map_map_iterator_gee_map_iterator_get_v_dup_func;
+	iface->get_v_destroy_func = (GDestroyNotify(*)(GeeMapIterator*)) gee_hash_map_map_iterator_gee_map_iterator_get_v_destroy_func;
 	iface->next = (gboolean (*)(GeeMapIterator*)) gee_hash_map_node_iterator_next;
 	iface->has_next = (gboolean (*)(GeeMapIterator*)) gee_hash_map_node_iterator_has_next;
-	iface->first = (gboolean (*)(GeeMapIterator*)) gee_hash_map_node_iterator_first;
+	iface->get_mutable = gee_hash_map_map_iterator_real_get_mutable;
+	iface->get_read_only = gee_hash_map_map_iterator_real_get_read_only;
+	iface->get_valid = (gboolean (*) (GeeMapIterator *)) gee_hash_map_node_iterator_get_valid;
 }
 
 
@@ -3159,6 +3623,12 @@ static void _vala_gee_hash_map_map_iterator_get_property (GObject * object, guin
 	GeeHashMapMapIterator * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_HASH_MAP_TYPE_MAP_ITERATOR, GeeHashMapMapIterator);
 	switch (property_id) {
+		case GEE_HASH_MAP_MAP_ITERATOR_MUTABLE:
+		g_value_set_boolean (value, gee_map_iterator_get_mutable ((GeeMapIterator*) self));
+		break;
+		case GEE_HASH_MAP_MAP_ITERATOR_READ_ONLY:
+		g_value_set_boolean (value, gee_hash_map_node_iterator_get_read_only ((GeeHashMapNodeIterator*) self));
+		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
 		break;
@@ -3248,6 +3718,100 @@ static void gee_hash_map_value_iterator_real_remove (GeeIterator* base) {
 }
 
 
+static gboolean gee_hash_map_value_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeHashMapValueIterator * self;
+	gboolean result = FALSE;
+	GeeHashMapNode* _tmp0_;
+	self = (GeeHashMapValueIterator*) base;
+	_tmp0_ = ((GeeHashMapNodeIterator*) self)->_node;
+	if (_tmp0_ != NULL) {
+		GeeForallFunc _tmp1_;
+		void* _tmp1__target;
+		GeeHashMapNode* _tmp2_;
+		gconstpointer _tmp3_;
+		gpointer _tmp4_;
+		gboolean _tmp5_ = FALSE;
+		GeeHashMapNode* _tmp6_;
+		_tmp1_ = f;
+		_tmp1__target = f_target;
+		_tmp2_ = ((GeeHashMapNodeIterator*) self)->_node;
+		_tmp3_ = _tmp2_->value;
+		_tmp4_ = ((_tmp3_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp3_) : ((gpointer) _tmp3_);
+		_tmp5_ = _tmp1_ (_tmp4_, _tmp1__target);
+		if (!_tmp5_) {
+			result = FALSE;
+			return result;
+		}
+		_tmp6_ = ((GeeHashMapNodeIterator*) self)->_next;
+		if (_tmp6_ == NULL) {
+			GeeHashMapNode* _tmp7_;
+			GeeHashMapNode* _tmp8_;
+			_tmp7_ = ((GeeHashMapNodeIterator*) self)->_node;
+			_tmp8_ = _tmp7_->next;
+			((GeeHashMapNodeIterator*) self)->_next = _tmp8_;
+		}
+	}
+	while (TRUE) {
+		gint _tmp18_;
+		GeeHashMap* _tmp19_;
+		gint _tmp20_;
+		while (TRUE) {
+			GeeHashMapNode* _tmp9_;
+			GeeHashMapNode* _tmp10_;
+			GeeForallFunc _tmp11_;
+			void* _tmp11__target;
+			GeeHashMapNode* _tmp12_;
+			gconstpointer _tmp13_;
+			gpointer _tmp14_;
+			gboolean _tmp15_ = FALSE;
+			GeeHashMapNode* _tmp16_;
+			GeeHashMapNode* _tmp17_;
+			_tmp9_ = ((GeeHashMapNodeIterator*) self)->_next;
+			if (!(_tmp9_ != NULL)) {
+				break;
+			}
+			_tmp10_ = ((GeeHashMapNodeIterator*) self)->_next;
+			((GeeHashMapNodeIterator*) self)->_node = _tmp10_;
+			_tmp11_ = f;
+			_tmp11__target = f_target;
+			_tmp12_ = ((GeeHashMapNodeIterator*) self)->_node;
+			_tmp13_ = _tmp12_->value;
+			_tmp14_ = ((_tmp13_ != NULL) && (self->priv->v_dup_func != NULL)) ? self->priv->v_dup_func ((gpointer) _tmp13_) : ((gpointer) _tmp13_);
+			_tmp15_ = _tmp11_ (_tmp14_, _tmp11__target);
+			if (!_tmp15_) {
+				result = FALSE;
+				return result;
+			}
+			_tmp16_ = ((GeeHashMapNodeIterator*) self)->_next;
+			_tmp17_ = _tmp16_->next;
+			((GeeHashMapNodeIterator*) self)->_next = _tmp17_;
+		}
+		_tmp18_ = ((GeeHashMapNodeIterator*) self)->_index;
+		_tmp19_ = ((GeeHashMapNodeIterator*) self)->_map;
+		_tmp20_ = _tmp19_->priv->_array_size;
+		if ((_tmp18_ + 1) < _tmp20_) {
+			GeeHashMap* _tmp21_;
+			GeeHashMapNode** _tmp22_;
+			gint _tmp22__length1;
+			gint _tmp23_;
+			gint _tmp24_;
+			GeeHashMapNode* _tmp25_;
+			_tmp21_ = ((GeeHashMapNodeIterator*) self)->_map;
+			_tmp22_ = _tmp21_->priv->_nodes;
+			_tmp22__length1 = _tmp21_->priv->_nodes_length1;
+			_tmp23_ = ((GeeHashMapNodeIterator*) self)->_index;
+			((GeeHashMapNodeIterator*) self)->_index = _tmp23_ + 1;
+			_tmp24_ = ((GeeHashMapNodeIterator*) self)->_index;
+			_tmp25_ = _tmp22_[_tmp24_];
+			((GeeHashMapNodeIterator*) self)->_next = _tmp25_;
+		} else {
+			result = TRUE;
+			return result;
+		}
+	}
+}
+
+
 static void gee_hash_map_value_iterator_class_init (GeeHashMapValueIteratorClass * klass) {
 	gee_hash_map_value_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeHashMapValueIteratorPrivate));
@@ -3262,13 +3826,38 @@ static void gee_hash_map_value_iterator_class_init (GeeHashMapValueIteratorClass
 }
 
 
+static GType gee_hash_map_value_iterator_gee_traversable_get_g_type (GeeHashMapValueIterator* self) {
+	return self->priv->v_type;
+}
+
+
+static GBoxedCopyFunc gee_hash_map_value_iterator_gee_traversable_get_g_dup_func (GeeHashMapValueIterator* self) {
+	return self->priv->v_dup_func;
+}
+
+
+static GDestroyNotify gee_hash_map_value_iterator_gee_traversable_get_g_destroy_func (GeeHashMapValueIterator* self) {
+	return self->priv->v_destroy_func;
+}
+
+
+static void gee_hash_map_value_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_hash_map_value_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_hash_map_value_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_hash_map_value_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_hash_map_value_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_hash_map_value_iterator_gee_traversable_get_g_destroy_func;
+}
+
+
 static void gee_hash_map_value_iterator_gee_iterator_interface_init (GeeIteratorIface * iface) {
 	gee_hash_map_value_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get = (gpointer (*)(GeeIterator*)) gee_hash_map_value_iterator_real_get;
 	iface->remove = (void (*)(GeeIterator*)) gee_hash_map_value_iterator_real_remove;
 	iface->next = (gboolean (*)(GeeIterator*)) gee_hash_map_node_iterator_next;
 	iface->has_next = (gboolean (*)(GeeIterator*)) gee_hash_map_node_iterator_has_next;
-	iface->first = (gboolean (*)(GeeIterator*)) gee_hash_map_node_iterator_first;
+	iface->get_valid = (gboolean (*) (GeeIterator *)) gee_hash_map_node_iterator_get_valid;
+	iface->get_read_only = (gboolean (*) (GeeIterator *)) gee_hash_map_node_iterator_get_read_only;
 }
 
 
@@ -3281,9 +3870,11 @@ static GType gee_hash_map_value_iterator_get_type (void) {
 	static volatile gsize gee_hash_map_value_iterator_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_hash_map_value_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeHashMapValueIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_hash_map_value_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeHashMapValueIterator), 0, (GInstanceInitFunc) gee_hash_map_value_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_hash_map_value_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_hash_map_value_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_hash_map_value_iterator_type_id;
 		gee_hash_map_value_iterator_type_id = g_type_register_static (GEE_HASH_MAP_TYPE_NODE_ITERATOR, "GeeHashMapValueIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_hash_map_value_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
 		g_type_add_interface_static (gee_hash_map_value_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
 		g_once_init_leave (&gee_hash_map_value_iterator_type_id__volatile, gee_hash_map_value_iterator_type_id);
 	}
@@ -3382,6 +3973,96 @@ static void gee_hash_map_entry_iterator_real_remove (GeeIterator* base) {
 }
 
 
+static gboolean gee_hash_map_entry_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeHashMapEntryIterator * self;
+	gboolean result = FALSE;
+	GeeHashMapNode* _tmp0_;
+	self = (GeeHashMapEntryIterator*) base;
+	_tmp0_ = ((GeeHashMapNodeIterator*) self)->_node;
+	if (_tmp0_ != NULL) {
+		GeeForallFunc _tmp1_;
+		void* _tmp1__target;
+		GeeHashMapNode* _tmp2_;
+		GeeMapEntry* _tmp3_ = NULL;
+		gboolean _tmp4_ = FALSE;
+		GeeHashMapNode* _tmp5_;
+		_tmp1_ = f;
+		_tmp1__target = f_target;
+		_tmp2_ = ((GeeHashMapNodeIterator*) self)->_node;
+		_tmp3_ = gee_hash_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp2_);
+		_tmp4_ = _tmp1_ (_tmp3_, _tmp1__target);
+		if (!_tmp4_) {
+			result = FALSE;
+			return result;
+		}
+		_tmp5_ = ((GeeHashMapNodeIterator*) self)->_next;
+		if (_tmp5_ == NULL) {
+			GeeHashMapNode* _tmp6_;
+			GeeHashMapNode* _tmp7_;
+			_tmp6_ = ((GeeHashMapNodeIterator*) self)->_node;
+			_tmp7_ = _tmp6_->next;
+			((GeeHashMapNodeIterator*) self)->_next = _tmp7_;
+		}
+	}
+	while (TRUE) {
+		gint _tmp16_;
+		GeeHashMap* _tmp17_;
+		gint _tmp18_;
+		while (TRUE) {
+			GeeHashMapNode* _tmp8_;
+			GeeHashMapNode* _tmp9_;
+			GeeForallFunc _tmp10_;
+			void* _tmp10__target;
+			GeeHashMapNode* _tmp11_;
+			GeeMapEntry* _tmp12_ = NULL;
+			gboolean _tmp13_ = FALSE;
+			GeeHashMapNode* _tmp14_;
+			GeeHashMapNode* _tmp15_;
+			_tmp8_ = ((GeeHashMapNodeIterator*) self)->_next;
+			if (!(_tmp8_ != NULL)) {
+				break;
+			}
+			_tmp9_ = ((GeeHashMapNodeIterator*) self)->_next;
+			((GeeHashMapNodeIterator*) self)->_node = _tmp9_;
+			_tmp10_ = f;
+			_tmp10__target = f_target;
+			_tmp11_ = ((GeeHashMapNodeIterator*) self)->_node;
+			_tmp12_ = gee_hash_map_entry_entry_for (self->priv->k_type, (GBoxedCopyFunc) self->priv->k_dup_func, self->priv->k_destroy_func, self->priv->v_type, (GBoxedCopyFunc) self->priv->v_dup_func, self->priv->v_destroy_func, _tmp11_);
+			_tmp13_ = _tmp10_ (_tmp12_, _tmp10__target);
+			if (!_tmp13_) {
+				result = FALSE;
+				return result;
+			}
+			_tmp14_ = ((GeeHashMapNodeIterator*) self)->_next;
+			_tmp15_ = _tmp14_->next;
+			((GeeHashMapNodeIterator*) self)->_next = _tmp15_;
+		}
+		_tmp16_ = ((GeeHashMapNodeIterator*) self)->_index;
+		_tmp17_ = ((GeeHashMapNodeIterator*) self)->_map;
+		_tmp18_ = _tmp17_->priv->_array_size;
+		if ((_tmp16_ + 1) < _tmp18_) {
+			GeeHashMap* _tmp19_;
+			GeeHashMapNode** _tmp20_;
+			gint _tmp20__length1;
+			gint _tmp21_;
+			gint _tmp22_;
+			GeeHashMapNode* _tmp23_;
+			_tmp19_ = ((GeeHashMapNodeIterator*) self)->_map;
+			_tmp20_ = _tmp19_->priv->_nodes;
+			_tmp20__length1 = _tmp19_->priv->_nodes_length1;
+			_tmp21_ = ((GeeHashMapNodeIterator*) self)->_index;
+			((GeeHashMapNodeIterator*) self)->_index = _tmp21_ + 1;
+			_tmp22_ = ((GeeHashMapNodeIterator*) self)->_index;
+			_tmp23_ = _tmp20_[_tmp22_];
+			((GeeHashMapNodeIterator*) self)->_next = _tmp23_;
+		} else {
+			result = TRUE;
+			return result;
+		}
+	}
+}
+
+
 static void gee_hash_map_entry_iterator_class_init (GeeHashMapEntryIteratorClass * klass) {
 	gee_hash_map_entry_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeHashMapEntryIteratorPrivate));
@@ -3396,13 +4077,38 @@ static void gee_hash_map_entry_iterator_class_init (GeeHashMapEntryIteratorClass
 }
 
 
+static GType gee_hash_map_entry_iterator_gee_traversable_get_g_type (GeeHashMapEntryIterator* self) {
+	return GEE_MAP_TYPE_ENTRY;
+}
+
+
+static GBoxedCopyFunc gee_hash_map_entry_iterator_gee_traversable_get_g_dup_func (GeeHashMapEntryIterator* self) {
+	return g_object_ref;
+}
+
+
+static GDestroyNotify gee_hash_map_entry_iterator_gee_traversable_get_g_destroy_func (GeeHashMapEntryIterator* self) {
+	return g_object_unref;
+}
+
+
+static void gee_hash_map_entry_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_hash_map_entry_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_hash_map_entry_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_hash_map_entry_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_hash_map_entry_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_hash_map_entry_iterator_gee_traversable_get_g_destroy_func;
+}
+
+
 static void gee_hash_map_entry_iterator_gee_iterator_interface_init (GeeIteratorIface * iface) {
 	gee_hash_map_entry_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get = (gpointer (*)(GeeIterator*)) gee_hash_map_entry_iterator_real_get;
 	iface->remove = (void (*)(GeeIterator*)) gee_hash_map_entry_iterator_real_remove;
 	iface->next = (gboolean (*)(GeeIterator*)) gee_hash_map_node_iterator_next;
 	iface->has_next = (gboolean (*)(GeeIterator*)) gee_hash_map_node_iterator_has_next;
-	iface->first = (gboolean (*)(GeeIterator*)) gee_hash_map_node_iterator_first;
+	iface->get_valid = (gboolean (*) (GeeIterator *)) gee_hash_map_node_iterator_get_valid;
+	iface->get_read_only = (gboolean (*) (GeeIterator *)) gee_hash_map_node_iterator_get_read_only;
 }
 
 
@@ -3415,9 +4121,11 @@ static GType gee_hash_map_entry_iterator_get_type (void) {
 	static volatile gsize gee_hash_map_entry_iterator_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_hash_map_entry_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeHashMapEntryIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_hash_map_entry_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeHashMapEntryIterator), 0, (GInstanceInitFunc) gee_hash_map_entry_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_hash_map_entry_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_hash_map_entry_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_hash_map_entry_iterator_type_id;
 		gee_hash_map_entry_iterator_type_id = g_type_register_static (GEE_HASH_MAP_TYPE_NODE_ITERATOR, "GeeHashMapEntryIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_hash_map_entry_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
 		g_type_add_interface_static (gee_hash_map_entry_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
 		g_once_init_leave (&gee_hash_map_entry_iterator_type_id__volatile, gee_hash_map_entry_iterator_type_id);
 	}
@@ -3476,6 +4184,7 @@ static void gee_hash_map_class_init (GeeHashMapClass * klass) {
 	GEE_ABSTRACT_MAP_CLASS (klass)->clear = gee_hash_map_real_clear;
 	GEE_ABSTRACT_MAP_CLASS (klass)->map_iterator = gee_hash_map_real_map_iterator;
 	GEE_ABSTRACT_MAP_CLASS (klass)->get_size = gee_hash_map_real_get_size;
+	GEE_ABSTRACT_MAP_CLASS (klass)->get_read_only = gee_hash_map_real_get_read_only;
 	GEE_ABSTRACT_MAP_CLASS (klass)->get_keys = gee_hash_map_real_get_keys;
 	GEE_ABSTRACT_MAP_CLASS (klass)->get_values = gee_hash_map_real_get_values;
 	GEE_ABSTRACT_MAP_CLASS (klass)->get_entries = gee_hash_map_real_get_entries;
@@ -3495,6 +4204,10 @@ static void gee_hash_map_class_init (GeeHashMapClass * klass) {
 	/**
 	 * {@inheritDoc}
 	 */
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	/**
+	 * {@inheritDoc}
+	 */
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_KEYS, g_param_spec_object ("keys", "keys", "keys", GEE_TYPE_SET, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	/**
 	 * {@inheritDoc}
@@ -3504,18 +4217,6 @@ static void gee_hash_map_class_init (GeeHashMapClass * klass) {
 	 * {@inheritDoc}
 	 */
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_ENTRIES, g_param_spec_object ("entries", "entries", "entries", GEE_TYPE_SET, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
-	/**
-	 * The keys' hash function.
-	 */
-	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_KEY_HASH_FUNC, g_param_spec_pointer ("key-hash-func", "key-hash-func", "key-hash-func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
-	/**
-	 * The keys' equality testing function.
-	 */
-	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_KEY_EQUAL_FUNC, g_param_spec_pointer ("key-equal-func", "key-equal-func", "key-equal-func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
-	/**
-	 * The values' equality testing function.
-	 */
-	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_HASH_MAP_VALUE_EQUAL_FUNC, g_param_spec_pointer ("value-equal-func", "value-equal-func", "value-equal-func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -3529,6 +4230,18 @@ static void gee_hash_map_finalize (GObject* obj) {
 	GeeHashMap * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (obj, GEE_TYPE_HASH_MAP, GeeHashMap);
 	gee_abstract_map_clear ((GeeAbstractMap*) self);
+	(self->priv->_key_hash_func_target_destroy_notify == NULL) ? NULL : (self->priv->_key_hash_func_target_destroy_notify (self->priv->_key_hash_func_target), NULL);
+	self->priv->_key_hash_func = NULL;
+	self->priv->_key_hash_func_target = NULL;
+	self->priv->_key_hash_func_target_destroy_notify = NULL;
+	(self->priv->_key_equal_func_target_destroy_notify == NULL) ? NULL : (self->priv->_key_equal_func_target_destroy_notify (self->priv->_key_equal_func_target), NULL);
+	self->priv->_key_equal_func = NULL;
+	self->priv->_key_equal_func_target = NULL;
+	self->priv->_key_equal_func_target_destroy_notify = NULL;
+	(self->priv->_value_equal_func_target_destroy_notify == NULL) ? NULL : (self->priv->_value_equal_func_target_destroy_notify (self->priv->_value_equal_func_target), NULL);
+	self->priv->_value_equal_func = NULL;
+	self->priv->_value_equal_func_target = NULL;
+	self->priv->_value_equal_func_target_destroy_notify = NULL;
 	self->priv->_nodes = (_vala_array_free (self->priv->_nodes, self->priv->_nodes_length1, (GDestroyNotify) gee_hash_map_node_free), NULL);
 	G_OBJECT_CLASS (gee_hash_map_parent_class)->finalize (obj);
 }
@@ -3562,6 +4275,9 @@ static void _vala_gee_hash_map_get_property (GObject * object, guint property_id
 		case GEE_HASH_MAP_SIZE:
 		g_value_set_int (value, gee_abstract_map_get_size ((GeeAbstractMap*) self));
 		break;
+		case GEE_HASH_MAP_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_map_get_read_only ((GeeAbstractMap*) self));
+		break;
 		case GEE_HASH_MAP_KEYS:
 		g_value_take_object (value, gee_abstract_map_get_keys ((GeeAbstractMap*) self));
 		break;
@@ -3570,15 +4286,6 @@ static void _vala_gee_hash_map_get_property (GObject * object, guint property_id
 		break;
 		case GEE_HASH_MAP_ENTRIES:
 		g_value_take_object (value, gee_abstract_map_get_entries ((GeeAbstractMap*) self));
-		break;
-		case GEE_HASH_MAP_KEY_HASH_FUNC:
-		g_value_set_pointer (value, gee_hash_map_get_key_hash_func (self));
-		break;
-		case GEE_HASH_MAP_KEY_EQUAL_FUNC:
-		g_value_set_pointer (value, gee_hash_map_get_key_equal_func (self));
-		break;
-		case GEE_HASH_MAP_VALUE_EQUAL_FUNC:
-		g_value_set_pointer (value, gee_hash_map_get_value_equal_func (self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -3591,15 +4298,6 @@ static void _vala_gee_hash_map_set_property (GObject * object, guint property_id
 	GeeHashMap * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TYPE_HASH_MAP, GeeHashMap);
 	switch (property_id) {
-		case GEE_HASH_MAP_KEY_HASH_FUNC:
-		gee_hash_map_set_key_hash_func (self, g_value_get_pointer (value));
-		break;
-		case GEE_HASH_MAP_KEY_EQUAL_FUNC:
-		gee_hash_map_set_key_equal_func (self, g_value_get_pointer (value));
-		break;
-		case GEE_HASH_MAP_VALUE_EQUAL_FUNC:
-		gee_hash_map_set_value_equal_func (self, g_value_get_pointer (value));
-		break;
 		case GEE_HASH_MAP_K_TYPE:
 		self->priv->k_type = g_value_get_gtype (value);
 		break;

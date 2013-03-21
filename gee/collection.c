@@ -25,15 +25,30 @@
 
 #include <glib.h>
 #include <glib-object.h>
+#include <float.h>
+#include <math.h>
+#include <string.h>
 
 
-#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
-#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
-#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
-#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+#define GEE_TYPE_TRAVERSABLE (gee_traversable_get_type ())
+#define GEE_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversable))
+#define GEE_IS_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_TRAVERSABLE))
+#define GEE_TRAVERSABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversableIface))
 
-typedef struct _GeeIterable GeeIterable;
-typedef struct _GeeIterableIface GeeIterableIface;
+typedef struct _GeeTraversable GeeTraversable;
+typedef struct _GeeTraversableIface GeeTraversableIface;
+
+#define GEE_TRAVERSABLE_TYPE_STREAM (gee_traversable_stream_get_type ())
+
+#define GEE_TYPE_LAZY (gee_lazy_get_type ())
+#define GEE_LAZY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LAZY, GeeLazy))
+#define GEE_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_LAZY, GeeLazyClass))
+#define GEE_IS_LAZY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LAZY))
+#define GEE_IS_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_LAZY))
+#define GEE_LAZY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_LAZY, GeeLazyClass))
+
+typedef struct _GeeLazy GeeLazy;
+typedef struct _GeeLazyClass GeeLazyClass;
 
 #define GEE_TYPE_ITERATOR (gee_iterator_get_type ())
 #define GEE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERATOR, GeeIterator))
@@ -43,6 +58,14 @@ typedef struct _GeeIterableIface GeeIterableIface;
 typedef struct _GeeIterator GeeIterator;
 typedef struct _GeeIteratorIface GeeIteratorIface;
 
+#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
+#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
+#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
+#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+
+typedef struct _GeeIterable GeeIterable;
+typedef struct _GeeIterableIface GeeIterableIface;
+
 #define GEE_TYPE_COLLECTION (gee_collection_get_type ())
 #define GEE_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_COLLECTION, GeeCollection))
 #define GEE_IS_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_COLLECTION))
@@ -50,6 +73,8 @@ typedef struct _GeeIteratorIface GeeIteratorIface;
 
 typedef struct _GeeCollection GeeCollection;
 typedef struct _GeeCollectionIface GeeCollectionIface;
+#define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
+#define _g_free0(var) ((var == NULL) ? NULL : (var = (g_free (var), NULL)))
 
 #define GEE_TYPE_ABSTRACT_COLLECTION (gee_abstract_collection_get_type ())
 #define GEE_ABSTRACT_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_COLLECTION, GeeAbstractCollection))
@@ -88,25 +113,56 @@ typedef struct _GeeHashSetClass GeeHashSetClass;
 
 typedef struct _GeeSet GeeSet;
 typedef struct _GeeSetIface GeeSetIface;
-#define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
+typedef gboolean (*GeeForallFunc) (gpointer g, void* user_data);
+typedef enum  {
+	GEE_TRAVERSABLE_STREAM_YIELD,
+	GEE_TRAVERSABLE_STREAM_CONTINUE,
+	GEE_TRAVERSABLE_STREAM_END
+} GeeTraversableStream;
+
+typedef GeeTraversableStream (*GeeStreamFunc) (GeeTraversableStream state, GeeLazy* g, GeeLazy** lazy, void* user_data);
 struct _GeeIteratorIface {
 	GTypeInterface parent_iface;
 	gboolean (*next) (GeeIterator* self);
 	gboolean (*has_next) (GeeIterator* self);
-	gboolean (*first) (GeeIterator* self);
 	gpointer (*get) (GeeIterator* self);
 	void (*remove) (GeeIterator* self);
+	gboolean (*get_valid) (GeeIterator* self);
+	gboolean (*get_read_only) (GeeIterator* self);
+};
+
+typedef gpointer (*GeeFoldFunc) (gpointer g, gpointer a, void* user_data);
+typedef gpointer (*GeeMapFunc) (gpointer g, void* user_data);
+typedef gboolean (*GeePredicate) (gconstpointer g, void* user_data);
+struct _GeeTraversableIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeTraversable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeTraversable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeTraversable* self);
+	gboolean (*foreach) (GeeTraversable* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	gpointer (*fold) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*map) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+	GeeIterator* (*scan) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*filter) (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+	GeeIterator* (*chop) (GeeTraversable* self, gint offset, gint length);
+	GType (*get_element_type) (GeeTraversable* self);
 };
 
 struct _GeeIterableIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeIterable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeIterable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeIterable* self);
 	GeeIterator* (*iterator) (GeeIterable* self);
-	GType (*get_element_type) (GeeIterable* self);
 };
 
 struct _GeeCollectionIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeCollection* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeCollection* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeCollection* self);
 	gboolean (*contains) (GeeCollection* self, gconstpointer item);
 	gboolean (*add) (GeeCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeCollection* self, gconstpointer item);
@@ -118,17 +174,32 @@ struct _GeeCollectionIface {
 	gpointer* (*to_array) (GeeCollection* self, int* result_length1);
 	gint (*get_size) (GeeCollection* self);
 	gboolean (*get_is_empty) (GeeCollection* self);
+	gboolean (*get_read_only) (GeeCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeCollection* self);
 };
 
+typedef guint (*GeeHashDataFunc) (gconstpointer v, void* user_data);
+typedef gboolean (*GeeEqualDataFunc) (gconstpointer a, gconstpointer b, void* user_data);
 struct _GeeSetIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeSet* self);
 	GeeSet* (*get_read_only_view) (GeeSet* self);
 };
 
 
 
+GType gee_traversable_stream_get_type (void) G_GNUC_CONST;
+gpointer gee_lazy_ref (gpointer instance);
+void gee_lazy_unref (gpointer instance);
+GParamSpec* gee_param_spec_lazy (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void gee_value_set_lazy (GValue* value, gpointer v_object);
+void gee_value_take_lazy (GValue* value, gpointer v_object);
+gpointer gee_value_get_lazy (const GValue* value);
+GType gee_lazy_get_type (void) G_GNUC_CONST;
 GType gee_iterator_get_type (void) G_GNUC_CONST;
+GType gee_traversable_get_type (void) G_GNUC_CONST;
 GType gee_iterable_get_type (void) G_GNUC_CONST;
 GType gee_collection_get_type (void) G_GNUC_CONST;
 gboolean gee_collection_contains (GeeCollection* self, gconstpointer item);
@@ -136,21 +207,57 @@ gboolean gee_collection_add (GeeCollection* self, gconstpointer item);
 gboolean gee_collection_remove (GeeCollection* self, gconstpointer item);
 void gee_collection_clear (GeeCollection* self);
 gboolean gee_collection_add_all (GeeCollection* self, GeeCollection* collection);
+static gboolean gee_collection_real_add_all (GeeCollection* self, GeeCollection* collection);
+gpointer gee_traversable_fold (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+static gboolean __lambda15_ (GeeCollection* self, gpointer item, gboolean changed);
+static gpointer ___lambda15__gee_fold_func (gpointer g, gpointer a, gpointer self);
 gboolean gee_collection_contains_all (GeeCollection* self, GeeCollection* collection);
+static gboolean gee_collection_real_contains_all (GeeCollection* self, GeeCollection* collection);
+gboolean gee_traversable_foreach (GeeTraversable* self, GeeForallFunc f, void* f_target);
+static gboolean __lambda16_ (GeeCollection* self, gpointer item);
+static gboolean ___lambda16__gee_forall_func (gpointer g, gpointer self);
 gboolean gee_collection_remove_all (GeeCollection* self, GeeCollection* collection);
+static gboolean gee_collection_real_remove_all (GeeCollection* self, GeeCollection* collection);
+static gboolean __lambda17_ (GeeCollection* self, gpointer item, gboolean changed);
+static gpointer ___lambda17__gee_fold_func (gpointer g, gpointer a, gpointer self);
 gboolean gee_collection_retain_all (GeeCollection* self, GeeCollection* collection);
+static gboolean gee_collection_real_retain_all (GeeCollection* self, GeeCollection* collection);
+GeeIterator* gee_iterable_iterator (GeeIterable* self);
+gboolean gee_iterator_next (GeeIterator* self);
+gpointer gee_iterator_get (GeeIterator* self);
+void gee_iterator_remove (GeeIterator* self);
 gpointer* gee_collection_to_array (GeeCollection* self, int* result_length1);
+static gpointer* gee_collection_real_to_array (GeeCollection* self, int* result_length1);
+static gboolean* gee_collection_to_bool_array (GeeCollection* coll, int* result_length1);
+static gchar* gee_collection_to_char_array (GeeCollection* coll, int* result_length1);
+static guchar* gee_collection_to_uchar_array (GeeCollection* coll, int* result_length1);
+static gint* gee_collection_to_int_array (GeeCollection* coll, int* result_length1);
+static guint* gee_collection_to_uint_array (GeeCollection* coll, int* result_length1);
+static gint64* gee_collection_to_int64_array (GeeCollection* coll, int* result_length1);
+static guint64* gee_collection_to_uint64_array (GeeCollection* coll, int* result_length1);
+static glong* gee_collection_to_long_array (GeeCollection* coll, int* result_length1);
+static gulong* gee_collection_to_ulong_array (GeeCollection* coll, int* result_length1);
+static gfloat** gee_collection_to_float_array (GeeCollection* coll, int* result_length1);
+static gdouble** gee_collection_to_double_array (GeeCollection* coll, int* result_length1);
+gint gee_collection_get_size (GeeCollection* self);
+gboolean gee_collection_add_all_array (GeeCollection* self, gpointer* array, int array_length1);
+gboolean gee_collection_contains_all_array (GeeCollection* self, gpointer* array, int array_length1);
+gboolean gee_collection_remove_all_array (GeeCollection* self, gpointer* array, int array_length1);
+static gfloat* _float_dup (gfloat* self);
+static gdouble* _double_dup (gdouble* self);
 GeeCollection* gee_collection_empty (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
-GeeHashSet* gee_hash_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GHashFunc hash_func, GEqualFunc equal_func);
-GeeHashSet* gee_hash_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GHashFunc hash_func, GEqualFunc equal_func);
+GeeHashSet* gee_hash_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeHashDataFunc hash_func, void* hash_func_target, GDestroyNotify hash_func_target_destroy_notify, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
+GeeHashSet* gee_hash_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeHashDataFunc hash_func, void* hash_func_target, GDestroyNotify hash_func_target_destroy_notify, GeeEqualDataFunc equal_func, void* equal_func_target, GDestroyNotify equal_func_target_destroy_notify);
 GType gee_abstract_collection_get_type (void) G_GNUC_CONST;
 GType gee_abstract_set_get_type (void) G_GNUC_CONST;
 GType gee_hash_set_get_type (void) G_GNUC_CONST;
 GType gee_set_get_type (void) G_GNUC_CONST;
 GeeSet* gee_abstract_set_get_read_only_view (GeeAbstractSet* self);
-gint gee_collection_get_size (GeeCollection* self);
 gboolean gee_collection_get_is_empty (GeeCollection* self);
+gboolean gee_collection_get_read_only (GeeCollection* self);
 GeeCollection* gee_collection_get_read_only_view (GeeCollection* self);
+static void _vala_array_destroy (gpointer array, gint array_length, GDestroyNotify destroy_func);
+static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify destroy_func);
 
 
 /**
@@ -212,6 +319,39 @@ void gee_collection_clear (GeeCollection* self) {
  *
  * @return     ``true`` if the collection has been changed, ``false`` otherwise
  */
+static gboolean __lambda15_ (GeeCollection* self, gpointer item, gboolean changed) {
+	gboolean result = FALSE;
+	gboolean _tmp0_;
+	gconstpointer _tmp1_;
+	gboolean _tmp2_ = FALSE;
+	_tmp0_ = changed;
+	_tmp1_ = item;
+	_tmp2_ = gee_collection_add (self, _tmp1_);
+	result = _tmp0_ | _tmp2_;
+	((item == NULL) || (GEE_COLLECTION_GET_INTERFACE (self)->get_g_destroy_func (self) == NULL)) ? NULL : (item = (GEE_COLLECTION_GET_INTERFACE (self)->get_g_destroy_func (self) (item), NULL));
+	return result;
+}
+
+
+static gpointer ___lambda15__gee_fold_func (gpointer g, gpointer a, gpointer self) {
+	gpointer result;
+	result = __lambda15_ (self, g, a);
+	return result;
+}
+
+
+static gboolean gee_collection_real_add_all (GeeCollection* self, GeeCollection* collection) {
+	gboolean result = FALSE;
+	GeeCollection* _tmp0_;
+	gpointer _tmp1_ = NULL;
+	g_return_val_if_fail (collection != NULL, FALSE);
+	_tmp0_ = collection;
+	_tmp1_ = gee_traversable_fold ((GeeTraversable*) _tmp0_, G_TYPE_BOOLEAN, NULL, NULL, ___lambda15__gee_fold_func, self, (gpointer) ((gintptr) FALSE));
+	result = (gboolean) ((gintptr) _tmp1_);
+	return result;
+}
+
+
 gboolean gee_collection_add_all (GeeCollection* self, GeeCollection* collection) {
 	g_return_val_if_fail (self != NULL, FALSE);
 	return GEE_COLLECTION_GET_INTERFACE (self)->add_all (self, collection);
@@ -227,6 +367,37 @@ gboolean gee_collection_add_all (GeeCollection* self, GeeCollection* collection)
  *
  * @return     ``true`` if the collection has been changed, ``false`` otherwise
  */
+static gboolean __lambda16_ (GeeCollection* self, gpointer item) {
+	gboolean result = FALSE;
+	gconstpointer _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	_tmp0_ = item;
+	_tmp1_ = gee_collection_contains (self, _tmp0_);
+	result = _tmp1_;
+	((item == NULL) || (GEE_COLLECTION_GET_INTERFACE (self)->get_g_destroy_func (self) == NULL)) ? NULL : (item = (GEE_COLLECTION_GET_INTERFACE (self)->get_g_destroy_func (self) (item), NULL));
+	return result;
+}
+
+
+static gboolean ___lambda16__gee_forall_func (gpointer g, gpointer self) {
+	gboolean result;
+	result = __lambda16_ (self, g);
+	return result;
+}
+
+
+static gboolean gee_collection_real_contains_all (GeeCollection* self, GeeCollection* collection) {
+	gboolean result = FALSE;
+	GeeCollection* _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	g_return_val_if_fail (collection != NULL, FALSE);
+	_tmp0_ = collection;
+	_tmp1_ = gee_traversable_foreach ((GeeTraversable*) _tmp0_, ___lambda16__gee_forall_func, self);
+	result = _tmp1_;
+	return result;
+}
+
+
 gboolean gee_collection_contains_all (GeeCollection* self, GeeCollection* collection) {
 	g_return_val_if_fail (self != NULL, FALSE);
 	return GEE_COLLECTION_GET_INTERFACE (self)->contains_all (self, collection);
@@ -244,6 +415,39 @@ gboolean gee_collection_contains_all (GeeCollection* self, GeeCollection* collec
  *
  * @return     ``true`` if the collection has been changed, ``false`` otherwise
  */
+static gboolean __lambda17_ (GeeCollection* self, gpointer item, gboolean changed) {
+	gboolean result = FALSE;
+	gboolean _tmp0_;
+	gconstpointer _tmp1_;
+	gboolean _tmp2_ = FALSE;
+	_tmp0_ = changed;
+	_tmp1_ = item;
+	_tmp2_ = gee_collection_remove (self, _tmp1_);
+	result = _tmp0_ | _tmp2_;
+	((item == NULL) || (GEE_COLLECTION_GET_INTERFACE (self)->get_g_destroy_func (self) == NULL)) ? NULL : (item = (GEE_COLLECTION_GET_INTERFACE (self)->get_g_destroy_func (self) (item), NULL));
+	return result;
+}
+
+
+static gpointer ___lambda17__gee_fold_func (gpointer g, gpointer a, gpointer self) {
+	gpointer result;
+	result = __lambda17_ (self, g, a);
+	return result;
+}
+
+
+static gboolean gee_collection_real_remove_all (GeeCollection* self, GeeCollection* collection) {
+	gboolean result = FALSE;
+	GeeCollection* _tmp0_;
+	gpointer _tmp1_ = NULL;
+	g_return_val_if_fail (collection != NULL, FALSE);
+	_tmp0_ = collection;
+	_tmp1_ = gee_traversable_fold ((GeeTraversable*) _tmp0_, G_TYPE_BOOLEAN, NULL, NULL, ___lambda17__gee_fold_func, self, (gpointer) ((gintptr) FALSE));
+	result = (gboolean) ((gintptr) _tmp1_);
+	return result;
+}
+
+
 gboolean gee_collection_remove_all (GeeCollection* self, GeeCollection* collection) {
 	g_return_val_if_fail (self != NULL, FALSE);
 	return GEE_COLLECTION_GET_INTERFACE (self)->remove_all (self, collection);
@@ -260,6 +464,60 @@ gboolean gee_collection_remove_all (GeeCollection* self, GeeCollection* collecti
  *
  * @return     ``true`` if the collection has been changed, ``false`` otherwise
  */
+static gboolean gee_collection_real_retain_all (GeeCollection* self, GeeCollection* collection) {
+	gboolean result = FALSE;
+	gboolean changed;
+	g_return_val_if_fail (collection != NULL, FALSE);
+	changed = FALSE;
+	{
+		GeeIterator* _tmp0_ = NULL;
+		GeeIterator* iter;
+		_tmp0_ = gee_iterable_iterator ((GeeIterable*) self);
+		iter = _tmp0_;
+		{
+			gboolean _tmp1_;
+			_tmp1_ = TRUE;
+			while (TRUE) {
+				gboolean _tmp2_;
+				GeeIterator* _tmp3_;
+				gboolean _tmp4_ = FALSE;
+				GeeIterator* _tmp5_;
+				gpointer _tmp6_ = NULL;
+				gpointer item;
+				GeeCollection* _tmp7_;
+				gconstpointer _tmp8_;
+				gboolean _tmp9_ = FALSE;
+				_tmp2_ = _tmp1_;
+				if (!_tmp2_) {
+				}
+				_tmp1_ = FALSE;
+				_tmp3_ = iter;
+				_tmp4_ = gee_iterator_next (_tmp3_);
+				if (!_tmp4_) {
+					break;
+				}
+				_tmp5_ = iter;
+				_tmp6_ = gee_iterator_get (_tmp5_);
+				item = _tmp6_;
+				_tmp7_ = collection;
+				_tmp8_ = item;
+				_tmp9_ = gee_collection_contains (_tmp7_, _tmp8_);
+				if (!_tmp9_) {
+					GeeIterator* _tmp10_;
+					_tmp10_ = iter;
+					gee_iterator_remove (_tmp10_);
+					changed = TRUE;
+				}
+				((item == NULL) || (GEE_COLLECTION_GET_INTERFACE (self)->get_g_destroy_func (self) == NULL)) ? NULL : (item = (GEE_COLLECTION_GET_INTERFACE (self)->get_g_destroy_func (self) (item), NULL));
+			}
+		}
+		_g_object_unref0 (iter);
+	}
+	result = changed;
+	return result;
+}
+
+
 gboolean gee_collection_retain_all (GeeCollection* self, GeeCollection* collection) {
 	g_return_val_if_fail (self != NULL, FALSE);
 	return GEE_COLLECTION_GET_INTERFACE (self)->retain_all (self, collection);
@@ -271,9 +529,1182 @@ gboolean gee_collection_retain_all (GeeCollection* self, GeeCollection* collecti
  *
  * @return an array containing all of items from this collection
  */
+static gpointer* gee_collection_real_to_array (GeeCollection* self, int* result_length1) {
+	gpointer* result = NULL;
+	GType t;
+	GType _tmp0_;
+	t = GEE_COLLECTION_GET_INTERFACE (self)->get_g_type (self);
+	_tmp0_ = t;
+	if (_tmp0_ == G_TYPE_BOOLEAN) {
+		gint _tmp1_ = 0;
+		gboolean* _tmp2_ = NULL;
+		gpointer* _tmp3_;
+		gint _tmp3__length1;
+		_tmp2_ = gee_collection_to_bool_array (G_TYPE_CHECK_INSTANCE_CAST (self, GEE_TYPE_COLLECTION, GeeCollection), &_tmp1_);
+		_tmp3_ = (gpointer*) _tmp2_;
+		_tmp3__length1 = (_tmp1_ * sizeof (gboolean)) / sizeof (gpointer);
+		if (result_length1) {
+			*result_length1 = _tmp3__length1;
+		}
+		result = _tmp3_;
+		return result;
+	} else {
+		GType _tmp4_;
+		_tmp4_ = t;
+		if (_tmp4_ == G_TYPE_CHAR) {
+			gint _tmp5_ = 0;
+			gchar* _tmp6_ = NULL;
+			gpointer* _tmp7_;
+			gint _tmp7__length1;
+			_tmp6_ = gee_collection_to_char_array (G_TYPE_CHECK_INSTANCE_CAST (self, GEE_TYPE_COLLECTION, GeeCollection), &_tmp5_);
+			_tmp7_ = (gpointer*) _tmp6_;
+			_tmp7__length1 = (_tmp5_ * sizeof (gchar)) / sizeof (gpointer);
+			if (result_length1) {
+				*result_length1 = _tmp7__length1;
+			}
+			result = _tmp7_;
+			return result;
+		} else {
+			GType _tmp8_;
+			_tmp8_ = t;
+			if (_tmp8_ == G_TYPE_UCHAR) {
+				gint _tmp9_ = 0;
+				guchar* _tmp10_ = NULL;
+				gpointer* _tmp11_;
+				gint _tmp11__length1;
+				_tmp10_ = gee_collection_to_uchar_array (G_TYPE_CHECK_INSTANCE_CAST (self, GEE_TYPE_COLLECTION, GeeCollection), &_tmp9_);
+				_tmp11_ = (gpointer*) _tmp10_;
+				_tmp11__length1 = (_tmp9_ * sizeof (guchar)) / sizeof (gpointer);
+				if (result_length1) {
+					*result_length1 = _tmp11__length1;
+				}
+				result = _tmp11_;
+				return result;
+			} else {
+				GType _tmp12_;
+				_tmp12_ = t;
+				if (_tmp12_ == G_TYPE_INT) {
+					gint _tmp13_ = 0;
+					gint* _tmp14_ = NULL;
+					gpointer* _tmp15_;
+					gint _tmp15__length1;
+					_tmp14_ = gee_collection_to_int_array (G_TYPE_CHECK_INSTANCE_CAST (self, GEE_TYPE_COLLECTION, GeeCollection), &_tmp13_);
+					_tmp15_ = (gpointer*) _tmp14_;
+					_tmp15__length1 = (_tmp13_ * sizeof (gint)) / sizeof (gpointer);
+					if (result_length1) {
+						*result_length1 = _tmp15__length1;
+					}
+					result = _tmp15_;
+					return result;
+				} else {
+					GType _tmp16_;
+					_tmp16_ = t;
+					if (_tmp16_ == G_TYPE_UINT) {
+						gint _tmp17_ = 0;
+						guint* _tmp18_ = NULL;
+						gpointer* _tmp19_;
+						gint _tmp19__length1;
+						_tmp18_ = gee_collection_to_uint_array (G_TYPE_CHECK_INSTANCE_CAST (self, GEE_TYPE_COLLECTION, GeeCollection), &_tmp17_);
+						_tmp19_ = (gpointer*) _tmp18_;
+						_tmp19__length1 = (_tmp17_ * sizeof (guint)) / sizeof (gpointer);
+						if (result_length1) {
+							*result_length1 = _tmp19__length1;
+						}
+						result = _tmp19_;
+						return result;
+					} else {
+						GType _tmp20_;
+						_tmp20_ = t;
+						if (_tmp20_ == G_TYPE_INT64) {
+							gint _tmp21_ = 0;
+							gint64* _tmp22_ = NULL;
+							gpointer* _tmp23_;
+							gint _tmp23__length1;
+							_tmp22_ = gee_collection_to_int64_array (G_TYPE_CHECK_INSTANCE_CAST (self, GEE_TYPE_COLLECTION, GeeCollection), &_tmp21_);
+							_tmp23_ = (gpointer*) _tmp22_;
+							_tmp23__length1 = (_tmp21_ * sizeof (gint64)) / sizeof (gpointer);
+							if (result_length1) {
+								*result_length1 = _tmp23__length1;
+							}
+							result = _tmp23_;
+							return result;
+						} else {
+							GType _tmp24_;
+							_tmp24_ = t;
+							if (_tmp24_ == G_TYPE_UINT64) {
+								gint _tmp25_ = 0;
+								guint64* _tmp26_ = NULL;
+								gpointer* _tmp27_;
+								gint _tmp27__length1;
+								_tmp26_ = gee_collection_to_uint64_array (G_TYPE_CHECK_INSTANCE_CAST (self, GEE_TYPE_COLLECTION, GeeCollection), &_tmp25_);
+								_tmp27_ = (gpointer*) _tmp26_;
+								_tmp27__length1 = (_tmp25_ * sizeof (guint64)) / sizeof (gpointer);
+								if (result_length1) {
+									*result_length1 = _tmp27__length1;
+								}
+								result = _tmp27_;
+								return result;
+							} else {
+								GType _tmp28_;
+								_tmp28_ = t;
+								if (_tmp28_ == G_TYPE_LONG) {
+									gint _tmp29_ = 0;
+									glong* _tmp30_ = NULL;
+									gpointer* _tmp31_;
+									gint _tmp31__length1;
+									_tmp30_ = gee_collection_to_long_array (G_TYPE_CHECK_INSTANCE_CAST (self, GEE_TYPE_COLLECTION, GeeCollection), &_tmp29_);
+									_tmp31_ = (gpointer*) _tmp30_;
+									_tmp31__length1 = (_tmp29_ * sizeof (glong)) / sizeof (gpointer);
+									if (result_length1) {
+										*result_length1 = _tmp31__length1;
+									}
+									result = _tmp31_;
+									return result;
+								} else {
+									GType _tmp32_;
+									_tmp32_ = t;
+									if (_tmp32_ == G_TYPE_ULONG) {
+										gint _tmp33_ = 0;
+										gulong* _tmp34_ = NULL;
+										gpointer* _tmp35_;
+										gint _tmp35__length1;
+										_tmp34_ = gee_collection_to_ulong_array (G_TYPE_CHECK_INSTANCE_CAST (self, GEE_TYPE_COLLECTION, GeeCollection), &_tmp33_);
+										_tmp35_ = (gpointer*) _tmp34_;
+										_tmp35__length1 = (_tmp33_ * sizeof (gulong)) / sizeof (gpointer);
+										if (result_length1) {
+											*result_length1 = _tmp35__length1;
+										}
+										result = _tmp35_;
+										return result;
+									} else {
+										GType _tmp36_;
+										_tmp36_ = t;
+										if (_tmp36_ == G_TYPE_FLOAT) {
+											gint _tmp37_ = 0;
+											gfloat** _tmp38_ = NULL;
+											gpointer* _tmp39_;
+											gint _tmp39__length1;
+											_tmp38_ = gee_collection_to_float_array (G_TYPE_CHECK_INSTANCE_CAST (self, GEE_TYPE_COLLECTION, GeeCollection), &_tmp37_);
+											_tmp39_ = (gpointer*) _tmp38_;
+											_tmp39__length1 = (_tmp37_ * sizeof (gfloat*)) / sizeof (gpointer);
+											if (result_length1) {
+												*result_length1 = _tmp39__length1;
+											}
+											result = _tmp39_;
+											return result;
+										} else {
+											GType _tmp40_;
+											_tmp40_ = t;
+											if (_tmp40_ == G_TYPE_DOUBLE) {
+												gint _tmp41_ = 0;
+												gdouble** _tmp42_ = NULL;
+												gpointer* _tmp43_;
+												gint _tmp43__length1;
+												_tmp42_ = gee_collection_to_double_array (G_TYPE_CHECK_INSTANCE_CAST (self, GEE_TYPE_COLLECTION, GeeCollection), &_tmp41_);
+												_tmp43_ = (gpointer*) _tmp42_;
+												_tmp43__length1 = (_tmp41_ * sizeof (gdouble*)) / sizeof (gpointer);
+												if (result_length1) {
+													*result_length1 = _tmp43__length1;
+												}
+												result = _tmp43_;
+												return result;
+											} else {
+												gint _tmp44_;
+												gint _tmp45_;
+												gpointer* _tmp46_ = NULL;
+												gpointer* array;
+												gint array_length1;
+												gint _array_size_;
+												gint index;
+												gpointer* _tmp57_;
+												gint _tmp57__length1;
+												_tmp44_ = gee_collection_get_size (self);
+												_tmp45_ = _tmp44_;
+												_tmp46_ = g_new0 (gpointer, _tmp45_);
+												array = _tmp46_;
+												array_length1 = _tmp45_;
+												_array_size_ = array_length1;
+												index = 0;
+												{
+													GeeIterator* _tmp47_ = NULL;
+													GeeIterator* _element_it;
+													_tmp47_ = gee_iterable_iterator ((GeeIterable*) self);
+													_element_it = _tmp47_;
+													while (TRUE) {
+														GeeIterator* _tmp48_;
+														gboolean _tmp49_ = FALSE;
+														GeeIterator* _tmp50_;
+														gpointer _tmp51_ = NULL;
+														gpointer element;
+														gpointer* _tmp52_;
+														gint _tmp52__length1;
+														gint _tmp53_;
+														gconstpointer _tmp54_;
+														gpointer _tmp55_;
+														gpointer _tmp56_;
+														_tmp48_ = _element_it;
+														_tmp49_ = gee_iterator_next (_tmp48_);
+														if (!_tmp49_) {
+															break;
+														}
+														_tmp50_ = _element_it;
+														_tmp51_ = gee_iterator_get (_tmp50_);
+														element = _tmp51_;
+														_tmp52_ = array;
+														_tmp52__length1 = array_length1;
+														_tmp53_ = index;
+														index = _tmp53_ + 1;
+														_tmp54_ = element;
+														_tmp55_ = ((_tmp54_ != NULL) && (GEE_COLLECTION_GET_INTERFACE (self)->get_g_dup_func (self) != NULL)) ? GEE_COLLECTION_GET_INTERFACE (self)->get_g_dup_func (self) ((gpointer) _tmp54_) : ((gpointer) _tmp54_);
+														((_tmp52_[_tmp53_] == NULL) || (GEE_COLLECTION_GET_INTERFACE (self)->get_g_destroy_func (self) == NULL)) ? NULL : (_tmp52_[_tmp53_] = (GEE_COLLECTION_GET_INTERFACE (self)->get_g_destroy_func (self) (_tmp52_[_tmp53_]), NULL));
+														_tmp52_[_tmp53_] = _tmp55_;
+														_tmp56_ = _tmp52_[_tmp53_];
+														((element == NULL) || (GEE_COLLECTION_GET_INTERFACE (self)->get_g_destroy_func (self) == NULL)) ? NULL : (element = (GEE_COLLECTION_GET_INTERFACE (self)->get_g_destroy_func (self) (element), NULL));
+													}
+													_g_object_unref0 (_element_it);
+												}
+												_tmp57_ = array;
+												_tmp57__length1 = array_length1;
+												if (result_length1) {
+													*result_length1 = _tmp57__length1;
+												}
+												result = _tmp57_;
+												return result;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
 gpointer* gee_collection_to_array (GeeCollection* self, int* result_length1) {
 	g_return_val_if_fail (self != NULL, NULL);
 	return GEE_COLLECTION_GET_INTERFACE (self)->to_array (self, result_length1);
+}
+
+
+/**
+ * Adds all items in the input array to this collection.
+ *
+ * @param array the array which items will be added to this
+ *              collection.
+ *
+ * @return     ``true`` if the collection has been changed, ``false`` otherwise
+ */
+gboolean gee_collection_add_all_array (GeeCollection* self, gpointer* array, int array_length1) {
+	gboolean result = FALSE;
+	gboolean changed;
+	gpointer* _tmp0_;
+	gint _tmp0__length1;
+	changed = FALSE;
+	_tmp0_ = array;
+	_tmp0__length1 = array_length1;
+	{
+		gpointer* item_collection = NULL;
+		gint item_collection_length1 = 0;
+		gint _item_collection_size_ = 0;
+		gint item_it = 0;
+		item_collection = _tmp0_;
+		item_collection_length1 = _tmp0__length1;
+		for (item_it = 0; item_it < _tmp0__length1; item_it = item_it + 1) {
+			gconstpointer item = NULL;
+			item = item_collection[item_it];
+			{
+				gboolean _tmp1_;
+				gconstpointer _tmp2_;
+				gboolean _tmp3_ = FALSE;
+				_tmp1_ = changed;
+				_tmp2_ = item;
+				_tmp3_ = gee_collection_add (self, _tmp2_);
+				changed = _tmp1_ | _tmp3_;
+			}
+		}
+	}
+	result = changed;
+	return result;
+}
+
+
+/**
+ * Returns ``true`` it this collection contains all items as the input
+ * array.
+ *
+ * @param array the array which items will be compared with
+ *              this collection.
+ *
+ * @return     ``true`` if the collection has been changed, ``false`` otherwise
+ */
+gboolean gee_collection_contains_all_array (GeeCollection* self, gpointer* array, int array_length1) {
+	gboolean result = FALSE;
+	gpointer* _tmp0_;
+	gint _tmp0__length1;
+	_tmp0_ = array;
+	_tmp0__length1 = array_length1;
+	{
+		gpointer* item_collection = NULL;
+		gint item_collection_length1 = 0;
+		gint _item_collection_size_ = 0;
+		gint item_it = 0;
+		item_collection = _tmp0_;
+		item_collection_length1 = _tmp0__length1;
+		for (item_it = 0; item_it < _tmp0__length1; item_it = item_it + 1) {
+			gconstpointer item = NULL;
+			item = item_collection[item_it];
+			{
+				gconstpointer _tmp1_;
+				gboolean _tmp2_ = FALSE;
+				_tmp1_ = item;
+				_tmp2_ = gee_collection_contains (self, _tmp1_);
+				if (!_tmp2_) {
+					result = FALSE;
+					return result;
+				}
+			}
+		}
+	}
+	result = TRUE;
+	return result;
+}
+
+
+/**
+ * Removes the subset of items in this collection corresponding to the
+ * elments in the input array. If there is several occurrences of
+ * the same value in this collection they are decremented of the number
+ * of occurrences in the input array.
+ *
+ * @param array the array which items will be compared with
+ *              this collection.
+ *
+ * @return     ``true`` if the collection has been changed, ``false`` otherwise
+ */
+gboolean gee_collection_remove_all_array (GeeCollection* self, gpointer* array, int array_length1) {
+	gboolean result = FALSE;
+	gboolean changed;
+	gpointer* _tmp0_;
+	gint _tmp0__length1;
+	changed = FALSE;
+	_tmp0_ = array;
+	_tmp0__length1 = array_length1;
+	{
+		gpointer* item_collection = NULL;
+		gint item_collection_length1 = 0;
+		gint _item_collection_size_ = 0;
+		gint item_it = 0;
+		item_collection = _tmp0_;
+		item_collection_length1 = _tmp0__length1;
+		for (item_it = 0; item_it < _tmp0__length1; item_it = item_it + 1) {
+			gconstpointer item = NULL;
+			item = item_collection[item_it];
+			{
+				gboolean _tmp1_;
+				gconstpointer _tmp2_;
+				gboolean _tmp3_ = FALSE;
+				_tmp1_ = changed;
+				_tmp2_ = item;
+				_tmp3_ = gee_collection_remove (self, _tmp2_);
+				changed = _tmp1_ | _tmp3_;
+			}
+		}
+	}
+	result = changed;
+	return result;
+}
+
+
+static gboolean* gee_collection_to_bool_array (GeeCollection* coll, int* result_length1) {
+	gboolean* result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	gboolean* _tmp3_ = NULL;
+	gboolean* array;
+	gint array_length1;
+	gint _array_size_;
+	gint index;
+	gboolean* _tmp14_;
+	gint _tmp14__length1;
+	g_return_val_if_fail (coll != NULL, NULL);
+	_tmp0_ = coll;
+	_tmp1_ = gee_collection_get_size (_tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = g_new0 (gboolean, _tmp2_);
+	array = _tmp3_;
+	array_length1 = _tmp2_;
+	_array_size_ = array_length1;
+	index = 0;
+	{
+		GeeCollection* _tmp4_;
+		GeeIterator* _tmp5_ = NULL;
+		GeeIterator* _element_it;
+		_tmp4_ = coll;
+		_tmp5_ = gee_iterable_iterator ((GeeIterable*) _tmp4_);
+		_element_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			gboolean element;
+			gboolean* _tmp10_;
+			gint _tmp10__length1;
+			gint _tmp11_;
+			gboolean _tmp12_;
+			gboolean _tmp13_;
+			_tmp6_ = _element_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _element_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			element = (gboolean) ((gintptr) _tmp9_);
+			_tmp10_ = array;
+			_tmp10__length1 = array_length1;
+			_tmp11_ = index;
+			index = _tmp11_ + 1;
+			_tmp12_ = element;
+			_tmp10_[_tmp11_] = _tmp12_;
+			_tmp13_ = _tmp10_[_tmp11_];
+		}
+		_g_object_unref0 (_element_it);
+	}
+	_tmp14_ = array;
+	_tmp14__length1 = array_length1;
+	if (result_length1) {
+		*result_length1 = _tmp14__length1;
+	}
+	result = _tmp14_;
+	return result;
+}
+
+
+static gchar* gee_collection_to_char_array (GeeCollection* coll, int* result_length1) {
+	gchar* result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	gchar* _tmp3_ = NULL;
+	gchar* array;
+	gint array_length1;
+	gint _array_size_;
+	gint index;
+	gchar* _tmp14_;
+	gint _tmp14__length1;
+	g_return_val_if_fail (coll != NULL, NULL);
+	_tmp0_ = coll;
+	_tmp1_ = gee_collection_get_size (_tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = g_new0 (gchar, _tmp2_);
+	array = _tmp3_;
+	array_length1 = _tmp2_;
+	_array_size_ = array_length1;
+	index = 0;
+	{
+		GeeCollection* _tmp4_;
+		GeeIterator* _tmp5_ = NULL;
+		GeeIterator* _element_it;
+		_tmp4_ = coll;
+		_tmp5_ = gee_iterable_iterator ((GeeIterable*) _tmp4_);
+		_element_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			gchar element;
+			gchar* _tmp10_;
+			gint _tmp10__length1;
+			gint _tmp11_;
+			gchar _tmp12_;
+			gchar _tmp13_;
+			_tmp6_ = _element_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _element_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			element = (gchar) ((gintptr) _tmp9_);
+			_tmp10_ = array;
+			_tmp10__length1 = array_length1;
+			_tmp11_ = index;
+			index = _tmp11_ + 1;
+			_tmp12_ = element;
+			_tmp10_[_tmp11_] = _tmp12_;
+			_tmp13_ = _tmp10_[_tmp11_];
+		}
+		_g_object_unref0 (_element_it);
+	}
+	_tmp14_ = array;
+	_tmp14__length1 = array_length1;
+	if (result_length1) {
+		*result_length1 = _tmp14__length1;
+	}
+	result = _tmp14_;
+	return result;
+}
+
+
+static guchar* gee_collection_to_uchar_array (GeeCollection* coll, int* result_length1) {
+	guchar* result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	guchar* _tmp3_ = NULL;
+	guchar* array;
+	gint array_length1;
+	gint _array_size_;
+	gint index;
+	guchar* _tmp14_;
+	gint _tmp14__length1;
+	g_return_val_if_fail (coll != NULL, NULL);
+	_tmp0_ = coll;
+	_tmp1_ = gee_collection_get_size (_tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = g_new0 (guchar, _tmp2_);
+	array = _tmp3_;
+	array_length1 = _tmp2_;
+	_array_size_ = array_length1;
+	index = 0;
+	{
+		GeeCollection* _tmp4_;
+		GeeIterator* _tmp5_ = NULL;
+		GeeIterator* _element_it;
+		_tmp4_ = coll;
+		_tmp5_ = gee_iterable_iterator ((GeeIterable*) _tmp4_);
+		_element_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			guchar element;
+			guchar* _tmp10_;
+			gint _tmp10__length1;
+			gint _tmp11_;
+			guchar _tmp12_;
+			guchar _tmp13_;
+			_tmp6_ = _element_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _element_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			element = (guchar) ((guintptr) _tmp9_);
+			_tmp10_ = array;
+			_tmp10__length1 = array_length1;
+			_tmp11_ = index;
+			index = _tmp11_ + 1;
+			_tmp12_ = element;
+			_tmp10_[_tmp11_] = _tmp12_;
+			_tmp13_ = _tmp10_[_tmp11_];
+		}
+		_g_object_unref0 (_element_it);
+	}
+	_tmp14_ = array;
+	_tmp14__length1 = array_length1;
+	if (result_length1) {
+		*result_length1 = _tmp14__length1;
+	}
+	result = _tmp14_;
+	return result;
+}
+
+
+static gint* gee_collection_to_int_array (GeeCollection* coll, int* result_length1) {
+	gint* result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	gint* _tmp3_ = NULL;
+	gint* array;
+	gint array_length1;
+	gint _array_size_;
+	gint index;
+	gint* _tmp14_;
+	gint _tmp14__length1;
+	g_return_val_if_fail (coll != NULL, NULL);
+	_tmp0_ = coll;
+	_tmp1_ = gee_collection_get_size (_tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = g_new0 (gint, _tmp2_);
+	array = _tmp3_;
+	array_length1 = _tmp2_;
+	_array_size_ = array_length1;
+	index = 0;
+	{
+		GeeCollection* _tmp4_;
+		GeeIterator* _tmp5_ = NULL;
+		GeeIterator* _element_it;
+		_tmp4_ = coll;
+		_tmp5_ = gee_iterable_iterator ((GeeIterable*) _tmp4_);
+		_element_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			gint element;
+			gint* _tmp10_;
+			gint _tmp10__length1;
+			gint _tmp11_;
+			gint _tmp12_;
+			gint _tmp13_;
+			_tmp6_ = _element_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _element_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			element = (gint) ((gintptr) _tmp9_);
+			_tmp10_ = array;
+			_tmp10__length1 = array_length1;
+			_tmp11_ = index;
+			index = _tmp11_ + 1;
+			_tmp12_ = element;
+			_tmp10_[_tmp11_] = _tmp12_;
+			_tmp13_ = _tmp10_[_tmp11_];
+		}
+		_g_object_unref0 (_element_it);
+	}
+	_tmp14_ = array;
+	_tmp14__length1 = array_length1;
+	if (result_length1) {
+		*result_length1 = _tmp14__length1;
+	}
+	result = _tmp14_;
+	return result;
+}
+
+
+static guint* gee_collection_to_uint_array (GeeCollection* coll, int* result_length1) {
+	guint* result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	guint* _tmp3_ = NULL;
+	guint* array;
+	gint array_length1;
+	gint _array_size_;
+	gint index;
+	guint* _tmp14_;
+	gint _tmp14__length1;
+	g_return_val_if_fail (coll != NULL, NULL);
+	_tmp0_ = coll;
+	_tmp1_ = gee_collection_get_size (_tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = g_new0 (guint, _tmp2_);
+	array = _tmp3_;
+	array_length1 = _tmp2_;
+	_array_size_ = array_length1;
+	index = 0;
+	{
+		GeeCollection* _tmp4_;
+		GeeIterator* _tmp5_ = NULL;
+		GeeIterator* _element_it;
+		_tmp4_ = coll;
+		_tmp5_ = gee_iterable_iterator ((GeeIterable*) _tmp4_);
+		_element_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			guint element;
+			guint* _tmp10_;
+			gint _tmp10__length1;
+			gint _tmp11_;
+			guint _tmp12_;
+			guint _tmp13_;
+			_tmp6_ = _element_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _element_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			element = (guint) ((guintptr) _tmp9_);
+			_tmp10_ = array;
+			_tmp10__length1 = array_length1;
+			_tmp11_ = index;
+			index = _tmp11_ + 1;
+			_tmp12_ = element;
+			_tmp10_[_tmp11_] = _tmp12_;
+			_tmp13_ = _tmp10_[_tmp11_];
+		}
+		_g_object_unref0 (_element_it);
+	}
+	_tmp14_ = array;
+	_tmp14__length1 = array_length1;
+	if (result_length1) {
+		*result_length1 = _tmp14__length1;
+	}
+	result = _tmp14_;
+	return result;
+}
+
+
+static gint64* gee_collection_to_int64_array (GeeCollection* coll, int* result_length1) {
+	gint64* result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	gint64* _tmp3_ = NULL;
+	gint64* array;
+	gint array_length1;
+	gint _array_size_;
+	gint index;
+	gint64* _tmp16_;
+	gint _tmp16__length1;
+	g_return_val_if_fail (coll != NULL, NULL);
+	_tmp0_ = coll;
+	_tmp1_ = gee_collection_get_size (_tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = g_new0 (gint64, _tmp2_);
+	array = _tmp3_;
+	array_length1 = _tmp2_;
+	_array_size_ = array_length1;
+	index = 0;
+	{
+		GeeCollection* _tmp4_;
+		GeeIterator* _tmp5_ = NULL;
+		GeeIterator* _element_it;
+		_tmp4_ = coll;
+		_tmp5_ = gee_iterable_iterator ((GeeIterable*) _tmp4_);
+		_element_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			gint64* _tmp10_;
+			gint64 _tmp11_;
+			gint64 element;
+			gint64* _tmp12_;
+			gint _tmp12__length1;
+			gint _tmp13_;
+			gint64 _tmp14_;
+			gint64 _tmp15_;
+			_tmp6_ = _element_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _element_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			_tmp10_ = (gint64*) _tmp9_;
+			_tmp11_ = *_tmp10_;
+			_g_free0 (_tmp10_);
+			element = _tmp11_;
+			_tmp12_ = array;
+			_tmp12__length1 = array_length1;
+			_tmp13_ = index;
+			index = _tmp13_ + 1;
+			_tmp14_ = element;
+			_tmp12_[_tmp13_] = _tmp14_;
+			_tmp15_ = _tmp12_[_tmp13_];
+		}
+		_g_object_unref0 (_element_it);
+	}
+	_tmp16_ = array;
+	_tmp16__length1 = array_length1;
+	if (result_length1) {
+		*result_length1 = _tmp16__length1;
+	}
+	result = _tmp16_;
+	return result;
+}
+
+
+static guint64* gee_collection_to_uint64_array (GeeCollection* coll, int* result_length1) {
+	guint64* result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	guint64* _tmp3_ = NULL;
+	guint64* array;
+	gint array_length1;
+	gint _array_size_;
+	gint index;
+	guint64* _tmp16_;
+	gint _tmp16__length1;
+	g_return_val_if_fail (coll != NULL, NULL);
+	_tmp0_ = coll;
+	_tmp1_ = gee_collection_get_size (_tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = g_new0 (guint64, _tmp2_);
+	array = _tmp3_;
+	array_length1 = _tmp2_;
+	_array_size_ = array_length1;
+	index = 0;
+	{
+		GeeCollection* _tmp4_;
+		GeeIterator* _tmp5_ = NULL;
+		GeeIterator* _element_it;
+		_tmp4_ = coll;
+		_tmp5_ = gee_iterable_iterator ((GeeIterable*) _tmp4_);
+		_element_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			guint64* _tmp10_;
+			guint64 _tmp11_;
+			guint64 element;
+			guint64* _tmp12_;
+			gint _tmp12__length1;
+			gint _tmp13_;
+			guint64 _tmp14_;
+			guint64 _tmp15_;
+			_tmp6_ = _element_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _element_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			_tmp10_ = (guint64*) _tmp9_;
+			_tmp11_ = *_tmp10_;
+			_g_free0 (_tmp10_);
+			element = _tmp11_;
+			_tmp12_ = array;
+			_tmp12__length1 = array_length1;
+			_tmp13_ = index;
+			index = _tmp13_ + 1;
+			_tmp14_ = element;
+			_tmp12_[_tmp13_] = _tmp14_;
+			_tmp15_ = _tmp12_[_tmp13_];
+		}
+		_g_object_unref0 (_element_it);
+	}
+	_tmp16_ = array;
+	_tmp16__length1 = array_length1;
+	if (result_length1) {
+		*result_length1 = _tmp16__length1;
+	}
+	result = _tmp16_;
+	return result;
+}
+
+
+static glong* gee_collection_to_long_array (GeeCollection* coll, int* result_length1) {
+	glong* result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	glong* _tmp3_ = NULL;
+	glong* array;
+	gint array_length1;
+	gint _array_size_;
+	gint index;
+	glong* _tmp14_;
+	gint _tmp14__length1;
+	g_return_val_if_fail (coll != NULL, NULL);
+	_tmp0_ = coll;
+	_tmp1_ = gee_collection_get_size (_tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = g_new0 (glong, _tmp2_);
+	array = _tmp3_;
+	array_length1 = _tmp2_;
+	_array_size_ = array_length1;
+	index = 0;
+	{
+		GeeCollection* _tmp4_;
+		GeeIterator* _tmp5_ = NULL;
+		GeeIterator* _element_it;
+		_tmp4_ = coll;
+		_tmp5_ = gee_iterable_iterator ((GeeIterable*) _tmp4_);
+		_element_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			glong element;
+			glong* _tmp10_;
+			gint _tmp10__length1;
+			gint _tmp11_;
+			glong _tmp12_;
+			glong _tmp13_;
+			_tmp6_ = _element_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _element_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			element = (glong) ((gintptr) _tmp9_);
+			_tmp10_ = array;
+			_tmp10__length1 = array_length1;
+			_tmp11_ = index;
+			index = _tmp11_ + 1;
+			_tmp12_ = element;
+			_tmp10_[_tmp11_] = _tmp12_;
+			_tmp13_ = _tmp10_[_tmp11_];
+		}
+		_g_object_unref0 (_element_it);
+	}
+	_tmp14_ = array;
+	_tmp14__length1 = array_length1;
+	if (result_length1) {
+		*result_length1 = _tmp14__length1;
+	}
+	result = _tmp14_;
+	return result;
+}
+
+
+static gulong* gee_collection_to_ulong_array (GeeCollection* coll, int* result_length1) {
+	gulong* result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	gulong* _tmp3_ = NULL;
+	gulong* array;
+	gint array_length1;
+	gint _array_size_;
+	gint index;
+	gulong* _tmp14_;
+	gint _tmp14__length1;
+	g_return_val_if_fail (coll != NULL, NULL);
+	_tmp0_ = coll;
+	_tmp1_ = gee_collection_get_size (_tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = g_new0 (gulong, _tmp2_);
+	array = _tmp3_;
+	array_length1 = _tmp2_;
+	_array_size_ = array_length1;
+	index = 0;
+	{
+		GeeCollection* _tmp4_;
+		GeeIterator* _tmp5_ = NULL;
+		GeeIterator* _element_it;
+		_tmp4_ = coll;
+		_tmp5_ = gee_iterable_iterator ((GeeIterable*) _tmp4_);
+		_element_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			gulong element;
+			gulong* _tmp10_;
+			gint _tmp10__length1;
+			gint _tmp11_;
+			gulong _tmp12_;
+			gulong _tmp13_;
+			_tmp6_ = _element_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _element_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			element = (gulong) ((guintptr) _tmp9_);
+			_tmp10_ = array;
+			_tmp10__length1 = array_length1;
+			_tmp11_ = index;
+			index = _tmp11_ + 1;
+			_tmp12_ = element;
+			_tmp10_[_tmp11_] = _tmp12_;
+			_tmp13_ = _tmp10_[_tmp11_];
+		}
+		_g_object_unref0 (_element_it);
+	}
+	_tmp14_ = array;
+	_tmp14__length1 = array_length1;
+	if (result_length1) {
+		*result_length1 = _tmp14__length1;
+	}
+	result = _tmp14_;
+	return result;
+}
+
+
+static gfloat* _float_dup (gfloat* self) {
+	gfloat* dup;
+	dup = g_new0 (gfloat, 1);
+	memcpy (dup, self, sizeof (gfloat));
+	return dup;
+}
+
+
+static gpointer __float_dup0 (gpointer self) {
+	return self ? _float_dup (self) : NULL;
+}
+
+
+static gfloat** gee_collection_to_float_array (GeeCollection* coll, int* result_length1) {
+	gfloat** result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	gfloat** _tmp3_ = NULL;
+	gfloat** array;
+	gint array_length1;
+	gint _array_size_;
+	gint index;
+	gfloat** _tmp17_;
+	gint _tmp17__length1;
+	g_return_val_if_fail (coll != NULL, NULL);
+	_tmp0_ = coll;
+	_tmp1_ = gee_collection_get_size (_tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = g_new0 (gfloat*, _tmp2_);
+	array = _tmp3_;
+	array_length1 = _tmp2_;
+	_array_size_ = array_length1;
+	index = 0;
+	{
+		GeeCollection* _tmp4_;
+		GeeIterator* _tmp5_ = NULL;
+		GeeIterator* _element_it;
+		_tmp4_ = coll;
+		_tmp5_ = gee_iterable_iterator ((GeeIterable*) _tmp4_);
+		_element_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			gfloat* _tmp10_;
+			gfloat _tmp11_;
+			gfloat element;
+			gfloat** _tmp12_;
+			gint _tmp12__length1;
+			gint _tmp13_;
+			gfloat _tmp14_;
+			gfloat* _tmp15_;
+			gfloat* _tmp16_;
+			_tmp6_ = _element_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _element_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			_tmp10_ = (gfloat*) _tmp9_;
+			_tmp11_ = *_tmp10_;
+			_g_free0 (_tmp10_);
+			element = _tmp11_;
+			_tmp12_ = array;
+			_tmp12__length1 = array_length1;
+			_tmp13_ = index;
+			index = _tmp13_ + 1;
+			_tmp14_ = element;
+			_tmp15_ = __float_dup0 (&_tmp14_);
+			_g_free0 (_tmp12_[_tmp13_]);
+			_tmp12_[_tmp13_] = _tmp15_;
+			_tmp16_ = _tmp12_[_tmp13_];
+		}
+		_g_object_unref0 (_element_it);
+	}
+	_tmp17_ = array;
+	_tmp17__length1 = array_length1;
+	if (result_length1) {
+		*result_length1 = _tmp17__length1;
+	}
+	result = _tmp17_;
+	return result;
+}
+
+
+static gdouble* _double_dup (gdouble* self) {
+	gdouble* dup;
+	dup = g_new0 (gdouble, 1);
+	memcpy (dup, self, sizeof (gdouble));
+	return dup;
+}
+
+
+static gpointer __double_dup0 (gpointer self) {
+	return self ? _double_dup (self) : NULL;
+}
+
+
+static gdouble** gee_collection_to_double_array (GeeCollection* coll, int* result_length1) {
+	gdouble** result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	gdouble** _tmp3_ = NULL;
+	gdouble** array;
+	gint array_length1;
+	gint _array_size_;
+	gint index;
+	gdouble** _tmp17_;
+	gint _tmp17__length1;
+	g_return_val_if_fail (coll != NULL, NULL);
+	_tmp0_ = coll;
+	_tmp1_ = gee_collection_get_size (_tmp0_);
+	_tmp2_ = _tmp1_;
+	_tmp3_ = g_new0 (gdouble*, _tmp2_);
+	array = _tmp3_;
+	array_length1 = _tmp2_;
+	_array_size_ = array_length1;
+	index = 0;
+	{
+		GeeCollection* _tmp4_;
+		GeeIterator* _tmp5_ = NULL;
+		GeeIterator* _element_it;
+		_tmp4_ = coll;
+		_tmp5_ = gee_iterable_iterator ((GeeIterable*) _tmp4_);
+		_element_it = _tmp5_;
+		while (TRUE) {
+			GeeIterator* _tmp6_;
+			gboolean _tmp7_ = FALSE;
+			GeeIterator* _tmp8_;
+			gpointer _tmp9_ = NULL;
+			gdouble* _tmp10_;
+			gdouble _tmp11_;
+			gdouble element;
+			gdouble** _tmp12_;
+			gint _tmp12__length1;
+			gint _tmp13_;
+			gdouble _tmp14_;
+			gdouble* _tmp15_;
+			gdouble* _tmp16_;
+			_tmp6_ = _element_it;
+			_tmp7_ = gee_iterator_next (_tmp6_);
+			if (!_tmp7_) {
+				break;
+			}
+			_tmp8_ = _element_it;
+			_tmp9_ = gee_iterator_get (_tmp8_);
+			_tmp10_ = (gdouble*) _tmp9_;
+			_tmp11_ = *_tmp10_;
+			_g_free0 (_tmp10_);
+			element = _tmp11_;
+			_tmp12_ = array;
+			_tmp12__length1 = array_length1;
+			_tmp13_ = index;
+			index = _tmp13_ + 1;
+			_tmp14_ = element;
+			_tmp15_ = __double_dup0 (&_tmp14_);
+			_g_free0 (_tmp12_[_tmp13_]);
+			_tmp12_[_tmp13_] = _tmp15_;
+			_tmp16_ = _tmp12_[_tmp13_];
+		}
+		_g_object_unref0 (_element_it);
+	}
+	_tmp17_ = array;
+	_tmp17__length1 = array_length1;
+	if (result_length1) {
+		*result_length1 = _tmp17__length1;
+	}
+	result = _tmp17_;
+	return result;
 }
 
 
@@ -289,7 +1720,7 @@ GeeCollection* gee_collection_empty (GType g_type, GBoxedCopyFunc g_dup_func, GD
 	GeeSet* _tmp2_;
 	GeeSet* _tmp3_;
 	GeeCollection* _tmp4_;
-	_tmp0_ = gee_hash_set_new (g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func, NULL, NULL);
+	_tmp0_ = gee_hash_set_new (g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func, NULL, NULL, NULL, NULL, NULL, NULL);
 	_tmp1_ = _tmp0_;
 	_tmp2_ = gee_abstract_set_get_read_only_view ((GeeAbstractSet*) _tmp1_);
 	_tmp3_ = _tmp2_;
@@ -312,6 +1743,25 @@ gboolean gee_collection_get_is_empty (GeeCollection* self) {
 }
 
 
+static gboolean gee_collection_real_get_is_empty (GeeCollection* base) {
+	gboolean result;
+	GeeCollection* self;
+	gint _tmp0_;
+	gint _tmp1_;
+	self = base;
+	_tmp0_ = gee_collection_get_size (self);
+	_tmp1_ = _tmp0_;
+	result = _tmp1_ == 0;
+	return result;
+}
+
+
+gboolean gee_collection_get_read_only (GeeCollection* self) {
+	g_return_val_if_fail (self != NULL, FALSE);
+	return GEE_COLLECTION_GET_INTERFACE (self)->get_read_only (self);
+}
+
+
 GeeCollection* gee_collection_get_read_only_view (GeeCollection* self) {
 	g_return_val_if_fail (self != NULL, NULL);
 	return GEE_COLLECTION_GET_INTERFACE (self)->get_read_only_view (self);
@@ -327,13 +1777,20 @@ static void gee_collection_base_init (GeeCollectionIface * iface) {
 		 */
 		g_object_interface_install_property (iface, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 		/**
-		 * Specifies whether this collection is empty.
+		 * Specifies whether this collection can change - i.e. wheather {@link add},
+		 * {@link remove} etc. are legal operations.
 		 */
-		g_object_interface_install_property (iface, g_param_spec_boolean ("is-empty", "is-empty", "is-empty", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+		g_object_interface_install_property (iface, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 		/**
 		 * The read-only view of this collection.
 		 */
 		g_object_interface_install_property (iface, g_param_spec_object ("read-only-view", "read-only-view", "read-only-view", GEE_TYPE_COLLECTION, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+		iface->add_all = gee_collection_real_add_all;
+		iface->contains_all = gee_collection_real_contains_all;
+		iface->remove_all = gee_collection_real_remove_all;
+		iface->retain_all = gee_collection_real_retain_all;
+		iface->to_array = gee_collection_real_to_array;
+		iface->get_is_empty = gee_collection_real_get_is_empty;
 	}
 }
 
@@ -351,6 +1808,24 @@ GType gee_collection_get_type (void) {
 		g_once_init_leave (&gee_collection_type_id__volatile, gee_collection_type_id);
 	}
 	return gee_collection_type_id__volatile;
+}
+
+
+static void _vala_array_destroy (gpointer array, gint array_length, GDestroyNotify destroy_func) {
+	if ((array != NULL) && (destroy_func != NULL)) {
+		int i;
+		for (i = 0; i < array_length; i = i + 1) {
+			if (((gpointer*) array)[i] != NULL) {
+				destroy_func (((gpointer*) array)[i]);
+			}
+		}
+	}
+}
+
+
+static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify destroy_func) {
+	_vala_array_destroy (array, array_length, destroy_func);
+	g_free (array);
 }
 
 

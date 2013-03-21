@@ -1,25 +1,22 @@
 include $(top_srcdir)/Makefile.decl
 
-NULL =
-
-AM_CPPFLAGS = \
-	-I$(top_srcdir)/gee \
-	$(GLIB_CFLAGS) \
-	$(NULL)
-
 noinst_PROGRAMS = $(TEST_PROGS)
 
-progs_ldadd = $(GLIB_LIBS) ../gee/libgee.la
-
-BUILT_SOURCES = tests.vala.stamp
-
 TEST_PROGS += tests
-tests_VALASOURCES = \
+
+tests_SOURCES = \
        testarraylist.vala \
+       testarrayqueue.vala \
+       testbidirlist.vala \
+       testbidirsortedset.vala \
+       testbidirsortedmap.vala \
        testcase.vala \
        testcollection.vala \
-       testcomparable.vala \
+       testconcurrentlist.vala \
+       testconcurrentset.vala \
+       testdata.vala \
        testdeque.vala \
+       testfunctions.vala \
        testhashmap.vala \
        testhashmultimap.vala \
        testhashmultiset.vala \
@@ -33,26 +30,39 @@ tests_VALASOURCES = \
        testmultiset.vala \
        testpriorityqueue.vala \
        testqueue.vala \
+       testreadonlybidirlist.vala \
        testreadonlycollection.vala \
        testreadonlylist.vala \
        testreadonlymap.vala \
        testreadonlyset.vala \
        testset.vala \
        testsortedset.vala \
+       testsortedmap.vala \
        testtreemap.vala \
        testtreemultimap.vala \
        testtreemultiset.vala \
        testtreeset.vala \
        $(NULL)
 
-tests_DEPENDENCIES = $(top_srcdir)/gee/gee-1.0.vapi
+tests_DEPENDENCIES = \
+	$(top_srcdir)/gee/gee-0.8.vapi \
+	$(NULL)
 
-tests_SOURCES = tests.vala.stamp $(tests_VALASOURCES:.vala=.c)
-tests.vala.stamp: $(tests_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir $(top_srcdir)/gee --pkg gee-1.0 --pkg posix $^
-	touch $@
-tests_LDADD = $(progs_ldadd)
-EXTRA_DIST += $(tests_VALASOURCES)
+tests_VALAFLAGS = \
+	--basedir $(top_srcdir) \
+	--vapidir $(top_srcdir)/gee \
+	--pkg gee-0.8 --pkg posix \
+	$(VALAFLAGS) \
+	$(NULL)
+
+tests_CPPFLAGS = \
+	-I$(top_srcdir)/gee \
+	$(GLIB_CFLAGS) \
+	$(NULL)
+
+tests_LDADD = \
+	$(GLIB_LIBS) ../gee/libgee-0.8.la \
+	$(NULL)
 
 coverage-reset:
 	lcov --base-directory=@top_srcdir@ --directory @top_srcdir@/gee --zerocounters
@@ -75,11 +85,6 @@ coverage-report:
 	@echo 'lcov report can be found in:'
 	@echo 'file://@abs_top_builddir@/tests/coverage/index.html'
 	@echo
-
-MAINTAINERCLEANFILES = \
-	$(tests_VALASOURCES:.vala=.c) \
-	tests.vala.stamp \
-	$(NULL)
 
 clean-local:
 	-rm -rf coverage

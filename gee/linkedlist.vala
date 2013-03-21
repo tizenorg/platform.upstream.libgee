@@ -32,7 +32,7 @@
  *
  * @see ArrayList
  */
-public class Gee.LinkedList<G> : AbstractList<G>, Queue<G>, Deque<G> {
+public class Gee.LinkedList<G> : AbstractBidirList<G>, Queue<G>, Deque<G> {
 	private int _size = 0;
 	private int _stamp = 0;
 	private Node<G>? _head = null;
@@ -41,7 +41,8 @@ public class Gee.LinkedList<G> : AbstractList<G>, Queue<G>, Deque<G> {
 	/**
 	 * The elements' equality testing function.
 	 */
-	public EqualFunc equal_func { private set; get; }
+	[CCode (notify = false)]
+	public EqualDataFunc<G> equal_func { private set; get; }
 
 	/**
 	 * Constructs a new, empty linked list.
@@ -51,7 +52,7 @@ public class Gee.LinkedList<G> : AbstractList<G>, Queue<G>, Deque<G> {
 	 *
 	 * @param equal_func an optional element equality testing function
 	 */
-	public LinkedList (EqualFunc? equal_func = null) {
+	public LinkedList (owned EqualDataFunc<G>? equal_func = null) {
 		if (equal_func == null) {
 			equal_func = Functions.get_equal_func_for (typeof (G));
 		}
@@ -60,6 +61,18 @@ public class Gee.LinkedList<G> : AbstractList<G>, Queue<G>, Deque<G> {
 	
 	~LinkedList () {
 		this.clear ();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public override bool foreach(ForallFunc<G> f) {
+		for (weak Node<G>? node = _head; node != null; node = node.next) {
+			if (!f (node.data)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -79,8 +92,22 @@ public class Gee.LinkedList<G> : AbstractList<G>, Queue<G>, Deque<G> {
 	/**
 	 * {@inheritDoc}
 	 */
+	public override BidirListIterator<G> bidir_list_iterator () {
+		return new Iterator<G> (this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public override int size {
 		get { return this._size; }
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public override bool read_only {
+		get { return false; }
 	}
 
 	/**
@@ -166,17 +193,13 @@ public class Gee.LinkedList<G> : AbstractList<G>, Queue<G>, Deque<G> {
 	 * {@inheritDoc}
 	 */
 	public override int index_of (G item) {
-		int result = -1;
 		int idx = 0;
-		foreach (G node_item in this) {
-			if (this.equal_func (item, node_item)) {
-				result = idx;
-				break;
-			} else {
-				idx++;
+		for (weak Node<G>? node = _head; node != null; node = node.next, idx++) {
+			if (this.equal_func (item, node.data)) {
+				return idx;
 			}
 		}
-		return result;
+		return -1;
 	}
 
 	/**
@@ -247,7 +270,7 @@ public class Gee.LinkedList<G> : AbstractList<G>, Queue<G>, Deque<G> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public override G first () {
+	public G first () {
 		assert (_size > 0);
 		return _head.data;
 	}
@@ -255,7 +278,7 @@ public class Gee.LinkedList<G> : AbstractList<G>, Queue<G>, Deque<G> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public override G last () {
+	public G last () {
 		assert (_size > 0);
 		return _tail.data;
 	}
@@ -406,7 +429,7 @@ public class Gee.LinkedList<G> : AbstractList<G>, Queue<G>, Deque<G> {
 		}
 	}
 
-	private class Iterator<G> : Object, Gee.Iterator<G>, BidirIterator<G>, ListIterator<G> {
+	private class Iterator<G> : Object, Traversable<G>, Gee.Iterator<G>, BidirIterator<G>, ListIterator<G>, BidirListIterator<G> {
 		private bool started = false;
 		private bool removed = false;
 		private unowned Node<G>? position;
@@ -424,18 +447,30 @@ public class Gee.LinkedList<G> : AbstractList<G>, Queue<G>, Deque<G> {
 		public bool next () {
 			assert (this._stamp == this._list._stamp);
 
-			if (this.removed && this.position != null) {
-				this.removed = false;
-				return true;
-			} else if (!this.started && this._list._head != null) {
-				this.started = true;
-				this.position = this._list._head;
-				this._index++;
-				return true;
-			} else if (this.position != null && this.position.next != null) {
-				this.position = this.position.next;
-				this._index++;
-				return true;
+			if (this.removed) {
+				if (this.position != null) {
+					this.removed = false;
+					return true;
+				} else {
+					return false;
+				}
+			} else if (!this.started) {
+				if (this._list._head != null) {
+					this.started = true;
+					this.position = this._list._head;
+					this._index++;
+					return true;
+				} else {
+					return false;
+				}
+			} else if (this.position != null) {
+				if (this.position.next != null) {
+					this.position = this.position.next;
+					this._index++;
+					return true;
+				} else {
+					return false;
+				}
 			}
 			return false;
 		}
@@ -577,6 +612,36 @@ public class Gee.LinkedList<G> : AbstractList<G>, Queue<G>, Deque<G> {
 			assert (this.position != null);
 
 			return this._index;
+		}
+		
+		public bool read_only {
+			get {
+				return false;
+			}
+		}
+		
+		public bool valid {
+			get {
+				return !this.removed && this.position != null;
+			}
+		}
+
+		public bool foreach (ForallFunc<G> f) {
+			assert (_stamp == _list._stamp);
+			if (!started) {
+				position = _list._head;
+				if (position != null)
+					started = true;
+			}
+			removed = false;
+			while (position != null) {
+				if (!f (position.data)) {
+					return false;
+				}
+				position = position.next;
+			}
+			position = _list._tail;
+			return true;
 		}
 	}
 

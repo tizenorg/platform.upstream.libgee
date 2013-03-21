@@ -111,7 +111,7 @@ enum  {
 HashMultiMapTests* hash_multi_map_tests_new (void);
 HashMultiMapTests* hash_multi_map_tests_construct (GType object_type);
 MultiMapTests* multi_map_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 static void hash_multi_map_tests_test_selected_functions (HashMultiMapTests* self);
 static void _hash_multi_map_tests_test_selected_functions_gee_test_case_test_method (gpointer self);
 static void hash_multi_map_tests_real_set_up (GeeTestCase* base);
@@ -126,7 +126,7 @@ static void _hash_multi_map_tests_test_selected_functions_gee_test_case_test_met
 HashMultiMapTests* hash_multi_map_tests_construct (GType object_type) {
 	HashMultiMapTests * self = NULL;
 	self = (HashMultiMapTests*) multi_map_tests_construct (object_type, "HashMultiMap");
-	gee_test_case_add_test ((GeeTestCase*) self, "[HashMultiMap] selected functions", _hash_multi_map_tests_test_selected_functions_gee_test_case_test_method, self);
+	gee_test_case_add_test ((GeeTestCase*) self, "[HashMultiMap] selected functions", _hash_multi_map_tests_test_selected_functions_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 
@@ -140,7 +140,7 @@ static void hash_multi_map_tests_real_set_up (GeeTestCase* base) {
 	HashMultiMapTests * self;
 	GeeHashMultiMap* _tmp0_;
 	self = (HashMultiMapTests*) base;
-	_tmp0_ = gee_hash_multi_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL, NULL);
+	_tmp0_ = gee_hash_multi_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 	_g_object_unref0 (((MultiMapTests*) self)->test_multi_map);
 	((MultiMapTests*) self)->test_multi_map = (GeeMultiMap*) _tmp0_;
 }
@@ -163,39 +163,11 @@ static void hash_multi_map_tests_test_selected_functions (HashMultiMapTests* sel
 	GeeMultiMap* _tmp0_;
 	GeeHashMultiMap* _tmp1_;
 	GeeHashMultiMap* test_hash_multi_map;
-	GHashFunc _tmp2_;
-	GHashFunc _tmp3_;
-	GHashFunc _tmp4_;
-	GEqualFunc _tmp5_;
-	GEqualFunc _tmp6_;
-	GEqualFunc _tmp7_;
-	GHashFunc _tmp8_;
-	GHashFunc _tmp9_;
-	GHashFunc _tmp10_;
-	GEqualFunc _tmp11_;
-	GEqualFunc _tmp12_;
-	GEqualFunc _tmp13_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = ((MultiMapTests*) self)->test_multi_map;
 	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_HASH_MULTI_MAP) ? ((GeeHashMultiMap*) _tmp0_) : NULL);
 	test_hash_multi_map = _tmp1_;
 	_vala_assert (test_hash_multi_map != NULL, "test_hash_multi_map != null");
-	_tmp2_ = gee_hash_multi_map_get_key_hash_func (test_hash_multi_map);
-	_tmp3_ = _tmp2_;
-	_tmp4_ = g_str_hash;
-	_vala_assert (_tmp3_ == _tmp4_, "test_hash_multi_map.key_hash_func == str_hash");
-	_tmp5_ = gee_hash_multi_map_get_key_equal_func (test_hash_multi_map);
-	_tmp6_ = _tmp5_;
-	_tmp7_ = g_str_equal;
-	_vala_assert (_tmp6_ == _tmp7_, "test_hash_multi_map.key_equal_func == str_equal");
-	_tmp8_ = gee_hash_multi_map_get_value_hash_func (test_hash_multi_map);
-	_tmp9_ = _tmp8_;
-	_tmp10_ = g_str_hash;
-	_vala_assert (_tmp9_ == _tmp10_, "test_hash_multi_map.value_hash_func == str_hash");
-	_tmp11_ = gee_hash_multi_map_get_value_equal_func (test_hash_multi_map);
-	_tmp12_ = _tmp11_;
-	_tmp13_ = g_str_equal;
-	_vala_assert (_tmp12_ == _tmp13_, "test_hash_multi_map.value_equal_func == str_equal");
 	_g_object_unref0 (test_hash_multi_map);
 }
 

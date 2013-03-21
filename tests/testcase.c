@@ -115,17 +115,17 @@ enum  {
 	GEE_TEST_CASE_DUMMY_PROPERTY
 };
 GeeTestCase* gee_test_case_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
-static GeeTestCaseAdaptor* gee_test_case_adaptor_new (const gchar* name, GeeTestCaseTestMethod test, void* test_target, GeeTestCase* test_case);
-static GeeTestCaseAdaptor* gee_test_case_adaptor_construct (GType object_type, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GeeTestCase* test_case);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
+static GeeTestCaseAdaptor* gee_test_case_adaptor_new (const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify, GeeTestCase* test_case);
+static GeeTestCaseAdaptor* gee_test_case_adaptor_construct (GType object_type, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify, GeeTestCase* test_case);
 static void _vala_array_add1 (GeeTestCaseAdaptor*** array, int* length, int* size, GeeTestCaseAdaptor* value);
 static const gchar* gee_test_case_adaptor_get_name (GeeTestCaseAdaptor* self);
 static void gee_test_case_adaptor_set_up (GeeTestCaseAdaptor* self, void* fixture);
-static void _gee_test_case_adaptor_set_up_gtest_func (void* fixture, gpointer self);
+static void _gee_test_case_adaptor_set_up_gtest_fixture_func (void* fixture, gpointer self);
 static void gee_test_case_adaptor_run (GeeTestCaseAdaptor* self, void* fixture);
-static void _gee_test_case_adaptor_run_gtest_func (void* fixture, gpointer self);
+static void _gee_test_case_adaptor_run_gtest_fixture_func (void* fixture, gpointer self);
 static void gee_test_case_adaptor_tear_down (GeeTestCaseAdaptor* self, void* fixture);
-static void _gee_test_case_adaptor_tear_down_gtest_func (void* fixture, gpointer self);
+static void _gee_test_case_adaptor_tear_down_gtest_fixture_func (void* fixture, gpointer self);
 void gee_test_case_set_up (GeeTestCase* self);
 static void gee_test_case_real_set_up (GeeTestCase* self);
 void gee_test_case_tear_down (GeeTestCase* self);
@@ -170,25 +170,26 @@ static void _vala_array_add1 (GeeTestCaseAdaptor*** array, int* length, int* siz
 }
 
 
-static void _gee_test_case_adaptor_set_up_gtest_func (void* fixture, gpointer self) {
+static void _gee_test_case_adaptor_set_up_gtest_fixture_func (void* fixture, gpointer self) {
 	gee_test_case_adaptor_set_up (self, fixture);
 }
 
 
-static void _gee_test_case_adaptor_run_gtest_func (void* fixture, gpointer self) {
+static void _gee_test_case_adaptor_run_gtest_fixture_func (void* fixture, gpointer self) {
 	gee_test_case_adaptor_run (self, fixture);
 }
 
 
-static void _gee_test_case_adaptor_tear_down_gtest_func (void* fixture, gpointer self) {
+static void _gee_test_case_adaptor_tear_down_gtest_fixture_func (void* fixture, gpointer self) {
 	gee_test_case_adaptor_tear_down (self, fixture);
 }
 
 
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target) {
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify) {
 	const gchar* _tmp0_;
 	GeeTestCaseTestMethod _tmp1_;
 	void* _tmp1__target;
+	GDestroyNotify _tmp1__target_destroy_notify;
 	GeeTestCaseAdaptor* _tmp2_;
 	GeeTestCaseAdaptor* adaptor;
 	GeeTestCaseAdaptor** _tmp3_;
@@ -203,7 +204,9 @@ void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTe
 	_tmp0_ = name;
 	_tmp1_ = test;
 	_tmp1__target = test_target;
-	_tmp2_ = gee_test_case_adaptor_new (_tmp0_, _tmp1_, _tmp1__target, self);
+	_tmp1__target_destroy_notify = test_target_destroy_notify;
+	test_target_destroy_notify = NULL;
+	_tmp2_ = gee_test_case_adaptor_new (_tmp0_, _tmp1_, _tmp1__target, _tmp1__target_destroy_notify, self);
 	adaptor = _tmp2_;
 	_tmp3_ = self->priv->adaptors;
 	_tmp3__length1 = self->priv->adaptors_length1;
@@ -212,9 +215,13 @@ void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTe
 	_tmp5_ = self->priv->suite;
 	_tmp6_ = gee_test_case_adaptor_get_name (adaptor);
 	_tmp7_ = _tmp6_;
-	_tmp8_ = g_test_create_case (_tmp7_, (gsize) 0, adaptor, (void (*) (void)) _gee_test_case_adaptor_set_up_gtest_func, (void (*) (void)) _gee_test_case_adaptor_run_gtest_func, (void (*) (void)) _gee_test_case_adaptor_tear_down_gtest_func);
+	_tmp8_ = g_test_create_case (_tmp7_, (gsize) 0, adaptor, _gee_test_case_adaptor_set_up_gtest_fixture_func, _gee_test_case_adaptor_run_gtest_fixture_func, _gee_test_case_adaptor_tear_down_gtest_fixture_func);
 	g_test_suite_add (_tmp5_, _tmp8_);
 	_gee_test_case_adaptor_unref0 (adaptor);
+	(test_target_destroy_notify == NULL) ? NULL : (test_target_destroy_notify (test_target), NULL);
+	test = NULL;
+	test_target = NULL;
+	test_target_destroy_notify = NULL;
 }
 
 
@@ -253,11 +260,12 @@ static gpointer _g_object_ref0 (gpointer self) {
 }
 
 
-static GeeTestCaseAdaptor* gee_test_case_adaptor_construct (GType object_type, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GeeTestCase* test_case) {
+static GeeTestCaseAdaptor* gee_test_case_adaptor_construct (GType object_type, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify, GeeTestCase* test_case) {
 	GeeTestCaseAdaptor* self = NULL;
 	const gchar* _tmp0_;
 	GeeTestCaseTestMethod _tmp1_;
 	void* _tmp1__target;
+	GDestroyNotify _tmp1__target_destroy_notify;
 	GeeTestCase* _tmp2_;
 	GeeTestCase* _tmp3_;
 	g_return_val_if_fail (name != NULL, NULL);
@@ -267,23 +275,29 @@ static GeeTestCaseAdaptor* gee_test_case_adaptor_construct (GType object_type, c
 	gee_test_case_adaptor_set_name (self, _tmp0_);
 	_tmp1_ = test;
 	_tmp1__target = test_target;
+	_tmp1__target_destroy_notify = test_target_destroy_notify;
+	test_target_destroy_notify = NULL;
 	(self->priv->test_target_destroy_notify == NULL) ? NULL : (self->priv->test_target_destroy_notify (self->priv->test_target), NULL);
 	self->priv->test = NULL;
 	self->priv->test_target = NULL;
 	self->priv->test_target_destroy_notify = NULL;
 	self->priv->test = _tmp1_;
 	self->priv->test_target = _tmp1__target;
-	self->priv->test_target_destroy_notify = NULL;
+	self->priv->test_target_destroy_notify = _tmp1__target_destroy_notify;
 	_tmp2_ = test_case;
 	_tmp3_ = _g_object_ref0 (_tmp2_);
 	_g_object_unref0 (self->priv->test_case);
 	self->priv->test_case = _tmp3_;
+	(test_target_destroy_notify == NULL) ? NULL : (test_target_destroy_notify (test_target), NULL);
+	test = NULL;
+	test_target = NULL;
+	test_target_destroy_notify = NULL;
 	return self;
 }
 
 
-static GeeTestCaseAdaptor* gee_test_case_adaptor_new (const gchar* name, GeeTestCaseTestMethod test, void* test_target, GeeTestCase* test_case) {
-	return gee_test_case_adaptor_construct (GEE_TEST_CASE_TYPE_ADAPTOR, name, test, test_target, test_case);
+static GeeTestCaseAdaptor* gee_test_case_adaptor_new (const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify, GeeTestCase* test_case) {
+	return gee_test_case_adaptor_construct (GEE_TEST_CASE_TYPE_ADAPTOR, name, test, test_target, test_target_destroy_notify, test_case);
 }
 
 

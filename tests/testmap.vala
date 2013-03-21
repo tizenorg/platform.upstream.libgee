@@ -1,7 +1,7 @@
 /* testmap.vala
  *
- * Copyright (C) 2008  Jürg Billeter, Maciej Piechotka
- * Copyright (C) 2009  Didier Villevalois, Julien Peeters
+ * Copyright (C) 2008  Jürg Billeter
+ * Copyright (C) 2009  Didier Villevalois, Julien Peeters, Maciej Piechotka
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,6 +39,8 @@ public abstract class MapTests : Gee.TestCase {
 		add_test ("[Map] unset all", test_unset_all);
 		add_test ("[Map] has all", test_has_all);
 		add_test ("[Map] GObject properties", test_gobject_properties);
+		add_test ("[Map] fold", test_fold);
+		add_test ("[Map] foreach", test_foreach);
 	}
 
 	protected Map<string, string> test_map;
@@ -314,9 +316,7 @@ public abstract class MapTests : Gee.TestCase {
 	}
 
 	public void test_set_all () {
-		var another_map = new HashMap<string,string> (str_hash,
-		                                              str_equal,
-		                                              str_equal);
+		var another_map = new HashMap<string,string> ();
 
 		test_map.set ("one", "value_of_one");
 		test_map.set ("two", "value_of_two");
@@ -344,9 +344,7 @@ public abstract class MapTests : Gee.TestCase {
 	}
 
 	public void test_unset_all () {
-		var another_map = new HashMap<string,string> (str_hash,
-		                                              str_equal,
-		                                              str_equal);
+		var another_map = new HashMap<string,string> ();
 
 		// Check unset all on empty maps.
 		assert (test_map.is_empty);
@@ -431,9 +429,7 @@ public abstract class MapTests : Gee.TestCase {
 	}
 
 	public void test_has_all () {
-		var another_map = new HashMap<string,string> (str_hash,
-		                                              str_equal,
-		                                              str_equal);
+		var another_map = new HashMap<string,string> ();
 
 		// Check empty.
 		assert (test_map.has_all (another_map));
@@ -523,27 +519,67 @@ public abstract class MapTests : Gee.TestCase {
 		assert (test_map != null);
 		Value value;
 
-		value = Value (typeof (bool));
-		test_map.get_property ("is-empty", ref value);
-		assert (value.get_boolean () == test_map.is_empty);
-		value.unset ();
-
 		value = Value (typeof (int));
 		test_map.get_property ("size", ref value);
 		assert (value.get_int () == test_map.size);
 		value.unset ();
 	}
 
+	public void test_fold () {
+		test_map.set ("one", "one");
+		test_map.set ("two", "two");
+		test_map.set ("three", "three");
+		
+		int count;
+		
+		count = test_map.map_iterator ().fold<int> ((x, y, z) => {return z + 1;}, 0);
+		assert (count == 3);
+		
+		var iter = test_map.map_iterator ();
+		assert (iter.next ());
+		count = iter.fold<int> ((x, y, z) => {return z + 1;}, 0);
+		assert (count == 3);
+	}
+	
+	public void test_foreach () {
+		test_map.set ("one", "one");
+		test_map.set ("two", "two");
+		test_map.set ("three", "three");
+		
+		int count = 0;
+		
+		test_map.map_iterator ().foreach ((x, y) => {count++; return true;});
+		assert (count == 3);
+		
+		var iter = test_map.map_iterator ();
+		assert (iter.next ());
+		iter.foreach ((x, y) => {count++; return true;});
+		assert (count == 6);
+	}
 
-
-	public class TestEntry<K,V> : Map.Entry<K,V> {
+	public static Map.Entry<string,string> entry_for (string key, string value) {
+		return new TestEntry<string,string> (key, value);
+	}
+	
+	public static bool check_entry (owned Map.Entry<string,string> e, string key, string value) {
+		return e.key == key && e.value == value;
+	}
+	
+	public static void assert_entry (Map.Entry<string,string> e, string key, string value) {
+		assert (e.key == key);
+		assert (e.value == value);
+	}
+	
+	private class TestEntry<K,V> : Map.Entry<K,V> {
 		public TestEntry (K key, V value) {
 			this._key = key;
 			this.value = value;
 		}
-
+		
 		public override K key { get {return _key; } }
 		private K _key;
 		public override V value { get; set; }
+		public override bool read_only { get { return false; } }
 	}
 }
+

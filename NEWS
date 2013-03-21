@@ -1,55 +1,83 @@
-libgee 0.6.6.1
-==============
+libgee 0.9.92
+=============
+ * Fix memory leak in TreeSet and TreeMap
 
- * Rebuild package with fixed Vala compiler
+libgee 0.9.91
+=============
+ * ConcurrentSet implements SortedSet
+ * Fix HashMultiMap, TreeMultiSet constructor
+ * Add add/contains/remove_all working on array
+ * Allow creation of ArrayList from array
+ * Add read_only_view to Gee.MultiSet and Gee.MultiMap
 
-libgee 0.6.6
+libgee 0.9.0
 ============
+ * ConcurrentSet preliminary implementation
+ * Bugfixes from 0.8.2 and 0.8.3
+ * Fix various Vala warnings
+ * First part of test refactoring
 
+libgee 0.8.1
+============
+ * Allow slice in ReadOnlyList
  * Fix Iterator.remove in PriorityQueue
+ * Add foreach specializations
+ * Use foreach function instead of iterators
 
-libgee 0.6.5
+libgee 0.8.0
 ============
+ * Fix Traversable.chop (bug #684348)
+ * Remove unnecessary method
+ * Update README
+ * Move everything to GenericAccessor
 
- * Prevent hashtables from resizing during iteration
+libgee 0.7.90
+=============
+ * Don't notify when constructor property is set
+ * Use views instead of copies in MultiMap as in rest of libgee
+ * Allow early termination in Traversable.foreach
 
-libgee 0.6.4
-============
-
- * Fix compilation with vala master
- * Fix creation of GObject introspection files
-
-libgee 0.6.3
-============
-
- * Fix buffer underflow.
-
-libgee 0.6.2.1
+libgee 0.7.4.1
 ==============
+ * Fix missing property read_only in testmap Entry
 
- * Add check-news to AM_INIT_AUTOMAKE
-
-libgee 0.6.2
+libgee 0.7.4
 ============
+ * Remove *_impl methods
+ * Move virtual methods to interfaces
+ * Future-proof the ABI by adding reserved v-table members
+ * Add read_only to Map.Entry
 
- * Fix adding second element to priority queue.
- * Fix problem with key used in range is freed.
-
-libgee 0.6.1
+libgee 0.7.3
 ============
+ * Update documentation
+ * Fix iteration order in hashtables
+ * Split SortedMap/SortedSet into bi-directional and uni-directional parts
+ * Simplify CompareDataFunc/HashDataFunc/EqualDataFunc
+ * Fix HazardPointers
 
- * Fix memory leaks in LinkedList.
-
-libgee 0.6.0
+libgee 0.7.2
 ============
+ * Require *_type property for all collections
+ * Add ArrayQueue
+ * Few bug fixes
 
- * Fix compiler warning.
-
-libgee 0.5.3
+libgee 0.7.1
 ============
+ * Implement hazard pointers and concurrent linked lists
+ * Respect VALAFLAGS when building tests
+ * Fix a few compiling warnings
 
- * Fix memory leaks in TimSort and LinkedList.
- * Bug fixes in TreeMap and TreeSet.
+libgee 0.7.0
+============
+ * Build system using the automake 1.11 vala support
+ * Move to delegates with targets and move them to Gee namespace
+ * Gee.Hashable interface
+ * Improve Iterator allowing to, among others, query about state of iterator
+ * Allow checking if Iterator or Collection is read-only
+ * Introducing highier-level function via Traversable interface
+ * Introduce support for lazy values
+ * Allow to install in parallel with 0.6
 
 libgee 0.5.2
 ============

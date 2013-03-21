@@ -5,6 +5,7 @@
  *
  * Copyright (C) 2008  Jürg Billeter
  * Copyright (C) 2009  Didier Villevalois, Julien Peeters
+ * Copyright (C) 2011-2012  Maciej Piechotka
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,6 +25,7 @@
  * 	Jürg Billeter <j@bitron.ch>
  * 	Didier 'Ptitjes' Villevalois <ptitjes@free.fr>
  * 	Julien Peeters <contact@julienpeeters.fr>
+ *      Maciej Piechotka <uzytkownik2@gmail.com>
  */
 
 #include <glib.h>
@@ -56,6 +58,10 @@ typedef struct _CollectionTestsClass CollectionTestsClass;
 typedef struct _CollectionTestsPrivate CollectionTestsPrivate;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 #define _g_free0(var) (var = (g_free (var), NULL))
+typedef struct _Block1Data Block1Data;
+typedef struct _Block2Data Block2Data;
+typedef struct _Block3Data Block3Data;
+typedef struct _Block4Data Block4Data;
 #define _vala_assert(expr, msg) if G_LIKELY (expr) ; else g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
 
 struct _GeeTestCase {
@@ -80,6 +86,37 @@ struct _CollectionTestsClass {
 };
 
 typedef void (*GeeTestCaseTestMethod) (void* user_data);
+struct _Block1Data {
+	int _ref_count_;
+	CollectionTests * self;
+	gint count;
+};
+
+struct _Block2Data {
+	int _ref_count_;
+	CollectionTests * self;
+	gboolean one;
+	gboolean two;
+	gboolean three;
+	gint i;
+};
+
+struct _Block3Data {
+	int _ref_count_;
+	CollectionTests * self;
+	gboolean one;
+	gboolean two;
+	gboolean three;
+};
+
+struct _Block4Data {
+	int _ref_count_;
+	CollectionTests * self;
+	gboolean one;
+	gboolean two;
+	gboolean three;
+};
+
 
 static gpointer collection_tests_parent_class = NULL;
 
@@ -90,7 +127,7 @@ enum  {
 };
 CollectionTests* collection_tests_construct (GType object_type, const gchar* name);
 GeeTestCase* gee_test_case_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 void collection_tests_test_type_correctness (CollectionTests* self);
 static void _collection_tests_test_type_correctness_gee_test_case_test_method (gpointer self);
 void collection_tests_test_iterator_returns_all_elements_once (CollectionTests* self);
@@ -115,6 +152,52 @@ void collection_tests_test_to_array (CollectionTests* self);
 static void _collection_tests_test_to_array_gee_test_case_test_method (gpointer self);
 void collection_tests_test_gobject_properties (CollectionTests* self);
 static void _collection_tests_test_gobject_properties_gee_test_case_test_method (gpointer self);
+void collection_tests_test_fold (CollectionTests* self);
+static void _collection_tests_test_fold_gee_test_case_test_method (gpointer self);
+void collection_tests_test_foreach (CollectionTests* self);
+static void _collection_tests_test_foreach_gee_test_case_test_method (gpointer self);
+void collection_tests_test_map (CollectionTests* self);
+static void _collection_tests_test_map_gee_test_case_test_method (gpointer self);
+void collection_tests_test_scan (CollectionTests* self);
+static void _collection_tests_test_scan_gee_test_case_test_method (gpointer self);
+void collection_tests_test_filter (CollectionTests* self);
+static void _collection_tests_test_filter_gee_test_case_test_method (gpointer self);
+void collection_tests_test_chop (CollectionTests* self);
+static void _collection_tests_test_chop_gee_test_case_test_method (gpointer self);
+gchar** test_data_get_data (int* result_length1);
+guint* test_data_get_drawn_numbers (int* result_length1);
+static gint __lambda3_ (CollectionTests* self, gchar* x, gint y);
+static gpointer ___lambda3__gee_fold_func (gpointer g, gpointer a, gpointer self);
+static gint __lambda4_ (CollectionTests* self, gchar* x, gint y);
+static gpointer ___lambda4__gee_fold_func (gpointer g, gpointer a, gpointer self);
+static gint __lambda5_ (CollectionTests* self, gchar* x, gint y);
+static gpointer ___lambda5__gee_fold_func (gpointer g, gpointer a, gpointer self);
+static Block1Data* block1_data_ref (Block1Data* _data1_);
+static void block1_data_unref (void * _userdata_);
+static gboolean __lambda6_ (Block1Data* _data1_, gchar* x);
+static gboolean ___lambda6__gee_forall_func (gpointer g, gpointer self);
+static gboolean __lambda7_ (Block1Data* _data1_, gchar* x);
+static gboolean ___lambda7__gee_forall_func (gpointer g, gpointer self);
+static gboolean __lambda8_ (Block1Data* _data1_, gchar* x);
+static gboolean ___lambda8__gee_forall_func (gpointer g, gpointer self);
+static Block2Data* block2_data_ref (Block2Data* _data2_);
+static void block2_data_unref (void * _userdata_);
+static gint __lambda9_ (Block2Data* _data2_, gchar* str);
+static gpointer ___lambda9__gee_map_func (gpointer g, gpointer self);
+static gint __lambda10_ (Block2Data* _data2_, gchar* str);
+static gpointer ___lambda10__gee_map_func (gpointer g, gpointer self);
+static Block3Data* block3_data_ref (Block3Data* _data3_);
+static void block3_data_unref (void * _userdata_);
+static gint __lambda11_ (Block3Data* _data3_, gchar* str, gint cur);
+static gpointer ___lambda11__gee_fold_func (gpointer g, gpointer a, gpointer self);
+static gint __lambda12_ (Block3Data* _data3_, gchar* str, gint cur);
+static gpointer ___lambda12__gee_fold_func (gpointer g, gpointer a, gpointer self);
+static Block4Data* block4_data_ref (Block4Data* _data4_);
+static void block4_data_unref (void * _userdata_);
+static gboolean __lambda13_ (Block4Data* _data4_, const gchar* str);
+static gboolean ___lambda13__gee_predicate (gconstpointer g, gpointer self);
+static gboolean __lambda14_ (Block4Data* _data4_, const gchar* str);
+static gboolean ___lambda14__gee_predicate (gconstpointer g, gpointer self);
 static void collection_tests_finalize (GObject* obj);
 static void _vala_array_destroy (gpointer array, gint array_length, GDestroyNotify destroy_func);
 static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify destroy_func);
@@ -180,24 +263,60 @@ static void _collection_tests_test_gobject_properties_gee_test_case_test_method 
 }
 
 
+static void _collection_tests_test_fold_gee_test_case_test_method (gpointer self) {
+	collection_tests_test_fold (self);
+}
+
+
+static void _collection_tests_test_foreach_gee_test_case_test_method (gpointer self) {
+	collection_tests_test_foreach (self);
+}
+
+
+static void _collection_tests_test_map_gee_test_case_test_method (gpointer self) {
+	collection_tests_test_map (self);
+}
+
+
+static void _collection_tests_test_scan_gee_test_case_test_method (gpointer self) {
+	collection_tests_test_scan (self);
+}
+
+
+static void _collection_tests_test_filter_gee_test_case_test_method (gpointer self) {
+	collection_tests_test_filter (self);
+}
+
+
+static void _collection_tests_test_chop_gee_test_case_test_method (gpointer self) {
+	collection_tests_test_chop (self);
+}
+
+
 CollectionTests* collection_tests_construct (GType object_type, const gchar* name) {
 	CollectionTests * self = NULL;
 	const gchar* _tmp0_;
 	g_return_val_if_fail (name != NULL, NULL);
 	_tmp0_ = name;
 	self = (CollectionTests*) gee_test_case_construct (object_type, _tmp0_);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] type correctness", _collection_tests_test_type_correctness_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] iterator returns all elements once", _collection_tests_test_iterator_returns_all_elements_once_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] mutable iterator", _collection_tests_test_mutable_iterator_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] contains, size and is_empty", _collection_tests_test_contains_size_and_is_empty_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] add and remove", _collection_tests_test_add_remove_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] clear", _collection_tests_test_clear_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] add_all", _collection_tests_test_add_all_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] contains_all", _collection_tests_test_contains_all_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] remove_all", _collection_tests_test_remove_all_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] retain_all", _collection_tests_test_retain_all_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] to_array", _collection_tests_test_to_array_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] GObject properties", _collection_tests_test_gobject_properties_gee_test_case_test_method, self);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] type correctness", _collection_tests_test_type_correctness_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] iterator returns all elements once", _collection_tests_test_iterator_returns_all_elements_once_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] mutable iterator", _collection_tests_test_mutable_iterator_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] contains, size and is_empty", _collection_tests_test_contains_size_and_is_empty_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] add and remove", _collection_tests_test_add_remove_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] clear", _collection_tests_test_clear_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] add_all", _collection_tests_test_add_all_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] contains_all", _collection_tests_test_contains_all_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] remove_all", _collection_tests_test_remove_all_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] retain_all", _collection_tests_test_retain_all_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] to_array", _collection_tests_test_to_array_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] GObject properties", _collection_tests_test_gobject_properties_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] fold", _collection_tests_test_fold_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] foreach", _collection_tests_test_foreach_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] map", _collection_tests_test_map_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] scan", _collection_tests_test_scan_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] filter", _collection_tests_test_filter_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Collection] chop", _collection_tests_test_chop_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 
@@ -211,7 +330,7 @@ void collection_tests_test_type_correctness (CollectionTests* self) {
 	_tmp0_ = self->test_collection;
 	_vala_assert (_tmp0_ != NULL, "test_collection != null");
 	_tmp1_ = self->test_collection;
-	_tmp2_ = gee_iterable_get_element_type ((GeeIterable*) _tmp1_);
+	_tmp2_ = gee_traversable_get_element_type ((GeeTraversable*) _tmp1_);
 	_tmp3_ = _tmp2_;
 	_vala_assert (_tmp3_ == G_TYPE_STRING, "test_collection.element_type == typeof (string)");
 }
@@ -227,48 +346,19 @@ void collection_tests_test_iterator_returns_all_elements_once (CollectionTests* 
 	gboolean _tmp4_ = FALSE;
 	GeeIterator* _tmp5_;
 	gboolean _tmp6_ = FALSE;
-	GeeIterator* _tmp7_;
-	gboolean _tmp8_ = FALSE;
-	GeeCollection* _tmp9_;
-	gboolean _tmp10_ = FALSE;
-	GeeCollection* _tmp11_;
-	gboolean _tmp12_ = FALSE;
-	GeeCollection* _tmp13_;
-	gboolean _tmp14_ = FALSE;
-	gboolean one_found;
-	gboolean two_found;
-	gboolean three_found;
-	gboolean one_found_once;
-	gboolean two_found_once;
-	gboolean three_found_once;
-	GeeCollection* _tmp15_;
-	GeeIterator* _tmp16_ = NULL;
-	GeeIterator* _tmp31_;
-	gboolean _tmp32_ = FALSE;
-	gboolean _tmp33_;
-	gboolean _tmp34_;
-	GeeIterator* _tmp35_;
-	gboolean _tmp36_ = FALSE;
-	gboolean _tmp37_;
-	gboolean _tmp38_;
-	gboolean _tmp39_;
-	gboolean _tmp40_;
-	gboolean _tmp41_;
-	gboolean _tmp42_;
-	GeeIterator* _tmp43_;
-	gboolean _tmp44_ = FALSE;
-	GeeIterator* _tmp59_;
-	gboolean _tmp60_ = FALSE;
-	gboolean _tmp61_;
-	gboolean _tmp62_;
-	GeeIterator* _tmp63_;
-	gboolean _tmp64_ = FALSE;
-	gboolean _tmp65_;
-	gboolean _tmp66_;
-	gboolean _tmp67_;
-	gboolean _tmp68_;
-	gboolean _tmp69_;
-	gboolean _tmp70_;
+	gint _tmp7_ = 0;
+	gchar** _tmp8_ = NULL;
+	gchar** data;
+	gint data_length1;
+	gint _data_size_;
+	gchar** _tmp9_;
+	gint _tmp9__length1;
+	gchar** _tmp13_;
+	gint _tmp13__length1;
+	guint* _tmp14_ = NULL;
+	guint* found_times;
+	gint found_times_length1;
+	gint _found_times_size_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->test_collection;
 	_vala_assert (_tmp0_ != NULL, "test_collection != null");
@@ -281,196 +371,265 @@ void collection_tests_test_iterator_returns_all_elements_once (CollectionTests* 
 	_tmp5_ = iterator;
 	_tmp6_ = gee_iterator_next (_tmp5_);
 	_vala_assert (!_tmp6_, "! iterator.next ()");
-	_tmp7_ = iterator;
-	_tmp8_ = gee_iterator_first (_tmp7_);
-	_vala_assert (!_tmp8_, "! iterator.first ()");
-	_tmp9_ = self->test_collection;
-	_tmp10_ = gee_collection_add (_tmp9_, "one");
-	_vala_assert (_tmp10_, "test_collection.add (\"one\")");
-	_tmp11_ = self->test_collection;
-	_tmp12_ = gee_collection_add (_tmp11_, "two");
-	_vala_assert (_tmp12_, "test_collection.add (\"two\")");
-	_tmp13_ = self->test_collection;
-	_tmp14_ = gee_collection_add (_tmp13_, "three");
-	_vala_assert (_tmp14_, "test_collection.add (\"three\")");
-	one_found = FALSE;
-	two_found = FALSE;
-	three_found = FALSE;
-	one_found_once = TRUE;
-	two_found_once = TRUE;
-	three_found_once = TRUE;
-	_tmp15_ = self->test_collection;
-	_tmp16_ = gee_iterable_iterator ((GeeIterable*) _tmp15_);
-	_g_object_unref0 (iterator);
-	iterator = _tmp16_;
-	while (TRUE) {
-		GeeIterator* _tmp17_;
-		gboolean _tmp18_ = FALSE;
-		gboolean _tmp19_;
-		GeeIterator* _tmp20_;
-		gboolean _tmp21_ = FALSE;
-		gboolean _tmp22_;
-		GeeIterator* _tmp23_;
-		gpointer _tmp24_ = NULL;
-		gchar* element;
-		const gchar* _tmp25_;
-		_tmp17_ = iterator;
-		_tmp18_ = gee_iterator_has_next (_tmp17_);
-		has_next = _tmp18_;
-		_tmp19_ = has_next;
-		_tmp20_ = iterator;
-		_tmp21_ = gee_iterator_next (_tmp20_);
-		_vala_assert (_tmp19_ == _tmp21_, "has_next == iterator.next ()");
-		_tmp22_ = has_next;
-		if (!_tmp22_) {
-			break;
-		}
-		_tmp23_ = iterator;
-		_tmp24_ = gee_iterator_get (_tmp23_);
-		element = (gchar*) _tmp24_;
-		_tmp25_ = element;
-		if (g_strcmp0 (_tmp25_, "one") == 0) {
-			gboolean _tmp26_;
-			_tmp26_ = one_found;
-			if (_tmp26_) {
-				one_found_once = FALSE;
-			}
-			one_found = TRUE;
-		} else {
-			const gchar* _tmp27_;
-			_tmp27_ = element;
-			if (g_strcmp0 (_tmp27_, "two") == 0) {
-				gboolean _tmp28_;
-				_tmp28_ = two_found;
-				if (_tmp28_) {
-					two_found_once = FALSE;
-				}
-				two_found = TRUE;
-			} else {
-				const gchar* _tmp29_;
-				_tmp29_ = element;
-				if (g_strcmp0 (_tmp29_, "three") == 0) {
-					gboolean _tmp30_;
-					_tmp30_ = three_found;
-					if (_tmp30_) {
-						three_found_once = FALSE;
-					}
-					three_found = TRUE;
-				}
+	_tmp8_ = test_data_get_data (&_tmp7_);
+	data = _tmp8_;
+	data_length1 = _tmp7_;
+	_data_size_ = data_length1;
+	_tmp9_ = data;
+	_tmp9__length1 = data_length1;
+	{
+		gchar** el_collection = NULL;
+		gint el_collection_length1 = 0;
+		gint _el_collection_size_ = 0;
+		gint el_it = 0;
+		el_collection = _tmp9_;
+		el_collection_length1 = _tmp9__length1;
+		for (el_it = 0; el_it < _tmp9__length1; el_it = el_it + 1) {
+			const gchar* el = NULL;
+			el = el_collection[el_it];
+			{
+				GeeCollection* _tmp10_;
+				const gchar* _tmp11_;
+				gboolean _tmp12_ = FALSE;
+				_tmp10_ = self->test_collection;
+				_tmp11_ = el;
+				_tmp12_ = gee_collection_add (_tmp10_, _tmp11_);
+				_vala_assert (_tmp12_, "test_collection.add (el)");
 			}
 		}
-		_g_free0 (element);
 	}
-	_tmp31_ = iterator;
-	_tmp32_ = gee_iterator_has_next (_tmp31_);
-	has_next = _tmp32_;
-	_tmp33_ = has_next;
-	_vala_assert (!_tmp33_, "! has_next");
-	_tmp34_ = has_next;
-	_tmp35_ = iterator;
-	_tmp36_ = gee_iterator_next (_tmp35_);
-	_vala_assert (_tmp34_ == _tmp36_, "has_next == iterator.next ()");
-	_tmp37_ = one_found;
-	_vala_assert (_tmp37_, "one_found");
-	_tmp38_ = one_found_once;
-	_vala_assert (_tmp38_, "one_found_once");
-	_tmp39_ = two_found;
-	_vala_assert (_tmp39_, "two_found");
-	_tmp40_ = two_found_once;
-	_vala_assert (_tmp40_, "two_found_once");
-	_tmp41_ = three_found;
-	_vala_assert (_tmp41_, "three_found");
-	_tmp42_ = three_found_once;
-	_vala_assert (_tmp42_, "three_found_once");
-	_tmp43_ = iterator;
-	_tmp44_ = gee_iterator_first (_tmp43_);
-	_vala_assert (_tmp44_, "iterator.first ()");
-	one_found = FALSE;
-	two_found = FALSE;
-	three_found = FALSE;
-	one_found_once = TRUE;
-	two_found_once = TRUE;
-	three_found_once = TRUE;
-	while (TRUE) {
-		GeeIterator* _tmp45_;
-		gpointer _tmp46_ = NULL;
-		gchar* element;
-		const gchar* _tmp47_;
-		GeeIterator* _tmp53_;
-		gboolean _tmp54_ = FALSE;
-		gboolean _tmp55_;
-		GeeIterator* _tmp56_;
-		gboolean _tmp57_ = FALSE;
-		gboolean _tmp58_;
-		_tmp45_ = iterator;
-		_tmp46_ = gee_iterator_get (_tmp45_);
-		element = (gchar*) _tmp46_;
-		_tmp47_ = element;
-		if (g_strcmp0 (_tmp47_, "one") == 0) {
-			gboolean _tmp48_;
-			_tmp48_ = one_found;
-			if (_tmp48_) {
-				one_found_once = FALSE;
-			}
-			one_found = TRUE;
-		} else {
-			const gchar* _tmp49_;
-			_tmp49_ = element;
-			if (g_strcmp0 (_tmp49_, "two") == 0) {
-				gboolean _tmp50_;
-				_tmp50_ = two_found;
-				if (_tmp50_) {
-					two_found_once = FALSE;
+	_tmp13_ = data;
+	_tmp13__length1 = data_length1;
+	_tmp14_ = g_new0 (guint, _tmp13__length1);
+	found_times = _tmp14_;
+	found_times_length1 = _tmp13__length1;
+	_found_times_size_ = found_times_length1;
+	{
+		guint i;
+		i = (guint) 0;
+		{
+			gboolean _tmp15_;
+			_tmp15_ = TRUE;
+			while (TRUE) {
+				gboolean _tmp16_;
+				guint _tmp18_;
+				GeeCollection* _tmp27_;
+				GeeIterator* _tmp28_ = NULL;
+				GeeIterator* _tmp29_;
+				gboolean _tmp30_;
+				gboolean _tmp31_;
+				gboolean valid;
+				gboolean _tmp32_;
+				GeeIterator* _tmp64_;
+				gboolean _tmp65_ = FALSE;
+				gboolean _tmp66_;
+				GeeIterator* _tmp67_;
+				gboolean _tmp68_;
+				gboolean _tmp69_;
+				gboolean _tmp70_;
+				GeeIterator* _tmp71_;
+				gboolean _tmp72_ = FALSE;
+				GeeIterator* _tmp73_;
+				gboolean _tmp74_;
+				gboolean _tmp75_;
+				guint* _tmp76_;
+				gint _tmp76__length1;
+				_tmp16_ = _tmp15_;
+				if (!_tmp16_) {
+					guint _tmp17_;
+					_tmp17_ = i;
+					i = _tmp17_ + 1;
 				}
-				two_found = TRUE;
-			} else {
-				const gchar* _tmp51_;
-				_tmp51_ = element;
-				if (g_strcmp0 (_tmp51_, "three") == 0) {
-					gboolean _tmp52_;
-					_tmp52_ = three_found;
-					if (_tmp52_) {
-						three_found_once = FALSE;
+				_tmp15_ = FALSE;
+				_tmp18_ = i;
+				if (!(_tmp18_ < ((guint) 2))) {
+					break;
+				}
+				{
+					guint j;
+					j = (guint) 0;
+					{
+						gboolean _tmp19_;
+						_tmp19_ = TRUE;
+						while (TRUE) {
+							gboolean _tmp20_;
+							guint _tmp22_;
+							guint* _tmp23_;
+							gint _tmp23__length1;
+							guint* _tmp24_;
+							gint _tmp24__length1;
+							guint _tmp25_;
+							guint _tmp26_;
+							_tmp20_ = _tmp19_;
+							if (!_tmp20_) {
+								guint _tmp21_;
+								_tmp21_ = j;
+								j = _tmp21_ + 1;
+							}
+							_tmp19_ = FALSE;
+							_tmp22_ = j;
+							_tmp23_ = found_times;
+							_tmp23__length1 = found_times_length1;
+							if (!(_tmp22_ < ((guint) _tmp23__length1))) {
+								break;
+							}
+							_tmp24_ = found_times;
+							_tmp24__length1 = found_times_length1;
+							_tmp25_ = j;
+							_tmp24_[_tmp25_] = (guint) 0;
+							_tmp26_ = _tmp24_[_tmp25_];
+						}
 					}
-					three_found = TRUE;
+				}
+				_tmp27_ = self->test_collection;
+				_tmp28_ = gee_iterable_iterator ((GeeIterable*) _tmp27_);
+				_g_object_unref0 (iterator);
+				iterator = _tmp28_;
+				_tmp29_ = iterator;
+				_tmp30_ = gee_iterator_get_valid (_tmp29_);
+				_tmp31_ = _tmp30_;
+				valid = _tmp31_;
+				_tmp32_ = valid;
+				_vala_assert (!_tmp32_, "! valid");
+				while (TRUE) {
+					GeeIterator* _tmp33_;
+					gboolean _tmp34_ = FALSE;
+					gboolean _tmp35_;
+					GeeIterator* _tmp36_;
+					gboolean _tmp37_;
+					gboolean _tmp38_;
+					gboolean _tmp39_;
+					GeeIterator* _tmp40_;
+					gboolean _tmp41_ = FALSE;
+					GeeIterator* _tmp42_;
+					gboolean _tmp43_;
+					gboolean _tmp44_;
+					gboolean _tmp45_;
+					gboolean _tmp46_;
+					GeeIterator* _tmp47_;
+					gpointer _tmp48_ = NULL;
+					gchar* element;
+					GeeIterator* _tmp49_;
+					gboolean _tmp50_;
+					gboolean _tmp51_;
+					_tmp33_ = iterator;
+					_tmp34_ = gee_iterator_has_next (_tmp33_);
+					has_next = _tmp34_;
+					_tmp35_ = valid;
+					_tmp36_ = iterator;
+					_tmp37_ = gee_iterator_get_valid (_tmp36_);
+					_tmp38_ = _tmp37_;
+					_vala_assert (_tmp35_ == _tmp38_, "valid == iterator.valid");
+					_tmp39_ = has_next;
+					_tmp40_ = iterator;
+					_tmp41_ = gee_iterator_next (_tmp40_);
+					_vala_assert (_tmp39_ == _tmp41_, "has_next == iterator.next ()");
+					_tmp42_ = iterator;
+					_tmp43_ = gee_iterator_get_valid (_tmp42_);
+					_tmp44_ = _tmp43_;
+					valid = _tmp44_;
+					_tmp45_ = valid;
+					_vala_assert (_tmp45_, "valid = iterator.valid");
+					_tmp46_ = has_next;
+					if (!_tmp46_) {
+						break;
+					}
+					_tmp47_ = iterator;
+					_tmp48_ = gee_iterator_get (_tmp47_);
+					element = (gchar*) _tmp48_;
+					_tmp49_ = iterator;
+					_tmp50_ = gee_iterator_get_valid (_tmp49_);
+					_tmp51_ = _tmp50_;
+					_vala_assert (_tmp51_, "iterator.valid");
+					{
+						guint element_idx;
+						element_idx = (guint) 0;
+						{
+							gboolean _tmp52_;
+							_tmp52_ = TRUE;
+							while (TRUE) {
+								gboolean _tmp53_;
+								guint _tmp55_;
+								gchar** _tmp56_;
+								gint _tmp56__length1;
+								gchar** _tmp57_;
+								gint _tmp57__length1;
+								guint _tmp58_;
+								const gchar* _tmp59_;
+								const gchar* _tmp60_;
+								_tmp53_ = _tmp52_;
+								if (!_tmp53_) {
+									guint _tmp54_;
+									_tmp54_ = element_idx;
+									element_idx = _tmp54_ + 1;
+								}
+								_tmp52_ = FALSE;
+								_tmp55_ = element_idx;
+								_tmp56_ = data;
+								_tmp56__length1 = data_length1;
+								_vala_assert (_tmp55_ < ((guint) _tmp56__length1), "element_idx < data.length");
+								_tmp57_ = data;
+								_tmp57__length1 = data_length1;
+								_tmp58_ = element_idx;
+								_tmp59_ = _tmp57_[_tmp58_];
+								_tmp60_ = element;
+								if (g_strcmp0 (_tmp59_, _tmp60_) == 0) {
+									guint* _tmp61_;
+									gint _tmp61__length1;
+									guint _tmp62_;
+									guint _tmp63_;
+									_tmp61_ = found_times;
+									_tmp61__length1 = found_times_length1;
+									_tmp62_ = element_idx;
+									_tmp63_ = _tmp61_[_tmp62_];
+									_tmp61_[_tmp62_] = _tmp63_ + 1;
+									break;
+								}
+							}
+						}
+					}
+					_g_free0 (element);
+				}
+				_tmp64_ = iterator;
+				_tmp65_ = gee_iterator_has_next (_tmp64_);
+				has_next = _tmp65_;
+				_tmp66_ = has_next;
+				_vala_assert (!_tmp66_, "! has_next");
+				_tmp67_ = iterator;
+				_tmp68_ = gee_iterator_get_valid (_tmp67_);
+				_tmp69_ = _tmp68_;
+				_vala_assert (_tmp69_, "iterator.valid");
+				_tmp70_ = has_next;
+				_tmp71_ = iterator;
+				_tmp72_ = gee_iterator_next (_tmp71_);
+				_vala_assert (_tmp70_ == _tmp72_, "has_next == iterator.next ()");
+				_tmp73_ = iterator;
+				_tmp74_ = gee_iterator_get_valid (_tmp73_);
+				_tmp75_ = _tmp74_;
+				_vala_assert (_tmp75_, "iterator.valid");
+				_tmp76_ = found_times;
+				_tmp76__length1 = found_times_length1;
+				{
+					guint* ft_collection = NULL;
+					gint ft_collection_length1 = 0;
+					gint _ft_collection_size_ = 0;
+					gint ft_it = 0;
+					ft_collection = _tmp76_;
+					ft_collection_length1 = _tmp76__length1;
+					for (ft_it = 0; ft_it < _tmp76__length1; ft_it = ft_it + 1) {
+						guint ft = 0U;
+						ft = ft_collection[ft_it];
+						{
+							guint _tmp77_;
+							_tmp77_ = ft;
+							_vala_assert (_tmp77_ == ((guint) 1), "ft == 1");
+						}
+					}
 				}
 			}
 		}
-		_tmp53_ = iterator;
-		_tmp54_ = gee_iterator_has_next (_tmp53_);
-		has_next = _tmp54_;
-		_tmp55_ = has_next;
-		_tmp56_ = iterator;
-		_tmp57_ = gee_iterator_next (_tmp56_);
-		_vala_assert (_tmp55_ == _tmp57_, "has_next == iterator.next ()");
-		_tmp58_ = has_next;
-		if (!_tmp58_) {
-			_g_free0 (element);
-			break;
-		}
-		_g_free0 (element);
 	}
-	_tmp59_ = iterator;
-	_tmp60_ = gee_iterator_has_next (_tmp59_);
-	has_next = _tmp60_;
-	_tmp61_ = has_next;
-	_vala_assert (!_tmp61_, "! has_next");
-	_tmp62_ = has_next;
-	_tmp63_ = iterator;
-	_tmp64_ = gee_iterator_next (_tmp63_);
-	_vala_assert (_tmp62_ == _tmp64_, "has_next == iterator.next ()");
-	_tmp65_ = one_found;
-	_vala_assert (_tmp65_, "one_found");
-	_tmp66_ = one_found_once;
-	_vala_assert (_tmp66_, "one_found_once");
-	_tmp67_ = two_found;
-	_vala_assert (_tmp67_, "two_found");
-	_tmp68_ = two_found_once;
-	_vala_assert (_tmp68_, "two_found_once");
-	_tmp69_ = three_found;
-	_vala_assert (_tmp69_, "three_found");
-	_tmp70_ = three_found_once;
-	_vala_assert (_tmp70_, "three_found_once");
+	found_times = (g_free (found_times), NULL);
 	_g_object_unref0 (iterator);
 }
 
@@ -481,1048 +640,1296 @@ void collection_tests_test_mutable_iterator (CollectionTests* self) {
 	GeeCollection* _tmp1_;
 	GeeIterator* _tmp2_ = NULL;
 	GeeIterator* iterator;
-	GeeCollection* _tmp3_;
-	gboolean _tmp4_ = FALSE;
-	GeeCollection* _tmp5_;
-	gboolean _tmp6_ = FALSE;
-	GeeCollection* _tmp7_;
-	gboolean _tmp8_ = FALSE;
-	gboolean one_found;
-	gboolean two_found;
-	gboolean three_found;
-	gboolean one_found_once;
-	gboolean two_found_once;
-	gboolean three_found_once;
-	GeeCollection* _tmp9_;
-	GeeIterator* _tmp10_ = NULL;
-	GeeIterator* _tmp26_;
-	gboolean _tmp27_ = FALSE;
-	gboolean _tmp28_;
-	gboolean _tmp29_;
-	GeeIterator* _tmp30_;
-	gboolean _tmp31_ = FALSE;
-	gboolean _tmp32_;
-	gboolean _tmp33_;
-	gboolean _tmp34_;
-	gboolean _tmp35_;
-	gboolean _tmp36_;
-	gboolean _tmp37_;
-	GeeIterator* _tmp38_;
-	gboolean _tmp39_ = FALSE;
-	GeeIterator* _tmp53_;
-	gboolean _tmp54_ = FALSE;
-	gboolean _tmp55_;
-	gboolean _tmp56_;
-	GeeIterator* _tmp57_;
-	gboolean _tmp58_ = FALSE;
-	gboolean _tmp59_;
-	gboolean _tmp60_;
-	gboolean _tmp61_;
-	gboolean _tmp62_;
-	gboolean _tmp63_;
+	gint _tmp3_ = 0;
+	gchar** _tmp4_ = NULL;
+	gchar** data;
+	gint data_length1;
+	gint _data_size_;
+	gint _tmp5_ = 0;
+	guint* _tmp6_ = NULL;
+	guint* idx;
+	gint idx_length1;
+	gint _idx_size_;
+	gchar** _tmp7_;
+	gint _tmp7__length1;
+	GeeCollection* _tmp11_;
+	GeeIterator* _tmp12_ = NULL;
+	gchar** _tmp13_;
+	gint _tmp13__length1;
+	guint* _tmp14_ = NULL;
+	guint* found_times;
+	gint found_times_length1;
+	gint _found_times_size_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->test_collection;
 	_vala_assert (_tmp0_ != NULL, "test_collection != null");
 	_tmp1_ = self->test_collection;
 	_tmp2_ = gee_iterable_iterator ((GeeIterable*) _tmp1_);
 	iterator = _tmp2_;
-	_tmp3_ = self->test_collection;
-	_tmp4_ = gee_collection_add (_tmp3_, "one");
-	_vala_assert (_tmp4_, "test_collection.add (\"one\")");
-	_tmp5_ = self->test_collection;
-	_tmp6_ = gee_collection_add (_tmp5_, "two");
-	_vala_assert (_tmp6_, "test_collection.add (\"two\")");
-	_tmp7_ = self->test_collection;
-	_tmp8_ = gee_collection_add (_tmp7_, "three");
-	_vala_assert (_tmp8_, "test_collection.add (\"three\")");
-	one_found = FALSE;
-	two_found = FALSE;
-	three_found = FALSE;
-	one_found_once = TRUE;
-	two_found_once = TRUE;
-	three_found_once = TRUE;
-	_tmp9_ = self->test_collection;
-	_tmp10_ = gee_iterable_iterator ((GeeIterable*) _tmp9_);
+	_tmp4_ = test_data_get_data (&_tmp3_);
+	data = _tmp4_;
+	data_length1 = _tmp3_;
+	_data_size_ = data_length1;
+	_tmp6_ = test_data_get_drawn_numbers (&_tmp5_);
+	idx = _tmp6_;
+	idx_length1 = _tmp5_;
+	_idx_size_ = idx_length1;
+	_tmp7_ = data;
+	_tmp7__length1 = data_length1;
+	{
+		gchar** el_collection = NULL;
+		gint el_collection_length1 = 0;
+		gint _el_collection_size_ = 0;
+		gint el_it = 0;
+		el_collection = _tmp7_;
+		el_collection_length1 = _tmp7__length1;
+		for (el_it = 0; el_it < _tmp7__length1; el_it = el_it + 1) {
+			const gchar* el = NULL;
+			el = el_collection[el_it];
+			{
+				GeeCollection* _tmp8_;
+				const gchar* _tmp9_;
+				gboolean _tmp10_ = FALSE;
+				_tmp8_ = self->test_collection;
+				_tmp9_ = el;
+				_tmp10_ = gee_collection_add (_tmp8_, _tmp9_);
+				_vala_assert (_tmp10_, "test_collection.add (el)");
+			}
+		}
+	}
+	_tmp11_ = self->test_collection;
+	_tmp12_ = gee_iterable_iterator ((GeeIterable*) _tmp11_);
 	_g_object_unref0 (iterator);
-	iterator = _tmp10_;
-	while (TRUE) {
-		GeeIterator* _tmp11_;
-		gboolean _tmp12_ = FALSE;
-		gboolean _tmp13_;
-		GeeIterator* _tmp14_;
-		gboolean _tmp15_ = FALSE;
-		gboolean _tmp16_;
-		GeeIterator* _tmp17_;
-		gpointer _tmp18_ = NULL;
-		gchar* element;
-		const gchar* _tmp19_;
-		_tmp11_ = iterator;
-		_tmp12_ = gee_iterator_has_next (_tmp11_);
-		has_next = _tmp12_;
-		_tmp13_ = has_next;
-		_tmp14_ = iterator;
-		_tmp15_ = gee_iterator_next (_tmp14_);
-		_vala_assert (_tmp13_ == _tmp15_, "has_next == iterator.next ()");
-		_tmp16_ = has_next;
-		if (!_tmp16_) {
-			break;
-		}
-		_tmp17_ = iterator;
-		_tmp18_ = gee_iterator_get (_tmp17_);
-		element = (gchar*) _tmp18_;
-		_tmp19_ = element;
-		if (g_strcmp0 (_tmp19_, "one") == 0) {
-			gboolean _tmp20_;
-			_tmp20_ = one_found;
-			if (_tmp20_) {
-				one_found_once = FALSE;
-			}
-			one_found = TRUE;
-		} else {
-			const gchar* _tmp21_;
-			_tmp21_ = element;
-			if (g_strcmp0 (_tmp21_, "two") == 0) {
-				gboolean _tmp22_;
-				GeeIterator* _tmp23_;
-				_tmp22_ = two_found;
-				if (_tmp22_) {
-					two_found_once = FALSE;
+	iterator = _tmp12_;
+	_tmp13_ = data;
+	_tmp13__length1 = data_length1;
+	_tmp14_ = g_new0 (guint, _tmp13__length1);
+	found_times = _tmp14_;
+	found_times_length1 = _tmp13__length1;
+	_found_times_size_ = found_times_length1;
+	{
+		guint i;
+		i = (guint) 0;
+		{
+			gboolean _tmp15_;
+			_tmp15_ = TRUE;
+			while (TRUE) {
+				gboolean _tmp16_;
+				guint _tmp18_;
+				guint* _tmp19_;
+				gint _tmp19__length1;
+				GeeCollection* _tmp28_;
+				GeeIterator* _tmp29_ = NULL;
+				GeeIterator* _tmp30_;
+				gboolean _tmp31_;
+				gboolean _tmp32_;
+				gboolean last_removed;
+				GeeIterator* _tmp72_;
+				gboolean _tmp73_ = FALSE;
+				gboolean _tmp74_;
+				GeeIterator* _tmp75_;
+				gboolean _tmp76_;
+				gboolean _tmp77_;
+				gboolean _tmp78_;
+				gboolean _tmp79_;
+				GeeIterator* _tmp80_;
+				gboolean _tmp81_ = FALSE;
+				GeeIterator* _tmp82_;
+				gboolean _tmp83_;
+				gboolean _tmp84_;
+				gboolean _tmp85_;
+				_tmp16_ = _tmp15_;
+				if (!_tmp16_) {
+					guint _tmp17_;
+					_tmp17_ = i;
+					i = _tmp17_ + 1;
 				}
-				two_found = TRUE;
-				_tmp23_ = iterator;
-				gee_iterator_remove (_tmp23_);
-			} else {
-				const gchar* _tmp24_;
-				_tmp24_ = element;
-				if (g_strcmp0 (_tmp24_, "three") == 0) {
-					gboolean _tmp25_;
-					_tmp25_ = three_found;
-					if (_tmp25_) {
-						three_found_once = FALSE;
+				_tmp15_ = FALSE;
+				_tmp18_ = i;
+				_tmp19_ = idx;
+				_tmp19__length1 = idx_length1;
+				if (!(_tmp18_ <= ((guint) _tmp19__length1))) {
+					break;
+				}
+				{
+					guint j;
+					j = (guint) 0;
+					{
+						gboolean _tmp20_;
+						_tmp20_ = TRUE;
+						while (TRUE) {
+							gboolean _tmp21_;
+							guint _tmp23_;
+							guint* _tmp24_;
+							gint _tmp24__length1;
+							guint* _tmp25_;
+							gint _tmp25__length1;
+							guint _tmp26_;
+							guint _tmp27_;
+							_tmp21_ = _tmp20_;
+							if (!_tmp21_) {
+								guint _tmp22_;
+								_tmp22_ = j;
+								j = _tmp22_ + 1;
+							}
+							_tmp20_ = FALSE;
+							_tmp23_ = j;
+							_tmp24_ = found_times;
+							_tmp24__length1 = found_times_length1;
+							if (!(_tmp23_ < ((guint) _tmp24__length1))) {
+								break;
+							}
+							_tmp25_ = found_times;
+							_tmp25__length1 = found_times_length1;
+							_tmp26_ = j;
+							_tmp25_[_tmp26_] = (guint) 0;
+							_tmp27_ = _tmp25_[_tmp26_];
+						}
 					}
-					three_found = TRUE;
 				}
-			}
-		}
-		_g_free0 (element);
-	}
-	_tmp26_ = iterator;
-	_tmp27_ = gee_iterator_has_next (_tmp26_);
-	has_next = _tmp27_;
-	_tmp28_ = has_next;
-	_vala_assert (!_tmp28_, "! has_next");
-	_tmp29_ = has_next;
-	_tmp30_ = iterator;
-	_tmp31_ = gee_iterator_next (_tmp30_);
-	_vala_assert (_tmp29_ == _tmp31_, "has_next == iterator.next ()");
-	_tmp32_ = one_found;
-	_vala_assert (_tmp32_, "one_found");
-	_tmp33_ = one_found_once;
-	_vala_assert (_tmp33_, "one_found_once");
-	_tmp34_ = two_found;
-	_vala_assert (_tmp34_, "two_found");
-	_tmp35_ = two_found_once;
-	_vala_assert (_tmp35_, "two_found_once");
-	_tmp36_ = three_found;
-	_vala_assert (_tmp36_, "three_found");
-	_tmp37_ = three_found_once;
-	_vala_assert (_tmp37_, "three_found_once");
-	_tmp38_ = iterator;
-	_tmp39_ = gee_iterator_first (_tmp38_);
-	_vala_assert (_tmp39_, "iterator.first ()");
-	one_found = FALSE;
-	two_found = FALSE;
-	three_found = FALSE;
-	one_found_once = TRUE;
-	two_found_once = TRUE;
-	three_found_once = TRUE;
-	while (TRUE) {
-		GeeIterator* _tmp40_;
-		gpointer _tmp41_ = NULL;
-		gchar* element;
-		const gchar* _tmp42_;
-		GeeIterator* _tmp47_;
-		gboolean _tmp48_ = FALSE;
-		gboolean _tmp49_;
-		GeeIterator* _tmp50_;
-		gboolean _tmp51_ = FALSE;
-		gboolean _tmp52_;
-		_tmp40_ = iterator;
-		_tmp41_ = gee_iterator_get (_tmp40_);
-		element = (gchar*) _tmp41_;
-		_tmp42_ = element;
-		if (g_strcmp0 (_tmp42_, "one") == 0) {
-			gboolean _tmp43_;
-			_tmp43_ = one_found;
-			if (_tmp43_) {
-				one_found_once = FALSE;
-			}
-			one_found = TRUE;
-		} else {
-			const gchar* _tmp44_;
-			_tmp44_ = element;
-			if (g_strcmp0 (_tmp44_, "two") == 0) {
-				two_found = TRUE;
-			} else {
-				const gchar* _tmp45_;
-				_tmp45_ = element;
-				if (g_strcmp0 (_tmp45_, "three") == 0) {
-					gboolean _tmp46_;
-					_tmp46_ = three_found;
-					if (_tmp46_) {
-						three_found_once = FALSE;
+				_tmp28_ = self->test_collection;
+				_tmp29_ = gee_iterable_iterator ((GeeIterable*) _tmp28_);
+				_g_object_unref0 (iterator);
+				iterator = _tmp29_;
+				_tmp30_ = iterator;
+				_tmp31_ = gee_iterator_get_valid (_tmp30_);
+				_tmp32_ = _tmp31_;
+				_vala_assert (!_tmp32_, "! iterator.valid");
+				last_removed = FALSE;
+				while (TRUE) {
+					GeeIterator* _tmp33_;
+					gboolean _tmp34_ = FALSE;
+					gboolean _tmp35_;
+					GeeIterator* _tmp36_;
+					gboolean _tmp37_ = FALSE;
+					gboolean _tmp38_;
+					GeeIterator* _tmp39_;
+					gpointer _tmp40_ = NULL;
+					gchar* element;
+					GeeIterator* _tmp41_;
+					gboolean _tmp42_;
+					gboolean _tmp43_;
+					_tmp33_ = iterator;
+					_tmp34_ = gee_iterator_has_next (_tmp33_);
+					has_next = _tmp34_;
+					_tmp35_ = has_next;
+					_tmp36_ = iterator;
+					_tmp37_ = gee_iterator_next (_tmp36_);
+					_vala_assert (_tmp35_ == _tmp37_, "has_next == iterator.next ()");
+					_tmp38_ = has_next;
+					if (!_tmp38_) {
+						break;
 					}
-					three_found = TRUE;
+					_tmp39_ = iterator;
+					_tmp40_ = gee_iterator_get (_tmp39_);
+					element = (gchar*) _tmp40_;
+					_tmp41_ = iterator;
+					_tmp42_ = gee_iterator_get_valid (_tmp41_);
+					_tmp43_ = _tmp42_;
+					_vala_assert (_tmp43_, "iterator.valid");
+					{
+						guint element_idx;
+						element_idx = (guint) 0;
+						{
+							gboolean _tmp44_;
+							_tmp44_ = TRUE;
+							while (TRUE) {
+								gboolean _tmp45_;
+								guint _tmp47_;
+								gchar** _tmp48_;
+								gint _tmp48__length1;
+								gchar** _tmp49_;
+								gint _tmp49__length1;
+								guint _tmp50_;
+								const gchar* _tmp51_;
+								const gchar* _tmp52_;
+								_tmp45_ = _tmp44_;
+								if (!_tmp45_) {
+									guint _tmp46_;
+									_tmp46_ = element_idx;
+									element_idx = _tmp46_ + 1;
+								}
+								_tmp44_ = FALSE;
+								_tmp47_ = element_idx;
+								_tmp48_ = data;
+								_tmp48__length1 = data_length1;
+								_vala_assert (_tmp47_ < ((guint) _tmp48__length1), "element_idx < data.length");
+								_tmp49_ = data;
+								_tmp49__length1 = data_length1;
+								_tmp50_ = element_idx;
+								_tmp51_ = _tmp49_[_tmp50_];
+								_tmp52_ = element;
+								if (g_strcmp0 (_tmp51_, _tmp52_) == 0) {
+									gboolean _tmp53_ = FALSE;
+									guint _tmp54_;
+									guint* _tmp55_;
+									gint _tmp55__length1;
+									gboolean _tmp64_;
+									guint* _tmp69_;
+									gint _tmp69__length1;
+									guint _tmp70_;
+									guint _tmp71_;
+									_tmp54_ = i;
+									_tmp55_ = idx;
+									_tmp55__length1 = idx_length1;
+									if (_tmp54_ != ((guint) _tmp55__length1)) {
+										gchar** _tmp56_;
+										gint _tmp56__length1;
+										guint _tmp57_;
+										const gchar* _tmp58_;
+										gchar** _tmp59_;
+										gint _tmp59__length1;
+										guint* _tmp60_;
+										gint _tmp60__length1;
+										guint _tmp61_;
+										guint _tmp62_;
+										const gchar* _tmp63_;
+										_tmp56_ = data;
+										_tmp56__length1 = data_length1;
+										_tmp57_ = element_idx;
+										_tmp58_ = _tmp56_[_tmp57_];
+										_tmp59_ = data;
+										_tmp59__length1 = data_length1;
+										_tmp60_ = idx;
+										_tmp60__length1 = idx_length1;
+										_tmp61_ = i;
+										_tmp62_ = _tmp60_[_tmp61_];
+										_tmp63_ = _tmp59_[_tmp62_];
+										_tmp53_ = g_strcmp0 (_tmp58_, _tmp63_) == 0;
+									} else {
+										_tmp53_ = FALSE;
+									}
+									_tmp64_ = _tmp53_;
+									if (_tmp64_) {
+										GeeIterator* _tmp65_;
+										GeeIterator* _tmp66_;
+										gboolean _tmp67_;
+										gboolean _tmp68_;
+										_tmp65_ = iterator;
+										gee_iterator_remove (_tmp65_);
+										_tmp66_ = iterator;
+										_tmp67_ = gee_iterator_get_valid (_tmp66_);
+										_tmp68_ = _tmp67_;
+										_vala_assert (!_tmp68_, "! iterator.valid");
+										last_removed = TRUE;
+									} else {
+										last_removed = FALSE;
+									}
+									_tmp69_ = found_times;
+									_tmp69__length1 = found_times_length1;
+									_tmp70_ = element_idx;
+									_tmp71_ = _tmp69_[_tmp70_];
+									_tmp69_[_tmp70_] = _tmp71_ + 1;
+									break;
+								}
+							}
+						}
+					}
+					_g_free0 (element);
+				}
+				_tmp72_ = iterator;
+				_tmp73_ = gee_iterator_has_next (_tmp72_);
+				has_next = _tmp73_;
+				_tmp74_ = has_next;
+				_vala_assert (!_tmp74_, "! has_next");
+				_tmp75_ = iterator;
+				_tmp76_ = gee_iterator_get_valid (_tmp75_);
+				_tmp77_ = _tmp76_;
+				_tmp78_ = last_removed;
+				_vala_assert (_tmp77_ == (!_tmp78_), "iterator.valid == !last_removed");
+				_tmp79_ = has_next;
+				_tmp80_ = iterator;
+				_tmp81_ = gee_iterator_next (_tmp80_);
+				_vala_assert (_tmp79_ == _tmp81_, "has_next == iterator.next ()");
+				_tmp82_ = iterator;
+				_tmp83_ = gee_iterator_get_valid (_tmp82_);
+				_tmp84_ = _tmp83_;
+				_tmp85_ = last_removed;
+				_vala_assert (_tmp84_ == (!_tmp85_), "iterator.valid == !last_removed");
+				{
+					guint j;
+					j = (guint) 0;
+					{
+						gboolean _tmp86_;
+						_tmp86_ = TRUE;
+						while (TRUE) {
+							gboolean _tmp87_;
+							guint _tmp89_;
+							guint* _tmp90_;
+							gint _tmp90__length1;
+							gboolean removed;
+							gint _tmp100_ = 0;
+							gboolean _tmp101_;
+							guint* _tmp102_;
+							gint _tmp102__length1;
+							guint _tmp103_;
+							guint _tmp104_;
+							gint _tmp105_;
+							_tmp87_ = _tmp86_;
+							if (!_tmp87_) {
+								guint _tmp88_;
+								_tmp88_ = j;
+								j = _tmp88_ + 1;
+							}
+							_tmp86_ = FALSE;
+							_tmp89_ = j;
+							_tmp90_ = found_times;
+							_tmp90__length1 = found_times_length1;
+							if (!(_tmp89_ < ((guint) _tmp90__length1))) {
+								break;
+							}
+							removed = FALSE;
+							{
+								gint k;
+								k = 0;
+								{
+									gboolean _tmp91_;
+									_tmp91_ = TRUE;
+									while (TRUE) {
+										gboolean _tmp92_;
+										gint _tmp94_;
+										guint _tmp95_;
+										guint* _tmp96_;
+										gint _tmp96__length1;
+										gint _tmp97_;
+										guint _tmp98_;
+										guint _tmp99_;
+										_tmp92_ = _tmp91_;
+										if (!_tmp92_) {
+											gint _tmp93_;
+											_tmp93_ = k;
+											k = _tmp93_ + 1;
+										}
+										_tmp91_ = FALSE;
+										_tmp94_ = k;
+										_tmp95_ = i;
+										if (!(((guint) _tmp94_) < _tmp95_)) {
+											break;
+										}
+										_tmp96_ = idx;
+										_tmp96__length1 = idx_length1;
+										_tmp97_ = k;
+										_tmp98_ = _tmp96_[_tmp97_];
+										_tmp99_ = j;
+										if (_tmp98_ == _tmp99_) {
+											removed = TRUE;
+											break;
+										}
+									}
+								}
+							}
+							_tmp101_ = removed;
+							if (_tmp101_) {
+								_tmp100_ = 0;
+							} else {
+								_tmp100_ = 1;
+							}
+							_tmp102_ = found_times;
+							_tmp102__length1 = found_times_length1;
+							_tmp103_ = j;
+							_tmp104_ = _tmp102_[_tmp103_];
+							_tmp105_ = _tmp100_;
+							_vala_assert (_tmp104_ == ((guint) _tmp105_), "found_times[j] == (removed ? 0 : 1)");
+						}
+					}
 				}
 			}
 		}
-		_tmp47_ = iterator;
-		_tmp48_ = gee_iterator_has_next (_tmp47_);
-		has_next = _tmp48_;
-		_tmp49_ = has_next;
-		_tmp50_ = iterator;
-		_tmp51_ = gee_iterator_next (_tmp50_);
-		_vala_assert (_tmp49_ == _tmp51_, "has_next == iterator.next ()");
-		_tmp52_ = has_next;
-		if (!_tmp52_) {
-			_g_free0 (element);
-			break;
-		}
-		_g_free0 (element);
 	}
-	_tmp53_ = iterator;
-	_tmp54_ = gee_iterator_has_next (_tmp53_);
-	has_next = _tmp54_;
-	_tmp55_ = has_next;
-	_vala_assert (!_tmp55_, "! has_next");
-	_tmp56_ = has_next;
-	_tmp57_ = iterator;
-	_tmp58_ = gee_iterator_next (_tmp57_);
-	_vala_assert (_tmp56_ == _tmp58_, "has_next == iterator.next ()");
-	_tmp59_ = one_found;
-	_vala_assert (_tmp59_, "one_found");
-	_tmp60_ = one_found_once;
-	_vala_assert (_tmp60_, "one_found_once");
-	_tmp61_ = two_found;
-	_vala_assert (!_tmp61_, "!two_found");
-	_tmp62_ = three_found;
-	_vala_assert (_tmp62_, "three_found");
-	_tmp63_ = three_found_once;
-	_vala_assert (_tmp63_, "three_found_once");
+	found_times = (g_free (found_times), NULL);
 	_g_object_unref0 (iterator);
 }
 
 
 void collection_tests_test_contains_size_and_is_empty (CollectionTests* self) {
 	GeeCollection* _tmp0_;
-	GeeCollection* _tmp1_;
-	gboolean _tmp2_ = FALSE;
-	GeeCollection* _tmp3_;
-	gboolean _tmp4_ = FALSE;
-	GeeCollection* _tmp5_;
-	gboolean _tmp6_ = FALSE;
-	GeeCollection* _tmp7_;
-	gint _tmp8_;
-	gint _tmp9_;
-	GeeCollection* _tmp10_;
-	gboolean _tmp11_;
-	gboolean _tmp12_;
-	GeeCollection* _tmp13_;
-	gboolean _tmp14_ = FALSE;
+	gint _tmp1_ = 0;
+	gchar** _tmp2_ = NULL;
+	gchar** data;
+	gint data_length1;
+	gint _data_size_;
+	gint _tmp3_ = 0;
+	guint* _tmp4_ = NULL;
+	guint* idx;
+	gint idx_length1;
+	gint _idx_size_;
+	gchar** _tmp5_;
+	gint _tmp5__length1;
+	GeeCollection* _tmp9_;
+	gint _tmp10_;
+	gint _tmp11_;
+	GeeCollection* _tmp12_;
+	gboolean _tmp13_;
+	gboolean _tmp14_;
 	GeeCollection* _tmp15_;
-	gboolean _tmp16_ = FALSE;
-	GeeCollection* _tmp17_;
+	gchar** _tmp16_;
+	gint _tmp16__length1;
+	const gchar* _tmp17_;
 	gboolean _tmp18_ = FALSE;
 	GeeCollection* _tmp19_;
-	gboolean _tmp20_ = FALSE;
-	GeeCollection* _tmp21_;
-	gint _tmp22_;
-	gint _tmp23_;
-	GeeCollection* _tmp24_;
-	gboolean _tmp25_;
-	gboolean _tmp26_;
-	GeeCollection* _tmp27_;
-	gboolean _tmp28_ = FALSE;
-	GeeCollection* _tmp29_;
-	gboolean _tmp30_ = FALSE;
-	GeeCollection* _tmp31_;
-	gboolean _tmp32_ = FALSE;
+	gchar** _tmp20_;
+	gint _tmp20__length1;
+	const gchar* _tmp21_;
+	gboolean _tmp22_ = FALSE;
 	GeeCollection* _tmp33_;
-	gboolean _tmp34_ = FALSE;
-	GeeCollection* _tmp35_;
-	gint _tmp36_;
-	gint _tmp37_;
-	GeeCollection* _tmp38_;
-	gboolean _tmp39_;
-	gboolean _tmp40_;
-	GeeCollection* _tmp41_;
-	gboolean _tmp42_ = FALSE;
-	GeeCollection* _tmp43_;
-	gboolean _tmp44_ = FALSE;
+	gint _tmp34_;
+	gint _tmp35_;
+	GeeCollection* _tmp36_;
+	gboolean _tmp37_;
+	gboolean _tmp38_;
+	GeeCollection* _tmp39_;
+	gboolean _tmp40_ = FALSE;
+	gchar** _tmp41_;
+	gint _tmp41__length1;
 	GeeCollection* _tmp45_;
-	gboolean _tmp46_ = FALSE;
-	GeeCollection* _tmp47_;
-	gboolean _tmp48_ = FALSE;
-	GeeCollection* _tmp49_;
-	gint _tmp50_;
-	gint _tmp51_;
-	GeeCollection* _tmp52_;
-	gboolean _tmp53_;
-	gboolean _tmp54_;
-	GeeCollection* _tmp55_;
-	gboolean _tmp56_ = FALSE;
-	GeeCollection* _tmp57_;
-	gboolean _tmp58_ = FALSE;
-	GeeCollection* _tmp59_;
-	gboolean _tmp60_ = FALSE;
-	GeeCollection* _tmp61_;
-	gboolean _tmp62_ = FALSE;
-	GeeCollection* _tmp63_;
-	gint _tmp64_;
-	gint _tmp65_;
-	GeeCollection* _tmp66_;
-	gboolean _tmp67_;
-	gboolean _tmp68_;
-	GeeCollection* _tmp69_;
-	gboolean _tmp70_ = FALSE;
-	GeeCollection* _tmp71_;
-	gboolean _tmp72_ = FALSE;
-	GeeCollection* _tmp73_;
-	gboolean _tmp74_ = FALSE;
-	GeeCollection* _tmp75_;
-	gboolean _tmp76_ = FALSE;
-	GeeCollection* _tmp77_;
-	gint _tmp78_;
-	gint _tmp79_;
-	GeeCollection* _tmp80_;
-	gboolean _tmp81_;
-	gboolean _tmp82_;
-	GeeCollection* _tmp83_;
-	gboolean _tmp84_ = FALSE;
-	GeeCollection* _tmp85_;
-	gboolean _tmp86_ = FALSE;
-	GeeCollection* _tmp87_;
-	gboolean _tmp88_ = FALSE;
-	GeeCollection* _tmp89_;
-	gboolean _tmp90_ = FALSE;
-	GeeCollection* _tmp91_;
-	gint _tmp92_;
-	gint _tmp93_;
-	GeeCollection* _tmp94_;
-	gboolean _tmp95_;
-	gboolean _tmp96_;
-	GeeCollection* _tmp97_;
-	gboolean _tmp98_ = FALSE;
-	GeeCollection* _tmp99_;
-	gboolean _tmp100_ = FALSE;
-	GeeCollection* _tmp101_;
-	gboolean _tmp102_ = FALSE;
-	GeeCollection* _tmp103_;
-	gboolean _tmp104_ = FALSE;
-	GeeCollection* _tmp105_;
-	gint _tmp106_;
-	gint _tmp107_;
-	GeeCollection* _tmp108_;
-	gboolean _tmp109_;
-	gboolean _tmp110_;
-	GeeCollection* _tmp111_;
-	GeeCollection* _tmp112_;
-	gboolean _tmp113_ = FALSE;
-	GeeCollection* _tmp114_;
-	gboolean _tmp115_ = FALSE;
-	GeeCollection* _tmp116_;
-	gboolean _tmp117_ = FALSE;
-	GeeCollection* _tmp118_;
-	gint _tmp119_;
-	gint _tmp120_;
-	GeeCollection* _tmp121_;
-	gboolean _tmp122_;
-	gboolean _tmp123_;
+	gint _tmp46_;
+	gint _tmp47_;
+	GeeCollection* _tmp48_;
+	gboolean _tmp49_;
+	gboolean _tmp50_;
+	GeeCollection* _tmp158_;
+	gchar** _tmp159_;
+	gint _tmp159__length1;
+	GeeCollection* _tmp163_;
+	gint _tmp164_;
+	gint _tmp165_;
+	GeeCollection* _tmp166_;
+	gboolean _tmp167_;
+	gboolean _tmp168_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->test_collection;
 	_vala_assert (_tmp0_ != NULL, "test_collection != null");
-	_tmp1_ = self->test_collection;
-	_tmp2_ = gee_collection_contains (_tmp1_, "one");
-	_vala_assert (!_tmp2_, "! test_collection.contains (\"one\")");
-	_tmp3_ = self->test_collection;
-	_tmp4_ = gee_collection_contains (_tmp3_, "two");
-	_vala_assert (!_tmp4_, "! test_collection.contains (\"two\")");
-	_tmp5_ = self->test_collection;
-	_tmp6_ = gee_collection_contains (_tmp5_, "three");
-	_vala_assert (!_tmp6_, "! test_collection.contains (\"three\")");
-	_tmp7_ = self->test_collection;
-	_tmp8_ = gee_collection_get_size (_tmp7_);
-	_tmp9_ = _tmp8_;
-	_vala_assert (_tmp9_ == 0, "test_collection.size == 0");
-	_tmp10_ = self->test_collection;
-	_tmp11_ = gee_collection_get_is_empty (_tmp10_);
-	_tmp12_ = _tmp11_;
-	_vala_assert (_tmp12_, "test_collection.is_empty");
-	_tmp13_ = self->test_collection;
-	_tmp14_ = gee_collection_add (_tmp13_, "one");
-	_vala_assert (_tmp14_, "test_collection.add (\"one\")");
+	_tmp2_ = test_data_get_data (&_tmp1_);
+	data = _tmp2_;
+	data_length1 = _tmp1_;
+	_data_size_ = data_length1;
+	_tmp4_ = test_data_get_drawn_numbers (&_tmp3_);
+	idx = _tmp4_;
+	idx_length1 = _tmp3_;
+	_idx_size_ = idx_length1;
+	_tmp5_ = data;
+	_tmp5__length1 = data_length1;
+	{
+		gchar** s_collection = NULL;
+		gint s_collection_length1 = 0;
+		gint _s_collection_size_ = 0;
+		gint s_it = 0;
+		s_collection = _tmp5_;
+		s_collection_length1 = _tmp5__length1;
+		for (s_it = 0; s_it < _tmp5__length1; s_it = s_it + 1) {
+			const gchar* s = NULL;
+			s = s_collection[s_it];
+			{
+				GeeCollection* _tmp6_;
+				const gchar* _tmp7_;
+				gboolean _tmp8_ = FALSE;
+				_tmp6_ = self->test_collection;
+				_tmp7_ = s;
+				_tmp8_ = gee_collection_contains (_tmp6_, _tmp7_);
+				_vala_assert (!_tmp8_, "! test_collection.contains (s)");
+			}
+		}
+	}
+	_tmp9_ = self->test_collection;
+	_tmp10_ = gee_collection_get_size (_tmp9_);
+	_tmp11_ = _tmp10_;
+	_vala_assert (_tmp11_ == 0, "test_collection.size == 0");
+	_tmp12_ = self->test_collection;
+	_tmp13_ = gee_collection_get_is_empty (_tmp12_);
+	_tmp14_ = _tmp13_;
+	_vala_assert (_tmp14_, "test_collection.is_empty");
 	_tmp15_ = self->test_collection;
-	_tmp16_ = gee_collection_contains (_tmp15_, "one");
-	_vala_assert (_tmp16_, "test_collection.contains (\"one\")");
-	_tmp17_ = self->test_collection;
-	_tmp18_ = gee_collection_contains (_tmp17_, "two");
-	_vala_assert (!_tmp18_, "! test_collection.contains (\"two\")");
+	_tmp16_ = data;
+	_tmp16__length1 = data_length1;
+	_tmp17_ = _tmp16_[0];
+	_tmp18_ = gee_collection_add (_tmp15_, _tmp17_);
+	_vala_assert (_tmp18_, "test_collection.add (data[0])");
 	_tmp19_ = self->test_collection;
-	_tmp20_ = gee_collection_contains (_tmp19_, "three");
-	_vala_assert (!_tmp20_, "! test_collection.contains (\"three\")");
-	_tmp21_ = self->test_collection;
-	_tmp22_ = gee_collection_get_size (_tmp21_);
-	_tmp23_ = _tmp22_;
-	_vala_assert (_tmp23_ == 1, "test_collection.size == 1");
-	_tmp24_ = self->test_collection;
-	_tmp25_ = gee_collection_get_is_empty (_tmp24_);
-	_tmp26_ = _tmp25_;
-	_vala_assert (!_tmp26_, "! test_collection.is_empty");
-	_tmp27_ = self->test_collection;
-	_tmp28_ = gee_collection_remove (_tmp27_, "one");
-	_vala_assert (_tmp28_, "test_collection.remove (\"one\")");
-	_tmp29_ = self->test_collection;
-	_tmp30_ = gee_collection_contains (_tmp29_, "one");
-	_vala_assert (!_tmp30_, "! test_collection.contains (\"one\")");
-	_tmp31_ = self->test_collection;
-	_tmp32_ = gee_collection_contains (_tmp31_, "two");
-	_vala_assert (!_tmp32_, "! test_collection.contains (\"two\")");
+	_tmp20_ = data;
+	_tmp20__length1 = data_length1;
+	_tmp21_ = _tmp20_[0];
+	_tmp22_ = gee_collection_contains (_tmp19_, _tmp21_);
+	_vala_assert (_tmp22_, "test_collection.contains (data[0])");
+	{
+		guint i;
+		i = (guint) 1;
+		{
+			gboolean _tmp23_;
+			_tmp23_ = TRUE;
+			while (TRUE) {
+				gboolean _tmp24_;
+				guint _tmp26_;
+				gchar** _tmp27_;
+				gint _tmp27__length1;
+				GeeCollection* _tmp28_;
+				gchar** _tmp29_;
+				gint _tmp29__length1;
+				guint _tmp30_;
+				const gchar* _tmp31_;
+				gboolean _tmp32_ = FALSE;
+				_tmp24_ = _tmp23_;
+				if (!_tmp24_) {
+					guint _tmp25_;
+					_tmp25_ = i;
+					i = _tmp25_ + 1;
+				}
+				_tmp23_ = FALSE;
+				_tmp26_ = i;
+				_tmp27_ = data;
+				_tmp27__length1 = data_length1;
+				if (!(_tmp26_ < ((guint) _tmp27__length1))) {
+					break;
+				}
+				_tmp28_ = self->test_collection;
+				_tmp29_ = data;
+				_tmp29__length1 = data_length1;
+				_tmp30_ = i;
+				_tmp31_ = _tmp29_[_tmp30_];
+				_tmp32_ = gee_collection_contains (_tmp28_, _tmp31_);
+				_vala_assert (!_tmp32_, "! test_collection.contains (data[i])");
+			}
+		}
+	}
 	_tmp33_ = self->test_collection;
-	_tmp34_ = gee_collection_contains (_tmp33_, "three");
-	_vala_assert (!_tmp34_, "! test_collection.contains (\"three\")");
-	_tmp35_ = self->test_collection;
-	_tmp36_ = gee_collection_get_size (_tmp35_);
-	_tmp37_ = _tmp36_;
-	_vala_assert (_tmp37_ == 0, "test_collection.size == 0");
-	_tmp38_ = self->test_collection;
-	_tmp39_ = gee_collection_get_is_empty (_tmp38_);
-	_tmp40_ = _tmp39_;
-	_vala_assert (_tmp40_, "test_collection.is_empty");
-	_tmp41_ = self->test_collection;
-	_tmp42_ = gee_collection_add (_tmp41_, "one");
-	_vala_assert (_tmp42_, "test_collection.add (\"one\")");
-	_tmp43_ = self->test_collection;
-	_tmp44_ = gee_collection_contains (_tmp43_, "one");
-	_vala_assert (_tmp44_, "test_collection.contains (\"one\")");
+	_tmp34_ = gee_collection_get_size (_tmp33_);
+	_tmp35_ = _tmp34_;
+	_vala_assert (_tmp35_ == 1, "test_collection.size == 1");
+	_tmp36_ = self->test_collection;
+	_tmp37_ = gee_collection_get_is_empty (_tmp36_);
+	_tmp38_ = _tmp37_;
+	_vala_assert (!_tmp38_, "! test_collection.is_empty");
+	_tmp39_ = self->test_collection;
+	_tmp40_ = gee_collection_remove (_tmp39_, "one");
+	_vala_assert (_tmp40_, "test_collection.remove (\"one\")");
+	_tmp41_ = data;
+	_tmp41__length1 = data_length1;
+	{
+		gchar** s_collection = NULL;
+		gint s_collection_length1 = 0;
+		gint _s_collection_size_ = 0;
+		gint s_it = 0;
+		s_collection = _tmp41_;
+		s_collection_length1 = _tmp41__length1;
+		for (s_it = 0; s_it < _tmp41__length1; s_it = s_it + 1) {
+			const gchar* s = NULL;
+			s = s_collection[s_it];
+			{
+				GeeCollection* _tmp42_;
+				const gchar* _tmp43_;
+				gboolean _tmp44_ = FALSE;
+				_tmp42_ = self->test_collection;
+				_tmp43_ = s;
+				_tmp44_ = gee_collection_contains (_tmp42_, _tmp43_);
+				_vala_assert (!_tmp44_, "! test_collection.contains (s)");
+			}
+		}
+	}
 	_tmp45_ = self->test_collection;
-	_tmp46_ = gee_collection_contains (_tmp45_, "two");
-	_vala_assert (!_tmp46_, "! test_collection.contains (\"two\")");
-	_tmp47_ = self->test_collection;
-	_tmp48_ = gee_collection_contains (_tmp47_, "three");
-	_vala_assert (!_tmp48_, "! test_collection.contains (\"three\")");
-	_tmp49_ = self->test_collection;
-	_tmp50_ = gee_collection_get_size (_tmp49_);
-	_tmp51_ = _tmp50_;
-	_vala_assert (_tmp51_ == 1, "test_collection.size == 1");
-	_tmp52_ = self->test_collection;
-	_tmp53_ = gee_collection_get_is_empty (_tmp52_);
-	_tmp54_ = _tmp53_;
-	_vala_assert (!_tmp54_, "! test_collection.is_empty");
-	_tmp55_ = self->test_collection;
-	_tmp56_ = gee_collection_add (_tmp55_, "two");
-	_vala_assert (_tmp56_, "test_collection.add (\"two\")");
-	_tmp57_ = self->test_collection;
-	_tmp58_ = gee_collection_contains (_tmp57_, "one");
-	_vala_assert (_tmp58_, "test_collection.contains (\"one\")");
-	_tmp59_ = self->test_collection;
-	_tmp60_ = gee_collection_contains (_tmp59_, "two");
-	_vala_assert (_tmp60_, "test_collection.contains (\"two\")");
-	_tmp61_ = self->test_collection;
-	_tmp62_ = gee_collection_contains (_tmp61_, "three");
-	_vala_assert (!_tmp62_, "! test_collection.contains (\"three\")");
-	_tmp63_ = self->test_collection;
-	_tmp64_ = gee_collection_get_size (_tmp63_);
-	_tmp65_ = _tmp64_;
-	_vala_assert (_tmp65_ == 2, "test_collection.size == 2");
-	_tmp66_ = self->test_collection;
-	_tmp67_ = gee_collection_get_is_empty (_tmp66_);
-	_tmp68_ = _tmp67_;
-	_vala_assert (!_tmp68_, "! test_collection.is_empty");
-	_tmp69_ = self->test_collection;
-	_tmp70_ = gee_collection_add (_tmp69_, "three");
-	_vala_assert (_tmp70_, "test_collection.add (\"three\")");
-	_tmp71_ = self->test_collection;
-	_tmp72_ = gee_collection_contains (_tmp71_, "one");
-	_vala_assert (_tmp72_, "test_collection.contains (\"one\")");
-	_tmp73_ = self->test_collection;
-	_tmp74_ = gee_collection_contains (_tmp73_, "two");
-	_vala_assert (_tmp74_, "test_collection.contains (\"two\")");
-	_tmp75_ = self->test_collection;
-	_tmp76_ = gee_collection_contains (_tmp75_, "three");
-	_vala_assert (_tmp76_, "test_collection.contains (\"three\")");
-	_tmp77_ = self->test_collection;
-	_tmp78_ = gee_collection_get_size (_tmp77_);
-	_tmp79_ = _tmp78_;
-	_vala_assert (_tmp79_ == 3, "test_collection.size == 3");
-	_tmp80_ = self->test_collection;
-	_tmp81_ = gee_collection_get_is_empty (_tmp80_);
-	_tmp82_ = _tmp81_;
-	_vala_assert (!_tmp82_, "! test_collection.is_empty");
-	_tmp83_ = self->test_collection;
-	_tmp84_ = gee_collection_remove (_tmp83_, "two");
-	_vala_assert (_tmp84_, "test_collection.remove (\"two\")");
-	_tmp85_ = self->test_collection;
-	_tmp86_ = gee_collection_contains (_tmp85_, "one");
-	_vala_assert (_tmp86_, "test_collection.contains (\"one\")");
-	_tmp87_ = self->test_collection;
-	_tmp88_ = gee_collection_contains (_tmp87_, "two");
-	_vala_assert (!_tmp88_, "! test_collection.contains (\"two\")");
-	_tmp89_ = self->test_collection;
-	_tmp90_ = gee_collection_contains (_tmp89_, "three");
-	_vala_assert (_tmp90_, "test_collection.contains (\"three\")");
-	_tmp91_ = self->test_collection;
-	_tmp92_ = gee_collection_get_size (_tmp91_);
-	_tmp93_ = _tmp92_;
-	_vala_assert (_tmp93_ == 2, "test_collection.size == 2");
-	_tmp94_ = self->test_collection;
-	_tmp95_ = gee_collection_get_is_empty (_tmp94_);
-	_tmp96_ = _tmp95_;
-	_vala_assert (!_tmp96_, "! test_collection.is_empty");
-	_tmp97_ = self->test_collection;
-	_tmp98_ = gee_collection_remove (_tmp97_, "two");
-	_vala_assert (!_tmp98_, "! test_collection.remove (\"two\")");
-	_tmp99_ = self->test_collection;
-	_tmp100_ = gee_collection_contains (_tmp99_, "one");
-	_vala_assert (_tmp100_, "test_collection.contains (\"one\")");
-	_tmp101_ = self->test_collection;
-	_tmp102_ = gee_collection_contains (_tmp101_, "two");
-	_vala_assert (!_tmp102_, "! test_collection.contains (\"two\")");
-	_tmp103_ = self->test_collection;
-	_tmp104_ = gee_collection_contains (_tmp103_, "three");
-	_vala_assert (_tmp104_, "test_collection.contains (\"three\")");
-	_tmp105_ = self->test_collection;
-	_tmp106_ = gee_collection_get_size (_tmp105_);
-	_tmp107_ = _tmp106_;
-	_vala_assert (_tmp107_ == 2, "test_collection.size == 2");
-	_tmp108_ = self->test_collection;
-	_tmp109_ = gee_collection_get_is_empty (_tmp108_);
-	_tmp110_ = _tmp109_;
-	_vala_assert (!_tmp110_, "! test_collection.is_empty");
-	_tmp111_ = self->test_collection;
-	gee_collection_clear (_tmp111_);
-	_tmp112_ = self->test_collection;
-	_tmp113_ = gee_collection_contains (_tmp112_, "one");
-	_vala_assert (!_tmp113_, "! test_collection.contains (\"one\")");
-	_tmp114_ = self->test_collection;
-	_tmp115_ = gee_collection_contains (_tmp114_, "two");
-	_vala_assert (!_tmp115_, "! test_collection.contains (\"two\")");
-	_tmp116_ = self->test_collection;
-	_tmp117_ = gee_collection_contains (_tmp116_, "three");
-	_vala_assert (!_tmp117_, "! test_collection.contains (\"three\")");
-	_tmp118_ = self->test_collection;
-	_tmp119_ = gee_collection_get_size (_tmp118_);
-	_tmp120_ = _tmp119_;
-	_vala_assert (_tmp120_ == 0, "test_collection.size == 0");
-	_tmp121_ = self->test_collection;
-	_tmp122_ = gee_collection_get_is_empty (_tmp121_);
-	_tmp123_ = _tmp122_;
-	_vala_assert (_tmp123_, "test_collection.is_empty");
+	_tmp46_ = gee_collection_get_size (_tmp45_);
+	_tmp47_ = _tmp46_;
+	_vala_assert (_tmp47_ == 0, "test_collection.size == 0");
+	_tmp48_ = self->test_collection;
+	_tmp49_ = gee_collection_get_is_empty (_tmp48_);
+	_tmp50_ = _tmp49_;
+	_vala_assert (_tmp50_, "test_collection.is_empty");
+	{
+		guint i;
+		i = (guint) 0;
+		{
+			gboolean _tmp51_;
+			_tmp51_ = TRUE;
+			while (TRUE) {
+				gboolean _tmp52_;
+				guint _tmp54_;
+				gchar** _tmp55_;
+				gint _tmp55__length1;
+				GeeCollection* _tmp56_;
+				gchar** _tmp57_;
+				gint _tmp57__length1;
+				guint _tmp58_;
+				const gchar* _tmp59_;
+				gboolean _tmp60_ = FALSE;
+				GeeCollection* _tmp82_;
+				gint _tmp83_;
+				gint _tmp84_;
+				guint _tmp85_;
+				GeeCollection* _tmp86_;
+				gboolean _tmp87_;
+				gboolean _tmp88_;
+				_tmp52_ = _tmp51_;
+				if (!_tmp52_) {
+					guint _tmp53_;
+					_tmp53_ = i;
+					i = _tmp53_ + 1;
+				}
+				_tmp51_ = FALSE;
+				_tmp54_ = i;
+				_tmp55_ = data;
+				_tmp55__length1 = data_length1;
+				if (!(_tmp54_ < ((guint) _tmp55__length1))) {
+					break;
+				}
+				_tmp56_ = self->test_collection;
+				_tmp57_ = data;
+				_tmp57__length1 = data_length1;
+				_tmp58_ = i;
+				_tmp59_ = _tmp57_[_tmp58_];
+				_tmp60_ = gee_collection_add (_tmp56_, _tmp59_);
+				_vala_assert (_tmp60_, "test_collection.add (data[i])");
+				{
+					guint j;
+					j = (guint) 0;
+					{
+						gboolean _tmp61_;
+						_tmp61_ = TRUE;
+						while (TRUE) {
+							gboolean _tmp62_;
+							guint _tmp64_;
+							guint _tmp65_;
+							GeeCollection* _tmp66_;
+							gchar** _tmp67_;
+							gint _tmp67__length1;
+							guint _tmp68_;
+							const gchar* _tmp69_;
+							gboolean _tmp70_ = FALSE;
+							_tmp62_ = _tmp61_;
+							if (!_tmp62_) {
+								guint _tmp63_;
+								_tmp63_ = j;
+								j = _tmp63_ + 1;
+							}
+							_tmp61_ = FALSE;
+							_tmp64_ = j;
+							_tmp65_ = i;
+							if (!(_tmp64_ <= _tmp65_)) {
+								break;
+							}
+							_tmp66_ = self->test_collection;
+							_tmp67_ = data;
+							_tmp67__length1 = data_length1;
+							_tmp68_ = j;
+							_tmp69_ = _tmp67_[_tmp68_];
+							_tmp70_ = gee_collection_contains (_tmp66_, _tmp69_);
+							_vala_assert (_tmp70_, "test_collection.contains (data[j])");
+						}
+					}
+				}
+				{
+					guint _tmp71_;
+					guint j;
+					_tmp71_ = i;
+					j = _tmp71_ + 1;
+					{
+						gboolean _tmp72_;
+						_tmp72_ = TRUE;
+						while (TRUE) {
+							gboolean _tmp73_;
+							guint _tmp75_;
+							gchar** _tmp76_;
+							gint _tmp76__length1;
+							GeeCollection* _tmp77_;
+							gchar** _tmp78_;
+							gint _tmp78__length1;
+							guint _tmp79_;
+							const gchar* _tmp80_;
+							gboolean _tmp81_ = FALSE;
+							_tmp73_ = _tmp72_;
+							if (!_tmp73_) {
+								guint _tmp74_;
+								_tmp74_ = j;
+								j = _tmp74_ + 1;
+							}
+							_tmp72_ = FALSE;
+							_tmp75_ = j;
+							_tmp76_ = data;
+							_tmp76__length1 = data_length1;
+							if (!(_tmp75_ < ((guint) _tmp76__length1))) {
+								break;
+							}
+							_tmp77_ = self->test_collection;
+							_tmp78_ = data;
+							_tmp78__length1 = data_length1;
+							_tmp79_ = j;
+							_tmp80_ = _tmp78_[_tmp79_];
+							_tmp81_ = gee_collection_contains (_tmp77_, _tmp80_);
+							_vala_assert (!_tmp81_, "! test_collection.contains (data[j])");
+						}
+					}
+				}
+				_tmp82_ = self->test_collection;
+				_tmp83_ = gee_collection_get_size (_tmp82_);
+				_tmp84_ = _tmp83_;
+				_tmp85_ = i;
+				_vala_assert (((guint) _tmp84_) == (_tmp85_ + 1), "test_collection.size == i + 1");
+				_tmp86_ = self->test_collection;
+				_tmp87_ = gee_collection_get_is_empty (_tmp86_);
+				_tmp88_ = _tmp87_;
+				_vala_assert (!_tmp88_, "! test_collection.is_empty");
+			}
+		}
+	}
+	{
+		guint i;
+		i = (guint) 0;
+		{
+			gboolean _tmp89_;
+			_tmp89_ = TRUE;
+			while (TRUE) {
+				gboolean _tmp90_;
+				guint _tmp92_;
+				guint* _tmp93_;
+				gint _tmp93__length1;
+				GeeCollection* _tmp94_;
+				gchar** _tmp95_;
+				gint _tmp95__length1;
+				guint* _tmp96_;
+				gint _tmp96__length1;
+				guint _tmp97_;
+				guint _tmp98_;
+				const gchar* _tmp99_;
+				gboolean _tmp100_ = FALSE;
+				GeeCollection* _tmp121_;
+				gint _tmp122_;
+				gint _tmp123_;
+				gchar** _tmp124_;
+				gint _tmp124__length1;
+				guint _tmp125_;
+				GeeCollection* _tmp126_;
+				gchar** _tmp127_;
+				gint _tmp127__length1;
+				guint* _tmp128_;
+				gint _tmp128__length1;
+				guint _tmp129_;
+				guint _tmp130_;
+				const gchar* _tmp131_;
+				gboolean _tmp132_ = FALSE;
+				GeeCollection* _tmp153_;
+				gint _tmp154_;
+				gint _tmp155_;
+				gchar** _tmp156_;
+				gint _tmp156__length1;
+				guint _tmp157_;
+				_tmp90_ = _tmp89_;
+				if (!_tmp90_) {
+					guint _tmp91_;
+					_tmp91_ = i;
+					i = _tmp91_ + 1;
+				}
+				_tmp89_ = FALSE;
+				_tmp92_ = i;
+				_tmp93_ = idx;
+				_tmp93__length1 = idx_length1;
+				if (!(_tmp92_ < ((guint) _tmp93__length1))) {
+					break;
+				}
+				_tmp94_ = self->test_collection;
+				_tmp95_ = data;
+				_tmp95__length1 = data_length1;
+				_tmp96_ = idx;
+				_tmp96__length1 = idx_length1;
+				_tmp97_ = i;
+				_tmp98_ = _tmp96_[_tmp97_];
+				_tmp99_ = _tmp95_[_tmp98_];
+				_tmp100_ = gee_collection_remove (_tmp94_, _tmp99_);
+				_vala_assert (_tmp100_, "test_collection.remove (data[idx[i]])");
+				{
+					guint j;
+					j = (guint) 0;
+					{
+						gboolean _tmp101_;
+						_tmp101_ = TRUE;
+						while (TRUE) {
+							gboolean _tmp102_;
+							guint _tmp104_;
+							gchar** _tmp105_;
+							gint _tmp105__length1;
+							gboolean removed;
+							GeeCollection* _tmp115_;
+							gchar** _tmp116_;
+							gint _tmp116__length1;
+							guint _tmp117_;
+							const gchar* _tmp118_;
+							gboolean _tmp119_ = FALSE;
+							gboolean _tmp120_;
+							_tmp102_ = _tmp101_;
+							if (!_tmp102_) {
+								guint _tmp103_;
+								_tmp103_ = j;
+								j = _tmp103_ + 1;
+							}
+							_tmp101_ = FALSE;
+							_tmp104_ = j;
+							_tmp105_ = data;
+							_tmp105__length1 = data_length1;
+							if (!(_tmp104_ < ((guint) _tmp105__length1))) {
+								break;
+							}
+							removed = FALSE;
+							{
+								guint k;
+								k = (guint) 0;
+								{
+									gboolean _tmp106_;
+									_tmp106_ = TRUE;
+									while (TRUE) {
+										gboolean _tmp107_;
+										guint _tmp109_;
+										guint _tmp110_;
+										guint* _tmp111_;
+										gint _tmp111__length1;
+										guint _tmp112_;
+										guint _tmp113_;
+										guint _tmp114_;
+										_tmp107_ = _tmp106_;
+										if (!_tmp107_) {
+											guint _tmp108_;
+											_tmp108_ = k;
+											k = _tmp108_ + 1;
+										}
+										_tmp106_ = FALSE;
+										_tmp109_ = k;
+										_tmp110_ = i;
+										if (!(_tmp109_ <= _tmp110_)) {
+											break;
+										}
+										_tmp111_ = idx;
+										_tmp111__length1 = idx_length1;
+										_tmp112_ = k;
+										_tmp113_ = _tmp111_[_tmp112_];
+										_tmp114_ = j;
+										if (_tmp113_ == _tmp114_) {
+											removed = TRUE;
+											break;
+										}
+									}
+								}
+							}
+							_tmp115_ = self->test_collection;
+							_tmp116_ = data;
+							_tmp116__length1 = data_length1;
+							_tmp117_ = j;
+							_tmp118_ = _tmp116_[_tmp117_];
+							_tmp119_ = gee_collection_contains (_tmp115_, _tmp118_);
+							_tmp120_ = removed;
+							_vala_assert (_tmp119_ == (!_tmp120_), "test_collection.contains (data[j]) == !removed");
+						}
+					}
+				}
+				_tmp121_ = self->test_collection;
+				_tmp122_ = gee_collection_get_size (_tmp121_);
+				_tmp123_ = _tmp122_;
+				_tmp124_ = data;
+				_tmp124__length1 = data_length1;
+				_tmp125_ = i;
+				_vala_assert (((guint) _tmp123_) == (_tmp124__length1 - (_tmp125_ + 1)), "test_collection.size == data.length - (i + 1)");
+				_tmp126_ = self->test_collection;
+				_tmp127_ = data;
+				_tmp127__length1 = data_length1;
+				_tmp128_ = idx;
+				_tmp128__length1 = idx_length1;
+				_tmp129_ = i;
+				_tmp130_ = _tmp128_[_tmp129_];
+				_tmp131_ = _tmp127_[_tmp130_];
+				_tmp132_ = gee_collection_remove (_tmp126_, _tmp131_);
+				_vala_assert (!_tmp132_, "! test_collection.remove (data[idx[i]])");
+				{
+					guint j;
+					j = (guint) 0;
+					{
+						gboolean _tmp133_;
+						_tmp133_ = TRUE;
+						while (TRUE) {
+							gboolean _tmp134_;
+							guint _tmp136_;
+							gchar** _tmp137_;
+							gint _tmp137__length1;
+							gboolean removed;
+							GeeCollection* _tmp147_;
+							gchar** _tmp148_;
+							gint _tmp148__length1;
+							guint _tmp149_;
+							const gchar* _tmp150_;
+							gboolean _tmp151_ = FALSE;
+							gboolean _tmp152_;
+							_tmp134_ = _tmp133_;
+							if (!_tmp134_) {
+								guint _tmp135_;
+								_tmp135_ = j;
+								j = _tmp135_ + 1;
+							}
+							_tmp133_ = FALSE;
+							_tmp136_ = j;
+							_tmp137_ = data;
+							_tmp137__length1 = data_length1;
+							if (!(_tmp136_ < ((guint) _tmp137__length1))) {
+								break;
+							}
+							removed = FALSE;
+							{
+								guint k;
+								k = (guint) 0;
+								{
+									gboolean _tmp138_;
+									_tmp138_ = TRUE;
+									while (TRUE) {
+										gboolean _tmp139_;
+										guint _tmp141_;
+										guint _tmp142_;
+										guint* _tmp143_;
+										gint _tmp143__length1;
+										guint _tmp144_;
+										guint _tmp145_;
+										guint _tmp146_;
+										_tmp139_ = _tmp138_;
+										if (!_tmp139_) {
+											guint _tmp140_;
+											_tmp140_ = k;
+											k = _tmp140_ + 1;
+										}
+										_tmp138_ = FALSE;
+										_tmp141_ = k;
+										_tmp142_ = i;
+										if (!(_tmp141_ <= _tmp142_)) {
+											break;
+										}
+										_tmp143_ = idx;
+										_tmp143__length1 = idx_length1;
+										_tmp144_ = k;
+										_tmp145_ = _tmp143_[_tmp144_];
+										_tmp146_ = j;
+										if (_tmp145_ == _tmp146_) {
+											removed = TRUE;
+											break;
+										}
+									}
+								}
+							}
+							_tmp147_ = self->test_collection;
+							_tmp148_ = data;
+							_tmp148__length1 = data_length1;
+							_tmp149_ = j;
+							_tmp150_ = _tmp148_[_tmp149_];
+							_tmp151_ = gee_collection_contains (_tmp147_, _tmp150_);
+							_tmp152_ = removed;
+							_vala_assert (_tmp151_ == (!_tmp152_), "test_collection.contains (data[j]) == !removed");
+						}
+					}
+				}
+				_tmp153_ = self->test_collection;
+				_tmp154_ = gee_collection_get_size (_tmp153_);
+				_tmp155_ = _tmp154_;
+				_tmp156_ = data;
+				_tmp156__length1 = data_length1;
+				_tmp157_ = i;
+				_vala_assert (((guint) _tmp155_) == (_tmp156__length1 - (_tmp157_ + 1)), "test_collection.size == data.length - (i + 1)");
+			}
+		}
+	}
+	_tmp158_ = self->test_collection;
+	gee_collection_clear (_tmp158_);
+	_tmp159_ = data;
+	_tmp159__length1 = data_length1;
+	{
+		gchar** el_collection = NULL;
+		gint el_collection_length1 = 0;
+		gint _el_collection_size_ = 0;
+		gint el_it = 0;
+		el_collection = _tmp159_;
+		el_collection_length1 = _tmp159__length1;
+		for (el_it = 0; el_it < _tmp159__length1; el_it = el_it + 1) {
+			const gchar* el = NULL;
+			el = el_collection[el_it];
+			{
+				GeeCollection* _tmp160_;
+				const gchar* _tmp161_;
+				gboolean _tmp162_ = FALSE;
+				_tmp160_ = self->test_collection;
+				_tmp161_ = el;
+				_tmp162_ = gee_collection_contains (_tmp160_, _tmp161_);
+				_vala_assert (!_tmp162_, "! test_collection.contains (el)");
+			}
+		}
+	}
+	_tmp163_ = self->test_collection;
+	_tmp164_ = gee_collection_get_size (_tmp163_);
+	_tmp165_ = _tmp164_;
+	_vala_assert (_tmp165_ == 0, "test_collection.size == 0");
+	_tmp166_ = self->test_collection;
+	_tmp167_ = gee_collection_get_is_empty (_tmp166_);
+	_tmp168_ = _tmp167_;
+	_vala_assert (_tmp168_, "test_collection.is_empty");
 }
 
 
 void collection_tests_test_add_remove (CollectionTests* self) {
 	GeeCollection* _tmp0_;
-	gchar* _tmp1_;
-	gchar* _tmp2_;
-	gchar* _tmp3_;
-	gchar* _tmp4_;
-	gchar* _tmp5_;
-	gchar* _tmp6_;
-	gchar* _tmp7_;
-	gchar* _tmp8_;
-	gchar* _tmp9_;
-	gchar* _tmp10_;
-	gchar* _tmp11_;
-	gchar* _tmp12_;
-	gchar* _tmp13_;
-	gchar* _tmp14_;
-	gchar* _tmp15_;
-	gchar* _tmp16_;
-	gchar* _tmp17_;
-	gchar* _tmp18_;
-	gchar* _tmp19_;
-	gchar* _tmp20_;
-	gchar* _tmp21_;
-	gchar* _tmp22_;
-	gchar* _tmp23_;
-	gchar* _tmp24_;
-	gchar* _tmp25_;
-	gchar* _tmp26_;
-	gchar* _tmp27_;
-	gchar* _tmp28_;
-	gchar* _tmp29_;
-	gchar* _tmp30_;
-	gchar* _tmp31_;
-	gchar* _tmp32_;
-	gchar* _tmp33_;
-	gchar* _tmp34_;
-	gchar* _tmp35_;
-	gchar* _tmp36_;
-	gchar* _tmp37_;
-	gchar* _tmp38_;
-	gchar* _tmp39_;
-	gchar** _tmp40_ = NULL;
+	gint _tmp1_ = 0;
+	gchar** _tmp2_ = NULL;
 	gchar** to_add;
 	gint to_add_length1;
 	gint _to_add_size_;
 	gint expected_size;
-	gchar** _tmp41_;
-	gint _tmp41__length1;
-	GeeCollection* _tmp56_;
-	gint _tmp57_;
-	gint _tmp58_;
-	gchar** _tmp59_;
-	gint _tmp59__length1;
-	gchar** _tmp60_;
-	gint _tmp60__length1;
-	gchar** _tmp65_;
-	gint _tmp65__length1;
-	GeeCollection* _tmp80_;
-	gint _tmp81_;
-	gint _tmp82_;
+	gchar** _tmp3_;
+	gint _tmp3__length1;
+	GeeCollection* _tmp18_;
+	gint _tmp19_;
+	gint _tmp20_;
+	gchar** _tmp21_;
+	gint _tmp21__length1;
+	gchar** _tmp22_;
+	gint _tmp22__length1;
+	gchar** _tmp27_;
+	gint _tmp27__length1;
+	GeeCollection* _tmp42_;
+	gint _tmp43_;
+	gint _tmp44_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->test_collection;
 	_vala_assert (_tmp0_ != NULL, "test_collection != null");
-	_tmp1_ = g_strdup ("one");
-	_tmp2_ = g_strdup ("two");
-	_tmp3_ = g_strdup ("three");
-	_tmp4_ = g_strdup ("four");
-	_tmp5_ = g_strdup ("five");
-	_tmp6_ = g_strdup ("six");
-	_tmp7_ = g_strdup ("seven");
-	_tmp8_ = g_strdup ("eight");
-	_tmp9_ = g_strdup ("nine");
-	_tmp10_ = g_strdup ("ten");
-	_tmp11_ = g_strdup ("eleven");
-	_tmp12_ = g_strdup ("twelve");
-	_tmp13_ = g_strdup ("thirteen");
-	_tmp14_ = g_strdup ("fourteen");
-	_tmp15_ = g_strdup ("fifteen");
-	_tmp16_ = g_strdup ("sixteen");
-	_tmp17_ = g_strdup ("seventeen");
-	_tmp18_ = g_strdup ("eighteen");
-	_tmp19_ = g_strdup ("nineteen");
-	_tmp20_ = g_strdup ("twenty");
-	_tmp21_ = g_strdup ("twenty one");
-	_tmp22_ = g_strdup ("twenty two");
-	_tmp23_ = g_strdup ("twenty three");
-	_tmp24_ = g_strdup ("twenty four");
-	_tmp25_ = g_strdup ("twenty five");
-	_tmp26_ = g_strdup ("twenty six");
-	_tmp27_ = g_strdup ("twenty seven");
-	_tmp28_ = g_strdup ("twenty eight");
-	_tmp29_ = g_strdup ("twenty nine");
-	_tmp30_ = g_strdup ("thirty");
-	_tmp31_ = g_strdup ("thirty one");
-	_tmp32_ = g_strdup ("thirty two");
-	_tmp33_ = g_strdup ("thirty four");
-	_tmp34_ = g_strdup ("thirty five");
-	_tmp35_ = g_strdup ("thirty six");
-	_tmp36_ = g_strdup ("thirty seven");
-	_tmp37_ = g_strdup ("thirty eight");
-	_tmp38_ = g_strdup ("thirty nine");
-	_tmp39_ = g_strdup ("fourty");
-	_tmp40_ = g_new0 (gchar*, 39 + 1);
-	_tmp40_[0] = _tmp1_;
-	_tmp40_[1] = _tmp2_;
-	_tmp40_[2] = _tmp3_;
-	_tmp40_[3] = _tmp4_;
-	_tmp40_[4] = _tmp5_;
-	_tmp40_[5] = _tmp6_;
-	_tmp40_[6] = _tmp7_;
-	_tmp40_[7] = _tmp8_;
-	_tmp40_[8] = _tmp9_;
-	_tmp40_[9] = _tmp10_;
-	_tmp40_[10] = _tmp11_;
-	_tmp40_[11] = _tmp12_;
-	_tmp40_[12] = _tmp13_;
-	_tmp40_[13] = _tmp14_;
-	_tmp40_[14] = _tmp15_;
-	_tmp40_[15] = _tmp16_;
-	_tmp40_[16] = _tmp17_;
-	_tmp40_[17] = _tmp18_;
-	_tmp40_[18] = _tmp19_;
-	_tmp40_[19] = _tmp20_;
-	_tmp40_[20] = _tmp21_;
-	_tmp40_[21] = _tmp22_;
-	_tmp40_[22] = _tmp23_;
-	_tmp40_[23] = _tmp24_;
-	_tmp40_[24] = _tmp25_;
-	_tmp40_[25] = _tmp26_;
-	_tmp40_[26] = _tmp27_;
-	_tmp40_[27] = _tmp28_;
-	_tmp40_[28] = _tmp29_;
-	_tmp40_[29] = _tmp30_;
-	_tmp40_[30] = _tmp31_;
-	_tmp40_[31] = _tmp32_;
-	_tmp40_[32] = _tmp33_;
-	_tmp40_[33] = _tmp34_;
-	_tmp40_[34] = _tmp35_;
-	_tmp40_[35] = _tmp36_;
-	_tmp40_[36] = _tmp37_;
-	_tmp40_[37] = _tmp38_;
-	_tmp40_[38] = _tmp39_;
-	to_add = _tmp40_;
-	to_add_length1 = 39;
+	_tmp2_ = test_data_get_data (&_tmp1_);
+	to_add = _tmp2_;
+	to_add_length1 = _tmp1_;
 	_to_add_size_ = to_add_length1;
 	expected_size = 0;
-	_tmp41_ = to_add;
-	_tmp41__length1 = to_add_length1;
+	_tmp3_ = to_add;
+	_tmp3__length1 = to_add_length1;
 	{
 		gchar** a_collection = NULL;
 		gint a_collection_length1 = 0;
 		gint _a_collection_size_ = 0;
 		gint a_it = 0;
-		a_collection = _tmp41_;
-		a_collection_length1 = _tmp41__length1;
-		for (a_it = 0; a_it < _tmp41__length1; a_it = a_it + 1) {
-			gchar* _tmp42_;
+		a_collection = _tmp3_;
+		a_collection_length1 = _tmp3__length1;
+		for (a_it = 0; a_it < _tmp3__length1; a_it = a_it + 1) {
+			gchar* _tmp4_;
 			gchar* a = NULL;
-			_tmp42_ = g_strdup (a_collection[a_it]);
-			a = _tmp42_;
+			_tmp4_ = g_strdup (a_collection[a_it]);
+			a = _tmp4_;
 			{
-				GeeCollection* _tmp43_;
-				const gchar* _tmp44_;
-				gboolean _tmp45_ = FALSE;
-				GeeCollection* _tmp46_;
-				gint _tmp47_;
-				gint _tmp48_;
-				gint _tmp49_;
-				GeeCollection* _tmp50_;
-				const gchar* _tmp51_;
-				gboolean _tmp52_ = FALSE;
-				GeeCollection* _tmp53_;
-				const gchar* _tmp54_;
-				gboolean _tmp55_ = FALSE;
-				_tmp43_ = self->test_collection;
-				_tmp44_ = a;
-				_tmp45_ = gee_collection_contains (_tmp43_, _tmp44_);
-				_vala_assert (!_tmp45_, "!test_collection.contains (a)");
-				_tmp46_ = self->test_collection;
-				_tmp47_ = gee_collection_get_size (_tmp46_);
-				_tmp48_ = _tmp47_;
-				_tmp49_ = expected_size;
-				expected_size = _tmp49_ + 1;
-				_vala_assert (_tmp48_ == _tmp49_, "test_collection.size == expected_size++");
-				_tmp50_ = self->test_collection;
-				_tmp51_ = a;
-				_tmp52_ = gee_collection_add (_tmp50_, _tmp51_);
-				_vala_assert (_tmp52_, "test_collection.add (a)");
-				_tmp53_ = self->test_collection;
-				_tmp54_ = a;
-				_tmp55_ = gee_collection_contains (_tmp53_, _tmp54_);
-				_vala_assert (_tmp55_, "test_collection.contains (a)");
+				GeeCollection* _tmp5_;
+				const gchar* _tmp6_;
+				gboolean _tmp7_ = FALSE;
+				GeeCollection* _tmp8_;
+				gint _tmp9_;
+				gint _tmp10_;
+				gint _tmp11_;
+				GeeCollection* _tmp12_;
+				const gchar* _tmp13_;
+				gboolean _tmp14_ = FALSE;
+				GeeCollection* _tmp15_;
+				const gchar* _tmp16_;
+				gboolean _tmp17_ = FALSE;
+				_tmp5_ = self->test_collection;
+				_tmp6_ = a;
+				_tmp7_ = gee_collection_contains (_tmp5_, _tmp6_);
+				_vala_assert (!_tmp7_, "!test_collection.contains (a)");
+				_tmp8_ = self->test_collection;
+				_tmp9_ = gee_collection_get_size (_tmp8_);
+				_tmp10_ = _tmp9_;
+				_tmp11_ = expected_size;
+				expected_size = _tmp11_ + 1;
+				_vala_assert (_tmp10_ == _tmp11_, "test_collection.size == expected_size++");
+				_tmp12_ = self->test_collection;
+				_tmp13_ = a;
+				_tmp14_ = gee_collection_add (_tmp12_, _tmp13_);
+				_vala_assert (_tmp14_, "test_collection.add (a)");
+				_tmp15_ = self->test_collection;
+				_tmp16_ = a;
+				_tmp17_ = gee_collection_contains (_tmp15_, _tmp16_);
+				_vala_assert (_tmp17_, "test_collection.contains (a)");
 				_g_free0 (a);
 			}
 		}
 	}
-	_tmp56_ = self->test_collection;
-	_tmp57_ = gee_collection_get_size (_tmp56_);
-	_tmp58_ = _tmp57_;
-	_tmp59_ = to_add;
-	_tmp59__length1 = to_add_length1;
-	_vala_assert (_tmp58_ == _tmp59__length1, "test_collection.size == to_add.length");
-	_tmp60_ = to_add;
-	_tmp60__length1 = to_add_length1;
+	_tmp18_ = self->test_collection;
+	_tmp19_ = gee_collection_get_size (_tmp18_);
+	_tmp20_ = _tmp19_;
+	_tmp21_ = to_add;
+	_tmp21__length1 = to_add_length1;
+	_vala_assert (_tmp20_ == _tmp21__length1, "test_collection.size == to_add.length");
+	_tmp22_ = to_add;
+	_tmp22__length1 = to_add_length1;
 	{
 		gchar** a_collection = NULL;
 		gint a_collection_length1 = 0;
 		gint _a_collection_size_ = 0;
 		gint a_it = 0;
-		a_collection = _tmp60_;
-		a_collection_length1 = _tmp60__length1;
-		for (a_it = 0; a_it < _tmp60__length1; a_it = a_it + 1) {
-			gchar* _tmp61_;
+		a_collection = _tmp22_;
+		a_collection_length1 = _tmp22__length1;
+		for (a_it = 0; a_it < _tmp22__length1; a_it = a_it + 1) {
+			gchar* _tmp23_;
 			gchar* a = NULL;
-			_tmp61_ = g_strdup (a_collection[a_it]);
-			a = _tmp61_;
+			_tmp23_ = g_strdup (a_collection[a_it]);
+			a = _tmp23_;
 			{
-				GeeCollection* _tmp62_;
-				const gchar* _tmp63_;
-				gboolean _tmp64_ = FALSE;
-				_tmp62_ = self->test_collection;
-				_tmp63_ = a;
-				_tmp64_ = gee_collection_contains (_tmp62_, _tmp63_);
-				_vala_assert (_tmp64_, "test_collection.contains (a)");
+				GeeCollection* _tmp24_;
+				const gchar* _tmp25_;
+				gboolean _tmp26_ = FALSE;
+				_tmp24_ = self->test_collection;
+				_tmp25_ = a;
+				_tmp26_ = gee_collection_contains (_tmp24_, _tmp25_);
+				_vala_assert (_tmp26_, "test_collection.contains (a)");
 				_g_free0 (a);
 			}
 		}
 	}
-	_tmp65_ = to_add;
-	_tmp65__length1 = to_add_length1;
+	_tmp27_ = to_add;
+	_tmp27__length1 = to_add_length1;
 	{
 		gchar** a_collection = NULL;
 		gint a_collection_length1 = 0;
 		gint _a_collection_size_ = 0;
 		gint a_it = 0;
-		a_collection = _tmp65_;
-		a_collection_length1 = _tmp65__length1;
-		for (a_it = 0; a_it < _tmp65__length1; a_it = a_it + 1) {
-			gchar* _tmp66_;
+		a_collection = _tmp27_;
+		a_collection_length1 = _tmp27__length1;
+		for (a_it = 0; a_it < _tmp27__length1; a_it = a_it + 1) {
+			gchar* _tmp28_;
 			gchar* a = NULL;
-			_tmp66_ = g_strdup (a_collection[a_it]);
-			a = _tmp66_;
+			_tmp28_ = g_strdup (a_collection[a_it]);
+			a = _tmp28_;
 			{
-				GeeCollection* _tmp67_;
-				const gchar* _tmp68_;
-				gboolean _tmp69_ = FALSE;
-				GeeCollection* _tmp70_;
-				gint _tmp71_;
-				gint _tmp72_;
-				gint _tmp73_;
-				GeeCollection* _tmp74_;
-				const gchar* _tmp75_;
-				gboolean _tmp76_ = FALSE;
-				GeeCollection* _tmp77_;
-				const gchar* _tmp78_;
-				gboolean _tmp79_ = FALSE;
-				_tmp67_ = self->test_collection;
-				_tmp68_ = a;
-				_tmp69_ = gee_collection_contains (_tmp67_, _tmp68_);
-				_vala_assert (_tmp69_, "test_collection.contains (a)");
-				_tmp70_ = self->test_collection;
-				_tmp71_ = gee_collection_get_size (_tmp70_);
-				_tmp72_ = _tmp71_;
-				_tmp73_ = expected_size;
-				expected_size = _tmp73_ - 1;
-				_vala_assert (_tmp72_ == _tmp73_, "test_collection.size == expected_size--");
-				_tmp74_ = self->test_collection;
-				_tmp75_ = a;
-				_tmp76_ = gee_collection_remove (_tmp74_, _tmp75_);
-				_vala_assert (_tmp76_, "test_collection.remove (a)");
-				_tmp77_ = self->test_collection;
-				_tmp78_ = a;
-				_tmp79_ = gee_collection_contains (_tmp77_, _tmp78_);
-				_vala_assert (!_tmp79_, "!test_collection.contains (a)");
+				GeeCollection* _tmp29_;
+				const gchar* _tmp30_;
+				gboolean _tmp31_ = FALSE;
+				GeeCollection* _tmp32_;
+				gint _tmp33_;
+				gint _tmp34_;
+				gint _tmp35_;
+				GeeCollection* _tmp36_;
+				const gchar* _tmp37_;
+				gboolean _tmp38_ = FALSE;
+				GeeCollection* _tmp39_;
+				const gchar* _tmp40_;
+				gboolean _tmp41_ = FALSE;
+				_tmp29_ = self->test_collection;
+				_tmp30_ = a;
+				_tmp31_ = gee_collection_contains (_tmp29_, _tmp30_);
+				_vala_assert (_tmp31_, "test_collection.contains (a)");
+				_tmp32_ = self->test_collection;
+				_tmp33_ = gee_collection_get_size (_tmp32_);
+				_tmp34_ = _tmp33_;
+				_tmp35_ = expected_size;
+				expected_size = _tmp35_ - 1;
+				_vala_assert (_tmp34_ == _tmp35_, "test_collection.size == expected_size--");
+				_tmp36_ = self->test_collection;
+				_tmp37_ = a;
+				_tmp38_ = gee_collection_remove (_tmp36_, _tmp37_);
+				_vala_assert (_tmp38_, "test_collection.remove (a)");
+				_tmp39_ = self->test_collection;
+				_tmp40_ = a;
+				_tmp41_ = gee_collection_contains (_tmp39_, _tmp40_);
+				_vala_assert (!_tmp41_, "!test_collection.contains (a)");
 				_g_free0 (a);
 			}
 		}
 	}
-	_tmp80_ = self->test_collection;
-	_tmp81_ = gee_collection_get_size (_tmp80_);
-	_tmp82_ = _tmp81_;
-	_vala_assert (_tmp82_ == 0, "test_collection.size == 0");
-	to_add = (_vala_array_free (to_add, to_add_length1, (GDestroyNotify) g_free), NULL);
+	_tmp42_ = self->test_collection;
+	_tmp43_ = gee_collection_get_size (_tmp42_);
+	_tmp44_ = _tmp43_;
+	_vala_assert (_tmp44_ == 0, "test_collection.size == 0");
 }
 
 
 void collection_tests_test_clear (CollectionTests* self) {
 	GeeCollection* _tmp0_;
-	gchar* _tmp1_;
-	gchar* _tmp2_;
-	gchar* _tmp3_;
-	gchar* _tmp4_;
-	gchar* _tmp5_;
-	gchar* _tmp6_;
-	gchar* _tmp7_;
-	gchar* _tmp8_;
-	gchar* _tmp9_;
-	gchar* _tmp10_;
-	gchar* _tmp11_;
-	gchar* _tmp12_;
-	gchar* _tmp13_;
-	gchar* _tmp14_;
-	gchar* _tmp15_;
-	gchar* _tmp16_;
-	gchar* _tmp17_;
-	gchar* _tmp18_;
-	gchar* _tmp19_;
-	gchar* _tmp20_;
-	gchar* _tmp21_;
-	gchar* _tmp22_;
-	gchar* _tmp23_;
-	gchar* _tmp24_;
-	gchar* _tmp25_;
-	gchar* _tmp26_;
-	gchar* _tmp27_;
-	gchar* _tmp28_;
-	gchar* _tmp29_;
-	gchar* _tmp30_;
-	gchar* _tmp31_;
-	gchar* _tmp32_;
-	gchar* _tmp33_;
-	gchar* _tmp34_;
-	gchar* _tmp35_;
-	gchar* _tmp36_;
-	gchar* _tmp37_;
-	gchar* _tmp38_;
-	gchar* _tmp39_;
-	gchar** _tmp40_ = NULL;
+	gint _tmp1_ = 0;
+	gchar** _tmp2_ = NULL;
 	gchar** to_add;
 	gint to_add_length1;
 	gint _to_add_size_;
 	gint expected_size;
-	gchar** _tmp41_;
-	gint _tmp41__length1;
-	GeeCollection* _tmp56_;
-	gint _tmp57_;
-	gint _tmp58_;
-	gchar** _tmp59_;
-	gint _tmp59__length1;
-	GeeCollection* _tmp60_;
-	GeeCollection* _tmp61_;
-	gint _tmp62_;
-	gint _tmp63_;
-	GeeCollection* _tmp64_;
-	GeeIterator* _tmp65_ = NULL;
+	gchar** _tmp3_;
+	gint _tmp3__length1;
+	GeeCollection* _tmp18_;
+	gint _tmp19_;
+	gint _tmp20_;
+	gchar** _tmp21_;
+	gint _tmp21__length1;
+	GeeCollection* _tmp22_;
+	GeeCollection* _tmp23_;
+	gint _tmp24_;
+	gint _tmp25_;
+	GeeCollection* _tmp26_;
+	GeeIterator* _tmp27_ = NULL;
 	GeeIterator* iter;
-	gboolean _tmp66_ = FALSE;
+	gboolean _tmp28_ = FALSE;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->test_collection;
 	_vala_assert (_tmp0_ != NULL, "test_collection != null");
-	_tmp1_ = g_strdup ("one");
-	_tmp2_ = g_strdup ("two");
-	_tmp3_ = g_strdup ("three");
-	_tmp4_ = g_strdup ("four");
-	_tmp5_ = g_strdup ("five");
-	_tmp6_ = g_strdup ("six");
-	_tmp7_ = g_strdup ("seven");
-	_tmp8_ = g_strdup ("eight");
-	_tmp9_ = g_strdup ("nine");
-	_tmp10_ = g_strdup ("ten");
-	_tmp11_ = g_strdup ("eleven");
-	_tmp12_ = g_strdup ("twelve");
-	_tmp13_ = g_strdup ("thirteen");
-	_tmp14_ = g_strdup ("fourteen");
-	_tmp15_ = g_strdup ("fifteen");
-	_tmp16_ = g_strdup ("sixteen");
-	_tmp17_ = g_strdup ("seventeen");
-	_tmp18_ = g_strdup ("eighteen");
-	_tmp19_ = g_strdup ("nineteen");
-	_tmp20_ = g_strdup ("twenty");
-	_tmp21_ = g_strdup ("twenty one");
-	_tmp22_ = g_strdup ("twenty two");
-	_tmp23_ = g_strdup ("twenty three");
-	_tmp24_ = g_strdup ("twenty four");
-	_tmp25_ = g_strdup ("twenty five");
-	_tmp26_ = g_strdup ("twenty six");
-	_tmp27_ = g_strdup ("twenty seven");
-	_tmp28_ = g_strdup ("twenty eight");
-	_tmp29_ = g_strdup ("twenty nine");
-	_tmp30_ = g_strdup ("thirty");
-	_tmp31_ = g_strdup ("thirty one");
-	_tmp32_ = g_strdup ("thirty two");
-	_tmp33_ = g_strdup ("thirty four");
-	_tmp34_ = g_strdup ("thirty five");
-	_tmp35_ = g_strdup ("thirty six");
-	_tmp36_ = g_strdup ("thirty seven");
-	_tmp37_ = g_strdup ("thirty eight");
-	_tmp38_ = g_strdup ("thirty nine");
-	_tmp39_ = g_strdup ("fourty");
-	_tmp40_ = g_new0 (gchar*, 39 + 1);
-	_tmp40_[0] = _tmp1_;
-	_tmp40_[1] = _tmp2_;
-	_tmp40_[2] = _tmp3_;
-	_tmp40_[3] = _tmp4_;
-	_tmp40_[4] = _tmp5_;
-	_tmp40_[5] = _tmp6_;
-	_tmp40_[6] = _tmp7_;
-	_tmp40_[7] = _tmp8_;
-	_tmp40_[8] = _tmp9_;
-	_tmp40_[9] = _tmp10_;
-	_tmp40_[10] = _tmp11_;
-	_tmp40_[11] = _tmp12_;
-	_tmp40_[12] = _tmp13_;
-	_tmp40_[13] = _tmp14_;
-	_tmp40_[14] = _tmp15_;
-	_tmp40_[15] = _tmp16_;
-	_tmp40_[16] = _tmp17_;
-	_tmp40_[17] = _tmp18_;
-	_tmp40_[18] = _tmp19_;
-	_tmp40_[19] = _tmp20_;
-	_tmp40_[20] = _tmp21_;
-	_tmp40_[21] = _tmp22_;
-	_tmp40_[22] = _tmp23_;
-	_tmp40_[23] = _tmp24_;
-	_tmp40_[24] = _tmp25_;
-	_tmp40_[25] = _tmp26_;
-	_tmp40_[26] = _tmp27_;
-	_tmp40_[27] = _tmp28_;
-	_tmp40_[28] = _tmp29_;
-	_tmp40_[29] = _tmp30_;
-	_tmp40_[30] = _tmp31_;
-	_tmp40_[31] = _tmp32_;
-	_tmp40_[32] = _tmp33_;
-	_tmp40_[33] = _tmp34_;
-	_tmp40_[34] = _tmp35_;
-	_tmp40_[35] = _tmp36_;
-	_tmp40_[36] = _tmp37_;
-	_tmp40_[37] = _tmp38_;
-	_tmp40_[38] = _tmp39_;
-	to_add = _tmp40_;
-	to_add_length1 = 39;
+	_tmp2_ = test_data_get_data (&_tmp1_);
+	to_add = _tmp2_;
+	to_add_length1 = _tmp1_;
 	_to_add_size_ = to_add_length1;
 	expected_size = 0;
-	_tmp41_ = to_add;
-	_tmp41__length1 = to_add_length1;
+	_tmp3_ = to_add;
+	_tmp3__length1 = to_add_length1;
 	{
 		gchar** a_collection = NULL;
 		gint a_collection_length1 = 0;
 		gint _a_collection_size_ = 0;
 		gint a_it = 0;
-		a_collection = _tmp41_;
-		a_collection_length1 = _tmp41__length1;
-		for (a_it = 0; a_it < _tmp41__length1; a_it = a_it + 1) {
-			gchar* _tmp42_;
+		a_collection = _tmp3_;
+		a_collection_length1 = _tmp3__length1;
+		for (a_it = 0; a_it < _tmp3__length1; a_it = a_it + 1) {
+			gchar* _tmp4_;
 			gchar* a = NULL;
-			_tmp42_ = g_strdup (a_collection[a_it]);
-			a = _tmp42_;
+			_tmp4_ = g_strdup (a_collection[a_it]);
+			a = _tmp4_;
 			{
-				GeeCollection* _tmp43_;
-				const gchar* _tmp44_;
-				gboolean _tmp45_ = FALSE;
-				GeeCollection* _tmp46_;
-				gint _tmp47_;
-				gint _tmp48_;
-				gint _tmp49_;
-				GeeCollection* _tmp50_;
-				const gchar* _tmp51_;
-				gboolean _tmp52_ = FALSE;
-				GeeCollection* _tmp53_;
-				const gchar* _tmp54_;
-				gboolean _tmp55_ = FALSE;
-				_tmp43_ = self->test_collection;
-				_tmp44_ = a;
-				_tmp45_ = gee_collection_contains (_tmp43_, _tmp44_);
-				_vala_assert (!_tmp45_, "!test_collection.contains (a)");
-				_tmp46_ = self->test_collection;
-				_tmp47_ = gee_collection_get_size (_tmp46_);
-				_tmp48_ = _tmp47_;
-				_tmp49_ = expected_size;
-				expected_size = _tmp49_ + 1;
-				_vala_assert (_tmp48_ == _tmp49_, "test_collection.size == expected_size++");
-				_tmp50_ = self->test_collection;
-				_tmp51_ = a;
-				_tmp52_ = gee_collection_add (_tmp50_, _tmp51_);
-				_vala_assert (_tmp52_, "test_collection.add (a)");
-				_tmp53_ = self->test_collection;
-				_tmp54_ = a;
-				_tmp55_ = gee_collection_contains (_tmp53_, _tmp54_);
-				_vala_assert (_tmp55_, "test_collection.contains (a)");
+				GeeCollection* _tmp5_;
+				const gchar* _tmp6_;
+				gboolean _tmp7_ = FALSE;
+				GeeCollection* _tmp8_;
+				gint _tmp9_;
+				gint _tmp10_;
+				gint _tmp11_;
+				GeeCollection* _tmp12_;
+				const gchar* _tmp13_;
+				gboolean _tmp14_ = FALSE;
+				GeeCollection* _tmp15_;
+				const gchar* _tmp16_;
+				gboolean _tmp17_ = FALSE;
+				_tmp5_ = self->test_collection;
+				_tmp6_ = a;
+				_tmp7_ = gee_collection_contains (_tmp5_, _tmp6_);
+				_vala_assert (!_tmp7_, "!test_collection.contains (a)");
+				_tmp8_ = self->test_collection;
+				_tmp9_ = gee_collection_get_size (_tmp8_);
+				_tmp10_ = _tmp9_;
+				_tmp11_ = expected_size;
+				expected_size = _tmp11_ + 1;
+				_vala_assert (_tmp10_ == _tmp11_, "test_collection.size == expected_size++");
+				_tmp12_ = self->test_collection;
+				_tmp13_ = a;
+				_tmp14_ = gee_collection_add (_tmp12_, _tmp13_);
+				_vala_assert (_tmp14_, "test_collection.add (a)");
+				_tmp15_ = self->test_collection;
+				_tmp16_ = a;
+				_tmp17_ = gee_collection_contains (_tmp15_, _tmp16_);
+				_vala_assert (_tmp17_, "test_collection.contains (a)");
 				_g_free0 (a);
 			}
 		}
 	}
-	_tmp56_ = self->test_collection;
-	_tmp57_ = gee_collection_get_size (_tmp56_);
-	_tmp58_ = _tmp57_;
-	_tmp59_ = to_add;
-	_tmp59__length1 = to_add_length1;
-	_vala_assert (_tmp58_ == _tmp59__length1, "test_collection.size == to_add.length");
-	_tmp60_ = self->test_collection;
-	gee_collection_clear (_tmp60_);
-	_tmp61_ = self->test_collection;
-	_tmp62_ = gee_collection_get_size (_tmp61_);
-	_tmp63_ = _tmp62_;
-	_vala_assert (_tmp63_ == 0, "test_collection.size == 0");
-	_tmp64_ = self->test_collection;
-	_tmp65_ = gee_iterable_iterator ((GeeIterable*) _tmp64_);
-	iter = _tmp65_;
+	_tmp18_ = self->test_collection;
+	_tmp19_ = gee_collection_get_size (_tmp18_);
+	_tmp20_ = _tmp19_;
+	_tmp21_ = to_add;
+	_tmp21__length1 = to_add_length1;
+	_vala_assert (_tmp20_ == _tmp21__length1, "test_collection.size == to_add.length");
+	_tmp22_ = self->test_collection;
+	gee_collection_clear (_tmp22_);
+	_tmp23_ = self->test_collection;
+	_tmp24_ = gee_collection_get_size (_tmp23_);
+	_tmp25_ = _tmp24_;
+	_vala_assert (_tmp25_ == 0, "test_collection.size == 0");
+	_tmp26_ = self->test_collection;
+	_tmp27_ = gee_iterable_iterator ((GeeIterable*) _tmp26_);
+	iter = _tmp27_;
 	_vala_assert (iter != NULL, "iter != null");
-	_tmp66_ = gee_iterator_has_next (iter);
-	_vala_assert (!_tmp66_, "!iter.has_next ()");
+	_tmp28_ = gee_iterator_has_next (iter);
+	_vala_assert (!_tmp28_, "!iter.has_next ()");
 	_g_object_unref0 (iter);
-	to_add = (_vala_array_free (to_add, to_add_length1, (GDestroyNotify) g_free), NULL);
 }
 
 
@@ -1615,7 +2022,7 @@ void collection_tests_test_add_all (CollectionTests* self) {
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->test_collection;
 	_vala_assert (_tmp0_ != NULL, "test_collection != null");
-	_tmp1_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp1_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	dummy = _tmp1_;
 	_tmp2_ = self->test_collection;
 	_tmp3_ = gee_collection_add_all (_tmp2_, (GeeCollection*) dummy);
@@ -1624,7 +2031,7 @@ void collection_tests_test_add_all (CollectionTests* self) {
 	_tmp5_ = gee_collection_get_is_empty (_tmp4_);
 	_tmp6_ = _tmp5_;
 	_vala_assert (_tmp6_, "test_collection.is_empty");
-	_tmp7_ = gee_abstract_collection_get_is_empty ((GeeAbstractCollection*) dummy);
+	_tmp7_ = gee_collection_get_is_empty ((GeeCollection*) dummy);
 	_tmp8_ = _tmp7_;
 	_vala_assert (_tmp8_, "dummy.is_empty");
 	_tmp9_ = self->test_collection;
@@ -1788,7 +2195,7 @@ void collection_tests_test_contains_all (CollectionTests* self) {
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->test_collection;
 	_vala_assert (_tmp0_ != NULL, "test_collection != null");
-	_tmp1_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp1_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	dummy = _tmp1_;
 	_tmp2_ = gee_abstract_collection_add ((GeeAbstractCollection*) dummy, "hello1");
 	_vala_assert (_tmp2_, "dummy.add (\"hello1\")");
@@ -1828,7 +2235,7 @@ void collection_tests_test_contains_all (CollectionTests* self) {
 	_tmp25_ = gee_collection_contains_all (_tmp24_, (GeeCollection*) dummy);
 	_vala_assert (_tmp25_, "test_collection.contains_all (dummy)");
 	_tmp26_ = self->test_collection;
-	_tmp27_ = gee_abstract_collection_contains_all ((GeeAbstractCollection*) dummy, _tmp26_);
+	_tmp27_ = gee_collection_contains_all ((GeeCollection*) dummy, _tmp26_);
 	_vala_assert (!_tmp27_, "! dummy.contains_all (test_collection)");
 	_g_object_unref0 (dummy);
 }
@@ -1889,7 +2296,7 @@ void collection_tests_test_remove_all (CollectionTests* self) {
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->test_collection;
 	_vala_assert (_tmp0_ != NULL, "test_collection != null");
-	_tmp1_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp1_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	dummy = _tmp1_;
 	_tmp2_ = self->test_collection;
 	_tmp3_ = gee_collection_remove_all (_tmp2_, (GeeCollection*) dummy);
@@ -1898,7 +2305,7 @@ void collection_tests_test_remove_all (CollectionTests* self) {
 	_tmp5_ = gee_collection_get_is_empty (_tmp4_);
 	_tmp6_ = _tmp5_;
 	_vala_assert (_tmp6_, "test_collection.is_empty");
-	_tmp7_ = gee_abstract_collection_get_is_empty ((GeeAbstractCollection*) dummy);
+	_tmp7_ = gee_collection_get_is_empty ((GeeCollection*) dummy);
 	_tmp8_ = _tmp7_;
 	_vala_assert (_tmp8_, "dummy.is_empty");
 	_tmp9_ = gee_abstract_collection_add ((GeeAbstractCollection*) dummy, "hello1");
@@ -2082,7 +2489,7 @@ void collection_tests_test_retain_all (CollectionTests* self) {
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->test_collection;
 	_vala_assert (_tmp0_ != NULL, "test_collection != null");
-	_tmp1_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp1_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	dummy = _tmp1_;
 	_tmp2_ = self->test_collection;
 	_tmp3_ = gee_collection_retain_all (_tmp2_, (GeeCollection*) dummy);
@@ -2091,7 +2498,7 @@ void collection_tests_test_retain_all (CollectionTests* self) {
 	_tmp5_ = gee_collection_get_is_empty (_tmp4_);
 	_tmp6_ = _tmp5_;
 	_vala_assert (_tmp6_, "test_collection.is_empty");
-	_tmp7_ = gee_abstract_collection_get_is_empty ((GeeAbstractCollection*) dummy);
+	_tmp7_ = gee_collection_get_is_empty ((GeeCollection*) dummy);
 	_tmp8_ = _tmp7_;
 	_vala_assert (_tmp8_, "dummy.is_empty");
 	_tmp9_ = self->test_collection;
@@ -2107,7 +2514,7 @@ void collection_tests_test_retain_all (CollectionTests* self) {
 	_tmp16_ = gee_collection_get_is_empty (_tmp15_);
 	_tmp17_ = _tmp16_;
 	_vala_assert (_tmp17_, "test_collection.is_empty");
-	_tmp18_ = gee_abstract_collection_get_is_empty ((GeeAbstractCollection*) dummy);
+	_tmp18_ = gee_collection_get_is_empty ((GeeCollection*) dummy);
 	_tmp19_ = _tmp18_;
 	_vala_assert (_tmp19_, "dummy.is_empty");
 	_tmp20_ = self->test_collection;
@@ -2343,64 +2750,1243 @@ void collection_tests_test_gobject_properties (CollectionTests* self) {
 	GValue _tmp1_ = {0};
 	GValue _tmp2_;
 	GeeCollection* _tmp3_;
-	GType _tmp4_ = 0UL;
+	gint _tmp4_ = 0;
 	GeeCollection* _tmp5_;
-	GType _tmp6_;
-	GType _tmp7_;
-	GValue _tmp8_ = {0};
-	GValue _tmp9_;
-	GeeCollection* _tmp10_;
-	gboolean _tmp11_ = FALSE;
-	GeeCollection* _tmp12_;
-	gboolean _tmp13_;
-	gboolean _tmp14_;
-	GValue _tmp15_ = {0};
-	GValue _tmp16_;
-	GeeCollection* _tmp17_;
-	gint _tmp18_ = 0;
-	GeeCollection* _tmp19_;
-	gint _tmp20_;
-	gint _tmp21_;
+	gint _tmp6_;
+	gint _tmp7_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->test_collection;
 	_vala_assert (_tmp0_ != NULL, "test_collection != null");
-	g_value_init (&_tmp1_, G_TYPE_GTYPE);
+	g_value_init (&_tmp1_, G_TYPE_INT);
 	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
 	value = _tmp1_;
 	_tmp2_ = value;
 	_tmp3_ = self->test_collection;
-	g_object_get_property ((GObject*) _tmp3_, "element-type", &value);
-	_tmp4_ = g_value_get_gtype (&value);
+	g_object_get_property ((GObject*) _tmp3_, "size", &value);
+	_tmp4_ = g_value_get_int (&value);
 	_tmp5_ = self->test_collection;
-	_tmp6_ = gee_iterable_get_element_type ((GeeIterable*) _tmp5_);
+	_tmp6_ = gee_collection_get_size (_tmp5_);
 	_tmp7_ = _tmp6_;
-	_vala_assert (_tmp4_ == _tmp7_, "value.get_gtype () == test_collection.element_type");
+	_vala_assert (_tmp4_ == _tmp7_, "value.get_int () == test_collection.size");
 	g_value_unset (&value);
-	g_value_init (&_tmp8_, G_TYPE_BOOLEAN);
 	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	value = _tmp8_;
-	_tmp9_ = value;
+}
+
+
+static gint __lambda3_ (CollectionTests* self, gchar* x, gint y) {
+	gint result = 0;
+	gint _tmp0_;
+	g_return_val_if_fail (x != NULL, 0);
+	_tmp0_ = y;
+	result = _tmp0_ + 1;
+	_g_free0 (x);
+	return result;
+}
+
+
+static gpointer ___lambda3__gee_fold_func (gpointer g, gpointer a, gpointer self) {
+	gpointer result;
+	result = __lambda3_ (self, g, a);
+	return result;
+}
+
+
+static gint __lambda4_ (CollectionTests* self, gchar* x, gint y) {
+	gint result = 0;
+	gint _tmp0_;
+	g_return_val_if_fail (x != NULL, 0);
+	_tmp0_ = y;
+	result = _tmp0_ + 1;
+	_g_free0 (x);
+	return result;
+}
+
+
+static gpointer ___lambda4__gee_fold_func (gpointer g, gpointer a, gpointer self) {
+	gpointer result;
+	result = __lambda4_ (self, g, a);
+	return result;
+}
+
+
+static gint __lambda5_ (CollectionTests* self, gchar* x, gint y) {
+	gint result = 0;
+	gint _tmp0_;
+	g_return_val_if_fail (x != NULL, 0);
+	_tmp0_ = y;
+	result = _tmp0_ + 1;
+	_g_free0 (x);
+	return result;
+}
+
+
+static gpointer ___lambda5__gee_fold_func (gpointer g, gpointer a, gpointer self) {
+	gpointer result;
+	result = __lambda5_ (self, g, a);
+	return result;
+}
+
+
+void collection_tests_test_fold (CollectionTests* self) {
+	GeeCollection* _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	GeeCollection* _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	GeeCollection* _tmp4_;
+	gboolean _tmp5_ = FALSE;
+	gint count = 0;
+	GeeCollection* _tmp6_;
+	gpointer _tmp7_ = NULL;
+	gint _tmp8_;
+	GeeCollection* _tmp9_;
+	GeeIterator* _tmp10_ = NULL;
+	GeeIterator* _tmp11_;
+	gpointer _tmp12_ = NULL;
+	gint _tmp13_;
+	GeeCollection* _tmp14_;
+	GeeIterator* _tmp15_ = NULL;
+	GeeIterator* iter;
+	gboolean _tmp16_ = FALSE;
+	gpointer _tmp17_ = NULL;
+	gint _tmp18_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = self->test_collection;
+	_tmp1_ = gee_collection_add (_tmp0_, "one");
+	_vala_assert (_tmp1_, "test_collection.add (\"one\")");
+	_tmp2_ = self->test_collection;
+	_tmp3_ = gee_collection_add (_tmp2_, "two");
+	_vala_assert (_tmp3_, "test_collection.add (\"two\")");
+	_tmp4_ = self->test_collection;
+	_tmp5_ = gee_collection_add (_tmp4_, "three");
+	_vala_assert (_tmp5_, "test_collection.add (\"three\")");
+	_tmp6_ = self->test_collection;
+	_tmp7_ = gee_traversable_fold ((GeeTraversable*) _tmp6_, G_TYPE_INT, NULL, NULL, ___lambda3__gee_fold_func, self, (gpointer) ((gintptr) 0));
+	count = (gint) ((gintptr) _tmp7_);
+	_tmp8_ = count;
+	_vala_assert (_tmp8_ == 3, "count == 3");
+	_tmp9_ = self->test_collection;
+	_tmp10_ = gee_iterable_iterator ((GeeIterable*) _tmp9_);
+	_tmp11_ = _tmp10_;
+	_tmp12_ = gee_traversable_fold ((GeeTraversable*) _tmp11_, G_TYPE_INT, NULL, NULL, ___lambda4__gee_fold_func, self, (gpointer) ((gintptr) 0));
+	count = (gint) ((gintptr) _tmp12_);
+	_g_object_unref0 (_tmp11_);
+	_tmp13_ = count;
+	_vala_assert (_tmp13_ == 3, "count == 3");
+	_tmp14_ = self->test_collection;
+	_tmp15_ = gee_iterable_iterator ((GeeIterable*) _tmp14_);
+	iter = _tmp15_;
+	_tmp16_ = gee_iterator_next (iter);
+	_vala_assert (_tmp16_, "iter.next ()");
+	_tmp17_ = gee_traversable_fold ((GeeTraversable*) iter, G_TYPE_INT, NULL, NULL, ___lambda5__gee_fold_func, self, (gpointer) ((gintptr) 0));
+	count = (gint) ((gintptr) _tmp17_);
+	_tmp18_ = count;
+	_vala_assert (_tmp18_ == 3, "count == 3");
+	_g_object_unref0 (iter);
+}
+
+
+static Block1Data* block1_data_ref (Block1Data* _data1_) {
+	g_atomic_int_inc (&_data1_->_ref_count_);
+	return _data1_;
+}
+
+
+static void block1_data_unref (void * _userdata_) {
+	Block1Data* _data1_;
+	_data1_ = (Block1Data*) _userdata_;
+	if (g_atomic_int_dec_and_test (&_data1_->_ref_count_)) {
+		CollectionTests * self;
+		self = _data1_->self;
+		_g_object_unref0 (self);
+		g_slice_free (Block1Data, _data1_);
+	}
+}
+
+
+static gboolean __lambda6_ (Block1Data* _data1_, gchar* x) {
+	CollectionTests * self;
+	gboolean result = FALSE;
+	gint _tmp0_;
+	self = _data1_->self;
+	g_return_val_if_fail (x != NULL, FALSE);
+	_tmp0_ = _data1_->count;
+	_data1_->count = _tmp0_ + 1;
+	result = TRUE;
+	_g_free0 (x);
+	return result;
+}
+
+
+static gboolean ___lambda6__gee_forall_func (gpointer g, gpointer self) {
+	gboolean result;
+	result = __lambda6_ (self, g);
+	return result;
+}
+
+
+static gboolean __lambda7_ (Block1Data* _data1_, gchar* x) {
+	CollectionTests * self;
+	gboolean result = FALSE;
+	gint _tmp0_;
+	self = _data1_->self;
+	g_return_val_if_fail (x != NULL, FALSE);
+	_tmp0_ = _data1_->count;
+	_data1_->count = _tmp0_ + 1;
+	result = TRUE;
+	_g_free0 (x);
+	return result;
+}
+
+
+static gboolean ___lambda7__gee_forall_func (gpointer g, gpointer self) {
+	gboolean result;
+	result = __lambda7_ (self, g);
+	return result;
+}
+
+
+static gboolean __lambda8_ (Block1Data* _data1_, gchar* x) {
+	CollectionTests * self;
+	gboolean result = FALSE;
+	gint _tmp0_;
+	self = _data1_->self;
+	g_return_val_if_fail (x != NULL, FALSE);
+	_tmp0_ = _data1_->count;
+	_data1_->count = _tmp0_ + 1;
+	result = TRUE;
+	_g_free0 (x);
+	return result;
+}
+
+
+static gboolean ___lambda8__gee_forall_func (gpointer g, gpointer self) {
+	gboolean result;
+	result = __lambda8_ (self, g);
+	return result;
+}
+
+
+void collection_tests_test_foreach (CollectionTests* self) {
+	Block1Data* _data1_;
+	GeeCollection* _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	GeeCollection* _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	GeeCollection* _tmp4_;
+	gboolean _tmp5_ = FALSE;
+	GeeCollection* _tmp6_;
+	GeeCollection* _tmp7_;
+	GeeIterator* _tmp8_ = NULL;
+	GeeIterator* _tmp9_;
+	GeeCollection* _tmp10_;
+	GeeIterator* _tmp11_ = NULL;
+	GeeIterator* iter;
+	gboolean _tmp12_ = FALSE;
+	g_return_if_fail (self != NULL);
+	_data1_ = g_slice_new0 (Block1Data);
+	_data1_->_ref_count_ = 1;
+	_data1_->self = g_object_ref (self);
+	_tmp0_ = self->test_collection;
+	_tmp1_ = gee_collection_add (_tmp0_, "one");
+	_vala_assert (_tmp1_, "test_collection.add (\"one\")");
+	_tmp2_ = self->test_collection;
+	_tmp3_ = gee_collection_add (_tmp2_, "two");
+	_vala_assert (_tmp3_, "test_collection.add (\"two\")");
+	_tmp4_ = self->test_collection;
+	_tmp5_ = gee_collection_add (_tmp4_, "three");
+	_vala_assert (_tmp5_, "test_collection.add (\"three\")");
+	_data1_->count = 0;
+	_tmp6_ = self->test_collection;
+	gee_traversable_foreach ((GeeTraversable*) _tmp6_, ___lambda6__gee_forall_func, _data1_);
+	_vala_assert (_data1_->count == 3, "count == 3");
+	_tmp7_ = self->test_collection;
+	_tmp8_ = gee_iterable_iterator ((GeeIterable*) _tmp7_);
+	_tmp9_ = _tmp8_;
+	gee_traversable_foreach ((GeeTraversable*) _tmp9_, ___lambda7__gee_forall_func, _data1_);
+	_g_object_unref0 (_tmp9_);
+	_vala_assert (_data1_->count == 6, "count == 6");
 	_tmp10_ = self->test_collection;
-	g_object_get_property ((GObject*) _tmp10_, "is-empty", &value);
-	_tmp11_ = g_value_get_boolean (&value);
-	_tmp12_ = self->test_collection;
-	_tmp13_ = gee_collection_get_is_empty (_tmp12_);
-	_tmp14_ = _tmp13_;
-	_vala_assert (_tmp11_ == _tmp14_, "value.get_boolean () == test_collection.is_empty");
-	g_value_unset (&value);
-	g_value_init (&_tmp15_, G_TYPE_INT);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	value = _tmp15_;
-	_tmp16_ = value;
-	_tmp17_ = self->test_collection;
-	g_object_get_property ((GObject*) _tmp17_, "size", &value);
-	_tmp18_ = g_value_get_int (&value);
-	_tmp19_ = self->test_collection;
-	_tmp20_ = gee_collection_get_size (_tmp19_);
-	_tmp21_ = _tmp20_;
-	_vala_assert (_tmp18_ == _tmp21_, "value.get_int () == test_collection.size");
-	g_value_unset (&value);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
+	_tmp11_ = gee_iterable_iterator ((GeeIterable*) _tmp10_);
+	iter = _tmp11_;
+	_tmp12_ = gee_iterator_next (iter);
+	_vala_assert (_tmp12_, "iter.next ()");
+	gee_traversable_foreach ((GeeTraversable*) iter, ___lambda8__gee_forall_func, _data1_);
+	_vala_assert (_data1_->count == 9, "count == 9");
+	_g_object_unref0 (iter);
+	block1_data_unref (_data1_);
+	_data1_ = NULL;
+}
+
+
+static Block2Data* block2_data_ref (Block2Data* _data2_) {
+	g_atomic_int_inc (&_data2_->_ref_count_);
+	return _data2_;
+}
+
+
+static void block2_data_unref (void * _userdata_) {
+	Block2Data* _data2_;
+	_data2_ = (Block2Data*) _userdata_;
+	if (g_atomic_int_dec_and_test (&_data2_->_ref_count_)) {
+		CollectionTests * self;
+		self = _data2_->self;
+		_g_object_unref0 (self);
+		g_slice_free (Block2Data, _data2_);
+	}
+}
+
+
+static gint __lambda9_ (Block2Data* _data2_, gchar* str) {
+	CollectionTests * self;
+	gint result = 0;
+	const gchar* _tmp0_;
+	gint _tmp6_;
+	self = _data2_->self;
+	g_return_val_if_fail (str != NULL, 0);
+	_tmp0_ = str;
+	if (g_strcmp0 (_tmp0_, "one") == 0) {
+		gboolean _tmp1_;
+		_tmp1_ = _data2_->one;
+		_vala_assert (!_tmp1_, "!one");
+		_data2_->one = TRUE;
+	} else {
+		const gchar* _tmp2_;
+		_tmp2_ = str;
+		if (g_strcmp0 (_tmp2_, "two") == 0) {
+			gboolean _tmp3_;
+			_tmp3_ = _data2_->two;
+			_vala_assert (!_tmp3_, "!two");
+			_data2_->two = TRUE;
+		} else {
+			const gchar* _tmp4_;
+			_tmp4_ = str;
+			if (g_strcmp0 (_tmp4_, "three") == 0) {
+				gboolean _tmp5_;
+				_tmp5_ = _data2_->three;
+				_vala_assert (!_tmp5_, "!three");
+				_data2_->three = TRUE;
+			} else {
+				g_assert_not_reached ();
+			}
+		}
+	}
+	_tmp6_ = _data2_->i;
+	_data2_->i = _tmp6_ + 1;
+	result = _tmp6_;
+	_g_free0 (str);
+	return result;
+}
+
+
+static gpointer ___lambda9__gee_map_func (gpointer g, gpointer self) {
+	gpointer result;
+	result = __lambda9_ (self, g);
+	return result;
+}
+
+
+static gint __lambda10_ (Block2Data* _data2_, gchar* str) {
+	CollectionTests * self;
+	gint result = 0;
+	const gchar* _tmp0_;
+	gint _tmp6_;
+	self = _data2_->self;
+	g_return_val_if_fail (str != NULL, 0);
+	_tmp0_ = str;
+	if (g_strcmp0 (_tmp0_, "one") == 0) {
+		gboolean _tmp1_;
+		_tmp1_ = _data2_->one;
+		_vala_assert (!_tmp1_, "!one");
+		_data2_->one = TRUE;
+	} else {
+		const gchar* _tmp2_;
+		_tmp2_ = str;
+		if (g_strcmp0 (_tmp2_, "two") == 0) {
+			gboolean _tmp3_;
+			_tmp3_ = _data2_->two;
+			_vala_assert (!_tmp3_, "!two");
+			_data2_->two = TRUE;
+		} else {
+			const gchar* _tmp4_;
+			_tmp4_ = str;
+			if (g_strcmp0 (_tmp4_, "three") == 0) {
+				gboolean _tmp5_;
+				_tmp5_ = _data2_->three;
+				_vala_assert (!_tmp5_, "!three");
+				_data2_->three = TRUE;
+			} else {
+				g_assert_not_reached ();
+			}
+		}
+	}
+	_tmp6_ = _data2_->i;
+	_data2_->i = _tmp6_ + 1;
+	result = _tmp6_;
+	_g_free0 (str);
+	return result;
+}
+
+
+static gpointer ___lambda10__gee_map_func (gpointer g, gpointer self) {
+	gpointer result;
+	result = __lambda10_ (self, g);
+	return result;
+}
+
+
+void collection_tests_test_map (CollectionTests* self) {
+	Block2Data* _data2_;
+	GeeCollection* _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	GeeCollection* _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	GeeCollection* _tmp4_;
+	gboolean _tmp5_ = FALSE;
+	GeeCollection* _tmp6_;
+	GeeIterator* _tmp7_ = NULL;
+	GeeIterator* _tmp8_;
+	GeeIterator* _tmp9_ = NULL;
+	GeeIterator* _tmp10_;
+	GeeIterator* iter;
+	gint j;
+	gint _tmp24_;
+	gint _tmp25_;
+	gint _tmp26_;
+	GeeCollection* _tmp27_;
+	gint _tmp28_;
+	gint _tmp29_;
+	gboolean _tmp30_;
+	gboolean _tmp31_;
+	gboolean _tmp32_;
+	gboolean _tmp33_;
+	gboolean _tmp34_;
+	gint _tmp35_;
+	GeeCollection* _tmp36_;
+	GeeIterator* _tmp37_ = NULL;
+	gint _tmp51_;
+	gint _tmp52_;
+	gint _tmp53_;
+	GeeCollection* _tmp54_;
+	gint _tmp55_;
+	gint _tmp56_;
+	gboolean _tmp57_;
+	gboolean _tmp58_;
+	gboolean _tmp59_;
+	g_return_if_fail (self != NULL);
+	_data2_ = g_slice_new0 (Block2Data);
+	_data2_->_ref_count_ = 1;
+	_data2_->self = g_object_ref (self);
+	_tmp0_ = self->test_collection;
+	_tmp1_ = gee_collection_add (_tmp0_, "one");
+	_vala_assert (_tmp1_, "test_collection.add (\"one\")");
+	_tmp2_ = self->test_collection;
+	_tmp3_ = gee_collection_add (_tmp2_, "two");
+	_vala_assert (_tmp3_, "test_collection.add (\"two\")");
+	_tmp4_ = self->test_collection;
+	_tmp5_ = gee_collection_add (_tmp4_, "three");
+	_vala_assert (_tmp5_, "test_collection.add (\"three\")");
+	_data2_->one = FALSE;
+	_data2_->two = FALSE;
+	_data2_->three = FALSE;
+	_data2_->i = 0;
+	_tmp6_ = self->test_collection;
+	_tmp7_ = gee_iterable_iterator ((GeeIterable*) _tmp6_);
+	_tmp8_ = _tmp7_;
+	_tmp9_ = gee_traversable_map ((GeeTraversable*) _tmp8_, G_TYPE_INT, NULL, NULL, ___lambda9__gee_map_func, _data2_);
+	_tmp10_ = _tmp9_;
+	_g_object_unref0 (_tmp8_);
+	iter = _tmp10_;
+	j = 0;
+	while (TRUE) {
+		GeeIterator* _tmp11_;
+		gboolean _tmp12_ = FALSE;
+		gint _tmp13_;
+		gint _tmp14_;
+		gint _tmp15_;
+		GeeIterator* _tmp16_;
+		gpointer _tmp17_ = NULL;
+		gint _tmp18_;
+		GeeIterator* _tmp19_;
+		gpointer _tmp20_ = NULL;
+		gint _tmp21_;
+		gint _tmp22_;
+		gint _tmp23_;
+		_tmp11_ = iter;
+		_tmp12_ = gee_iterator_next (_tmp11_);
+		if (!_tmp12_) {
+			break;
+		}
+		_tmp13_ = _data2_->i;
+		_tmp14_ = j;
+		_vala_assert (_tmp13_ == _tmp14_, "i == j");
+		_tmp15_ = j;
+		_tmp16_ = iter;
+		_tmp17_ = gee_iterator_get (_tmp16_);
+		_vala_assert (_tmp15_ == ((gint) ((gintptr) _tmp17_)), "j == iter.get ()");
+		_tmp18_ = j;
+		_tmp19_ = iter;
+		_tmp20_ = gee_iterator_get (_tmp19_);
+		_vala_assert (_tmp18_ == ((gint) ((gintptr) _tmp20_)), "j == iter.get ()");
+		_tmp21_ = j;
+		j = _tmp21_ + 1;
+		_tmp22_ = _data2_->i;
+		_tmp23_ = j;
+		_vala_assert (_tmp22_ == _tmp23_, "i == j");
+	}
+	_tmp24_ = _data2_->i;
+	_tmp25_ = j;
+	_vala_assert (_tmp24_ == _tmp25_, "i == j");
+	_tmp26_ = _data2_->i;
+	_tmp27_ = self->test_collection;
+	_tmp28_ = gee_collection_get_size (_tmp27_);
+	_tmp29_ = _tmp28_;
+	_vala_assert (_tmp26_ == _tmp29_, "i == test_collection.size");
+	_tmp30_ = _data2_->one;
+	_vala_assert (_tmp30_, "one");
+	_tmp31_ = _data2_->two;
+	_vala_assert (_tmp31_, "two");
+	_tmp32_ = _data2_->three;
+	_vala_assert (_tmp32_, "three");
+	_data2_->three = FALSE;
+	_tmp33_ = _data2_->three;
+	_data2_->two = _tmp33_;
+	_tmp34_ = _data2_->two;
+	_data2_->one = _tmp34_;
+	j = 0;
+	_tmp35_ = j;
+	_data2_->i = _tmp35_;
+	_tmp36_ = self->test_collection;
+	_tmp37_ = gee_traversable_map ((GeeTraversable*) _tmp36_, G_TYPE_INT, NULL, NULL, ___lambda10__gee_map_func, _data2_);
+	_g_object_unref0 (iter);
+	iter = _tmp37_;
+	while (TRUE) {
+		GeeIterator* _tmp38_;
+		gboolean _tmp39_ = FALSE;
+		gint _tmp40_;
+		gint _tmp41_;
+		gint _tmp42_;
+		GeeIterator* _tmp43_;
+		gpointer _tmp44_ = NULL;
+		gint _tmp45_;
+		GeeIterator* _tmp46_;
+		gpointer _tmp47_ = NULL;
+		gint _tmp48_;
+		gint _tmp49_;
+		gint _tmp50_;
+		_tmp38_ = iter;
+		_tmp39_ = gee_iterator_next (_tmp38_);
+		if (!_tmp39_) {
+			break;
+		}
+		_tmp40_ = _data2_->i;
+		_tmp41_ = j;
+		_vala_assert (_tmp40_ == _tmp41_, "i == j");
+		_tmp42_ = j;
+		_tmp43_ = iter;
+		_tmp44_ = gee_iterator_get (_tmp43_);
+		_vala_assert (_tmp42_ == ((gint) ((gintptr) _tmp44_)), "j == iter.get ()");
+		_tmp45_ = j;
+		_tmp46_ = iter;
+		_tmp47_ = gee_iterator_get (_tmp46_);
+		_vala_assert (_tmp45_ == ((gint) ((gintptr) _tmp47_)), "j == iter.get ()");
+		_tmp48_ = j;
+		j = _tmp48_ + 1;
+		_tmp49_ = _data2_->i;
+		_tmp50_ = j;
+		_vala_assert (_tmp49_ == _tmp50_, "i == j");
+	}
+	_tmp51_ = _data2_->i;
+	_tmp52_ = j;
+	_vala_assert (_tmp51_ == _tmp52_, "i == j");
+	_tmp53_ = _data2_->i;
+	_tmp54_ = self->test_collection;
+	_tmp55_ = gee_collection_get_size (_tmp54_);
+	_tmp56_ = _tmp55_;
+	_vala_assert (_tmp53_ == _tmp56_, "i == test_collection.size");
+	_tmp57_ = _data2_->one;
+	_vala_assert (_tmp57_, "one");
+	_tmp58_ = _data2_->two;
+	_vala_assert (_tmp58_, "two");
+	_tmp59_ = _data2_->three;
+	_vala_assert (_tmp59_, "three");
+	_g_object_unref0 (iter);
+	block2_data_unref (_data2_);
+	_data2_ = NULL;
+}
+
+
+static Block3Data* block3_data_ref (Block3Data* _data3_) {
+	g_atomic_int_inc (&_data3_->_ref_count_);
+	return _data3_;
+}
+
+
+static void block3_data_unref (void * _userdata_) {
+	Block3Data* _data3_;
+	_data3_ = (Block3Data*) _userdata_;
+	if (g_atomic_int_dec_and_test (&_data3_->_ref_count_)) {
+		CollectionTests * self;
+		self = _data3_->self;
+		_g_object_unref0 (self);
+		g_slice_free (Block3Data, _data3_);
+	}
+}
+
+
+static gint __lambda11_ (Block3Data* _data3_, gchar* str, gint cur) {
+	CollectionTests * self;
+	gint result = 0;
+	const gchar* _tmp0_;
+	gint _tmp6_;
+	self = _data3_->self;
+	g_return_val_if_fail (str != NULL, 0);
+	_tmp0_ = str;
+	if (g_strcmp0 (_tmp0_, "one") == 0) {
+		gboolean _tmp1_;
+		_tmp1_ = _data3_->one;
+		_vala_assert (!_tmp1_, "!one");
+		_data3_->one = TRUE;
+	} else {
+		const gchar* _tmp2_;
+		_tmp2_ = str;
+		if (g_strcmp0 (_tmp2_, "two") == 0) {
+			gboolean _tmp3_;
+			_tmp3_ = _data3_->two;
+			_vala_assert (!_tmp3_, "!two");
+			_data3_->two = TRUE;
+		} else {
+			const gchar* _tmp4_;
+			_tmp4_ = str;
+			if (g_strcmp0 (_tmp4_, "three") == 0) {
+				gboolean _tmp5_;
+				_tmp5_ = _data3_->three;
+				_vala_assert (!_tmp5_, "!three");
+				_data3_->three = TRUE;
+			} else {
+				g_assert_not_reached ();
+			}
+		}
+	}
+	_tmp6_ = cur;
+	result = _tmp6_ + 1;
+	_g_free0 (str);
+	return result;
+}
+
+
+static gpointer ___lambda11__gee_fold_func (gpointer g, gpointer a, gpointer self) {
+	gpointer result;
+	result = __lambda11_ (self, g, a);
+	return result;
+}
+
+
+static gint __lambda12_ (Block3Data* _data3_, gchar* str, gint cur) {
+	CollectionTests * self;
+	gint result = 0;
+	const gchar* _tmp0_;
+	gint _tmp6_;
+	self = _data3_->self;
+	g_return_val_if_fail (str != NULL, 0);
+	_tmp0_ = str;
+	if (g_strcmp0 (_tmp0_, "one") == 0) {
+		gboolean _tmp1_;
+		_tmp1_ = _data3_->one;
+		_vala_assert (!_tmp1_, "!one");
+		_data3_->one = TRUE;
+	} else {
+		const gchar* _tmp2_;
+		_tmp2_ = str;
+		if (g_strcmp0 (_tmp2_, "two") == 0) {
+			gboolean _tmp3_;
+			_tmp3_ = _data3_->two;
+			_vala_assert (!_tmp3_, "!two");
+			_data3_->two = TRUE;
+		} else {
+			const gchar* _tmp4_;
+			_tmp4_ = str;
+			if (g_strcmp0 (_tmp4_, "three") == 0) {
+				gboolean _tmp5_;
+				_tmp5_ = _data3_->three;
+				_vala_assert (!_tmp5_, "!three");
+				_data3_->three = TRUE;
+			} else {
+				g_assert_not_reached ();
+			}
+		}
+	}
+	_tmp6_ = cur;
+	result = _tmp6_ + 1;
+	_g_free0 (str);
+	return result;
+}
+
+
+static gpointer ___lambda12__gee_fold_func (gpointer g, gpointer a, gpointer self) {
+	gpointer result;
+	result = __lambda12_ (self, g, a);
+	return result;
+}
+
+
+void collection_tests_test_scan (CollectionTests* self) {
+	Block3Data* _data3_;
+	GeeCollection* _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	GeeCollection* _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	GeeCollection* _tmp4_;
+	gboolean _tmp5_ = FALSE;
+	GeeCollection* _tmp6_;
+	GeeIterator* _tmp7_ = NULL;
+	GeeIterator* _tmp8_;
+	GeeIterator* _tmp9_ = NULL;
+	GeeIterator* _tmp10_;
+	GeeIterator* iter;
+	gint j;
+	gint _tmp22_;
+	GeeCollection* _tmp23_;
+	gint _tmp24_;
+	gint _tmp25_;
+	gboolean _tmp26_;
+	gboolean _tmp27_;
+	gboolean _tmp28_;
+	gboolean _tmp29_;
+	gboolean _tmp30_;
+	GeeCollection* _tmp31_;
+	GeeIterator* _tmp32_ = NULL;
+	gint _tmp44_;
+	GeeCollection* _tmp45_;
+	gint _tmp46_;
+	gint _tmp47_;
+	gboolean _tmp48_;
+	gboolean _tmp49_;
+	gboolean _tmp50_;
+	g_return_if_fail (self != NULL);
+	_data3_ = g_slice_new0 (Block3Data);
+	_data3_->_ref_count_ = 1;
+	_data3_->self = g_object_ref (self);
+	_tmp0_ = self->test_collection;
+	_tmp1_ = gee_collection_add (_tmp0_, "one");
+	_vala_assert (_tmp1_, "test_collection.add (\"one\")");
+	_tmp2_ = self->test_collection;
+	_tmp3_ = gee_collection_add (_tmp2_, "two");
+	_vala_assert (_tmp3_, "test_collection.add (\"two\")");
+	_tmp4_ = self->test_collection;
+	_tmp5_ = gee_collection_add (_tmp4_, "three");
+	_vala_assert (_tmp5_, "test_collection.add (\"three\")");
+	_data3_->one = FALSE;
+	_data3_->two = FALSE;
+	_data3_->three = FALSE;
+	_tmp6_ = self->test_collection;
+	_tmp7_ = gee_iterable_iterator ((GeeIterable*) _tmp6_);
+	_tmp8_ = _tmp7_;
+	_tmp9_ = gee_traversable_scan ((GeeTraversable*) _tmp8_, G_TYPE_INT, NULL, NULL, ___lambda11__gee_fold_func, _data3_, (gpointer) ((gintptr) 0));
+	_tmp10_ = _tmp9_;
+	_g_object_unref0 (_tmp8_);
+	iter = _tmp10_;
+	j = 0;
+	{
+		gboolean _tmp11_;
+		_tmp11_ = TRUE;
+		while (TRUE) {
+			gboolean _tmp12_;
+			gint _tmp15_;
+			GeeIterator* _tmp16_;
+			gpointer _tmp17_ = NULL;
+			gint _tmp18_;
+			GeeIterator* _tmp19_;
+			gpointer _tmp20_ = NULL;
+			gint _tmp21_;
+			_tmp12_ = _tmp11_;
+			if (!_tmp12_) {
+				GeeIterator* _tmp13_;
+				gboolean _tmp14_ = FALSE;
+				_tmp13_ = iter;
+				_tmp14_ = gee_iterator_next (_tmp13_);
+				if (!_tmp14_) {
+					break;
+				}
+			}
+			_tmp11_ = FALSE;
+			_tmp15_ = j;
+			_tmp16_ = iter;
+			_tmp17_ = gee_iterator_get (_tmp16_);
+			_vala_assert (_tmp15_ == ((gint) ((gintptr) _tmp17_)), "j == iter.get ()");
+			_tmp18_ = j;
+			_tmp19_ = iter;
+			_tmp20_ = gee_iterator_get (_tmp19_);
+			_vala_assert (_tmp18_ == ((gint) ((gintptr) _tmp20_)), "j == iter.get ()");
+			_tmp21_ = j;
+			j = _tmp21_ + 1;
+		}
+	}
+	_tmp22_ = j;
+	_tmp23_ = self->test_collection;
+	_tmp24_ = gee_collection_get_size (_tmp23_);
+	_tmp25_ = _tmp24_;
+	_vala_assert (_tmp22_ == (_tmp25_ + 1), "j == test_collection.size + 1");
+	_tmp26_ = _data3_->one;
+	_vala_assert (_tmp26_, "one");
+	_tmp27_ = _data3_->two;
+	_vala_assert (_tmp27_, "two");
+	_tmp28_ = _data3_->three;
+	_vala_assert (_tmp28_, "three");
+	_data3_->three = FALSE;
+	_tmp29_ = _data3_->three;
+	_data3_->two = _tmp29_;
+	_tmp30_ = _data3_->two;
+	_data3_->one = _tmp30_;
+	j = 0;
+	_tmp31_ = self->test_collection;
+	_tmp32_ = gee_traversable_scan ((GeeTraversable*) _tmp31_, G_TYPE_INT, NULL, NULL, ___lambda12__gee_fold_func, _data3_, (gpointer) ((gintptr) 0));
+	_g_object_unref0 (iter);
+	iter = _tmp32_;
+	{
+		gboolean _tmp33_;
+		_tmp33_ = TRUE;
+		while (TRUE) {
+			gboolean _tmp34_;
+			gint _tmp37_;
+			GeeIterator* _tmp38_;
+			gpointer _tmp39_ = NULL;
+			gint _tmp40_;
+			GeeIterator* _tmp41_;
+			gpointer _tmp42_ = NULL;
+			gint _tmp43_;
+			_tmp34_ = _tmp33_;
+			if (!_tmp34_) {
+				GeeIterator* _tmp35_;
+				gboolean _tmp36_ = FALSE;
+				_tmp35_ = iter;
+				_tmp36_ = gee_iterator_next (_tmp35_);
+				if (!_tmp36_) {
+					break;
+				}
+			}
+			_tmp33_ = FALSE;
+			_tmp37_ = j;
+			_tmp38_ = iter;
+			_tmp39_ = gee_iterator_get (_tmp38_);
+			_vala_assert (_tmp37_ == ((gint) ((gintptr) _tmp39_)), "j == iter.get ()");
+			_tmp40_ = j;
+			_tmp41_ = iter;
+			_tmp42_ = gee_iterator_get (_tmp41_);
+			_vala_assert (_tmp40_ == ((gint) ((gintptr) _tmp42_)), "j == iter.get ()");
+			_tmp43_ = j;
+			j = _tmp43_ + 1;
+		}
+	}
+	_tmp44_ = j;
+	_tmp45_ = self->test_collection;
+	_tmp46_ = gee_collection_get_size (_tmp45_);
+	_tmp47_ = _tmp46_;
+	_vala_assert (_tmp44_ == (_tmp47_ + 1), "j == test_collection.size + 1");
+	_tmp48_ = _data3_->one;
+	_vala_assert (_tmp48_, "one");
+	_tmp49_ = _data3_->two;
+	_vala_assert (_tmp49_, "two");
+	_tmp50_ = _data3_->three;
+	_vala_assert (_tmp50_, "three");
+	_g_object_unref0 (iter);
+	block3_data_unref (_data3_);
+	_data3_ = NULL;
+}
+
+
+static Block4Data* block4_data_ref (Block4Data* _data4_) {
+	g_atomic_int_inc (&_data4_->_ref_count_);
+	return _data4_;
+}
+
+
+static void block4_data_unref (void * _userdata_) {
+	Block4Data* _data4_;
+	_data4_ = (Block4Data*) _userdata_;
+	if (g_atomic_int_dec_and_test (&_data4_->_ref_count_)) {
+		CollectionTests * self;
+		self = _data4_->self;
+		_g_object_unref0 (self);
+		g_slice_free (Block4Data, _data4_);
+	}
+}
+
+
+static gboolean __lambda13_ (Block4Data* _data4_, const gchar* str) {
+	CollectionTests * self;
+	gboolean result = FALSE;
+	const gchar* _tmp0_;
+	const gchar* _tmp6_;
+	self = _data4_->self;
+	g_return_val_if_fail (str != NULL, FALSE);
+	_tmp0_ = str;
+	if (g_strcmp0 (_tmp0_, "one") == 0) {
+		gboolean _tmp1_;
+		_tmp1_ = _data4_->one;
+		_vala_assert (!_tmp1_, "!one");
+		_data4_->one = TRUE;
+	} else {
+		const gchar* _tmp2_;
+		_tmp2_ = str;
+		if (g_strcmp0 (_tmp2_, "two") == 0) {
+			gboolean _tmp3_;
+			_tmp3_ = _data4_->two;
+			_vala_assert (!_tmp3_, "!two");
+			_data4_->two = TRUE;
+		} else {
+			const gchar* _tmp4_;
+			_tmp4_ = str;
+			if (g_strcmp0 (_tmp4_, "three") == 0) {
+				gboolean _tmp5_;
+				_tmp5_ = _data4_->three;
+				_vala_assert (!_tmp5_, "!three");
+				_data4_->three = TRUE;
+			} else {
+				g_assert_not_reached ();
+			}
+		}
+	}
+	_tmp6_ = str;
+	result = g_strcmp0 (_tmp6_, "two") != 0;
+	return result;
+}
+
+
+static gboolean ___lambda13__gee_predicate (gconstpointer g, gpointer self) {
+	gboolean result;
+	result = __lambda13_ (self, g);
+	return result;
+}
+
+
+static gboolean __lambda14_ (Block4Data* _data4_, const gchar* str) {
+	CollectionTests * self;
+	gboolean result = FALSE;
+	const gchar* _tmp0_;
+	const gchar* _tmp6_;
+	self = _data4_->self;
+	g_return_val_if_fail (str != NULL, FALSE);
+	_tmp0_ = str;
+	if (g_strcmp0 (_tmp0_, "one") == 0) {
+		gboolean _tmp1_;
+		_tmp1_ = _data4_->one;
+		_vala_assert (!_tmp1_, "!one");
+		_data4_->one = TRUE;
+	} else {
+		const gchar* _tmp2_;
+		_tmp2_ = str;
+		if (g_strcmp0 (_tmp2_, "two") == 0) {
+			gboolean _tmp3_;
+			_tmp3_ = _data4_->two;
+			_vala_assert (!_tmp3_, "!two");
+			_data4_->two = TRUE;
+		} else {
+			const gchar* _tmp4_;
+			_tmp4_ = str;
+			if (g_strcmp0 (_tmp4_, "three") == 0) {
+				gboolean _tmp5_;
+				_tmp5_ = _data4_->three;
+				_vala_assert (!_tmp5_, "!three");
+				_data4_->three = TRUE;
+			} else {
+				g_assert_not_reached ();
+			}
+		}
+	}
+	_tmp6_ = str;
+	result = g_strcmp0 (_tmp6_, "two") != 0;
+	return result;
+}
+
+
+static gboolean ___lambda14__gee_predicate (gconstpointer g, gpointer self) {
+	gboolean result;
+	result = __lambda14_ (self, g);
+	return result;
+}
+
+
+void collection_tests_test_filter (CollectionTests* self) {
+	Block4Data* _data4_;
+	GeeCollection* _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	GeeCollection* _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	GeeCollection* _tmp4_;
+	gboolean _tmp5_ = FALSE;
+	GeeCollection* _tmp6_;
+	GeeIterator* _tmp7_ = NULL;
+	GeeIterator* _tmp8_;
+	GeeIterator* _tmp9_ = NULL;
+	GeeIterator* _tmp10_;
+	GeeIterator* iter;
+	GeeIterator* _tmp11_;
+	gboolean _tmp12_;
+	gboolean _tmp13_;
+	gint j;
+	gint _tmp20_;
+	gboolean _tmp21_;
+	gboolean _tmp22_;
+	gboolean _tmp23_;
+	gboolean _tmp24_;
+	gboolean _tmp25_;
+	GeeCollection* _tmp26_;
+	GeeIterator* _tmp27_ = NULL;
+	GeeIterator* _tmp28_;
+	gboolean _tmp29_;
+	gboolean _tmp30_;
+	gint _tmp37_;
+	gboolean _tmp38_;
+	gboolean _tmp39_;
+	gboolean _tmp40_;
+	g_return_if_fail (self != NULL);
+	_data4_ = g_slice_new0 (Block4Data);
+	_data4_->_ref_count_ = 1;
+	_data4_->self = g_object_ref (self);
+	_tmp0_ = self->test_collection;
+	_tmp1_ = gee_collection_add (_tmp0_, "one");
+	_vala_assert (_tmp1_, "test_collection.add (\"one\")");
+	_tmp2_ = self->test_collection;
+	_tmp3_ = gee_collection_add (_tmp2_, "two");
+	_vala_assert (_tmp3_, "test_collection.add (\"two\")");
+	_tmp4_ = self->test_collection;
+	_tmp5_ = gee_collection_add (_tmp4_, "three");
+	_vala_assert (_tmp5_, "test_collection.add (\"three\")");
+	_data4_->one = FALSE;
+	_data4_->two = FALSE;
+	_data4_->three = FALSE;
+	_tmp6_ = self->test_collection;
+	_tmp7_ = gee_iterable_iterator ((GeeIterable*) _tmp6_);
+	_tmp8_ = _tmp7_;
+	_tmp9_ = gee_traversable_filter ((GeeTraversable*) _tmp8_, ___lambda13__gee_predicate, block4_data_ref (_data4_), block4_data_unref);
+	_tmp10_ = _tmp9_;
+	_g_object_unref0 (_tmp8_);
+	iter = _tmp10_;
+	_tmp11_ = iter;
+	_tmp12_ = gee_iterator_get_valid (_tmp11_);
+	_tmp13_ = _tmp12_;
+	_vala_assert (!_tmp13_, "!iter.valid");
+	j = 0;
+	while (TRUE) {
+		GeeIterator* _tmp14_;
+		gboolean _tmp15_ = FALSE;
+		GeeIterator* _tmp16_;
+		gpointer _tmp17_ = NULL;
+		gchar* _tmp18_;
+		gint _tmp19_;
+		_tmp14_ = iter;
+		_tmp15_ = gee_iterator_next (_tmp14_);
+		if (!_tmp15_) {
+			break;
+		}
+		_tmp16_ = iter;
+		_tmp17_ = gee_iterator_get (_tmp16_);
+		_tmp18_ = (gchar*) _tmp17_;
+		_vala_assert (g_strcmp0 (_tmp18_, "two") != 0, "iter.get () != \"two\"");
+		_g_free0 (_tmp18_);
+		_tmp19_ = j;
+		j = _tmp19_ + 1;
+	}
+	_tmp20_ = j;
+	_vala_assert (_tmp20_ == 2, "j == 2");
+	_tmp21_ = _data4_->one;
+	_vala_assert (_tmp21_, "one");
+	_tmp22_ = _data4_->two;
+	_vala_assert (_tmp22_, "two");
+	_tmp23_ = _data4_->three;
+	_vala_assert (_tmp23_, "three");
+	_data4_->three = FALSE;
+	_tmp24_ = _data4_->three;
+	_data4_->two = _tmp24_;
+	_tmp25_ = _data4_->two;
+	_data4_->one = _tmp25_;
+	j = 0;
+	_tmp26_ = self->test_collection;
+	_tmp27_ = gee_traversable_filter ((GeeTraversable*) _tmp26_, ___lambda14__gee_predicate, block4_data_ref (_data4_), block4_data_unref);
+	_g_object_unref0 (iter);
+	iter = _tmp27_;
+	_tmp28_ = iter;
+	_tmp29_ = gee_iterator_get_valid (_tmp28_);
+	_tmp30_ = _tmp29_;
+	_vala_assert (!_tmp30_, "!iter.valid");
+	while (TRUE) {
+		GeeIterator* _tmp31_;
+		gboolean _tmp32_ = FALSE;
+		GeeIterator* _tmp33_;
+		gpointer _tmp34_ = NULL;
+		gchar* _tmp35_;
+		gint _tmp36_;
+		_tmp31_ = iter;
+		_tmp32_ = gee_iterator_next (_tmp31_);
+		if (!_tmp32_) {
+			break;
+		}
+		_tmp33_ = iter;
+		_tmp34_ = gee_iterator_get (_tmp33_);
+		_tmp35_ = (gchar*) _tmp34_;
+		_vala_assert (g_strcmp0 (_tmp35_, "two") != 0, "iter.get () != \"two\"");
+		_g_free0 (_tmp35_);
+		_tmp36_ = j;
+		j = _tmp36_ + 1;
+	}
+	_tmp37_ = j;
+	_vala_assert (_tmp37_ == 2, "j == 2");
+	_tmp38_ = _data4_->one;
+	_vala_assert (_tmp38_, "one");
+	_tmp39_ = _data4_->two;
+	_vala_assert (_tmp39_, "two");
+	_tmp40_ = _data4_->three;
+	_vala_assert (_tmp40_, "three");
+	_g_object_unref0 (iter);
+	block4_data_unref (_data4_);
+	_data4_ = NULL;
+}
+
+
+void collection_tests_test_chop (CollectionTests* self) {
+	GeeCollection* _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	GeeCollection* _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	GeeCollection* _tmp4_;
+	gboolean _tmp5_ = FALSE;
+	GeeCollection* _tmp6_;
+	GeeIterator* _tmp7_ = NULL;
+	GeeIterator* _tmp8_;
+	GeeIterator* _tmp9_ = NULL;
+	GeeIterator* _tmp10_;
+	GeeIterator* iter;
+	GeeIterator* _tmp11_;
+	gboolean _tmp12_;
+	gboolean _tmp13_;
+	GeeCollection* _tmp14_;
+	GeeIterator* _tmp15_ = NULL;
+	GeeIterator* iter2;
+	GeeIterator* _tmp16_;
+	gboolean _tmp17_ = FALSE;
+	GeeIterator* _tmp18_;
+	gboolean _tmp19_ = FALSE;
+	GeeIterator* _tmp20_;
+	gboolean _tmp21_ = FALSE;
+	GeeIterator* _tmp22_;
+	gpointer _tmp23_ = NULL;
+	gchar* _tmp24_;
+	GeeIterator* _tmp25_;
+	gpointer _tmp26_ = NULL;
+	gchar* _tmp27_;
+	GeeIterator* _tmp28_;
+	gboolean _tmp29_ = FALSE;
+	GeeIterator* _tmp30_;
+	gboolean _tmp31_ = FALSE;
+	GeeCollection* _tmp32_;
+	GeeIterator* _tmp33_ = NULL;
+	GeeIterator* _tmp34_;
+	gboolean _tmp35_;
+	gboolean _tmp36_;
+	GeeCollection* _tmp37_;
+	GeeIterator* _tmp38_ = NULL;
+	GeeIterator* _tmp39_;
+	gboolean _tmp40_ = FALSE;
+	GeeIterator* _tmp41_;
+	gboolean _tmp42_ = FALSE;
+	GeeIterator* _tmp43_;
+	gboolean _tmp44_ = FALSE;
+	GeeIterator* _tmp45_;
+	gpointer _tmp46_ = NULL;
+	gchar* _tmp47_;
+	GeeIterator* _tmp48_;
+	gpointer _tmp49_ = NULL;
+	gchar* _tmp50_;
+	GeeIterator* _tmp51_;
+	gboolean _tmp52_ = FALSE;
+	GeeIterator* _tmp53_;
+	gboolean _tmp54_ = FALSE;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = self->test_collection;
+	_tmp1_ = gee_collection_add (_tmp0_, "one");
+	_vala_assert (_tmp1_, "test_collection.add (\"one\")");
+	_tmp2_ = self->test_collection;
+	_tmp3_ = gee_collection_add (_tmp2_, "two");
+	_vala_assert (_tmp3_, "test_collection.add (\"two\")");
+	_tmp4_ = self->test_collection;
+	_tmp5_ = gee_collection_add (_tmp4_, "three");
+	_vala_assert (_tmp5_, "test_collection.add (\"three\")");
+	_tmp6_ = self->test_collection;
+	_tmp7_ = gee_iterable_iterator ((GeeIterable*) _tmp6_);
+	_tmp8_ = _tmp7_;
+	_tmp9_ = gee_traversable_chop ((GeeTraversable*) _tmp8_, 1, 1);
+	_tmp10_ = _tmp9_;
+	_g_object_unref0 (_tmp8_);
+	iter = _tmp10_;
+	_tmp11_ = iter;
+	_tmp12_ = gee_iterator_get_valid (_tmp11_);
+	_tmp13_ = _tmp12_;
+	_vala_assert (!_tmp13_, "!iter.valid");
+	_tmp14_ = self->test_collection;
+	_tmp15_ = gee_iterable_iterator ((GeeIterable*) _tmp14_);
+	iter2 = _tmp15_;
+	_tmp16_ = iter2;
+	_tmp17_ = gee_iterator_next (_tmp16_);
+	_vala_assert (_tmp17_, "iter2.next ()");
+	_tmp18_ = iter2;
+	_tmp19_ = gee_iterator_next (_tmp18_);
+	_vala_assert (_tmp19_, "iter2.next ()");
+	_tmp20_ = iter;
+	_tmp21_ = gee_iterator_next (_tmp20_);
+	_vala_assert (_tmp21_, "iter.next ()");
+	_tmp22_ = iter2;
+	_tmp23_ = gee_iterator_get (_tmp22_);
+	_tmp24_ = (gchar*) _tmp23_;
+	_tmp25_ = iter;
+	_tmp26_ = gee_iterator_get (_tmp25_);
+	_tmp27_ = (gchar*) _tmp26_;
+	_vala_assert (g_strcmp0 (_tmp24_, _tmp27_) == 0, "iter2.get () == iter.get ()");
+	_g_free0 (_tmp27_);
+	_g_free0 (_tmp24_);
+	_tmp28_ = iter;
+	_tmp29_ = gee_iterator_next (_tmp28_);
+	_vala_assert (!_tmp29_, "!iter.next ()");
+	_tmp30_ = iter2;
+	_tmp31_ = gee_iterator_next (_tmp30_);
+	_vala_assert (_tmp31_, "iter2.next ()");
+	_tmp32_ = self->test_collection;
+	_tmp33_ = gee_traversable_chop ((GeeTraversable*) _tmp32_, 1, 1);
+	_g_object_unref0 (iter);
+	iter = _tmp33_;
+	_tmp34_ = iter;
+	_tmp35_ = gee_iterator_get_valid (_tmp34_);
+	_tmp36_ = _tmp35_;
+	_vala_assert (!_tmp36_, "!iter.valid");
+	_tmp37_ = self->test_collection;
+	_tmp38_ = gee_iterable_iterator ((GeeIterable*) _tmp37_);
+	_g_object_unref0 (iter2);
+	iter2 = _tmp38_;
+	_tmp39_ = iter2;
+	_tmp40_ = gee_iterator_next (_tmp39_);
+	_vala_assert (_tmp40_, "iter2.next ()");
+	_tmp41_ = iter2;
+	_tmp42_ = gee_iterator_next (_tmp41_);
+	_vala_assert (_tmp42_, "iter2.next ()");
+	_tmp43_ = iter;
+	_tmp44_ = gee_iterator_next (_tmp43_);
+	_vala_assert (_tmp44_, "iter.next ()");
+	_tmp45_ = iter2;
+	_tmp46_ = gee_iterator_get (_tmp45_);
+	_tmp47_ = (gchar*) _tmp46_;
+	_tmp48_ = iter;
+	_tmp49_ = gee_iterator_get (_tmp48_);
+	_tmp50_ = (gchar*) _tmp49_;
+	_vala_assert (g_strcmp0 (_tmp47_, _tmp50_) == 0, "iter2.get () == iter.get ()");
+	_g_free0 (_tmp50_);
+	_g_free0 (_tmp47_);
+	_tmp51_ = iter;
+	_tmp52_ = gee_iterator_next (_tmp51_);
+	_vala_assert (!_tmp52_, "!iter.next ()");
+	_tmp53_ = iter2;
+	_tmp54_ = gee_iterator_next (_tmp53_);
+	_vala_assert (_tmp54_, "iter2.next ()");
+	_g_object_unref0 (iter2);
+	_g_object_unref0 (iter);
 }
 
 

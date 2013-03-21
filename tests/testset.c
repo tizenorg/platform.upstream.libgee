@@ -111,7 +111,7 @@ enum  {
 };
 SetTests* set_tests_construct (GType object_type, const gchar* name);
 CollectionTests* collection_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 void set_tests_test_duplicates_are_ignored (SetTests* self);
 static void _set_tests_test_duplicates_are_ignored_gee_test_case_test_method (gpointer self);
 static void set_tests_real_test_duplicates_are_ignored (SetTests* self);
@@ -128,7 +128,7 @@ SetTests* set_tests_construct (GType object_type, const gchar* name) {
 	g_return_val_if_fail (name != NULL, NULL);
 	_tmp0_ = name;
 	self = (SetTests*) collection_tests_construct (object_type, _tmp0_);
-	gee_test_case_add_test ((GeeTestCase*) self, "[Set] duplicates are ignored", _set_tests_test_duplicates_are_ignored_gee_test_case_test_method, self);
+	gee_test_case_add_test ((GeeTestCase*) self, "[Set] duplicates are ignored", _set_tests_test_duplicates_are_ignored_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 

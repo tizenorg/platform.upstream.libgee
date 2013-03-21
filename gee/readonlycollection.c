@@ -27,13 +27,25 @@
 #include <glib-object.h>
 
 
-#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
-#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
-#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
-#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+#define GEE_TYPE_TRAVERSABLE (gee_traversable_get_type ())
+#define GEE_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversable))
+#define GEE_IS_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_TRAVERSABLE))
+#define GEE_TRAVERSABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversableIface))
 
-typedef struct _GeeIterable GeeIterable;
-typedef struct _GeeIterableIface GeeIterableIface;
+typedef struct _GeeTraversable GeeTraversable;
+typedef struct _GeeTraversableIface GeeTraversableIface;
+
+#define GEE_TRAVERSABLE_TYPE_STREAM (gee_traversable_stream_get_type ())
+
+#define GEE_TYPE_LAZY (gee_lazy_get_type ())
+#define GEE_LAZY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LAZY, GeeLazy))
+#define GEE_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_LAZY, GeeLazyClass))
+#define GEE_IS_LAZY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LAZY))
+#define GEE_IS_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_LAZY))
+#define GEE_LAZY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_LAZY, GeeLazyClass))
+
+typedef struct _GeeLazy GeeLazy;
+typedef struct _GeeLazyClass GeeLazyClass;
 
 #define GEE_TYPE_ITERATOR (gee_iterator_get_type ())
 #define GEE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERATOR, GeeIterator))
@@ -42,6 +54,14 @@ typedef struct _GeeIterableIface GeeIterableIface;
 
 typedef struct _GeeIterator GeeIterator;
 typedef struct _GeeIteratorIface GeeIteratorIface;
+
+#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
+#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
+#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
+#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+
+typedef struct _GeeIterable GeeIterable;
+typedef struct _GeeIterableIface GeeIterableIface;
 
 #define GEE_TYPE_COLLECTION (gee_collection_get_type ())
 #define GEE_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_COLLECTION, GeeCollection))
@@ -74,23 +94,55 @@ typedef struct _GeeReadOnlyCollectionIterator GeeReadOnlyCollectionIterator;
 typedef struct _GeeReadOnlyCollectionIteratorClass GeeReadOnlyCollectionIteratorClass;
 typedef struct _GeeReadOnlyCollectionIteratorPrivate GeeReadOnlyCollectionIteratorPrivate;
 
+typedef gboolean (*GeeForallFunc) (gpointer g, void* user_data);
+typedef enum  {
+	GEE_TRAVERSABLE_STREAM_YIELD,
+	GEE_TRAVERSABLE_STREAM_CONTINUE,
+	GEE_TRAVERSABLE_STREAM_END
+} GeeTraversableStream;
+
+typedef GeeTraversableStream (*GeeStreamFunc) (GeeTraversableStream state, GeeLazy* g, GeeLazy** lazy, void* user_data);
 struct _GeeIteratorIface {
 	GTypeInterface parent_iface;
 	gboolean (*next) (GeeIterator* self);
 	gboolean (*has_next) (GeeIterator* self);
-	gboolean (*first) (GeeIterator* self);
 	gpointer (*get) (GeeIterator* self);
 	void (*remove) (GeeIterator* self);
+	gboolean (*get_valid) (GeeIterator* self);
+	gboolean (*get_read_only) (GeeIterator* self);
+};
+
+typedef gpointer (*GeeFoldFunc) (gpointer g, gpointer a, void* user_data);
+typedef gpointer (*GeeMapFunc) (gpointer g, void* user_data);
+typedef gboolean (*GeePredicate) (gconstpointer g, void* user_data);
+struct _GeeTraversableIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeTraversable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeTraversable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeTraversable* self);
+	gboolean (*foreach) (GeeTraversable* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	gpointer (*fold) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*map) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+	GeeIterator* (*scan) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*filter) (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+	GeeIterator* (*chop) (GeeTraversable* self, gint offset, gint length);
+	GType (*get_element_type) (GeeTraversable* self);
 };
 
 struct _GeeIterableIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeIterable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeIterable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeIterable* self);
 	GeeIterator* (*iterator) (GeeIterable* self);
-	GType (*get_element_type) (GeeIterable* self);
 };
 
 struct _GeeCollectionIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeCollection* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeCollection* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeCollection* self);
 	gboolean (*contains) (GeeCollection* self, gconstpointer item);
 	gboolean (*add) (GeeCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeCollection* self, gconstpointer item);
@@ -102,6 +154,7 @@ struct _GeeCollectionIface {
 	gpointer* (*to_array) (GeeCollection* self, int* result_length1);
 	gint (*get_size) (GeeCollection* self);
 	gboolean (*get_is_empty) (GeeCollection* self);
+	gboolean (*get_read_only) (GeeCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeCollection* self);
 };
 
@@ -141,11 +194,22 @@ struct _GeeReadOnlyCollectionIteratorPrivate {
 
 static gpointer gee_read_only_collection_parent_class = NULL;
 static gpointer gee_read_only_collection_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_read_only_collection_iterator_gee_traversable_parent_iface = NULL;
 static GeeIteratorIface* gee_read_only_collection_iterator_gee_iterator_parent_iface = NULL;
+static GeeTraversableIface* gee_read_only_collection_gee_traversable_parent_iface = NULL;
 static GeeIterableIface* gee_read_only_collection_gee_iterable_parent_iface = NULL;
 static GeeCollectionIface* gee_read_only_collection_gee_collection_parent_iface = NULL;
 
+GType gee_traversable_stream_get_type (void) G_GNUC_CONST;
+gpointer gee_lazy_ref (gpointer instance);
+void gee_lazy_unref (gpointer instance);
+GParamSpec* gee_param_spec_lazy (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void gee_value_set_lazy (GValue* value, gpointer v_object);
+void gee_value_take_lazy (GValue* value, gpointer v_object);
+gpointer gee_value_get_lazy (const GValue* value);
+GType gee_lazy_get_type (void) G_GNUC_CONST;
 GType gee_iterator_get_type (void) G_GNUC_CONST;
+GType gee_traversable_get_type (void) G_GNUC_CONST;
 GType gee_iterable_get_type (void) G_GNUC_CONST;
 GType gee_collection_get_type (void) G_GNUC_CONST;
 GType gee_read_only_collection_get_type (void) G_GNUC_CONST;
@@ -156,12 +220,19 @@ enum  {
 	GEE_READ_ONLY_COLLECTION_G_DUP_FUNC,
 	GEE_READ_ONLY_COLLECTION_G_DESTROY_FUNC,
 	GEE_READ_ONLY_COLLECTION_SIZE,
-	GEE_READ_ONLY_COLLECTION_IS_EMPTY,
-	GEE_READ_ONLY_COLLECTION_ELEMENT_TYPE,
+	GEE_READ_ONLY_COLLECTION_READ_ONLY,
 	GEE_READ_ONLY_COLLECTION_READ_ONLY_VIEW
 };
 GeeReadOnlyCollection* gee_read_only_collection_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeCollection* collection);
 GeeReadOnlyCollection* gee_read_only_collection_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeCollection* collection);
+static gboolean gee_read_only_collection_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
+gboolean gee_traversable_foreach (GeeTraversable* self, GeeForallFunc f, void* f_target);
+static GeeIterator* gee_read_only_collection_real_stream (GeeTraversable* base, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+GeeIterator* gee_traversable_stream (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+static GeeIterator* gee_read_only_collection_real_filter (GeeTraversable* base, GeePredicate f, void* f_target, GDestroyNotify f_target_destroy_notify);
+GeeIterator* gee_traversable_filter (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+static GeeIterator* gee_read_only_collection_real_chop (GeeTraversable* base, gint offset, gint length);
+GeeIterator* gee_traversable_chop (GeeTraversable* self, gint offset, gint length);
 static GeeIterator* gee_read_only_collection_real_iterator (GeeIterable* base);
 GeeIterator* gee_iterable_iterator (GeeIterable* self);
 GeeReadOnlyCollectionIterator* gee_read_only_collection_iterator_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeIterator* iterator);
@@ -187,22 +258,28 @@ enum  {
 	GEE_READ_ONLY_COLLECTION_ITERATOR_DUMMY_PROPERTY,
 	GEE_READ_ONLY_COLLECTION_ITERATOR_G_TYPE,
 	GEE_READ_ONLY_COLLECTION_ITERATOR_G_DUP_FUNC,
-	GEE_READ_ONLY_COLLECTION_ITERATOR_G_DESTROY_FUNC
+	GEE_READ_ONLY_COLLECTION_ITERATOR_G_DESTROY_FUNC,
+	GEE_READ_ONLY_COLLECTION_ITERATOR_VALID,
+	GEE_READ_ONLY_COLLECTION_ITERATOR_READ_ONLY
 };
 static gboolean gee_read_only_collection_iterator_real_next (GeeIterator* base);
 gboolean gee_iterator_next (GeeIterator* self);
 static gboolean gee_read_only_collection_iterator_real_has_next (GeeIterator* base);
 gboolean gee_iterator_has_next (GeeIterator* self);
-static gboolean gee_read_only_collection_iterator_real_first (GeeIterator* base);
-gboolean gee_iterator_first (GeeIterator* self);
 static gpointer gee_read_only_collection_iterator_real_get (GeeIterator* base);
 gpointer gee_iterator_get (GeeIterator* self);
 static void gee_read_only_collection_iterator_real_remove (GeeIterator* base);
+static gboolean gee_read_only_collection_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
+static GeeIterator* gee_read_only_collection_iterator_real_stream (GeeTraversable* base, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+static GeeIterator* gee_read_only_collection_iterator_real_filter (GeeTraversable* base, GeePredicate f, void* f_target, GDestroyNotify f_target_destroy_notify);
+static GeeIterator* gee_read_only_collection_iterator_real_chop (GeeTraversable* base, gint offset, gint length);
+gboolean gee_iterator_get_valid (GeeIterator* self);
 static void gee_read_only_collection_iterator_finalize (GObject* obj);
+gboolean gee_iterator_get_read_only (GeeIterator* self);
 static void _vala_gee_read_only_collection_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_read_only_collection_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 static void gee_read_only_collection_finalize (GObject* obj);
-GType gee_iterable_get_element_type (GeeIterable* self);
+gboolean gee_collection_get_read_only (GeeCollection* self);
 static void _vala_gee_read_only_collection_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_read_only_collection_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 
@@ -237,6 +314,100 @@ GeeReadOnlyCollection* gee_read_only_collection_construct (GType object_type, GT
 
 GeeReadOnlyCollection* gee_read_only_collection_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeCollection* collection) {
 	return gee_read_only_collection_construct (GEE_TYPE_READ_ONLY_COLLECTION, g_type, g_dup_func, g_destroy_func, collection);
+}
+
+
+/**
+ * {@inheritDoc}
+ */
+static gboolean gee_read_only_collection_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeReadOnlyCollection * self;
+	gboolean result = FALSE;
+	GeeCollection* _tmp0_;
+	GeeForallFunc _tmp1_;
+	void* _tmp1__target;
+	gboolean _tmp2_ = FALSE;
+	self = (GeeReadOnlyCollection*) base;
+	_tmp0_ = self->_collection;
+	_tmp1_ = f;
+	_tmp1__target = f_target;
+	_tmp2_ = gee_traversable_foreach ((GeeTraversable*) _tmp0_, _tmp1_, _tmp1__target);
+	result = _tmp2_;
+	return result;
+}
+
+
+/**
+ * {@inheritDoc}
+ */
+static GeeIterator* gee_read_only_collection_real_stream (GeeTraversable* base, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify) {
+	GeeReadOnlyCollection * self;
+	GeeIterator* result = NULL;
+	GeeCollection* _tmp0_;
+	GeeStreamFunc _tmp1_;
+	void* _tmp1__target;
+	GDestroyNotify _tmp1__target_destroy_notify;
+	GeeIterator* _tmp2_ = NULL;
+	self = (GeeReadOnlyCollection*) base;
+	_tmp0_ = self->_collection;
+	_tmp1_ = f;
+	_tmp1__target = f_target;
+	_tmp1__target_destroy_notify = f_target_destroy_notify;
+	f_target_destroy_notify = NULL;
+	_tmp2_ = gee_traversable_stream ((GeeTraversable*) _tmp0_, a_type, (GBoxedCopyFunc) a_dup_func, a_destroy_func, _tmp1_, _tmp1__target, _tmp1__target_destroy_notify);
+	result = _tmp2_;
+	(f_target_destroy_notify == NULL) ? NULL : (f_target_destroy_notify (f_target), NULL);
+	f = NULL;
+	f_target = NULL;
+	f_target_destroy_notify = NULL;
+	return result;
+}
+
+
+/**
+ * {@inheritDoc}
+ */
+static GeeIterator* gee_read_only_collection_real_filter (GeeTraversable* base, GeePredicate f, void* f_target, GDestroyNotify f_target_destroy_notify) {
+	GeeReadOnlyCollection * self;
+	GeeIterator* result = NULL;
+	GeeCollection* _tmp0_;
+	GeePredicate _tmp1_;
+	void* _tmp1__target;
+	GDestroyNotify _tmp1__target_destroy_notify;
+	GeeIterator* _tmp2_ = NULL;
+	self = (GeeReadOnlyCollection*) base;
+	_tmp0_ = self->_collection;
+	_tmp1_ = f;
+	_tmp1__target = f_target;
+	_tmp1__target_destroy_notify = f_target_destroy_notify;
+	f_target_destroy_notify = NULL;
+	_tmp2_ = gee_traversable_filter ((GeeTraversable*) _tmp0_, _tmp1_, _tmp1__target, _tmp1__target_destroy_notify);
+	result = _tmp2_;
+	(f_target_destroy_notify == NULL) ? NULL : (f_target_destroy_notify (f_target), NULL);
+	f = NULL;
+	f_target = NULL;
+	f_target_destroy_notify = NULL;
+	return result;
+}
+
+
+/**
+ * {@inheritDoc}
+ */
+static GeeIterator* gee_read_only_collection_real_chop (GeeTraversable* base, gint offset, gint length) {
+	GeeReadOnlyCollection * self;
+	GeeIterator* result = NULL;
+	GeeCollection* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	GeeIterator* _tmp3_ = NULL;
+	self = (GeeReadOnlyCollection*) base;
+	_tmp0_ = self->_collection;
+	_tmp1_ = offset;
+	_tmp2_ = length;
+	_tmp3_ = gee_traversable_chop ((GeeTraversable*) _tmp0_, _tmp1_, _tmp2_);
+	result = _tmp3_;
+	return result;
 }
 
 
@@ -427,7 +598,16 @@ static gboolean gee_read_only_collection_real_get_is_empty (GeeCollection* base)
 }
 
 
-static GType gee_read_only_collection_real_get_element_type (GeeIterable* base) {
+static gboolean gee_read_only_collection_real_get_read_only (GeeCollection* base) {
+	gboolean result;
+	GeeReadOnlyCollection* self;
+	self = (GeeReadOnlyCollection*) base;
+	result = TRUE;
+	return result;
+}
+
+
+static GType gee_read_only_collection_real_get_element_type (GeeTraversable* base) {
 	GType result;
 	GeeReadOnlyCollection* self;
 	self = (GeeReadOnlyCollection*) base;
@@ -501,19 +681,6 @@ static gboolean gee_read_only_collection_iterator_real_has_next (GeeIterator* ba
 }
 
 
-static gboolean gee_read_only_collection_iterator_real_first (GeeIterator* base) {
-	GeeReadOnlyCollectionIterator * self;
-	gboolean result = FALSE;
-	GeeIterator* _tmp0_;
-	gboolean _tmp1_ = FALSE;
-	self = (GeeReadOnlyCollectionIterator*) base;
-	_tmp0_ = self->_iter;
-	_tmp1_ = gee_iterator_first (_tmp0_);
-	result = _tmp1_;
-	return result;
-}
-
-
 static gpointer gee_read_only_collection_iterator_real_get (GeeIterator* base) {
 	GeeReadOnlyCollectionIterator * self;
 	gpointer result = NULL;
@@ -534,6 +701,121 @@ static void gee_read_only_collection_iterator_real_remove (GeeIterator* base) {
 }
 
 
+static gboolean gee_read_only_collection_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeReadOnlyCollectionIterator * self;
+	gboolean result = FALSE;
+	GeeIterator* _tmp0_;
+	GeeForallFunc _tmp1_;
+	void* _tmp1__target;
+	gboolean _tmp2_ = FALSE;
+	self = (GeeReadOnlyCollectionIterator*) base;
+	_tmp0_ = self->_iter;
+	_tmp1_ = f;
+	_tmp1__target = f_target;
+	_tmp2_ = gee_traversable_foreach ((GeeTraversable*) _tmp0_, _tmp1_, _tmp1__target);
+	result = _tmp2_;
+	return result;
+}
+
+
+static GeeIterator* gee_read_only_collection_iterator_real_stream (GeeTraversable* base, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify) {
+	GeeReadOnlyCollectionIterator * self;
+	GeeIterator* result = NULL;
+	GeeIterator* _tmp0_;
+	GeeStreamFunc _tmp1_;
+	void* _tmp1__target;
+	GDestroyNotify _tmp1__target_destroy_notify;
+	GeeIterator* _tmp2_ = NULL;
+	self = (GeeReadOnlyCollectionIterator*) base;
+	_tmp0_ = self->_iter;
+	_tmp1_ = f;
+	_tmp1__target = f_target;
+	_tmp1__target_destroy_notify = f_target_destroy_notify;
+	f_target_destroy_notify = NULL;
+	_tmp2_ = gee_traversable_stream ((GeeTraversable*) _tmp0_, a_type, (GBoxedCopyFunc) a_dup_func, a_destroy_func, _tmp1_, _tmp1__target, _tmp1__target_destroy_notify);
+	result = _tmp2_;
+	(f_target_destroy_notify == NULL) ? NULL : (f_target_destroy_notify (f_target), NULL);
+	f = NULL;
+	f_target = NULL;
+	f_target_destroy_notify = NULL;
+	return result;
+}
+
+
+static GeeIterator* gee_read_only_collection_iterator_real_filter (GeeTraversable* base, GeePredicate f, void* f_target, GDestroyNotify f_target_destroy_notify) {
+	GeeReadOnlyCollectionIterator * self;
+	GeeIterator* result = NULL;
+	GeeIterator* _tmp0_;
+	GeePredicate _tmp1_;
+	void* _tmp1__target;
+	GDestroyNotify _tmp1__target_destroy_notify;
+	GeeIterator* _tmp2_ = NULL;
+	self = (GeeReadOnlyCollectionIterator*) base;
+	_tmp0_ = self->_iter;
+	_tmp1_ = f;
+	_tmp1__target = f_target;
+	_tmp1__target_destroy_notify = f_target_destroy_notify;
+	f_target_destroy_notify = NULL;
+	_tmp2_ = gee_traversable_filter ((GeeTraversable*) _tmp0_, _tmp1_, _tmp1__target, _tmp1__target_destroy_notify);
+	result = _tmp2_;
+	(f_target_destroy_notify == NULL) ? NULL : (f_target_destroy_notify (f_target), NULL);
+	f = NULL;
+	f_target = NULL;
+	f_target_destroy_notify = NULL;
+	return result;
+}
+
+
+static GeeIterator* gee_read_only_collection_iterator_real_chop (GeeTraversable* base, gint offset, gint length) {
+	GeeReadOnlyCollectionIterator * self;
+	GeeIterator* result = NULL;
+	GeeIterator* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
+	GeeIterator* _tmp3_ = NULL;
+	self = (GeeReadOnlyCollectionIterator*) base;
+	_tmp0_ = self->_iter;
+	_tmp1_ = offset;
+	_tmp2_ = length;
+	_tmp3_ = gee_traversable_chop ((GeeTraversable*) _tmp0_, _tmp1_, _tmp2_);
+	result = _tmp3_;
+	return result;
+}
+
+
+static gboolean gee_read_only_collection_iterator_real_get_valid (GeeIterator* base) {
+	gboolean result;
+	GeeReadOnlyCollectionIterator* self;
+	GeeIterator* _tmp0_;
+	gboolean _tmp1_;
+	gboolean _tmp2_;
+	self = (GeeReadOnlyCollectionIterator*) base;
+	_tmp0_ = self->_iter;
+	_tmp1_ = gee_iterator_get_valid (_tmp0_);
+	_tmp2_ = _tmp1_;
+	result = _tmp2_;
+	return result;
+}
+
+
+static gboolean gee_read_only_collection_iterator_real_get_read_only (GeeIterator* base) {
+	gboolean result;
+	GeeReadOnlyCollectionIterator* self;
+	self = (GeeReadOnlyCollectionIterator*) base;
+	result = TRUE;
+	return result;
+}
+
+
+static GType gee_read_only_collection_iterator_real_get_element_type (GeeTraversable* base) {
+	GType result;
+	GeeReadOnlyCollectionIterator* self;
+	self = (GeeReadOnlyCollectionIterator*) base;
+	result = self->priv->g_type;
+	return result;
+}
+
+
 static void gee_read_only_collection_iterator_class_init (GeeReadOnlyCollectionIteratorClass * klass) {
 	gee_read_only_collection_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeReadOnlyCollectionIteratorPrivate));
@@ -543,6 +825,36 @@ static void gee_read_only_collection_iterator_class_init (GeeReadOnlyCollectionI
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_READ_ONLY_COLLECTION_ITERATOR_G_TYPE, g_param_spec_gtype ("g-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_READ_ONLY_COLLECTION_ITERATOR_G_DUP_FUNC, g_param_spec_pointer ("g-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_READ_ONLY_COLLECTION_ITERATOR_G_DESTROY_FUNC, g_param_spec_pointer ("g-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_READ_ONLY_COLLECTION_ITERATOR_VALID, g_param_spec_boolean ("valid", "valid", "valid", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_READ_ONLY_COLLECTION_ITERATOR_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static GType gee_read_only_collection_iterator_gee_traversable_get_g_type (GeeReadOnlyCollectionIterator* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_read_only_collection_iterator_gee_traversable_get_g_dup_func (GeeReadOnlyCollectionIterator* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_read_only_collection_iterator_gee_traversable_get_g_destroy_func (GeeReadOnlyCollectionIterator* self) {
+	return self->priv->g_destroy_func;
+}
+
+
+static void gee_read_only_collection_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_read_only_collection_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_read_only_collection_iterator_real_foreach;
+	iface->stream = (GeeIterator* (*)(GeeTraversable*, GType, GBoxedCopyFunc, GDestroyNotify, GeeStreamFunc, void*, GDestroyNotify)) gee_read_only_collection_iterator_real_stream;
+	iface->filter = (GeeIterator* (*)(GeeTraversable*, GeePredicate, void*, GDestroyNotify)) gee_read_only_collection_iterator_real_filter;
+	iface->chop = (GeeIterator* (*)(GeeTraversable*, gint, gint)) gee_read_only_collection_iterator_real_chop;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_read_only_collection_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_read_only_collection_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_read_only_collection_iterator_gee_traversable_get_g_destroy_func;
+	iface->get_element_type = gee_read_only_collection_iterator_real_get_element_type;
 }
 
 
@@ -550,9 +862,10 @@ static void gee_read_only_collection_iterator_gee_iterator_interface_init (GeeIt
 	gee_read_only_collection_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->next = (gboolean (*)(GeeIterator*)) gee_read_only_collection_iterator_real_next;
 	iface->has_next = (gboolean (*)(GeeIterator*)) gee_read_only_collection_iterator_real_has_next;
-	iface->first = (gboolean (*)(GeeIterator*)) gee_read_only_collection_iterator_real_first;
 	iface->get = (gpointer (*)(GeeIterator*)) gee_read_only_collection_iterator_real_get;
 	iface->remove = (void (*)(GeeIterator*)) gee_read_only_collection_iterator_real_remove;
+	iface->get_valid = gee_read_only_collection_iterator_real_get_valid;
+	iface->get_read_only = gee_read_only_collection_iterator_real_get_read_only;
 }
 
 
@@ -573,9 +886,11 @@ GType gee_read_only_collection_iterator_get_type (void) {
 	static volatile gsize gee_read_only_collection_iterator_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_read_only_collection_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeReadOnlyCollectionIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_read_only_collection_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeReadOnlyCollectionIterator), 0, (GInstanceInitFunc) gee_read_only_collection_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_read_only_collection_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_read_only_collection_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_read_only_collection_iterator_type_id;
 		gee_read_only_collection_iterator_type_id = g_type_register_static (G_TYPE_OBJECT, "GeeReadOnlyCollectionIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_read_only_collection_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
 		g_type_add_interface_static (gee_read_only_collection_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
 		g_once_init_leave (&gee_read_only_collection_iterator_type_id__volatile, gee_read_only_collection_iterator_type_id);
 	}
@@ -587,6 +902,12 @@ static void _vala_gee_read_only_collection_iterator_get_property (GObject * obje
 	GeeReadOnlyCollectionIterator * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_READ_ONLY_COLLECTION_TYPE_ITERATOR, GeeReadOnlyCollectionIterator);
 	switch (property_id) {
+		case GEE_READ_ONLY_COLLECTION_ITERATOR_VALID:
+		g_value_set_boolean (value, gee_iterator_get_valid ((GeeIterator*) self));
+		break;
+		case GEE_READ_ONLY_COLLECTION_ITERATOR_READ_ONLY:
+		g_value_set_boolean (value, gee_iterator_get_read_only ((GeeIterator*) self));
+		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
 		break;
@@ -631,19 +952,75 @@ static void gee_read_only_collection_class_init (GeeReadOnlyCollectionClass * kl
 	/**
 	 * {@inheritDoc}
 	 */
-	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_READ_ONLY_COLLECTION_IS_EMPTY, g_param_spec_boolean ("is-empty", "is-empty", "is-empty", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
-	/**
-	 * {@inheritDoc}
-	 */
-	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_READ_ONLY_COLLECTION_ELEMENT_TYPE, g_param_spec_gtype ("element-type", "element-type", "element-type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_READ_ONLY_COLLECTION_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_READ_ONLY_COLLECTION_READ_ONLY_VIEW, g_param_spec_object ("read-only-view", "read-only-view", "read-only-view", GEE_TYPE_COLLECTION, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static GType gee_read_only_collection_gee_traversable_get_g_type (GeeReadOnlyCollection* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_read_only_collection_gee_traversable_get_g_dup_func (GeeReadOnlyCollection* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_read_only_collection_gee_traversable_get_g_destroy_func (GeeReadOnlyCollection* self) {
+	return self->priv->g_destroy_func;
+}
+
+
+static void gee_read_only_collection_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_read_only_collection_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_read_only_collection_real_foreach;
+	iface->stream = (GeeIterator* (*)(GeeTraversable*, GType, GBoxedCopyFunc, GDestroyNotify, GeeStreamFunc, void*, GDestroyNotify)) gee_read_only_collection_real_stream;
+	iface->filter = (GeeIterator* (*)(GeeTraversable*, GeePredicate, void*, GDestroyNotify)) gee_read_only_collection_real_filter;
+	iface->chop = (GeeIterator* (*)(GeeTraversable*, gint, gint)) gee_read_only_collection_real_chop;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_read_only_collection_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_read_only_collection_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_read_only_collection_gee_traversable_get_g_destroy_func;
+	iface->get_element_type = gee_read_only_collection_real_get_element_type;
+}
+
+
+static GType gee_read_only_collection_gee_iterable_get_g_type (GeeReadOnlyCollection* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_read_only_collection_gee_iterable_get_g_dup_func (GeeReadOnlyCollection* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_read_only_collection_gee_iterable_get_g_destroy_func (GeeReadOnlyCollection* self) {
+	return self->priv->g_destroy_func;
 }
 
 
 static void gee_read_only_collection_gee_iterable_interface_init (GeeIterableIface * iface) {
 	gee_read_only_collection_gee_iterable_parent_iface = g_type_interface_peek_parent (iface);
 	iface->iterator = (GeeIterator* (*)(GeeIterable*)) gee_read_only_collection_real_iterator;
-	iface->get_element_type = gee_read_only_collection_real_get_element_type;
+	iface->get_g_type = (GType(*)(GeeIterable*)) gee_read_only_collection_gee_iterable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeIterable*)) gee_read_only_collection_gee_iterable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeIterable*)) gee_read_only_collection_gee_iterable_get_g_destroy_func;
+}
+
+
+static GType gee_read_only_collection_gee_collection_get_g_type (GeeReadOnlyCollection* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_read_only_collection_gee_collection_get_g_dup_func (GeeReadOnlyCollection* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_read_only_collection_gee_collection_get_g_destroy_func (GeeReadOnlyCollection* self) {
+	return self->priv->g_destroy_func;
 }
 
 
@@ -658,8 +1035,12 @@ static void gee_read_only_collection_gee_collection_interface_init (GeeCollectio
 	iface->remove_all = (gboolean (*)(GeeCollection*, GeeCollection*)) gee_read_only_collection_real_remove_all;
 	iface->retain_all = (gboolean (*)(GeeCollection*, GeeCollection*)) gee_read_only_collection_real_retain_all;
 	iface->to_array = (gpointer* (*)(GeeCollection*, int*)) gee_read_only_collection_real_to_array;
+	iface->get_g_type = (GType(*)(GeeCollection*)) gee_read_only_collection_gee_collection_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeCollection*)) gee_read_only_collection_gee_collection_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeCollection*)) gee_read_only_collection_gee_collection_get_g_destroy_func;
 	iface->get_size = gee_read_only_collection_real_get_size;
 	iface->get_is_empty = gee_read_only_collection_real_get_is_empty;
+	iface->get_read_only = gee_read_only_collection_real_get_read_only;
 	iface->get_read_only_view = (GeeCollection* (*) (GeeCollection *)) gee_read_only_collection_get_read_only_view;
 }
 
@@ -690,10 +1071,12 @@ GType gee_read_only_collection_get_type (void) {
 	static volatile gsize gee_read_only_collection_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_read_only_collection_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeReadOnlyCollectionClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_read_only_collection_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeReadOnlyCollection), 0, (GInstanceInitFunc) gee_read_only_collection_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_read_only_collection_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_iterable_info = { (GInterfaceInitFunc) gee_read_only_collection_gee_iterable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_collection_info = { (GInterfaceInitFunc) gee_read_only_collection_gee_collection_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_read_only_collection_type_id;
 		gee_read_only_collection_type_id = g_type_register_static (G_TYPE_OBJECT, "GeeReadOnlyCollection", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_read_only_collection_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
 		g_type_add_interface_static (gee_read_only_collection_type_id, GEE_TYPE_ITERABLE, &gee_iterable_info);
 		g_type_add_interface_static (gee_read_only_collection_type_id, GEE_TYPE_COLLECTION, &gee_collection_info);
 		g_once_init_leave (&gee_read_only_collection_type_id__volatile, gee_read_only_collection_type_id);
@@ -709,11 +1092,8 @@ static void _vala_gee_read_only_collection_get_property (GObject * object, guint
 		case GEE_READ_ONLY_COLLECTION_SIZE:
 		g_value_set_int (value, gee_collection_get_size ((GeeCollection*) self));
 		break;
-		case GEE_READ_ONLY_COLLECTION_IS_EMPTY:
-		g_value_set_boolean (value, gee_collection_get_is_empty ((GeeCollection*) self));
-		break;
-		case GEE_READ_ONLY_COLLECTION_ELEMENT_TYPE:
-		g_value_set_gtype (value, gee_iterable_get_element_type ((GeeIterable*) self));
+		case GEE_READ_ONLY_COLLECTION_READ_ONLY:
+		g_value_set_boolean (value, gee_collection_get_read_only ((GeeCollection*) self));
 		break;
 		case GEE_READ_ONLY_COLLECTION_READ_ONLY_VIEW:
 		g_value_take_object (value, gee_read_only_collection_get_read_only_view (self));

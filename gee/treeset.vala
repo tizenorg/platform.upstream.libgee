@@ -1,6 +1,6 @@
 /* treeset.vala
  *
- * Copyright (C) 2009  Maciej Piechotka
+ * Copyright (C) 2009-2011  Maciej Piechotka
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,18 +32,26 @@ using GLib;
  *
  * @see HashSet
  */
-public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
+public class Gee.TreeSet<G> : AbstractBidirSortedSet<G> {
 	/**
 	 * {@inheritDoc}
 	 */
 	public override int size {
 		get {return _size;}
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public override bool read_only {
+		get { return false; }
+	}
 
 	/**
 	 * The elements' comparator function.
 	 */
-	public CompareFunc compare_func { private set; get; }
+	[CCode (notify = false)]
+	public CompareDataFunc<G> compare_func { private set; get; }
 
 	private int _size = 0;
 
@@ -56,11 +64,15 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 	 *
 	 * @param compare_func an optional element comparator function
 	 */
-	public TreeSet (CompareFunc? compare_func = null) {
+	public TreeSet (owned CompareDataFunc<G>? compare_func = null) {
 		if (compare_func == null) {
 			compare_func = Functions.get_compare_func_for (typeof (G));
 		}
 		this.compare_func = compare_func;
+	}
+
+	~TreeSet () {
+		clear ();
 	}
 
 	/**
@@ -212,10 +224,7 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 
 	private inline void fix_removal (ref Node<G> node, out G? key = null) {
 		Node<G> n = (owned)node;
-		if (&key != null)
-			key = (owned) n.key;
-		else
-			n.key = null;
+		key = (owned) n.key;
 		if (n.prev != null) {
 			n.prev.next = n.next;
 		} else {
@@ -250,10 +259,14 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 		stdout.printf ("Removing %s from %s\n", (string)item, node != null ? (string)node.key : null);
 #endif
 		if (node == null) {
+			prev = null;
+			next = null;
 			return false;
 		} else if (compare_func (item, node.key) < 0) {
 			weak Node<G> left = node.left;
 			if (left == null) {
+				prev = null;
+				next = null;
 				return false;
 			}
 			if (is_black (left) && is_black (left.left)) {
@@ -269,10 +282,8 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 
 			weak Node<G>? r = node.right;
 			if (compare_func (item, node.key) == 0 && r == null) {
-				if (&prev != null)
-					prev = node.prev;
-				if (&next != null)
-					next = node.next;
+				prev = node.prev;
+				next = node.next;
 				fix_removal (ref node, null);
 				return true;
 			}
@@ -280,10 +291,8 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 				move_red_right (ref node);
 			}
 			if (compare_func (item, node.key) == 0) {
-				if (&prev != null)
-					prev = node.prev;
-				if (&next != null)
-					next = node;
+				prev = node.prev;
+				next = node;
 				remove_minimal (ref node.right, out node.key);
 				fix_up (ref node);
 				return true;
@@ -343,7 +352,7 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public BidirIterator<G> bidir_iterator () {
+	public override BidirIterator<G> bidir_iterator () {
 		return new Iterator<G> (this);
 	}
 
@@ -354,7 +363,7 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public G first () {
+	public override G first () {
 		assert (_first != null);
 		return _first.key;
 	}
@@ -362,7 +371,7 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public G last () {
+	public override G last () {
 		assert (_last != null);
 		return _last.key;
 	}
@@ -370,21 +379,21 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public SortedSet<G> head_set (G before) {
+	public override SortedSet<G> head_set (G before) {
 		return new SubSet<G>.head (this, before);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public SortedSet<G> tail_set (G after) {
+	public override SortedSet<G> tail_set (G after) {
 		return new SubSet<G>.tail (this, after);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public SortedSet<G> sub_set (G after, G before) {
+	public override SortedSet<G> sub_set (G after, G before) {
 		return new SubSet<G> (this, after, before);
 	}
 
@@ -406,7 +415,7 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public BidirIterator<G>? iterator_at (G item) {
+	public override Gee.Iterator<G>? iterator_at (G item) {
 		weak Node<G>? node = find_node (item);
 		return node != null ? new Iterator<G>.pointing (this, node) : null;
 	}
@@ -461,28 +470,28 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public G? lower (G item) {
+	public override G? lower (G item) {
 		return lift_null_get (find_lower (item));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public G? higher (G item) {
+	public override G? higher (G item) {
 		return lift_null_get (find_higher (item));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public G? floor (G item) {
+	public override G? floor (G item) {
 		return lift_null_get (find_floor (item));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public G? ceil (G item) {
+	public override G? ceil (G item) {
 		return lift_null_get (find_ceil (item));
 	}
 
@@ -568,7 +577,7 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 		public weak Node<G>? next;
 	}
 
-	private class Iterator<G> : Object, Gee.Iterator<G>, BidirIterator<G> {
+	private class Iterator<G> : Object, Traversable<G>, Gee.Iterator<G>, BidirIterator<G> {
 		private TreeSet<G> _set;
 
 		// concurrent modification protection
@@ -696,6 +705,39 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 				val = _set.lift_null_get (_prev);
 				return _next != null;
 			}
+		}
+		
+		public bool valid {
+			get {
+				assert (stamp == _set.stamp);
+				return current != null;
+			}
+		}
+		
+		public bool read_only {
+			get {
+				return false;
+			}
+		}
+
+		public bool foreach (ForallFunc<G> f) {
+			assert (stamp == _set.stamp);
+			if (current != null) {
+				if (!f (current.key)) {
+					return false;
+				}
+				_next = current.next;
+			} else if (!started) {
+				_next = _set._first;
+			}
+			while (_next != null) {
+				current = _next;
+				if (!f (current.key)) {
+					return false;
+				}
+				_next = current.next;
+			}
+			return true;
 		}
 
 		private weak Node<G>? current = null;
@@ -853,7 +895,7 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 		BOUNDED
 	}
 
-	private class SubSet<G> : AbstractSet<G>, SortedSet<G> {
+	private class SubSet<G> : AbstractBidirSortedSet<G> {
 		public SubSet (TreeSet<G> set, G after, G before) {
 			this.set = set;
 			this.range = new Range<G> (set, after, before);
@@ -884,7 +926,11 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 			}
 		}
 
-		public override bool is_empty {
+		public override bool read_only {
+			get { return true; }
+		}
+
+		public bool is_empty {
 			get {
 				return range.empty_subset ();
 			}
@@ -913,35 +959,35 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 			return new SubIterator<G> (set, range);
 		}
 
-		public BidirIterator<G> bidir_iterator () {
+		public override BidirIterator<G> bidir_iterator () {
 			return new SubIterator<G> (set, range);
 		}
 
-		public G first () {
+		public override G first () {
 			weak Node<G>? _first = range.first ();
 			assert (_first != null);
 			return _first.key;
 		}
 
-		public G last () {
+		public override G last () {
 			weak Node<G>? _last = range.last ();
 			assert (_last != null);
 			return _last.key;
 		}
 
-		public SortedSet<G> head_set (G before) {
+		public override SortedSet<G> head_set (G before) {
 			return new SubSet<G>.from_range (set, range.cut_tail (before));
 		}
 
-		public SortedSet<G> tail_set (G after) {
+		public override SortedSet<G> tail_set (G after) {
 			return new SubSet<G>.from_range (set, range.cut_head (after));
 		}
 
-		public SortedSet<G> sub_set (G after, G before) {
+		public override SortedSet<G> sub_set (G after, G before) {
 			return new SubSet<G>.from_range (set, range.cut (after, before));
 		}
 
-		public BidirIterator<G>? iterator_at (G item) {
+		public override Gee.Iterator<G>? iterator_at (G item) {
 			if (!range.in_range (item))
 				return null;
 			weak Node<G>? n = set.find_node (item);
@@ -950,7 +996,7 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 			return new SubIterator<G>.pointing (set, range, n);
 		}
 
-		public G? lower (G item) {
+		public override G? lower (G item) {
 			var res = range.compare_range (item);
 			if (res > 0)
 				return last ();
@@ -958,7 +1004,7 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 			return l != null && range.in_range (l) ? l : null;
 		}
 
-		public G? higher (G item) {
+		public override G? higher (G item) {
 			var res = range.compare_range (item);
 			if (res < 0)
 				return first ();
@@ -966,7 +1012,7 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 			return h != null && range.in_range (h) ? h : null;
 		}
 
-		public G? floor (G item) {
+		public override G? floor (G item) {
 			var res = range.compare_range (item);
 			if (res > 0)
 				return last ();
@@ -974,7 +1020,7 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 			return l != null && range.in_range (l) ? l : null;
 		}
 
-		public G? ceil (G item) {
+		public override G? ceil (G item) {
 			var res = range.compare_range (item);
 			if (res < 0)
 				return first ();
@@ -986,7 +1032,7 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 		private Range<G> range;
 	}
 
-	private class SubIterator<G> : Object, Gee.Iterator<G>, BidirIterator<G> {
+	private class SubIterator<G> : Object, Traversable<G>, Gee.Iterator<G>, BidirIterator<G> {
 		public SubIterator (TreeSet<G> set, Range<G> range) {
 			this.set = set;
 			this.range = range;
@@ -1064,6 +1110,32 @@ public class Gee.TreeSet<G> : AbstractSet<G>, SortedSet<G> {
 		public void remove () {
 			assert (iterator != null);
 			iterator.remove ();
+		}
+		
+		public bool read_only {
+			get {
+				return false;
+			}
+		}
+		
+		public bool valid {
+			get {
+				return iterator.valid;
+			}
+		}
+
+		public bool foreach(ForallFunc<G> f) {
+			if(valid) {
+				if (!f(get())) {
+					return false;
+				}
+			}
+			while(next()) {
+				if (!f(get())) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		private new TreeSet<G> set;

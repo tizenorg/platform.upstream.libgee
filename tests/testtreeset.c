@@ -75,6 +75,17 @@ typedef struct _SortedSetTests SortedSetTests;
 typedef struct _SortedSetTestsClass SortedSetTestsClass;
 typedef struct _SortedSetTestsPrivate SortedSetTestsPrivate;
 
+#define TYPE_BIDIR_SORTED_SET_TESTS (bidir_sorted_set_tests_get_type ())
+#define BIDIR_SORTED_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_BIDIR_SORTED_SET_TESTS, BidirSortedSetTests))
+#define BIDIR_SORTED_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_BIDIR_SORTED_SET_TESTS, BidirSortedSetTestsClass))
+#define IS_BIDIR_SORTED_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_BIDIR_SORTED_SET_TESTS))
+#define IS_BIDIR_SORTED_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_BIDIR_SORTED_SET_TESTS))
+#define BIDIR_SORTED_SET_TESTS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_BIDIR_SORTED_SET_TESTS, BidirSortedSetTestsClass))
+
+typedef struct _BidirSortedSetTests BidirSortedSetTests;
+typedef struct _BidirSortedSetTestsClass BidirSortedSetTestsClass;
+typedef struct _BidirSortedSetTestsPrivate BidirSortedSetTestsPrivate;
+
 #define TYPE_TREE_SET_TESTS (tree_set_tests_get_type ())
 #define TREE_SET_TESTS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_TREE_SET_TESTS, TreeSetTests))
 #define TREE_SET_TESTS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_TREE_SET_TESTS, TreeSetTestsClass))
@@ -129,13 +140,22 @@ struct _SortedSetTestsClass {
 	SetTestsClass parent_class;
 };
 
-struct _TreeSetTests {
+struct _BidirSortedSetTests {
 	SortedSetTests parent_instance;
+	BidirSortedSetTestsPrivate * priv;
+};
+
+struct _BidirSortedSetTestsClass {
+	SortedSetTestsClass parent_class;
+};
+
+struct _TreeSetTests {
+	BidirSortedSetTests parent_instance;
 	TreeSetTestsPrivate * priv;
 };
 
 struct _TreeSetTestsClass {
-	SortedSetTestsClass parent_class;
+	BidirSortedSetTestsClass parent_class;
 };
 
 typedef void (*GeeTestCaseTestMethod) (void* user_data);
@@ -146,18 +166,15 @@ GType gee_test_case_get_type (void) G_GNUC_CONST;
 GType collection_tests_get_type (void) G_GNUC_CONST;
 GType set_tests_get_type (void) G_GNUC_CONST;
 GType sorted_set_tests_get_type (void) G_GNUC_CONST;
+GType bidir_sorted_set_tests_get_type (void) G_GNUC_CONST;
 GType tree_set_tests_get_type (void) G_GNUC_CONST;
 enum  {
 	TREE_SET_TESTS_DUMMY_PROPERTY
 };
 TreeSetTests* tree_set_tests_new (void);
 TreeSetTests* tree_set_tests_construct (GType object_type);
-SortedSetTests* sorted_set_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
-void tree_set_tests_test_selected_functions (TreeSetTests* self);
-static void _tree_set_tests_test_selected_functions_gee_test_case_test_method (gpointer self);
-void tree_set_tests_test_gobject_properties (TreeSetTests* self);
-static void _tree_set_tests_test_gobject_properties_gee_test_case_test_method (gpointer self);
+BidirSortedSetTests* bidir_sorted_set_tests_construct (GType object_type, const gchar* name);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 void tree_set_tests_test_add_remove (TreeSetTests* self);
 static void _tree_set_tests_test_add_remove_gee_test_case_test_method (gpointer self);
 static void tree_set_tests_real_set_up (GeeTestCase* base);
@@ -167,16 +184,6 @@ static void _vala_array_destroy (gpointer array, gint array_length, GDestroyNoti
 static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify destroy_func);
 
 
-static void _tree_set_tests_test_selected_functions_gee_test_case_test_method (gpointer self) {
-	tree_set_tests_test_selected_functions (self);
-}
-
-
-static void _tree_set_tests_test_gobject_properties_gee_test_case_test_method (gpointer self) {
-	tree_set_tests_test_gobject_properties (self);
-}
-
-
 static void _tree_set_tests_test_add_remove_gee_test_case_test_method (gpointer self) {
 	tree_set_tests_test_add_remove (self);
 }
@@ -184,10 +191,8 @@ static void _tree_set_tests_test_add_remove_gee_test_case_test_method (gpointer 
 
 TreeSetTests* tree_set_tests_construct (GType object_type) {
 	TreeSetTests * self = NULL;
-	self = (TreeSetTests*) sorted_set_tests_construct (object_type, "TreeSet");
-	gee_test_case_add_test ((GeeTestCase*) self, "[TreeSet] selected functions", _tree_set_tests_test_selected_functions_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[TreeSet] GObject properties", _tree_set_tests_test_gobject_properties_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[TreeSet] add and remove", _tree_set_tests_test_add_remove_gee_test_case_test_method, self);
+	self = (TreeSetTests*) bidir_sorted_set_tests_construct (object_type, "TreeSet");
+	gee_test_case_add_test ((GeeTestCase*) self, "[TreeSet] add and remove", _tree_set_tests_test_add_remove_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 
@@ -201,7 +206,7 @@ static void tree_set_tests_real_set_up (GeeTestCase* base) {
 	TreeSetTests * self;
 	GeeTreeSet* _tmp0_;
 	self = (TreeSetTests*) base;
-	_tmp0_ = gee_tree_set_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp0_ = gee_tree_set_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	_g_object_unref0 (((CollectionTests*) self)->test_collection);
 	((CollectionTests*) self)->test_collection = (GeeCollection*) _tmp0_;
 }
@@ -217,56 +222,6 @@ static void tree_set_tests_real_tear_down (GeeTestCase* base) {
 
 static gpointer _g_object_ref0 (gpointer self) {
 	return self ? g_object_ref (self) : NULL;
-}
-
-
-void tree_set_tests_test_selected_functions (TreeSetTests* self) {
-	GeeCollection* _tmp0_;
-	GeeTreeSet* _tmp1_;
-	GeeTreeSet* test_set;
-	GCompareFunc _tmp2_;
-	GCompareFunc _tmp3_;
-	GCompareFunc _tmp4_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((CollectionTests*) self)->test_collection;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_TREE_SET) ? ((GeeTreeSet*) _tmp0_) : NULL);
-	test_set = _tmp1_;
-	_vala_assert (test_set != NULL, "test_set != null");
-	_tmp2_ = gee_tree_set_get_compare_func (test_set);
-	_tmp3_ = _tmp2_;
-	_tmp4_ = g_strcmp0;
-	_vala_assert (_tmp3_ == ((GCompareFunc) _tmp4_), "test_set.compare_func == (CompareFunc) strcmp");
-	_g_object_unref0 (test_set);
-}
-
-
-void tree_set_tests_test_gobject_properties (TreeSetTests* self) {
-	GeeCollection* _tmp0_;
-	GeeTreeSet* _tmp1_;
-	GeeTreeSet* test_set;
-	GValue value = {0};
-	GValue _tmp2_ = {0};
-	GValue _tmp3_;
-	void* _tmp4_ = NULL;
-	GCompareFunc _tmp5_;
-	GCompareFunc _tmp6_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((CollectionTests*) self)->test_collection;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_TREE_SET) ? ((GeeTreeSet*) _tmp0_) : NULL);
-	test_set = _tmp1_;
-	_vala_assert (test_set != NULL, "test_set != null");
-	g_value_init (&_tmp2_, G_TYPE_POINTER);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	value = _tmp2_;
-	_tmp3_ = value;
-	g_object_get_property ((GObject*) test_set, "compare-func", &value);
-	_tmp4_ = g_value_get_pointer (&value);
-	_tmp5_ = gee_tree_set_get_compare_func (test_set);
-	_tmp6_ = _tmp5_;
-	_vala_assert (_tmp4_ == ((void*) _tmp6_), "value.get_pointer () == (void*) test_set.compare_func");
-	g_value_unset (&value);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	_g_object_unref0 (test_set);
 }
 
 
@@ -363,7 +318,7 @@ void tree_set_tests_test_add_remove (TreeSetTests* self) {
 	test_set = _tmp1_;
 	_tmp2_ = test_set;
 	_vala_assert (_tmp2_ != NULL, "test_set != null");
-	collection_tests_test_remove_all ((CollectionTests*) G_TYPE_CHECK_INSTANCE_CAST (self, TYPE_SORTED_SET_TESTS, SortedSetTests));
+	collection_tests_test_remove_all ((CollectionTests*) G_TYPE_CHECK_INSTANCE_CAST (self, TYPE_BIDIR_SORTED_SET_TESTS, BidirSortedSetTests));
 	_tmp3_ = g_strdup ("3");
 	_tmp4_ = g_strdup ("10");
 	_tmp5_ = g_strdup ("5");
@@ -692,7 +647,7 @@ GType tree_set_tests_get_type (void) {
 	if (g_once_init_enter (&tree_set_tests_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (TreeSetTestsClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) tree_set_tests_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (TreeSetTests), 0, (GInstanceInitFunc) tree_set_tests_instance_init, NULL };
 		GType tree_set_tests_type_id;
-		tree_set_tests_type_id = g_type_register_static (TYPE_SORTED_SET_TESTS, "TreeSetTests", &g_define_type_info, 0);
+		tree_set_tests_type_id = g_type_register_static (TYPE_BIDIR_SORTED_SET_TESTS, "TreeSetTests", &g_define_type_info, 0);
 		g_once_init_leave (&tree_set_tests_type_id__volatile, tree_set_tests_type_id);
 	}
 	return tree_set_tests_type_id__volatile;

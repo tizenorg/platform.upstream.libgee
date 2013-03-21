@@ -37,20 +37,28 @@ using GLib;
  *
  * @see LinkedList
  */
-public class Gee.ArrayList<G> : AbstractList<G> {
+public class Gee.ArrayList<G> : AbstractBidirList<G> {
 	/**
 	 * {@inheritDoc}
 	 */
 	public override int size {
 		get { return _size; }
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public override bool read_only {
+		get { return false; }
+	}
 
 	/**
 	 * The elements' equality testing function.
 	 */
-	public EqualFunc equal_func { private set; get; }
+	[CCode (notify = false)]
+	public EqualDataFunc<G> equal_func { private set; get; }
 
-	internal G[] _items = new G[4];
+	internal G[] _items;
 	internal int _size;
 
 	// concurrent modification protection
@@ -64,11 +72,43 @@ public class Gee.ArrayList<G> : AbstractList<G> {
 	 *
 	 * @param equal_func an optional element equality testing function
 	 */
-	public ArrayList (EqualFunc? equal_func = null) {
+	public ArrayList (owned EqualDataFunc<G>? equal_func = null) {
 		if (equal_func == null) {
 			equal_func = Functions.get_equal_func_for (typeof (G));
 		}
 		this.equal_func = equal_func;
+		_items = new G[4];
+		_size = 0;
+	}
+
+	/**
+	 * Constructs a new array list based on provided array.
+	 *
+	 * If not provided, the function parameter is requested to the
+	 * {@link Functions} function factory methods.
+	 *
+	 * @param items initial items to be put into array
+	 * @param equal_func an optional element equality testing function
+	 */
+	public ArrayList.wrap (owned G[] items, owned EqualDataFunc<G>? equal_func = null) {
+		if (equal_func == null) {
+			equal_func = Functions.get_equal_func_for (typeof (G));
+		}
+		this.equal_func = equal_func;
+		_items = items;
+		_size = items.length;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public override bool foreach(ForallFunc<G> f) {
+		for (int i = 0; i < _size; i++) {
+			if (!f (_items[i])) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -82,6 +122,13 @@ public class Gee.ArrayList<G> : AbstractList<G> {
 	 * {@inheritDoc}
 	 */
 	public override ListIterator<G> list_iterator () {
+		return new Iterator<G> (this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public override BidirListIterator<G> bidir_list_iterator () {
 		return new Iterator<G> (this);
 	}
 
@@ -210,29 +257,15 @@ public class Gee.ArrayList<G> : AbstractList<G> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public override bool add_all (Collection<G> collection) {
+	public bool add_all (Collection<G> collection) {
 		if (collection.is_empty) {
 			return false;
 		}
 
 		grow_if_needed (collection.size);
-		foreach (G item in collection) {
-			_items[_size++] = item;
-		}
+		collection.foreach ((item) => {_items[_size++] = item; return true;});
 		_stamp++;
 		return true;
-	}
-
-	/**
-	 * Sorts items by comparing with the specified compare function.
-	 *
-	 * @deprecated This method has only been added as hack and will be
-	 * deprecated after the next odd minor version bump (>= 0.7.x).
-	 *
-	 * @param compare_func compare function to use to compare items
-	 */
-	public void sort_with_data (CompareDataFunc compare) {
-		TimSort.sort_with_data<G> (this, compare);
 	}
 
 	private void shift (int start, int delta) {
@@ -261,7 +294,7 @@ public class Gee.ArrayList<G> : AbstractList<G> {
 		_items.resize (value);
 	}
 
-	private class Iterator<G> : Object, Gee.Iterator<G>, BidirIterator<G>, ListIterator<G> {
+	private class Iterator<G> : Object, Traversable<G>, Gee.Iterator<G>, BidirIterator<G>, ListIterator<G>, BidirListIterator<G> {
 		private ArrayList<G> _list;
 		private int _index = -1;
 		private bool _removed = false;
@@ -372,6 +405,33 @@ public class Gee.ArrayList<G> : AbstractList<G> {
 			assert (_index >= 0);
 			assert (_index < _list._size);
 			return _index;
+		}
+		
+		public bool read_only {
+			get {
+				return false;
+			}
+		}
+		
+		public bool valid {
+			get {
+				return _index >= 0 && _index < _list._size && ! _removed;
+			}
+		}
+
+		public bool foreach (ForallFunc<G> f) {
+			assert (_stamp == _list._stamp);
+			if (_index < 0 || _removed) {
+				_index++;
+			}
+			while (_index < _list._size) {
+				if (!f (_list._items[_index])) {
+					return false;
+				}
+				_index++;
+			}
+			_index = _list._size - 1;
+			return true;
 		}
 	}
 }

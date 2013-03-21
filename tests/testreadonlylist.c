@@ -113,9 +113,11 @@ enum  {
 };
 ReadOnlyListTests* read_only_list_tests_new (void);
 ReadOnlyListTests* read_only_list_tests_construct (GType object_type);
+ReadOnlyListTests* read_only_list_tests_new_with_name (const gchar* name);
+ReadOnlyListTests* read_only_list_tests_construct_with_name (GType object_type, const gchar* name);
 ReadOnlyCollectionTests* read_only_collection_tests_new_with_name (const gchar* name);
 ReadOnlyCollectionTests* read_only_collection_tests_construct_with_name (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 void read_only_list_tests_test_immutable_iterator (ReadOnlyListTests* self);
 static void _read_only_list_tests_test_immutable_iterator_gee_test_case_test_method (gpointer self);
 void read_only_list_tests_test_immutable (ReadOnlyListTests* self);
@@ -126,6 +128,18 @@ static void read_only_list_tests_real_set_up (GeeTestCase* base);
 GeeCollection* read_only_collection_tests_get_ro_view (ReadOnlyCollectionTests* self, GeeCollection* collection);
 static void read_only_list_tests_real_tear_down (GeeTestCase* base);
 static GeeCollection* read_only_list_tests_real_get_ro_view (ReadOnlyCollectionTests* base, GeeCollection* collection);
+
+
+ReadOnlyListTests* read_only_list_tests_construct (GType object_type) {
+	ReadOnlyListTests * self = NULL;
+	self = (ReadOnlyListTests*) read_only_list_tests_construct_with_name (object_type, "ReadOnlyList");
+	return self;
+}
+
+
+ReadOnlyListTests* read_only_list_tests_new (void) {
+	return read_only_list_tests_construct (TYPE_READ_ONLY_LIST_TESTS);
+}
 
 
 static void _read_only_list_tests_test_immutable_iterator_gee_test_case_test_method (gpointer self) {
@@ -143,18 +157,21 @@ static void _read_only_list_tests_test_accurate_view_gee_test_case_test_method (
 }
 
 
-ReadOnlyListTests* read_only_list_tests_construct (GType object_type) {
+ReadOnlyListTests* read_only_list_tests_construct_with_name (GType object_type, const gchar* name) {
 	ReadOnlyListTests * self = NULL;
-	self = (ReadOnlyListTests*) read_only_collection_tests_construct_with_name (object_type, "ReadOnlyList");
-	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyList] immutable iterator", _read_only_list_tests_test_immutable_iterator_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyList] immutable", _read_only_list_tests_test_immutable_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyList] accurate view", _read_only_list_tests_test_accurate_view_gee_test_case_test_method, self);
+	const gchar* _tmp0_;
+	g_return_val_if_fail (name != NULL, NULL);
+	_tmp0_ = name;
+	self = (ReadOnlyListTests*) read_only_collection_tests_construct_with_name (object_type, _tmp0_);
+	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyList] immutable iterator", _read_only_list_tests_test_immutable_iterator_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyList] immutable", _read_only_list_tests_test_immutable_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyList] accurate view", _read_only_list_tests_test_accurate_view_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 
 
-ReadOnlyListTests* read_only_list_tests_new (void) {
-	return read_only_list_tests_construct (TYPE_READ_ONLY_LIST_TESTS);
+ReadOnlyListTests* read_only_list_tests_new_with_name (const gchar* name) {
+	return read_only_list_tests_construct_with_name (TYPE_READ_ONLY_LIST_TESTS, name);
 }
 
 
@@ -164,7 +181,7 @@ static void read_only_list_tests_real_set_up (GeeTestCase* base) {
 	GeeCollection* _tmp1_;
 	GeeCollection* _tmp2_ = NULL;
 	self = (ReadOnlyListTests*) base;
-	_tmp0_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp0_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	_g_object_unref0 (((ReadOnlyCollectionTests*) self)->test_collection);
 	((ReadOnlyCollectionTests*) self)->test_collection = (GeeCollection*) _tmp0_;
 	_tmp1_ = ((ReadOnlyCollectionTests*) self)->test_collection;
@@ -250,77 +267,57 @@ void read_only_list_tests_test_immutable_iterator (ReadOnlyListTests* self) {
 	gboolean _tmp38_ = FALSE;
 	GeeListIterator* _tmp39_;
 	gboolean _tmp40_ = FALSE;
-	GeeListIterator* _tmp41_;
-	gboolean _tmp42_ = FALSE;
+	GeeList* _tmp41_;
+	GeeListIterator* _tmp42_ = NULL;
 	GeeListIterator* _tmp43_;
 	gboolean _tmp44_ = FALSE;
-	GeeListIterator* _tmp45_;
-	gpointer _tmp46_ = NULL;
-	gchar* _tmp47_;
-	GeeListIterator* _tmp48_;
-	gint _tmp49_ = 0;
-	GeeListIterator* _tmp50_;
-	gboolean _tmp51_ = FALSE;
-	GeeListIterator* _tmp52_;
-	gpointer _tmp53_ = NULL;
-	gchar* _tmp54_;
-	GeeListIterator* _tmp55_;
-	gint _tmp56_ = 0;
-	GeeListIterator* _tmp57_;
+	gboolean _tmp45_ = FALSE;
+	GeeList* _tmp47_;
+	gint _tmp48_;
+	gint _tmp49_;
+	GeeList* _tmp50_;
+	gpointer _tmp51_ = NULL;
+	gchar* _tmp52_;
+	GeeList* _tmp53_;
+	gpointer _tmp54_ = NULL;
+	gchar* _tmp55_;
+	GeeListIterator* _tmp56_;
+	gint _tmp57_ = 0;
 	gboolean _tmp58_ = FALSE;
-	GeeListIterator* _tmp59_;
-	gpointer _tmp60_ = NULL;
-	gchar* _tmp61_;
-	GeeListIterator* _tmp62_;
-	gint _tmp63_ = 0;
-	gboolean _tmp64_ = FALSE;
+	GeeList* _tmp60_;
+	gint _tmp61_;
+	gint _tmp62_;
+	GeeList* _tmp63_;
+	gpointer _tmp64_ = NULL;
+	gchar* _tmp65_;
 	GeeList* _tmp66_;
-	gint _tmp67_;
-	gint _tmp68_;
-	GeeList* _tmp69_;
-	gpointer _tmp70_ = NULL;
-	gchar* _tmp71_;
-	GeeList* _tmp72_;
-	gpointer _tmp73_ = NULL;
-	gchar* _tmp74_;
-	GeeListIterator* _tmp75_;
-	gint _tmp76_ = 0;
-	gboolean _tmp77_ = FALSE;
-	GeeList* _tmp79_;
-	gint _tmp80_;
-	gint _tmp81_;
-	GeeList* _tmp82_;
-	gpointer _tmp83_ = NULL;
-	gchar* _tmp84_;
-	GeeList* _tmp85_;
-	gpointer _tmp86_ = NULL;
-	gchar* _tmp87_;
-	GeeListIterator* _tmp88_;
-	gint _tmp89_ = 0;
-	gboolean _tmp90_ = FALSE;
-	GeeList* _tmp92_;
-	gint _tmp93_;
-	gint _tmp94_;
-	GeeList* _tmp95_;
-	gpointer _tmp96_ = NULL;
-	gchar* _tmp97_;
-	GeeList* _tmp98_;
-	gpointer _tmp99_ = NULL;
-	gchar* _tmp100_;
-	GeeListIterator* _tmp101_;
-	gint _tmp102_ = 0;
-	gboolean _tmp103_ = FALSE;
-	GeeList* _tmp105_;
-	gint _tmp106_;
-	gint _tmp107_;
-	GeeList* _tmp108_;
-	gpointer _tmp109_ = NULL;
-	gchar* _tmp110_;
-	GeeList* _tmp111_;
-	gpointer _tmp112_ = NULL;
-	gchar* _tmp113_;
-	GeeListIterator* _tmp114_;
-	gint _tmp115_ = 0;
+	gpointer _tmp67_ = NULL;
+	gchar* _tmp68_;
+	GeeListIterator* _tmp69_;
+	gint _tmp70_ = 0;
+	GeeList* _tmp71_;
+	gint _tmp72_;
+	gint _tmp73_;
+	GeeList* _tmp74_;
+	gpointer _tmp75_ = NULL;
+	gchar* _tmp76_;
+	GeeList* _tmp77_;
+	gpointer _tmp78_ = NULL;
+	gchar* _tmp79_;
+	GeeListIterator* _tmp80_;
+	gint _tmp81_ = 0;
+	gboolean _tmp82_ = FALSE;
+	GeeList* _tmp84_;
+	gint _tmp85_;
+	gint _tmp86_;
+	GeeList* _tmp87_;
+	gpointer _tmp88_ = NULL;
+	gchar* _tmp89_;
+	GeeList* _tmp90_;
+	gpointer _tmp91_ = NULL;
+	gchar* _tmp92_;
+	GeeListIterator* _tmp93_;
+	gint _tmp94_ = 0;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = ((ReadOnlyCollectionTests*) self)->test_collection;
 	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_LIST) ? ((GeeList*) _tmp0_) : NULL);
@@ -385,142 +382,105 @@ void read_only_list_tests_test_immutable_iterator (ReadOnlyListTests* self) {
 	_tmp39_ = iterator;
 	_tmp40_ = gee_iterator_next ((GeeIterator*) _tmp39_);
 	_vala_assert (!_tmp40_, "! iterator.next ()");
-	_tmp41_ = iterator;
-	_tmp42_ = gee_bidir_iterator_has_previous ((GeeBidirIterator*) _tmp41_);
-	_vala_assert (_tmp42_, "iterator.has_previous ()");
+	_tmp41_ = ro_list;
+	_tmp42_ = gee_list_list_iterator (_tmp41_);
+	_g_object_unref0 (iterator);
+	iterator = _tmp42_;
 	_tmp43_ = iterator;
-	_tmp44_ = gee_bidir_iterator_previous ((GeeBidirIterator*) _tmp43_);
-	_vala_assert (_tmp44_, "iterator.previous ()");
-	_tmp45_ = iterator;
-	_tmp46_ = gee_iterator_get ((GeeIterator*) _tmp45_);
-	_tmp47_ = (gchar*) _tmp46_;
-	_vala_assert (g_strcmp0 (_tmp47_, "one") == 0, "iterator.get () == \"one\"");
-	_g_free0 (_tmp47_);
-	_tmp48_ = iterator;
-	_tmp49_ = gee_list_iterator_index (_tmp48_);
-	_vala_assert (_tmp49_ == 0, "iterator.index () == 0");
-	_tmp50_ = iterator;
-	_tmp51_ = gee_bidir_iterator_last ((GeeBidirIterator*) _tmp50_);
-	_vala_assert (_tmp51_, "iterator.last ()");
-	_tmp52_ = iterator;
-	_tmp53_ = gee_iterator_get ((GeeIterator*) _tmp52_);
-	_tmp54_ = (gchar*) _tmp53_;
-	_vala_assert (g_strcmp0 (_tmp54_, "two") == 0, "iterator.get () == \"two\"");
-	_g_free0 (_tmp54_);
-	_tmp55_ = iterator;
-	_tmp56_ = gee_list_iterator_index (_tmp55_);
-	_vala_assert (_tmp56_ == 1, "iterator.index () == 1");
-	_tmp57_ = iterator;
-	_tmp58_ = gee_iterator_first ((GeeIterator*) _tmp57_);
-	_vala_assert (_tmp58_, "iterator.first ()");
-	_tmp59_ = iterator;
-	_tmp60_ = gee_iterator_get ((GeeIterator*) _tmp59_);
-	_tmp61_ = (gchar*) _tmp60_;
-	_vala_assert (g_strcmp0 (_tmp61_, "one") == 0, "iterator.get () == \"one\"");
-	_g_free0 (_tmp61_);
-	_tmp62_ = iterator;
-	_tmp63_ = gee_list_iterator_index (_tmp62_);
-	_vala_assert (_tmp63_ == 0, "iterator.index () == 0");
-	_tmp64_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
-	if (_tmp64_) {
-		GeeListIterator* _tmp65_;
-		_tmp65_ = iterator;
-		gee_iterator_remove ((GeeIterator*) _tmp65_);
+	_tmp44_ = gee_iterator_next ((GeeIterator*) _tmp43_);
+	_vala_assert (_tmp44_, "iterator.next ()");
+	_tmp45_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
+	if (_tmp45_) {
+		GeeListIterator* _tmp46_;
+		_tmp46_ = iterator;
+		gee_iterator_remove ((GeeIterator*) _tmp46_);
 		exit (0);
 	}
 	g_test_trap_assert_failed ();
+	_tmp47_ = ro_list;
+	_tmp48_ = gee_collection_get_size ((GeeCollection*) _tmp47_);
+	_tmp49_ = _tmp48_;
+	_vala_assert (_tmp49_ == 2, "ro_list.size == 2");
+	_tmp50_ = ro_list;
+	_tmp51_ = gee_list_get (_tmp50_, 0);
+	_tmp52_ = (gchar*) _tmp51_;
+	_vala_assert (g_strcmp0 (_tmp52_, "one") == 0, "ro_list.get (0) == \"one\"");
+	_g_free0 (_tmp52_);
+	_tmp53_ = ro_list;
+	_tmp54_ = gee_list_get (_tmp53_, 1);
+	_tmp55_ = (gchar*) _tmp54_;
+	_vala_assert (g_strcmp0 (_tmp55_, "two") == 0, "ro_list.get (1) == \"two\"");
+	_g_free0 (_tmp55_);
+	_tmp56_ = iterator;
+	_tmp57_ = gee_list_iterator_index (_tmp56_);
+	_vala_assert (_tmp57_ == 0, "iterator.index () == 0");
+	_tmp58_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
+	if (_tmp58_) {
+		GeeListIterator* _tmp59_;
+		_tmp59_ = iterator;
+		gee_list_iterator_set (_tmp59_, "three");
+		exit (0);
+	}
+	g_test_trap_assert_failed ();
+	_tmp60_ = ro_list;
+	_tmp61_ = gee_collection_get_size ((GeeCollection*) _tmp60_);
+	_tmp62_ = _tmp61_;
+	_vala_assert (_tmp62_ == 2, "ro_list.size == 2");
+	_tmp63_ = ro_list;
+	_tmp64_ = gee_list_get (_tmp63_, 0);
+	_tmp65_ = (gchar*) _tmp64_;
+	_vala_assert (g_strcmp0 (_tmp65_, "one") == 0, "ro_list.get (0) == \"one\"");
+	_g_free0 (_tmp65_);
 	_tmp66_ = ro_list;
-	_tmp67_ = gee_collection_get_size ((GeeCollection*) _tmp66_);
-	_tmp68_ = _tmp67_;
-	_vala_assert (_tmp68_ == 2, "ro_list.size == 2");
-	_tmp69_ = ro_list;
-	_tmp70_ = gee_list_get (_tmp69_, 0);
-	_tmp71_ = (gchar*) _tmp70_;
-	_vala_assert (g_strcmp0 (_tmp71_, "one") == 0, "ro_list.get (0) == \"one\"");
-	_g_free0 (_tmp71_);
-	_tmp72_ = ro_list;
-	_tmp73_ = gee_list_get (_tmp72_, 1);
-	_tmp74_ = (gchar*) _tmp73_;
-	_vala_assert (g_strcmp0 (_tmp74_, "two") == 0, "ro_list.get (1) == \"two\"");
-	_g_free0 (_tmp74_);
-	_tmp75_ = iterator;
-	_tmp76_ = gee_list_iterator_index (_tmp75_);
-	_vala_assert (_tmp76_ == 0, "iterator.index () == 0");
-	_tmp77_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
-	if (_tmp77_) {
-		GeeListIterator* _tmp78_;
-		_tmp78_ = iterator;
-		gee_list_iterator_set (_tmp78_, "three");
+	_tmp67_ = gee_list_get (_tmp66_, 1);
+	_tmp68_ = (gchar*) _tmp67_;
+	_vala_assert (g_strcmp0 (_tmp68_, "two") == 0, "ro_list.get (1) == \"two\"");
+	_g_free0 (_tmp68_);
+	_tmp69_ = iterator;
+	_tmp70_ = gee_list_iterator_index (_tmp69_);
+	_vala_assert (_tmp70_ == 0, "iterator.index () == 0");
+	_tmp71_ = ro_list;
+	_tmp72_ = gee_collection_get_size ((GeeCollection*) _tmp71_);
+	_tmp73_ = _tmp72_;
+	_vala_assert (_tmp73_ == 2, "ro_list.size == 2");
+	_tmp74_ = ro_list;
+	_tmp75_ = gee_list_get (_tmp74_, 0);
+	_tmp76_ = (gchar*) _tmp75_;
+	_vala_assert (g_strcmp0 (_tmp76_, "one") == 0, "ro_list.get (0) == \"one\"");
+	_g_free0 (_tmp76_);
+	_tmp77_ = ro_list;
+	_tmp78_ = gee_list_get (_tmp77_, 1);
+	_tmp79_ = (gchar*) _tmp78_;
+	_vala_assert (g_strcmp0 (_tmp79_, "two") == 0, "ro_list.get (1) == \"two\"");
+	_g_free0 (_tmp79_);
+	_tmp80_ = iterator;
+	_tmp81_ = gee_list_iterator_index (_tmp80_);
+	_vala_assert (_tmp81_ == 0, "iterator.index () == 0");
+	_tmp82_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
+	if (_tmp82_) {
+		GeeListIterator* _tmp83_;
+		_tmp83_ = iterator;
+		gee_list_iterator_add (_tmp83_, "three");
 		exit (0);
 	}
 	g_test_trap_assert_failed ();
-	_tmp79_ = ro_list;
-	_tmp80_ = gee_collection_get_size ((GeeCollection*) _tmp79_);
-	_tmp81_ = _tmp80_;
-	_vala_assert (_tmp81_ == 2, "ro_list.size == 2");
-	_tmp82_ = ro_list;
-	_tmp83_ = gee_list_get (_tmp82_, 0);
-	_tmp84_ = (gchar*) _tmp83_;
-	_vala_assert (g_strcmp0 (_tmp84_, "one") == 0, "ro_list.get (0) == \"one\"");
-	_g_free0 (_tmp84_);
-	_tmp85_ = ro_list;
-	_tmp86_ = gee_list_get (_tmp85_, 1);
-	_tmp87_ = (gchar*) _tmp86_;
-	_vala_assert (g_strcmp0 (_tmp87_, "two") == 0, "ro_list.get (1) == \"two\"");
-	_g_free0 (_tmp87_);
-	_tmp88_ = iterator;
-	_tmp89_ = gee_list_iterator_index (_tmp88_);
-	_vala_assert (_tmp89_ == 0, "iterator.index () == 0");
-	_tmp90_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
-	if (_tmp90_) {
-		GeeListIterator* _tmp91_;
-		_tmp91_ = iterator;
-		gee_list_iterator_insert (_tmp91_, "three");
-		exit (0);
-	}
-	g_test_trap_assert_failed ();
-	_tmp92_ = ro_list;
-	_tmp93_ = gee_collection_get_size ((GeeCollection*) _tmp92_);
-	_tmp94_ = _tmp93_;
-	_vala_assert (_tmp94_ == 2, "ro_list.size == 2");
-	_tmp95_ = ro_list;
-	_tmp96_ = gee_list_get (_tmp95_, 0);
-	_tmp97_ = (gchar*) _tmp96_;
-	_vala_assert (g_strcmp0 (_tmp97_, "one") == 0, "ro_list.get (0) == \"one\"");
-	_g_free0 (_tmp97_);
-	_tmp98_ = ro_list;
-	_tmp99_ = gee_list_get (_tmp98_, 1);
-	_tmp100_ = (gchar*) _tmp99_;
-	_vala_assert (g_strcmp0 (_tmp100_, "two") == 0, "ro_list.get (1) == \"two\"");
-	_g_free0 (_tmp100_);
-	_tmp101_ = iterator;
-	_tmp102_ = gee_list_iterator_index (_tmp101_);
-	_vala_assert (_tmp102_ == 0, "iterator.index () == 0");
-	_tmp103_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
-	if (_tmp103_) {
-		GeeListIterator* _tmp104_;
-		_tmp104_ = iterator;
-		gee_list_iterator_add (_tmp104_, "three");
-		exit (0);
-	}
-	g_test_trap_assert_failed ();
-	_tmp105_ = ro_list;
-	_tmp106_ = gee_collection_get_size ((GeeCollection*) _tmp105_);
-	_tmp107_ = _tmp106_;
-	_vala_assert (_tmp107_ == 2, "ro_list.size == 2");
-	_tmp108_ = ro_list;
-	_tmp109_ = gee_list_get (_tmp108_, 0);
-	_tmp110_ = (gchar*) _tmp109_;
-	_vala_assert (g_strcmp0 (_tmp110_, "one") == 0, "ro_list.get (0) == \"one\"");
-	_g_free0 (_tmp110_);
-	_tmp111_ = ro_list;
-	_tmp112_ = gee_list_get (_tmp111_, 1);
-	_tmp113_ = (gchar*) _tmp112_;
-	_vala_assert (g_strcmp0 (_tmp113_, "two") == 0, "ro_list.get (1) == \"two\"");
-	_g_free0 (_tmp113_);
-	_tmp114_ = iterator;
-	_tmp115_ = gee_list_iterator_index (_tmp114_);
-	_vala_assert (_tmp115_ == 0, "iterator.index () == 0");
+	_tmp84_ = ro_list;
+	_tmp85_ = gee_collection_get_size ((GeeCollection*) _tmp84_);
+	_tmp86_ = _tmp85_;
+	_vala_assert (_tmp86_ == 2, "ro_list.size == 2");
+	_tmp87_ = ro_list;
+	_tmp88_ = gee_list_get (_tmp87_, 0);
+	_tmp89_ = (gchar*) _tmp88_;
+	_vala_assert (g_strcmp0 (_tmp89_, "one") == 0, "ro_list.get (0) == \"one\"");
+	_g_free0 (_tmp89_);
+	_tmp90_ = ro_list;
+	_tmp91_ = gee_list_get (_tmp90_, 1);
+	_tmp92_ = (gchar*) _tmp91_;
+	_vala_assert (g_strcmp0 (_tmp92_, "two") == 0, "ro_list.get (1) == \"two\"");
+	_g_free0 (_tmp92_);
+	_tmp93_ = iterator;
+	_tmp94_ = gee_list_iterator_index (_tmp93_);
+	_vala_assert (_tmp94_ == 0, "iterator.index () == 0");
 	_g_object_unref0 (iterator);
 	_g_object_unref0 (ro_list);
 	_g_object_unref0 (test_list);
@@ -594,7 +554,7 @@ void read_only_list_tests_test_immutable (ReadOnlyListTests* self) {
 	_tmp9_ = ro_list;
 	_tmp10_ = gee_collection_contains ((GeeCollection*) _tmp9_, "one");
 	_vala_assert (_tmp10_, "ro_list.contains (\"one\")");
-	_tmp11_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp11_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	dummy = (GeeCollection*) _tmp11_;
 	_tmp12_ = dummy;
 	_tmp13_ = gee_collection_add (_tmp12_, "one");
@@ -672,7 +632,7 @@ void read_only_list_tests_test_immutable (ReadOnlyListTests* self) {
 	if (_tmp47_) {
 		GeeList* _tmp48_;
 		_tmp48_ = ro_list;
-		gee_list_sort (_tmp48_, NULL);
+		gee_list_sort (_tmp48_, NULL, NULL, NULL);
 		exit (0);
 	}
 	g_test_trap_assert_failed ();
@@ -763,13 +723,13 @@ void read_only_list_tests_test_accurate_view (ReadOnlyListTests* self) {
 	_tmp2_ = ((ReadOnlyCollectionTests*) self)->ro_collection;
 	_tmp3_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp2_, GEE_TYPE_LIST) ? ((GeeList*) _tmp2_) : NULL);
 	ro_list = _tmp3_;
-	_tmp4_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp4_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	dummy = (GeeCollection*) _tmp4_;
 	_tmp5_ = gee_collection_add (dummy, "one");
 	_vala_assert (_tmp5_, "dummy.add (\"one\")");
 	_tmp6_ = gee_collection_add (dummy, "two");
 	_vala_assert (_tmp6_, "dummy.add (\"two\")");
-	_tmp7_ = gee_iterable_get_element_type ((GeeIterable*) ro_list);
+	_tmp7_ = gee_traversable_get_element_type ((GeeTraversable*) ro_list);
 	_tmp8_ = _tmp7_;
 	_vala_assert (_tmp8_ == G_TYPE_STRING, "ro_list.element_type == typeof (string)");
 	_tmp9_ = gee_collection_get_size ((GeeCollection*) ro_list);

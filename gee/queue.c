@@ -27,13 +27,25 @@
 #include <glib-object.h>
 
 
-#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
-#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
-#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
-#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+#define GEE_TYPE_TRAVERSABLE (gee_traversable_get_type ())
+#define GEE_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversable))
+#define GEE_IS_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_TRAVERSABLE))
+#define GEE_TRAVERSABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversableIface))
 
-typedef struct _GeeIterable GeeIterable;
-typedef struct _GeeIterableIface GeeIterableIface;
+typedef struct _GeeTraversable GeeTraversable;
+typedef struct _GeeTraversableIface GeeTraversableIface;
+
+#define GEE_TRAVERSABLE_TYPE_STREAM (gee_traversable_stream_get_type ())
+
+#define GEE_TYPE_LAZY (gee_lazy_get_type ())
+#define GEE_LAZY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LAZY, GeeLazy))
+#define GEE_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_LAZY, GeeLazyClass))
+#define GEE_IS_LAZY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LAZY))
+#define GEE_IS_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_LAZY))
+#define GEE_LAZY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_LAZY, GeeLazyClass))
+
+typedef struct _GeeLazy GeeLazy;
+typedef struct _GeeLazyClass GeeLazyClass;
 
 #define GEE_TYPE_ITERATOR (gee_iterator_get_type ())
 #define GEE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERATOR, GeeIterator))
@@ -42,6 +54,14 @@ typedef struct _GeeIterableIface GeeIterableIface;
 
 typedef struct _GeeIterator GeeIterator;
 typedef struct _GeeIteratorIface GeeIteratorIface;
+
+#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
+#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
+#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
+#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+
+typedef struct _GeeIterable GeeIterable;
+typedef struct _GeeIterableIface GeeIterableIface;
 
 #define GEE_TYPE_COLLECTION (gee_collection_get_type ())
 #define GEE_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_COLLECTION, GeeCollection))
@@ -59,23 +79,55 @@ typedef struct _GeeCollectionIface GeeCollectionIface;
 typedef struct _GeeQueue GeeQueue;
 typedef struct _GeeQueueIface GeeQueueIface;
 
+typedef gboolean (*GeeForallFunc) (gpointer g, void* user_data);
+typedef enum  {
+	GEE_TRAVERSABLE_STREAM_YIELD,
+	GEE_TRAVERSABLE_STREAM_CONTINUE,
+	GEE_TRAVERSABLE_STREAM_END
+} GeeTraversableStream;
+
+typedef GeeTraversableStream (*GeeStreamFunc) (GeeTraversableStream state, GeeLazy* g, GeeLazy** lazy, void* user_data);
 struct _GeeIteratorIface {
 	GTypeInterface parent_iface;
 	gboolean (*next) (GeeIterator* self);
 	gboolean (*has_next) (GeeIterator* self);
-	gboolean (*first) (GeeIterator* self);
 	gpointer (*get) (GeeIterator* self);
 	void (*remove) (GeeIterator* self);
+	gboolean (*get_valid) (GeeIterator* self);
+	gboolean (*get_read_only) (GeeIterator* self);
+};
+
+typedef gpointer (*GeeFoldFunc) (gpointer g, gpointer a, void* user_data);
+typedef gpointer (*GeeMapFunc) (gpointer g, void* user_data);
+typedef gboolean (*GeePredicate) (gconstpointer g, void* user_data);
+struct _GeeTraversableIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeTraversable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeTraversable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeTraversable* self);
+	gboolean (*foreach) (GeeTraversable* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	gpointer (*fold) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*map) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+	GeeIterator* (*scan) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*filter) (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+	GeeIterator* (*chop) (GeeTraversable* self, gint offset, gint length);
+	GType (*get_element_type) (GeeTraversable* self);
 };
 
 struct _GeeIterableIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeIterable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeIterable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeIterable* self);
 	GeeIterator* (*iterator) (GeeIterable* self);
-	GType (*get_element_type) (GeeIterable* self);
 };
 
 struct _GeeCollectionIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeCollection* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeCollection* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeCollection* self);
 	gboolean (*contains) (GeeCollection* self, gconstpointer item);
 	gboolean (*add) (GeeCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeCollection* self, gconstpointer item);
@@ -87,11 +139,15 @@ struct _GeeCollectionIface {
 	gpointer* (*to_array) (GeeCollection* self, int* result_length1);
 	gint (*get_size) (GeeCollection* self);
 	gboolean (*get_is_empty) (GeeCollection* self);
+	gboolean (*get_read_only) (GeeCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeCollection* self);
 };
 
 struct _GeeQueueIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeQueue* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeQueue* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeQueue* self);
 	gboolean (*offer) (GeeQueue* self, gconstpointer element);
 	gpointer (*peek) (GeeQueue* self);
 	gpointer (*poll) (GeeQueue* self);
@@ -103,14 +159,26 @@ struct _GeeQueueIface {
 
 
 
+GType gee_traversable_stream_get_type (void) G_GNUC_CONST;
+gpointer gee_lazy_ref (gpointer instance);
+void gee_lazy_unref (gpointer instance);
+GParamSpec* gee_param_spec_lazy (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void gee_value_set_lazy (GValue* value, gpointer v_object);
+void gee_value_take_lazy (GValue* value, gpointer v_object);
+gpointer gee_value_get_lazy (const GValue* value);
+GType gee_lazy_get_type (void) G_GNUC_CONST;
 GType gee_iterator_get_type (void) G_GNUC_CONST;
+GType gee_traversable_get_type (void) G_GNUC_CONST;
 GType gee_iterable_get_type (void) G_GNUC_CONST;
 GType gee_collection_get_type (void) G_GNUC_CONST;
 GType gee_queue_get_type (void) G_GNUC_CONST;
 gboolean gee_queue_offer (GeeQueue* self, gconstpointer element);
+static gboolean gee_queue_real_offer (GeeQueue* self, gconstpointer element);
+gboolean gee_collection_add (GeeCollection* self, gconstpointer item);
 gpointer gee_queue_peek (GeeQueue* self);
 gpointer gee_queue_poll (GeeQueue* self);
 gint gee_queue_drain (GeeQueue* self, GeeCollection* recipient, gint amount);
+static gint gee_queue_real_drain (GeeQueue* self, GeeCollection* recipient, gint amount);
 #define GEE_QUEUE_UNBOUNDED_CAPACITY (-1)
 gint gee_queue_get_capacity (GeeQueue* self);
 gint gee_queue_get_remaining_capacity (GeeQueue* self);
@@ -124,6 +192,17 @@ gboolean gee_queue_get_is_full (GeeQueue* self);
  *
  * @return        ``true`` if the element was added to the queue
  */
+static gboolean gee_queue_real_offer (GeeQueue* self, gconstpointer element) {
+	gboolean result = FALSE;
+	gconstpointer _tmp0_;
+	gboolean _tmp1_ = FALSE;
+	_tmp0_ = element;
+	_tmp1_ = gee_collection_add ((GeeCollection*) self, _tmp0_);
+	result = _tmp1_;
+	return result;
+}
+
+
 gboolean gee_queue_offer (GeeQueue* self, gconstpointer element) {
 	g_return_val_if_fail (self != NULL, FALSE);
 	return GEE_QUEUE_GET_INTERFACE (self)->offer (self, element);
@@ -163,6 +242,61 @@ gpointer gee_queue_poll (GeeQueue* self) {
  *
  * @return          the amount of elements that were actually drained
  */
+static gint gee_queue_real_drain (GeeQueue* self, GeeCollection* recipient, gint amount) {
+	gint result = 0;
+	gpointer item;
+	gint drained;
+	g_return_val_if_fail (recipient != NULL, 0);
+	item = NULL;
+	drained = 0;
+	while (TRUE) {
+		gboolean _tmp0_ = FALSE;
+		gboolean _tmp1_ = FALSE;
+		gint _tmp2_;
+		gboolean _tmp5_;
+		gboolean _tmp8_;
+		GeeCollection* _tmp9_;
+		gconstpointer _tmp10_;
+		gint _tmp11_;
+		_tmp2_ = amount;
+		if (_tmp2_ == (-1)) {
+			_tmp1_ = TRUE;
+		} else {
+			gint _tmp3_;
+			gint _tmp4_;
+			_tmp3_ = amount;
+			amount = _tmp3_ - 1;
+			_tmp4_ = amount;
+			_tmp1_ = _tmp4_ >= 0;
+		}
+		_tmp5_ = _tmp1_;
+		if (_tmp5_) {
+			gpointer _tmp6_ = NULL;
+			gconstpointer _tmp7_;
+			_tmp6_ = gee_queue_poll (self);
+			((item == NULL) || (GEE_QUEUE_GET_INTERFACE (self)->get_g_destroy_func (self) == NULL)) ? NULL : (item = (GEE_QUEUE_GET_INTERFACE (self)->get_g_destroy_func (self) (item), NULL));
+			item = _tmp6_;
+			_tmp7_ = item;
+			_tmp0_ = _tmp7_ != NULL;
+		} else {
+			_tmp0_ = FALSE;
+		}
+		_tmp8_ = _tmp0_;
+		if (!_tmp8_) {
+			break;
+		}
+		_tmp9_ = recipient;
+		_tmp10_ = item;
+		gee_collection_add (_tmp9_, _tmp10_);
+		_tmp11_ = drained;
+		drained = _tmp11_ + 1;
+	}
+	result = drained;
+	((item == NULL) || (GEE_QUEUE_GET_INTERFACE (self)->get_g_destroy_func (self) == NULL)) ? NULL : (item = (GEE_QUEUE_GET_INTERFACE (self)->get_g_destroy_func (self) (item), NULL));
+	return result;
+}
+
+
 gint gee_queue_drain (GeeQueue* self, GeeCollection* recipient, gint amount) {
 	g_return_val_if_fail (self != NULL, 0);
 	return GEE_QUEUE_GET_INTERFACE (self)->drain (self, recipient, amount);
@@ -204,6 +338,8 @@ static void gee_queue_base_init (GeeQueueIface * iface) {
 		 * Specifies whether this queue is full.
 		 */
 		g_object_interface_install_property (iface, g_param_spec_boolean ("is-full", "is-full", "is-full", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+		iface->offer = gee_queue_real_offer;
+		iface->drain = gee_queue_real_drain;
 	}
 }
 

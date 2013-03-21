@@ -3,7 +3,7 @@
 
 /* treeset.vala
  *
- * Copyright (C) 2009  Maciej Piechotka
+ * Copyright (C) 2009-2011  Maciej Piechotka
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,13 +28,25 @@
 #include <gobject/gvaluecollector.h>
 
 
-#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
-#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
-#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
-#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+#define GEE_TYPE_TRAVERSABLE (gee_traversable_get_type ())
+#define GEE_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversable))
+#define GEE_IS_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_TRAVERSABLE))
+#define GEE_TRAVERSABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversableIface))
 
-typedef struct _GeeIterable GeeIterable;
-typedef struct _GeeIterableIface GeeIterableIface;
+typedef struct _GeeTraversable GeeTraversable;
+typedef struct _GeeTraversableIface GeeTraversableIface;
+
+#define GEE_TRAVERSABLE_TYPE_STREAM (gee_traversable_stream_get_type ())
+
+#define GEE_TYPE_LAZY (gee_lazy_get_type ())
+#define GEE_LAZY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LAZY, GeeLazy))
+#define GEE_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_LAZY, GeeLazyClass))
+#define GEE_IS_LAZY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LAZY))
+#define GEE_IS_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_LAZY))
+#define GEE_LAZY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_LAZY, GeeLazyClass))
+
+typedef struct _GeeLazy GeeLazy;
+typedef struct _GeeLazyClass GeeLazyClass;
 
 #define GEE_TYPE_ITERATOR (gee_iterator_get_type ())
 #define GEE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERATOR, GeeIterator))
@@ -43,6 +55,14 @@ typedef struct _GeeIterableIface GeeIterableIface;
 
 typedef struct _GeeIterator GeeIterator;
 typedef struct _GeeIteratorIface GeeIteratorIface;
+
+#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
+#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
+#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
+#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+
+typedef struct _GeeIterable GeeIterable;
+typedef struct _GeeIterableIface GeeIterableIface;
 
 #define GEE_TYPE_COLLECTION (gee_collection_get_type ())
 #define GEE_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_COLLECTION, GeeCollection))
@@ -90,6 +110,25 @@ typedef struct _GeeAbstractSetPrivate GeeAbstractSetPrivate;
 typedef struct _GeeSortedSet GeeSortedSet;
 typedef struct _GeeSortedSetIface GeeSortedSetIface;
 
+#define GEE_TYPE_ABSTRACT_SORTED_SET (gee_abstract_sorted_set_get_type ())
+#define GEE_ABSTRACT_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_SORTED_SET, GeeAbstractSortedSet))
+#define GEE_ABSTRACT_SORTED_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_SORTED_SET, GeeAbstractSortedSetClass))
+#define GEE_IS_ABSTRACT_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_SORTED_SET))
+#define GEE_IS_ABSTRACT_SORTED_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_SORTED_SET))
+#define GEE_ABSTRACT_SORTED_SET_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_SORTED_SET, GeeAbstractSortedSetClass))
+
+typedef struct _GeeAbstractSortedSet GeeAbstractSortedSet;
+typedef struct _GeeAbstractSortedSetClass GeeAbstractSortedSetClass;
+typedef struct _GeeAbstractSortedSetPrivate GeeAbstractSortedSetPrivate;
+
+#define GEE_TYPE_BIDIR_SORTED_SET (gee_bidir_sorted_set_get_type ())
+#define GEE_BIDIR_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_SORTED_SET, GeeBidirSortedSet))
+#define GEE_IS_BIDIR_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_SORTED_SET))
+#define GEE_BIDIR_SORTED_SET_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_BIDIR_SORTED_SET, GeeBidirSortedSetIface))
+
+typedef struct _GeeBidirSortedSet GeeBidirSortedSet;
+typedef struct _GeeBidirSortedSetIface GeeBidirSortedSetIface;
+
 #define GEE_TYPE_BIDIR_ITERATOR (gee_bidir_iterator_get_type ())
 #define GEE_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_BIDIR_ITERATOR, GeeBidirIterator))
 #define GEE_IS_BIDIR_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_BIDIR_ITERATOR))
@@ -97,6 +136,17 @@ typedef struct _GeeSortedSetIface GeeSortedSetIface;
 
 typedef struct _GeeBidirIterator GeeBidirIterator;
 typedef struct _GeeBidirIteratorIface GeeBidirIteratorIface;
+
+#define GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET (gee_abstract_bidir_sorted_set_get_type ())
+#define GEE_ABSTRACT_BIDIR_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, GeeAbstractBidirSortedSet))
+#define GEE_ABSTRACT_BIDIR_SORTED_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, GeeAbstractBidirSortedSetClass))
+#define GEE_IS_ABSTRACT_BIDIR_SORTED_SET(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET))
+#define GEE_IS_ABSTRACT_BIDIR_SORTED_SET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET))
+#define GEE_ABSTRACT_BIDIR_SORTED_SET_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, GeeAbstractBidirSortedSetClass))
+
+typedef struct _GeeAbstractBidirSortedSet GeeAbstractBidirSortedSet;
+typedef struct _GeeAbstractBidirSortedSetClass GeeAbstractBidirSortedSetClass;
+typedef struct _GeeAbstractBidirSortedSetPrivate GeeAbstractBidirSortedSetPrivate;
 
 #define GEE_TYPE_TREE_SET (gee_tree_set_get_type ())
 #define GEE_TREE_SET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TREE_SET, GeeTreeSet))
@@ -164,23 +214,55 @@ typedef struct _GeeTreeSetSubIteratorClass GeeTreeSetSubIteratorClass;
 typedef struct _GeeTreeSetSubIteratorPrivate GeeTreeSetSubIteratorPrivate;
 #define _vala_assert(expr, msg) if G_LIKELY (expr) ; else g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
 
+typedef gboolean (*GeeForallFunc) (gpointer g, void* user_data);
+typedef enum  {
+	GEE_TRAVERSABLE_STREAM_YIELD,
+	GEE_TRAVERSABLE_STREAM_CONTINUE,
+	GEE_TRAVERSABLE_STREAM_END
+} GeeTraversableStream;
+
+typedef GeeTraversableStream (*GeeStreamFunc) (GeeTraversableStream state, GeeLazy* g, GeeLazy** lazy, void* user_data);
 struct _GeeIteratorIface {
 	GTypeInterface parent_iface;
 	gboolean (*next) (GeeIterator* self);
 	gboolean (*has_next) (GeeIterator* self);
-	gboolean (*first) (GeeIterator* self);
 	gpointer (*get) (GeeIterator* self);
 	void (*remove) (GeeIterator* self);
+	gboolean (*get_valid) (GeeIterator* self);
+	gboolean (*get_read_only) (GeeIterator* self);
+};
+
+typedef gpointer (*GeeFoldFunc) (gpointer g, gpointer a, void* user_data);
+typedef gpointer (*GeeMapFunc) (gpointer g, void* user_data);
+typedef gboolean (*GeePredicate) (gconstpointer g, void* user_data);
+struct _GeeTraversableIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeTraversable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeTraversable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeTraversable* self);
+	gboolean (*foreach) (GeeTraversable* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	gpointer (*fold) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*map) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+	GeeIterator* (*scan) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*filter) (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+	GeeIterator* (*chop) (GeeTraversable* self, gint offset, gint length);
+	GType (*get_element_type) (GeeTraversable* self);
 };
 
 struct _GeeIterableIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeIterable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeIterable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeIterable* self);
 	GeeIterator* (*iterator) (GeeIterable* self);
-	GType (*get_element_type) (GeeIterable* self);
 };
 
 struct _GeeCollectionIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeCollection* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeCollection* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeCollection* self);
 	gboolean (*contains) (GeeCollection* self, gconstpointer item);
 	gboolean (*add) (GeeCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeCollection* self, gconstpointer item);
@@ -192,6 +274,7 @@ struct _GeeCollectionIface {
 	gpointer* (*to_array) (GeeCollection* self, int* result_length1);
 	gint (*get_size) (GeeCollection* self);
 	gboolean (*get_is_empty) (GeeCollection* self);
+	gboolean (*get_read_only) (GeeCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeCollection* self);
 };
 
@@ -206,19 +289,28 @@ struct _GeeAbstractCollectionClass {
 	gboolean (*add) (GeeAbstractCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeAbstractCollection* self, gconstpointer item);
 	void (*clear) (GeeAbstractCollection* self);
-	gpointer* (*to_array) (GeeAbstractCollection* self, int* result_length1);
-	gboolean (*add_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*contains_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*remove_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*retain_all) (GeeAbstractCollection* self, GeeCollection* collection);
 	GeeIterator* (*iterator) (GeeAbstractCollection* self);
+	gboolean (*foreach) (GeeAbstractCollection* self, GeeForallFunc f, void* f_target);
+	void (*reserved0) (GeeAbstractCollection* self);
+	void (*reserved1) (GeeAbstractCollection* self);
+	void (*reserved2) (GeeAbstractCollection* self);
+	void (*reserved3) (GeeAbstractCollection* self);
+	void (*reserved4) (GeeAbstractCollection* self);
+	void (*reserved5) (GeeAbstractCollection* self);
+	void (*reserved6) (GeeAbstractCollection* self);
+	void (*reserved7) (GeeAbstractCollection* self);
+	void (*reserved8) (GeeAbstractCollection* self);
+	void (*reserved9) (GeeAbstractCollection* self);
 	gint (*get_size) (GeeAbstractCollection* self);
-	gboolean (*get_is_empty) (GeeAbstractCollection* self);
+	gboolean (*get_read_only) (GeeAbstractCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeAbstractCollection* self);
 };
 
 struct _GeeSetIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeSet* self);
 	GeeSet* (*get_read_only_view) (GeeSet* self);
 };
 
@@ -229,22 +321,27 @@ struct _GeeAbstractSet {
 
 struct _GeeAbstractSetClass {
 	GeeAbstractCollectionClass parent_class;
+	void (*reserved0) (GeeAbstractSet* self);
+	void (*reserved1) (GeeAbstractSet* self);
+	void (*reserved2) (GeeAbstractSet* self);
+	void (*reserved3) (GeeAbstractSet* self);
+	void (*reserved4) (GeeAbstractSet* self);
+	void (*reserved5) (GeeAbstractSet* self);
+	void (*reserved6) (GeeAbstractSet* self);
+	void (*reserved7) (GeeAbstractSet* self);
+	void (*reserved8) (GeeAbstractSet* self);
+	void (*reserved9) (GeeAbstractSet* self);
 	GeeSet* (*get_read_only_view) (GeeAbstractSet* self);
-};
-
-struct _GeeBidirIteratorIface {
-	GTypeInterface parent_iface;
-	gboolean (*previous) (GeeBidirIterator* self);
-	gboolean (*has_previous) (GeeBidirIterator* self);
-	gboolean (*last) (GeeBidirIterator* self);
 };
 
 struct _GeeSortedSetIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeSortedSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeSortedSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeSortedSet* self);
 	gpointer (*first) (GeeSortedSet* self);
 	gpointer (*last) (GeeSortedSet* self);
-	GeeBidirIterator* (*bidir_iterator) (GeeSortedSet* self);
-	GeeBidirIterator* (*iterator_at) (GeeSortedSet* self, gconstpointer element);
+	GeeIterator* (*iterator_at) (GeeSortedSet* self, gconstpointer element);
 	gpointer (*lower) (GeeSortedSet* self, gconstpointer element);
 	gpointer (*higher) (GeeSortedSet* self, gconstpointer element);
 	gpointer (*floor) (GeeSortedSet* self, gconstpointer element);
@@ -252,22 +349,96 @@ struct _GeeSortedSetIface {
 	GeeSortedSet* (*head_set) (GeeSortedSet* self, gconstpointer before);
 	GeeSortedSet* (*tail_set) (GeeSortedSet* self, gconstpointer after);
 	GeeSortedSet* (*sub_set) (GeeSortedSet* self, gconstpointer from, gconstpointer to);
+	GeeSortedSet* (*get_read_only_view) (GeeSortedSet* self);
+};
+
+struct _GeeAbstractSortedSet {
+	GeeAbstractSet parent_instance;
+	GeeAbstractSortedSetPrivate * priv;
+};
+
+struct _GeeAbstractSortedSetClass {
+	GeeAbstractSetClass parent_class;
+	gpointer (*first) (GeeAbstractSortedSet* self);
+	gpointer (*last) (GeeAbstractSortedSet* self);
+	GeeIterator* (*iterator_at) (GeeAbstractSortedSet* self, gconstpointer element);
+	gpointer (*lower) (GeeAbstractSortedSet* self, gconstpointer element);
+	gpointer (*higher) (GeeAbstractSortedSet* self, gconstpointer element);
+	gpointer (*floor) (GeeAbstractSortedSet* self, gconstpointer element);
+	gpointer (*ceil) (GeeAbstractSortedSet* self, gconstpointer element);
+	GeeSortedSet* (*head_set) (GeeAbstractSortedSet* self, gconstpointer before);
+	GeeSortedSet* (*tail_set) (GeeAbstractSortedSet* self, gconstpointer after);
+	GeeSortedSet* (*sub_set) (GeeAbstractSortedSet* self, gconstpointer from, gconstpointer to);
+	void (*reserved0) (GeeAbstractSortedSet* self);
+	void (*reserved1) (GeeAbstractSortedSet* self);
+	void (*reserved2) (GeeAbstractSortedSet* self);
+	void (*reserved3) (GeeAbstractSortedSet* self);
+	void (*reserved4) (GeeAbstractSortedSet* self);
+	void (*reserved5) (GeeAbstractSortedSet* self);
+	void (*reserved6) (GeeAbstractSortedSet* self);
+	void (*reserved7) (GeeAbstractSortedSet* self);
+	void (*reserved8) (GeeAbstractSortedSet* self);
+	void (*reserved9) (GeeAbstractSortedSet* self);
+	GeeSortedSet* (*get_read_only_view) (GeeAbstractSortedSet* self);
+};
+
+struct _GeeBidirIteratorIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeBidirIterator* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeBidirIterator* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeBidirIterator* self);
+	gboolean (*previous) (GeeBidirIterator* self);
+	gboolean (*has_previous) (GeeBidirIterator* self);
+	gboolean (*first) (GeeBidirIterator* self);
+	gboolean (*last) (GeeBidirIterator* self);
+};
+
+struct _GeeBidirSortedSetIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeBidirSortedSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeBidirSortedSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeBidirSortedSet* self);
+	GeeBidirIterator* (*bidir_iterator) (GeeBidirSortedSet* self);
+	GeeBidirSortedSet* (*get_read_only_view) (GeeBidirSortedSet* self);
+};
+
+struct _GeeAbstractBidirSortedSet {
+	GeeAbstractSortedSet parent_instance;
+	GeeAbstractBidirSortedSetPrivate * priv;
+};
+
+struct _GeeAbstractBidirSortedSetClass {
+	GeeAbstractSortedSetClass parent_class;
+	GeeBidirIterator* (*bidir_iterator) (GeeAbstractBidirSortedSet* self);
+	void (*reserved0) (GeeAbstractBidirSortedSet* self);
+	void (*reserved1) (GeeAbstractBidirSortedSet* self);
+	void (*reserved2) (GeeAbstractBidirSortedSet* self);
+	void (*reserved3) (GeeAbstractBidirSortedSet* self);
+	void (*reserved4) (GeeAbstractBidirSortedSet* self);
+	void (*reserved5) (GeeAbstractBidirSortedSet* self);
+	void (*reserved6) (GeeAbstractBidirSortedSet* self);
+	void (*reserved7) (GeeAbstractBidirSortedSet* self);
+	void (*reserved8) (GeeAbstractBidirSortedSet* self);
+	void (*reserved9) (GeeAbstractBidirSortedSet* self);
+	GeeBidirSortedSet* (*get_read_only_view) (GeeAbstractBidirSortedSet* self);
 };
 
 struct _GeeTreeSet {
-	GeeAbstractSet parent_instance;
+	GeeAbstractBidirSortedSet parent_instance;
 	GeeTreeSetPrivate * priv;
 };
 
 struct _GeeTreeSetClass {
-	GeeAbstractSetClass parent_class;
+	GeeAbstractBidirSortedSetClass parent_class;
 };
 
 struct _GeeTreeSetPrivate {
 	GType g_type;
 	GBoxedCopyFunc g_dup_func;
 	GDestroyNotify g_destroy_func;
-	GCompareFunc _compare_func;
+	GCompareDataFunc _compare_func;
+	gpointer _compare_func_target;
+	GDestroyNotify _compare_func_target_destroy_notify;
 	gint _size;
 	GeeTreeSetNode* root;
 	GeeTreeSetNode* _first;
@@ -343,12 +514,12 @@ struct _GeeTreeSetParamSpecRange {
 };
 
 struct _GeeTreeSetSubSet {
-	GeeAbstractSet parent_instance;
+	GeeAbstractBidirSortedSet parent_instance;
 	GeeTreeSetSubSetPrivate * priv;
 };
 
 struct _GeeTreeSetSubSetClass {
-	GeeAbstractSetClass parent_class;
+	GeeAbstractBidirSortedSetClass parent_class;
 };
 
 struct _GeeTreeSetSubSetPrivate {
@@ -380,24 +551,36 @@ struct _GeeTreeSetSubIteratorPrivate {
 
 static gpointer gee_tree_set_parent_class = NULL;
 static gpointer gee_tree_set_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_tree_set_iterator_gee_traversable_parent_iface = NULL;
 static GeeIteratorIface* gee_tree_set_iterator_gee_iterator_parent_iface = NULL;
 static GeeBidirIteratorIface* gee_tree_set_iterator_gee_bidir_iterator_parent_iface = NULL;
 static gpointer gee_tree_set_range_parent_class = NULL;
 static gpointer gee_tree_set_sub_set_parent_class = NULL;
-static GeeSortedSetIface* gee_tree_set_sub_set_gee_sorted_set_parent_iface = NULL;
 static gpointer gee_tree_set_sub_iterator_parent_class = NULL;
+static GeeTraversableIface* gee_tree_set_sub_iterator_gee_traversable_parent_iface = NULL;
 static GeeIteratorIface* gee_tree_set_sub_iterator_gee_iterator_parent_iface = NULL;
 static GeeBidirIteratorIface* gee_tree_set_sub_iterator_gee_bidir_iterator_parent_iface = NULL;
-static GeeSortedSetIface* gee_tree_set_gee_sorted_set_parent_iface = NULL;
 
+GType gee_traversable_stream_get_type (void) G_GNUC_CONST;
+gpointer gee_lazy_ref (gpointer instance);
+void gee_lazy_unref (gpointer instance);
+GParamSpec* gee_param_spec_lazy (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void gee_value_set_lazy (GValue* value, gpointer v_object);
+void gee_value_take_lazy (GValue* value, gpointer v_object);
+gpointer gee_value_get_lazy (const GValue* value);
+GType gee_lazy_get_type (void) G_GNUC_CONST;
 GType gee_iterator_get_type (void) G_GNUC_CONST;
+GType gee_traversable_get_type (void) G_GNUC_CONST;
 GType gee_iterable_get_type (void) G_GNUC_CONST;
 GType gee_collection_get_type (void) G_GNUC_CONST;
 GType gee_abstract_collection_get_type (void) G_GNUC_CONST;
 GType gee_set_get_type (void) G_GNUC_CONST;
 GType gee_abstract_set_get_type (void) G_GNUC_CONST;
-GType gee_bidir_iterator_get_type (void) G_GNUC_CONST;
 GType gee_sorted_set_get_type (void) G_GNUC_CONST;
+GType gee_abstract_sorted_set_get_type (void) G_GNUC_CONST;
+GType gee_bidir_iterator_get_type (void) G_GNUC_CONST;
+GType gee_bidir_sorted_set_get_type (void) G_GNUC_CONST;
+GType gee_abstract_bidir_sorted_set_get_type (void) G_GNUC_CONST;
 GType gee_tree_set_get_type (void) G_GNUC_CONST;
 static void gee_tree_set_node_free (GeeTreeSetNode* self);
 #define GEE_TREE_SET_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TYPE_TREE_SET, GeeTreeSetPrivate))
@@ -407,16 +590,17 @@ enum  {
 	GEE_TREE_SET_G_DUP_FUNC,
 	GEE_TREE_SET_G_DESTROY_FUNC,
 	GEE_TREE_SET_SIZE,
-	GEE_TREE_SET_COMPARE_FUNC
+	GEE_TREE_SET_READ_ONLY
 };
+void gee_abstract_collection_clear (GeeAbstractCollection* self);
 static GType gee_tree_set_range_type_get_type (void) G_GNUC_UNUSED;
-GeeTreeSet* gee_tree_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func);
-GeeTreeSet* gee_tree_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func);
-GeeAbstractSet* gee_abstract_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
-GCompareFunc gee_functions_get_compare_func_for (GType t);
-static void gee_tree_set_set_compare_func (GeeTreeSet* self, GCompareFunc value);
+GeeTreeSet* gee_tree_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
+GeeTreeSet* gee_tree_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
+GeeAbstractBidirSortedSet* gee_abstract_bidir_sorted_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func);
+GCompareDataFunc gee_functions_get_compare_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+static void gee_tree_set_set_compare_func (GeeTreeSet* self, GCompareDataFunc value, gpointer value_target);
 static gboolean gee_tree_set_real_contains (GeeAbstractCollection* base, gconstpointer item);
-GCompareFunc gee_tree_set_get_compare_func (GeeTreeSet* self);
+GCompareDataFunc gee_tree_set_get_compare_func (GeeTreeSet* self, gpointer* result_target);
 GType gee_tree_set_node_color_get_type (void) G_GNUC_CONST;
 static inline void gee_tree_set_rotate_right (GeeTreeSet* self, GeeTreeSetNode** root);
 static inline void gee_tree_set_rotate_left (GeeTreeSet* self, GeeTreeSetNode** root);
@@ -440,22 +624,22 @@ static GeeIterator* gee_tree_set_real_iterator (GeeAbstractCollection* base);
 static GeeTreeSetIterator* gee_tree_set_iterator_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set);
 static GeeTreeSetIterator* gee_tree_set_iterator_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set);
 static GType gee_tree_set_iterator_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
-static GeeBidirIterator* gee_tree_set_real_bidir_iterator (GeeSortedSet* base);
+static GeeBidirIterator* gee_tree_set_real_bidir_iterator (GeeAbstractBidirSortedSet* base);
 static inline gpointer gee_tree_set_lift_null_get (GeeTreeSet* self, GeeTreeSetNode* node);
-static gpointer gee_tree_set_real_first (GeeSortedSet* base);
-static gpointer gee_tree_set_real_last (GeeSortedSet* base);
-static GeeSortedSet* gee_tree_set_real_head_set (GeeSortedSet* base, gconstpointer before);
+static gpointer gee_tree_set_real_first (GeeAbstractSortedSet* base);
+static gpointer gee_tree_set_real_last (GeeAbstractSortedSet* base);
+static GeeSortedSet* gee_tree_set_real_head_set (GeeAbstractSortedSet* base, gconstpointer before);
 static GeeTreeSetSubSet* gee_tree_set_sub_set_new_head (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, gconstpointer before);
 static GeeTreeSetSubSet* gee_tree_set_sub_set_construct_head (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, gconstpointer before);
 static GType gee_tree_set_sub_set_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
-static GeeSortedSet* gee_tree_set_real_tail_set (GeeSortedSet* base, gconstpointer after);
+static GeeSortedSet* gee_tree_set_real_tail_set (GeeAbstractSortedSet* base, gconstpointer after);
 static GeeTreeSetSubSet* gee_tree_set_sub_set_new_tail (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, gconstpointer after);
 static GeeTreeSetSubSet* gee_tree_set_sub_set_construct_tail (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, gconstpointer after);
-static GeeSortedSet* gee_tree_set_real_sub_set (GeeSortedSet* base, gconstpointer after, gconstpointer before);
+static GeeSortedSet* gee_tree_set_real_sub_set (GeeAbstractSortedSet* base, gconstpointer after, gconstpointer before);
 static GeeTreeSetSubSet* gee_tree_set_sub_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, gconstpointer after, gconstpointer before);
 static GeeTreeSetSubSet* gee_tree_set_sub_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, gconstpointer after, gconstpointer before);
 static inline GeeTreeSetNode* gee_tree_set_find_node (GeeTreeSet* self, gconstpointer item);
-static GeeBidirIterator* gee_tree_set_real_iterator_at (GeeSortedSet* base, gconstpointer item);
+static GeeIterator* gee_tree_set_real_iterator_at (GeeAbstractSortedSet* base, gconstpointer item);
 static GeeTreeSetIterator* gee_tree_set_iterator_new_pointing (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, GeeTreeSetNode* current);
 static GeeTreeSetIterator* gee_tree_set_iterator_construct_pointing (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, GeeTreeSetNode* current);
 static inline GeeTreeSetNode* gee_tree_set_find_nearest (GeeTreeSet* self, gconstpointer item);
@@ -463,10 +647,10 @@ static inline GeeTreeSetNode* gee_tree_set_find_lower (GeeTreeSet* self, gconstp
 static inline GeeTreeSetNode* gee_tree_set_find_higher (GeeTreeSet* self, gconstpointer item);
 static inline GeeTreeSetNode* gee_tree_set_find_floor (GeeTreeSet* self, gconstpointer item);
 static inline GeeTreeSetNode* gee_tree_set_find_ceil (GeeTreeSet* self, gconstpointer item);
-static gpointer gee_tree_set_real_lower (GeeSortedSet* base, gconstpointer item);
-static gpointer gee_tree_set_real_higher (GeeSortedSet* base, gconstpointer item);
-static gpointer gee_tree_set_real_floor (GeeSortedSet* base, gconstpointer item);
-static gpointer gee_tree_set_real_ceil (GeeSortedSet* base, gconstpointer item);
+static gpointer gee_tree_set_real_lower (GeeAbstractSortedSet* base, gconstpointer item);
+static gpointer gee_tree_set_real_higher (GeeAbstractSortedSet* base, gconstpointer item);
+static gpointer gee_tree_set_real_floor (GeeAbstractSortedSet* base, gconstpointer item);
+static gpointer gee_tree_set_real_ceil (GeeAbstractSortedSet* base, gconstpointer item);
 static inline gpointer gee_tree_set_min (GeeTreeSet* self, gconstpointer a, gconstpointer b);
 static inline gpointer gee_tree_set_max (GeeTreeSet* self, gconstpointer a, gconstpointer b);
 static void gee_tree_set_node_instance_init (GeeTreeSetNode * self);
@@ -476,11 +660,13 @@ enum  {
 	GEE_TREE_SET_ITERATOR_DUMMY_PROPERTY,
 	GEE_TREE_SET_ITERATOR_G_TYPE,
 	GEE_TREE_SET_ITERATOR_G_DUP_FUNC,
-	GEE_TREE_SET_ITERATOR_G_DESTROY_FUNC
+	GEE_TREE_SET_ITERATOR_G_DESTROY_FUNC,
+	GEE_TREE_SET_ITERATOR_VALID,
+	GEE_TREE_SET_ITERATOR_READ_ONLY
 };
 static gboolean gee_tree_set_iterator_real_next (GeeIterator* base);
 static gboolean gee_tree_set_iterator_real_has_next (GeeIterator* base);
-static gboolean gee_tree_set_iterator_real_first (GeeIterator* base);
+static gboolean gee_tree_set_iterator_real_first (GeeBidirIterator* base);
 static gboolean gee_tree_set_iterator_real_previous (GeeBidirIterator* base);
 static gboolean gee_tree_set_iterator_real_has_previous (GeeBidirIterator* base);
 static gboolean gee_tree_set_iterator_real_last (GeeBidirIterator* base);
@@ -488,7 +674,10 @@ static gpointer gee_tree_set_iterator_real_get (GeeIterator* base);
 static void gee_tree_set_iterator_real_remove (GeeIterator* base);
 static gboolean gee_tree_set_iterator_safe_next_get (GeeTreeSetIterator* self, gpointer* val);
 static gboolean gee_tree_set_iterator_safe_previous_get (GeeTreeSetIterator* self, gpointer* val);
+static gboolean gee_tree_set_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
 static void gee_tree_set_iterator_finalize (GObject* obj);
+gboolean gee_iterator_get_valid (GeeIterator* self);
+gboolean gee_iterator_get_read_only (GeeIterator* self);
 static void _vala_gee_tree_set_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_set_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 static gpointer gee_tree_set_range_ref (gpointer instance);
@@ -524,6 +713,7 @@ enum  {
 	GEE_TREE_SET_SUB_SET_G_DUP_FUNC,
 	GEE_TREE_SET_SUB_SET_G_DESTROY_FUNC,
 	GEE_TREE_SET_SUB_SET_SIZE,
+	GEE_TREE_SET_SUB_SET_READ_ONLY,
 	GEE_TREE_SET_SUB_SET_IS_EMPTY
 };
 static GeeTreeSetSubSet* gee_tree_set_sub_set_new_from_range (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, GeeTreeSetRange* range);
@@ -542,28 +732,29 @@ static GeeIterator* gee_tree_set_sub_set_real_iterator (GeeAbstractCollection* b
 static GeeTreeSetSubIterator* gee_tree_set_sub_iterator_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, GeeTreeSetRange* range);
 static GeeTreeSetSubIterator* gee_tree_set_sub_iterator_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, GeeTreeSetRange* range);
 static GType gee_tree_set_sub_iterator_get_type (void) G_GNUC_CONST G_GNUC_UNUSED;
-static GeeBidirIterator* gee_tree_set_sub_set_real_bidir_iterator (GeeSortedSet* base);
-static gpointer gee_tree_set_sub_set_real_first (GeeSortedSet* base);
-static gpointer gee_tree_set_sub_set_real_last (GeeSortedSet* base);
-static GeeSortedSet* gee_tree_set_sub_set_real_head_set (GeeSortedSet* base, gconstpointer before);
-static GeeSortedSet* gee_tree_set_sub_set_real_tail_set (GeeSortedSet* base, gconstpointer after);
-static GeeSortedSet* gee_tree_set_sub_set_real_sub_set (GeeSortedSet* base, gconstpointer after, gconstpointer before);
-static GeeBidirIterator* gee_tree_set_sub_set_real_iterator_at (GeeSortedSet* base, gconstpointer item);
+static GeeBidirIterator* gee_tree_set_sub_set_real_bidir_iterator (GeeAbstractBidirSortedSet* base);
+static gpointer gee_tree_set_sub_set_real_first (GeeAbstractSortedSet* base);
+static gpointer gee_tree_set_sub_set_real_last (GeeAbstractSortedSet* base);
+static GeeSortedSet* gee_tree_set_sub_set_real_head_set (GeeAbstractSortedSet* base, gconstpointer before);
+static GeeSortedSet* gee_tree_set_sub_set_real_tail_set (GeeAbstractSortedSet* base, gconstpointer after);
+static GeeSortedSet* gee_tree_set_sub_set_real_sub_set (GeeAbstractSortedSet* base, gconstpointer after, gconstpointer before);
+static GeeIterator* gee_tree_set_sub_set_real_iterator_at (GeeAbstractSortedSet* base, gconstpointer item);
 static GeeTreeSetSubIterator* gee_tree_set_sub_iterator_new_pointing (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, GeeTreeSetRange* range, GeeTreeSetNode* node);
 static GeeTreeSetSubIterator* gee_tree_set_sub_iterator_construct_pointing (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeTreeSet* set, GeeTreeSetRange* range, GeeTreeSetNode* node);
-static gpointer gee_tree_set_sub_set_real_lower (GeeSortedSet* base, gconstpointer item);
-gpointer gee_sorted_set_last (GeeSortedSet* self);
-gpointer gee_sorted_set_lower (GeeSortedSet* self, gconstpointer element);
-static gpointer gee_tree_set_sub_set_real_higher (GeeSortedSet* base, gconstpointer item);
-gpointer gee_sorted_set_first (GeeSortedSet* self);
-gpointer gee_sorted_set_higher (GeeSortedSet* self, gconstpointer element);
-static gpointer gee_tree_set_sub_set_real_floor (GeeSortedSet* base, gconstpointer item);
-gpointer gee_sorted_set_floor (GeeSortedSet* self, gconstpointer element);
-static gpointer gee_tree_set_sub_set_real_ceil (GeeSortedSet* base, gconstpointer item);
-gpointer gee_sorted_set_ceil (GeeSortedSet* self, gconstpointer element);
+static gpointer gee_tree_set_sub_set_real_lower (GeeAbstractSortedSet* base, gconstpointer item);
+gpointer gee_abstract_sorted_set_last (GeeAbstractSortedSet* self);
+gpointer gee_abstract_sorted_set_lower (GeeAbstractSortedSet* self, gconstpointer element);
+static gpointer gee_tree_set_sub_set_real_higher (GeeAbstractSortedSet* base, gconstpointer item);
+gpointer gee_abstract_sorted_set_first (GeeAbstractSortedSet* self);
+gpointer gee_abstract_sorted_set_higher (GeeAbstractSortedSet* self, gconstpointer element);
+static gpointer gee_tree_set_sub_set_real_floor (GeeAbstractSortedSet* base, gconstpointer item);
+gpointer gee_abstract_sorted_set_floor (GeeAbstractSortedSet* self, gconstpointer element);
+static gpointer gee_tree_set_sub_set_real_ceil (GeeAbstractSortedSet* base, gconstpointer item);
+gpointer gee_abstract_sorted_set_ceil (GeeAbstractSortedSet* self, gconstpointer element);
+static gboolean gee_tree_set_sub_set_get_is_empty (GeeTreeSetSubSet* self);
 static void gee_tree_set_sub_set_finalize (GObject* obj);
 gint gee_abstract_collection_get_size (GeeAbstractCollection* self);
-gboolean gee_abstract_collection_get_is_empty (GeeAbstractCollection* self);
+gboolean gee_abstract_collection_get_read_only (GeeAbstractCollection* self);
 static void _vala_gee_tree_set_sub_set_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_set_sub_set_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 #define GEE_TREE_SET_SUB_ITERATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GEE_TREE_SET_TYPE_SUB_ITERATOR, GeeTreeSetSubIteratorPrivate))
@@ -571,12 +762,14 @@ enum  {
 	GEE_TREE_SET_SUB_ITERATOR_DUMMY_PROPERTY,
 	GEE_TREE_SET_SUB_ITERATOR_G_TYPE,
 	GEE_TREE_SET_SUB_ITERATOR_G_DUP_FUNC,
-	GEE_TREE_SET_SUB_ITERATOR_G_DESTROY_FUNC
+	GEE_TREE_SET_SUB_ITERATOR_G_DESTROY_FUNC,
+	GEE_TREE_SET_SUB_ITERATOR_READ_ONLY,
+	GEE_TREE_SET_SUB_ITERATOR_VALID
 };
 static gboolean gee_tree_set_sub_iterator_real_next (GeeIterator* base);
-gboolean gee_iterator_first (GeeIterator* self);
+gboolean gee_bidir_iterator_first (GeeBidirIterator* self);
 static gboolean gee_tree_set_sub_iterator_real_has_next (GeeIterator* base);
-static gboolean gee_tree_set_sub_iterator_real_first (GeeIterator* base);
+static gboolean gee_tree_set_sub_iterator_real_first (GeeBidirIterator* base);
 static gboolean gee_tree_set_sub_iterator_real_previous (GeeBidirIterator* base);
 gboolean gee_bidir_iterator_previous (GeeBidirIterator* self);
 static gboolean gee_tree_set_sub_iterator_real_has_previous (GeeBidirIterator* base);
@@ -584,6 +777,7 @@ static gboolean gee_tree_set_sub_iterator_real_last (GeeBidirIterator* base);
 static gpointer gee_tree_set_sub_iterator_real_get (GeeIterator* base);
 gpointer gee_iterator_get (GeeIterator* self);
 static void gee_tree_set_sub_iterator_real_remove (GeeIterator* base);
+static gboolean gee_tree_set_sub_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target);
 static void gee_tree_set_sub_iterator_finalize (GObject* obj);
 static void _vala_gee_tree_set_sub_iterator_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_set_sub_iterator_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
@@ -613,28 +807,44 @@ static GType gee_tree_set_range_type_get_type (void) {
  *
  * @param compare_func an optional element comparator function
  */
-GeeTreeSet* gee_tree_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func) {
+GeeTreeSet* gee_tree_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify) {
 	GeeTreeSet * self = NULL;
-	GCompareFunc _tmp0_;
-	GCompareFunc _tmp2_;
-	self = (GeeTreeSet*) gee_abstract_set_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
+	GCompareDataFunc _tmp0_;
+	void* _tmp0__target;
+	GCompareDataFunc _tmp4_;
+	void* _tmp4__target;
+	self = (GeeTreeSet*) gee_abstract_bidir_sorted_set_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
 	self->priv->g_type = g_type;
 	self->priv->g_dup_func = g_dup_func;
 	self->priv->g_destroy_func = g_destroy_func;
 	_tmp0_ = compare_func;
+	_tmp0__target = compare_func_target;
 	if (_tmp0_ == NULL) {
-		GCompareFunc _tmp1_ = NULL;
-		_tmp1_ = gee_functions_get_compare_func_for (g_type);
-		compare_func = _tmp1_;
+		void* _tmp1_ = NULL;
+		GDestroyNotify _tmp2_ = NULL;
+		GCompareDataFunc _tmp3_ = NULL;
+		_tmp3_ = gee_functions_get_compare_func_for (g_type, &_tmp1_, &_tmp2_);
+		(compare_func_target_destroy_notify == NULL) ? NULL : (compare_func_target_destroy_notify (compare_func_target), NULL);
+		compare_func = NULL;
+		compare_func_target = NULL;
+		compare_func_target_destroy_notify = NULL;
+		compare_func = _tmp3_;
+		compare_func_target = _tmp1_;
+		compare_func_target_destroy_notify = _tmp2_;
 	}
-	_tmp2_ = compare_func;
-	gee_tree_set_set_compare_func (self, _tmp2_);
+	_tmp4_ = compare_func;
+	_tmp4__target = compare_func_target;
+	gee_tree_set_set_compare_func (self, _tmp4_, _tmp4__target);
+	(compare_func_target_destroy_notify == NULL) ? NULL : (compare_func_target_destroy_notify (compare_func_target), NULL);
+	compare_func = NULL;
+	compare_func_target = NULL;
+	compare_func_target_destroy_notify = NULL;
 	return self;
 }
 
 
-GeeTreeSet* gee_tree_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func) {
-	return gee_tree_set_construct (GEE_TYPE_TREE_SET, g_type, g_dup_func, g_destroy_func, compare_func);
+GeeTreeSet* gee_tree_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify) {
+	return gee_tree_set_construct (GEE_TYPE_TREE_SET, g_type, g_dup_func, g_destroy_func, compare_func, compare_func_target, compare_func_target_destroy_notify);
 }
 
 
@@ -651,8 +861,10 @@ static gboolean gee_tree_set_real_contains (GeeAbstractCollection* base, gconstp
 	cur = _tmp0_;
 	while (TRUE) {
 		GeeTreeSetNode* _tmp1_;
-		GCompareFunc _tmp2_;
-		GCompareFunc _tmp3_;
+		GCompareDataFunc _tmp2_;
+		void* _tmp2__target;
+		GCompareDataFunc _tmp3_;
+		void* _tmp3__target;
 		gconstpointer _tmp4_;
 		GeeTreeSetNode* _tmp5_;
 		gconstpointer _tmp6_;
@@ -663,12 +875,13 @@ static gboolean gee_tree_set_real_contains (GeeAbstractCollection* base, gconstp
 		if (!(_tmp1_ != NULL)) {
 			break;
 		}
-		_tmp2_ = gee_tree_set_get_compare_func (self);
+		_tmp2_ = gee_tree_set_get_compare_func (self, &_tmp2__target);
 		_tmp3_ = _tmp2_;
+		_tmp3__target = _tmp2__target;
 		_tmp4_ = item;
 		_tmp5_ = cur;
 		_tmp6_ = _tmp5_->key;
-		_tmp7_ = _tmp3_ (_tmp4_, _tmp6_);
+		_tmp7_ = _tmp3_ (_tmp4_, _tmp6_, _tmp3__target);
 		res = _tmp7_;
 		_tmp8_ = res;
 		if (_tmp8_ == 0) {
@@ -913,8 +1126,10 @@ static inline void gee_tree_set_fix_up (GeeTreeSet* self, GeeTreeSetNode** node)
 static gboolean gee_tree_set_add_to_node (GeeTreeSet* self, GeeTreeSetNode** node, gpointer item, GeeTreeSetNode* prev, GeeTreeSetNode* next) {
 	gboolean result = FALSE;
 	GeeTreeSetNode* _tmp0_;
-	GCompareFunc _tmp10_;
-	GCompareFunc _tmp11_;
+	GCompareDataFunc _tmp10_;
+	void* _tmp10__target;
+	GCompareDataFunc _tmp11_;
+	void* _tmp11__target;
 	gconstpointer _tmp12_;
 	GeeTreeSetNode* _tmp13_;
 	gconstpointer _tmp14_;
@@ -956,12 +1171,13 @@ static gboolean gee_tree_set_add_to_node (GeeTreeSet* self, GeeTreeSetNode** nod
 		((item == NULL) || (self->priv->g_destroy_func == NULL)) ? NULL : (item = (self->priv->g_destroy_func (item), NULL));
 		return result;
 	}
-	_tmp10_ = gee_tree_set_get_compare_func (self);
+	_tmp10_ = gee_tree_set_get_compare_func (self, &_tmp10__target);
 	_tmp11_ = _tmp10_;
+	_tmp11__target = _tmp10__target;
 	_tmp12_ = item;
 	_tmp13_ = *node;
 	_tmp14_ = _tmp13_->key;
-	_tmp15_ = _tmp11_ (_tmp12_, _tmp14_);
+	_tmp15_ = _tmp11_ (_tmp12_, _tmp14_, _tmp11__target);
 	cmp = _tmp15_;
 	_tmp16_ = cmp;
 	if (_tmp16_ == 0) {
@@ -1101,72 +1317,65 @@ static inline void gee_tree_set_fix_removal (GeeTreeSet* self, GeeTreeSetNode** 
 	gpointer _vala_key = NULL;
 	GeeTreeSetNode* _tmp0_;
 	GeeTreeSetNode* n;
+	GeeTreeSetNode* _tmp1_;
+	gpointer _tmp2_;
+	GeeTreeSetNode* _tmp3_;
 	GeeTreeSetNode* _tmp4_;
-	GeeTreeSetNode* _tmp5_;
+	GeeTreeSetNode* _tmp11_;
 	GeeTreeSetNode* _tmp12_;
-	GeeTreeSetNode* _tmp13_;
-	gint _tmp20_;
+	gint _tmp19_;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (*node != NULL);
 	_tmp0_ = *node;
 	*node = NULL;
 	n = _tmp0_;
-	if ((&_vala_key) != NULL) {
-		GeeTreeSetNode* _tmp1_;
-		gpointer _tmp2_;
-		_tmp1_ = n;
-		_tmp2_ = _tmp1_->key;
-		_tmp1_->key = NULL;
-		((_vala_key == NULL) || (self->priv->g_destroy_func == NULL)) ? NULL : (_vala_key = (self->priv->g_destroy_func (_vala_key), NULL));
-		_vala_key = _tmp2_;
-	} else {
-		GeeTreeSetNode* _tmp3_;
-		_tmp3_ = n;
-		((_tmp3_->key == NULL) || (self->priv->g_destroy_func == NULL)) ? NULL : (_tmp3_->key = (self->priv->g_destroy_func (_tmp3_->key), NULL));
-		_tmp3_->key = NULL;
-	}
-	_tmp4_ = n;
-	_tmp5_ = _tmp4_->prev;
-	if (_tmp5_ != NULL) {
+	_tmp1_ = n;
+	_tmp2_ = _tmp1_->key;
+	_tmp1_->key = NULL;
+	((_vala_key == NULL) || (self->priv->g_destroy_func == NULL)) ? NULL : (_vala_key = (self->priv->g_destroy_func (_vala_key), NULL));
+	_vala_key = _tmp2_;
+	_tmp3_ = n;
+	_tmp4_ = _tmp3_->prev;
+	if (_tmp4_ != NULL) {
+		GeeTreeSetNode* _tmp5_;
 		GeeTreeSetNode* _tmp6_;
 		GeeTreeSetNode* _tmp7_;
 		GeeTreeSetNode* _tmp8_;
-		GeeTreeSetNode* _tmp9_;
-		_tmp6_ = n;
-		_tmp7_ = _tmp6_->prev;
-		_tmp8_ = n;
-		_tmp9_ = _tmp8_->next;
-		_tmp7_->next = _tmp9_;
+		_tmp5_ = n;
+		_tmp6_ = _tmp5_->prev;
+		_tmp7_ = n;
+		_tmp8_ = _tmp7_->next;
+		_tmp6_->next = _tmp8_;
 	} else {
+		GeeTreeSetNode* _tmp9_;
 		GeeTreeSetNode* _tmp10_;
-		GeeTreeSetNode* _tmp11_;
-		_tmp10_ = n;
-		_tmp11_ = _tmp10_->next;
-		self->priv->_first = _tmp11_;
+		_tmp9_ = n;
+		_tmp10_ = _tmp9_->next;
+		self->priv->_first = _tmp10_;
 	}
-	_tmp12_ = n;
-	_tmp13_ = _tmp12_->next;
-	if (_tmp13_ != NULL) {
+	_tmp11_ = n;
+	_tmp12_ = _tmp11_->next;
+	if (_tmp12_ != NULL) {
+		GeeTreeSetNode* _tmp13_;
 		GeeTreeSetNode* _tmp14_;
 		GeeTreeSetNode* _tmp15_;
 		GeeTreeSetNode* _tmp16_;
-		GeeTreeSetNode* _tmp17_;
-		_tmp14_ = n;
-		_tmp15_ = _tmp14_->next;
-		_tmp16_ = n;
-		_tmp17_ = _tmp16_->prev;
-		_tmp15_->prev = _tmp17_;
+		_tmp13_ = n;
+		_tmp14_ = _tmp13_->next;
+		_tmp15_ = n;
+		_tmp16_ = _tmp15_->prev;
+		_tmp14_->prev = _tmp16_;
 	} else {
+		GeeTreeSetNode* _tmp17_;
 		GeeTreeSetNode* _tmp18_;
-		GeeTreeSetNode* _tmp19_;
-		_tmp18_ = n;
-		_tmp19_ = _tmp18_->prev;
-		self->priv->_last = _tmp19_;
+		_tmp17_ = n;
+		_tmp18_ = _tmp17_->prev;
+		self->priv->_last = _tmp18_;
 	}
 	_gee_tree_set_node_free0 (*node);
 	*node = NULL;
-	_tmp20_ = self->priv->_size;
-	self->priv->_size = _tmp20_ - 1;
+	_tmp19_ = self->priv->_size;
+	self->priv->_size = _tmp19_ - 1;
 	_gee_tree_set_node_free0 (n);
 	if (key) {
 		*key = _vala_key;
@@ -1244,6 +1453,8 @@ static gboolean gee_tree_set_remove_from_node (GeeTreeSet* self, GeeTreeSetNode*
 	g_return_val_if_fail (self != NULL, FALSE);
 	_tmp0_ = *node;
 	if (_tmp0_ == NULL) {
+		_vala_prev = NULL;
+		_vala_next = NULL;
 		result = FALSE;
 		if (prev) {
 			*prev = _vala_prev;
@@ -1253,18 +1464,21 @@ static gboolean gee_tree_set_remove_from_node (GeeTreeSet* self, GeeTreeSetNode*
 		}
 		return result;
 	} else {
-		GCompareFunc _tmp1_;
-		GCompareFunc _tmp2_;
+		GCompareDataFunc _tmp1_;
+		void* _tmp1__target;
+		GCompareDataFunc _tmp2_;
+		void* _tmp2__target;
 		gconstpointer _tmp3_;
 		GeeTreeSetNode* _tmp4_;
 		gconstpointer _tmp5_;
 		gint _tmp6_ = 0;
-		_tmp1_ = gee_tree_set_get_compare_func (self);
+		_tmp1_ = gee_tree_set_get_compare_func (self, &_tmp1__target);
 		_tmp2_ = _tmp1_;
+		_tmp2__target = _tmp1__target;
 		_tmp3_ = item;
 		_tmp4_ = *node;
 		_tmp5_ = _tmp4_->key;
-		_tmp6_ = _tmp2_ (_tmp3_, _tmp5_);
+		_tmp6_ = _tmp2_ (_tmp3_, _tmp5_, _tmp2__target);
 		if (_tmp6_ < 0) {
 			GeeTreeSetNode* _tmp7_;
 			GeeTreeSetNode* _tmp8_;
@@ -1285,6 +1499,8 @@ static gboolean gee_tree_set_remove_from_node (GeeTreeSet* self, GeeTreeSetNode*
 			left = _tmp8_;
 			_tmp9_ = left;
 			if (_tmp9_ == NULL) {
+				_vala_prev = NULL;
+				_vala_next = NULL;
 				result = FALSE;
 				if (prev) {
 					*prev = _vala_prev;
@@ -1334,8 +1550,10 @@ static gboolean gee_tree_set_remove_from_node (GeeTreeSet* self, GeeTreeSetNode*
 			GeeTreeSetNode* _tmp26_;
 			GeeTreeSetNode* r;
 			gboolean _tmp27_ = FALSE;
-			GCompareFunc _tmp28_;
-			GCompareFunc _tmp29_;
+			GCompareDataFunc _tmp28_;
+			void* _tmp28__target;
+			GCompareDataFunc _tmp29_;
+			void* _tmp29__target;
 			gconstpointer _tmp30_;
 			GeeTreeSetNode* _tmp31_;
 			gconstpointer _tmp32_;
@@ -1347,8 +1565,10 @@ static gboolean gee_tree_set_remove_from_node (GeeTreeSet* self, GeeTreeSetNode*
 			gboolean _tmp43_ = FALSE;
 			gboolean _tmp45_;
 			gboolean _tmp49_;
-			GCompareFunc _tmp50_;
-			GCompareFunc _tmp51_;
+			GCompareDataFunc _tmp50_;
+			void* _tmp50__target;
+			GCompareDataFunc _tmp51_;
+			void* _tmp51__target;
 			gconstpointer _tmp52_;
 			GeeTreeSetNode* _tmp53_;
 			gconstpointer _tmp54_;
@@ -1362,12 +1582,13 @@ static gboolean gee_tree_set_remove_from_node (GeeTreeSet* self, GeeTreeSetNode*
 			_tmp25_ = *node;
 			_tmp26_ = _tmp25_->right;
 			r = _tmp26_;
-			_tmp28_ = gee_tree_set_get_compare_func (self);
+			_tmp28_ = gee_tree_set_get_compare_func (self, &_tmp28__target);
 			_tmp29_ = _tmp28_;
+			_tmp29__target = _tmp28__target;
 			_tmp30_ = item;
 			_tmp31_ = *node;
 			_tmp32_ = _tmp31_->key;
-			_tmp33_ = _tmp29_ (_tmp30_, _tmp32_);
+			_tmp33_ = _tmp29_ (_tmp30_, _tmp32_, _tmp29__target);
 			if (_tmp33_ == 0) {
 				GeeTreeSetNode* _tmp34_;
 				_tmp34_ = r;
@@ -1377,20 +1598,16 @@ static gboolean gee_tree_set_remove_from_node (GeeTreeSet* self, GeeTreeSetNode*
 			}
 			_tmp35_ = _tmp27_;
 			if (_tmp35_) {
-				if ((&_vala_prev) != NULL) {
-					GeeTreeSetNode* _tmp36_;
-					GeeTreeSetNode* _tmp37_;
-					_tmp36_ = *node;
-					_tmp37_ = _tmp36_->prev;
-					_vala_prev = _tmp37_;
-				}
-				if ((&_vala_next) != NULL) {
-					GeeTreeSetNode* _tmp38_;
-					GeeTreeSetNode* _tmp39_;
-					_tmp38_ = *node;
-					_tmp39_ = _tmp38_->next;
-					_vala_next = _tmp39_;
-				}
+				GeeTreeSetNode* _tmp36_;
+				GeeTreeSetNode* _tmp37_;
+				GeeTreeSetNode* _tmp38_;
+				GeeTreeSetNode* _tmp39_;
+				_tmp36_ = *node;
+				_tmp37_ = _tmp36_->prev;
+				_vala_prev = _tmp37_;
+				_tmp38_ = *node;
+				_tmp39_ = _tmp38_->next;
+				_vala_next = _tmp39_;
 				gee_tree_set_fix_removal (self, node, NULL);
 				result = TRUE;
 				if (prev) {
@@ -1426,28 +1643,25 @@ static gboolean gee_tree_set_remove_from_node (GeeTreeSet* self, GeeTreeSetNode*
 			if (_tmp49_) {
 				gee_tree_set_move_red_right (self, node);
 			}
-			_tmp50_ = gee_tree_set_get_compare_func (self);
+			_tmp50_ = gee_tree_set_get_compare_func (self, &_tmp50__target);
 			_tmp51_ = _tmp50_;
+			_tmp51__target = _tmp50__target;
 			_tmp52_ = item;
 			_tmp53_ = *node;
 			_tmp54_ = _tmp53_->key;
-			_tmp55_ = _tmp51_ (_tmp52_, _tmp54_);
+			_tmp55_ = _tmp51_ (_tmp52_, _tmp54_, _tmp51__target);
 			if (_tmp55_ == 0) {
+				GeeTreeSetNode* _tmp56_;
+				GeeTreeSetNode* _tmp57_;
+				GeeTreeSetNode* _tmp58_;
 				GeeTreeSetNode* _tmp59_;
 				GeeTreeSetNode* _tmp60_;
 				gpointer _tmp61_ = NULL;
-				if ((&_vala_prev) != NULL) {
-					GeeTreeSetNode* _tmp56_;
-					GeeTreeSetNode* _tmp57_;
-					_tmp56_ = *node;
-					_tmp57_ = _tmp56_->prev;
-					_vala_prev = _tmp57_;
-				}
-				if ((&_vala_next) != NULL) {
-					GeeTreeSetNode* _tmp58_;
-					_tmp58_ = *node;
-					_vala_next = _tmp58_;
-				}
+				_tmp56_ = *node;
+				_tmp57_ = _tmp56_->prev;
+				_vala_prev = _tmp57_;
+				_tmp58_ = *node;
+				_vala_next = _tmp58_;
 				_tmp59_ = *node;
 				_tmp60_ = *node;
 				gee_tree_set_remove_minimal (self, &_tmp59_->right, &_tmp61_);
@@ -1601,7 +1815,7 @@ static GeeIterator* gee_tree_set_real_iterator (GeeAbstractCollection* base) {
 /**
  * {@inheritDoc}
  */
-static GeeBidirIterator* gee_tree_set_real_bidir_iterator (GeeSortedSet* base) {
+static GeeBidirIterator* gee_tree_set_real_bidir_iterator (GeeAbstractBidirSortedSet* base) {
 	GeeTreeSet * self;
 	GeeBidirIterator* result = NULL;
 	GeeTreeSetIterator* _tmp0_;
@@ -1639,7 +1853,7 @@ static inline gpointer gee_tree_set_lift_null_get (GeeTreeSet* self, GeeTreeSetN
 /**
  * {@inheritDoc}
  */
-static gpointer gee_tree_set_real_first (GeeSortedSet* base) {
+static gpointer gee_tree_set_real_first (GeeAbstractSortedSet* base) {
 	GeeTreeSet * self;
 	gpointer result = NULL;
 	GeeTreeSetNode* _tmp0_;
@@ -1660,7 +1874,7 @@ static gpointer gee_tree_set_real_first (GeeSortedSet* base) {
 /**
  * {@inheritDoc}
  */
-static gpointer gee_tree_set_real_last (GeeSortedSet* base) {
+static gpointer gee_tree_set_real_last (GeeAbstractSortedSet* base) {
 	GeeTreeSet * self;
 	gpointer result = NULL;
 	GeeTreeSetNode* _tmp0_;
@@ -1681,7 +1895,7 @@ static gpointer gee_tree_set_real_last (GeeSortedSet* base) {
 /**
  * {@inheritDoc}
  */
-static GeeSortedSet* gee_tree_set_real_head_set (GeeSortedSet* base, gconstpointer before) {
+static GeeSortedSet* gee_tree_set_real_head_set (GeeAbstractSortedSet* base, gconstpointer before) {
 	GeeTreeSet * self;
 	GeeSortedSet* result = NULL;
 	gconstpointer _tmp0_;
@@ -1697,7 +1911,7 @@ static GeeSortedSet* gee_tree_set_real_head_set (GeeSortedSet* base, gconstpoint
 /**
  * {@inheritDoc}
  */
-static GeeSortedSet* gee_tree_set_real_tail_set (GeeSortedSet* base, gconstpointer after) {
+static GeeSortedSet* gee_tree_set_real_tail_set (GeeAbstractSortedSet* base, gconstpointer after) {
 	GeeTreeSet * self;
 	GeeSortedSet* result = NULL;
 	gconstpointer _tmp0_;
@@ -1713,7 +1927,7 @@ static GeeSortedSet* gee_tree_set_real_tail_set (GeeSortedSet* base, gconstpoint
 /**
  * {@inheritDoc}
  */
-static GeeSortedSet* gee_tree_set_real_sub_set (GeeSortedSet* base, gconstpointer after, gconstpointer before) {
+static GeeSortedSet* gee_tree_set_real_sub_set (GeeAbstractSortedSet* base, gconstpointer after, gconstpointer before) {
 	GeeTreeSet * self;
 	GeeSortedSet* result = NULL;
 	gconstpointer _tmp0_;
@@ -1737,8 +1951,10 @@ static inline GeeTreeSetNode* gee_tree_set_find_node (GeeTreeSet* self, gconstpo
 	cur = _tmp0_;
 	while (TRUE) {
 		GeeTreeSetNode* _tmp1_;
-		GCompareFunc _tmp2_;
-		GCompareFunc _tmp3_;
+		GCompareDataFunc _tmp2_;
+		void* _tmp2__target;
+		GCompareDataFunc _tmp3_;
+		void* _tmp3__target;
 		gconstpointer _tmp4_;
 		GeeTreeSetNode* _tmp5_;
 		gconstpointer _tmp6_;
@@ -1749,12 +1965,13 @@ static inline GeeTreeSetNode* gee_tree_set_find_node (GeeTreeSet* self, gconstpo
 		if (!(_tmp1_ != NULL)) {
 			break;
 		}
-		_tmp2_ = gee_tree_set_get_compare_func (self);
+		_tmp2_ = gee_tree_set_get_compare_func (self, &_tmp2__target);
 		_tmp3_ = _tmp2_;
+		_tmp3__target = _tmp2__target;
 		_tmp4_ = item;
 		_tmp5_ = cur;
 		_tmp6_ = _tmp5_->key;
-		_tmp7_ = _tmp3_ (_tmp4_, _tmp6_);
+		_tmp7_ = _tmp3_ (_tmp4_, _tmp6_, _tmp3__target);
 		res = _tmp7_;
 		_tmp8_ = res;
 		if (_tmp8_ == 0) {
@@ -1788,9 +2005,9 @@ static inline GeeTreeSetNode* gee_tree_set_find_node (GeeTreeSet* self, gconstpo
 /**
  * {@inheritDoc}
  */
-static GeeBidirIterator* gee_tree_set_real_iterator_at (GeeSortedSet* base, gconstpointer item) {
+static GeeIterator* gee_tree_set_real_iterator_at (GeeAbstractSortedSet* base, gconstpointer item) {
 	GeeTreeSet * self;
-	GeeBidirIterator* result = NULL;
+	GeeIterator* result = NULL;
 	gconstpointer _tmp0_;
 	GeeTreeSetNode* _tmp1_ = NULL;
 	GeeTreeSetNode* node;
@@ -1812,7 +2029,7 @@ static GeeBidirIterator* gee_tree_set_real_iterator_at (GeeSortedSet* base, gcon
 		_g_object_unref0 (_tmp2_);
 		_tmp2_ = NULL;
 	}
-	result = (GeeBidirIterator*) _tmp2_;
+	result = (GeeIterator*) _tmp2_;
 	return result;
 }
 
@@ -1826,8 +2043,10 @@ static inline GeeTreeSetNode* gee_tree_set_find_nearest (GeeTreeSet* self, gcons
 	cur = _tmp0_;
 	while (TRUE) {
 		GeeTreeSetNode* _tmp1_;
-		GCompareFunc _tmp2_;
-		GCompareFunc _tmp3_;
+		GCompareDataFunc _tmp2_;
+		void* _tmp2__target;
+		GCompareDataFunc _tmp3_;
+		void* _tmp3__target;
 		gconstpointer _tmp4_;
 		GeeTreeSetNode* _tmp5_;
 		gconstpointer _tmp6_;
@@ -1838,12 +2057,13 @@ static inline GeeTreeSetNode* gee_tree_set_find_nearest (GeeTreeSet* self, gcons
 		if (!(_tmp1_ != NULL)) {
 			break;
 		}
-		_tmp2_ = gee_tree_set_get_compare_func (self);
+		_tmp2_ = gee_tree_set_get_compare_func (self, &_tmp2__target);
 		_tmp3_ = _tmp2_;
+		_tmp3__target = _tmp2__target;
 		_tmp4_ = item;
 		_tmp5_ = cur;
 		_tmp6_ = _tmp5_->key;
-		_tmp7_ = _tmp3_ (_tmp4_, _tmp6_);
+		_tmp7_ = _tmp3_ (_tmp4_, _tmp6_, _tmp3__target);
 		res = _tmp7_;
 		_tmp8_ = res;
 		if (_tmp8_ == 0) {
@@ -1901,8 +2121,10 @@ static inline GeeTreeSetNode* gee_tree_set_find_lower (GeeTreeSet* self, gconstp
 	GeeTreeSetNode* node;
 	GeeTreeSetNode* _tmp2_;
 	GeeTreeSetNode* _tmp3_ = NULL;
-	GCompareFunc _tmp4_;
-	GCompareFunc _tmp5_;
+	GCompareDataFunc _tmp4_;
+	void* _tmp4__target;
+	GCompareDataFunc _tmp5_;
+	void* _tmp5__target;
 	gconstpointer _tmp6_;
 	GeeTreeSetNode* _tmp7_;
 	gconstpointer _tmp8_;
@@ -1917,12 +2139,13 @@ static inline GeeTreeSetNode* gee_tree_set_find_lower (GeeTreeSet* self, gconstp
 		result = NULL;
 		return result;
 	}
-	_tmp4_ = gee_tree_set_get_compare_func (self);
+	_tmp4_ = gee_tree_set_get_compare_func (self, &_tmp4__target);
 	_tmp5_ = _tmp4_;
+	_tmp5__target = _tmp4__target;
 	_tmp6_ = item;
 	_tmp7_ = node;
 	_tmp8_ = _tmp7_->key;
-	_tmp9_ = _tmp5_ (_tmp6_, _tmp8_);
+	_tmp9_ = _tmp5_ (_tmp6_, _tmp8_, _tmp5__target);
 	if (_tmp9_ <= 0) {
 		GeeTreeSetNode* _tmp10_;
 		GeeTreeSetNode* _tmp11_;
@@ -1947,8 +2170,10 @@ static inline GeeTreeSetNode* gee_tree_set_find_higher (GeeTreeSet* self, gconst
 	GeeTreeSetNode* node;
 	GeeTreeSetNode* _tmp2_;
 	GeeTreeSetNode* _tmp3_ = NULL;
-	GCompareFunc _tmp4_;
-	GCompareFunc _tmp5_;
+	GCompareDataFunc _tmp4_;
+	void* _tmp4__target;
+	GCompareDataFunc _tmp5_;
+	void* _tmp5__target;
 	gconstpointer _tmp6_;
 	GeeTreeSetNode* _tmp7_;
 	gconstpointer _tmp8_;
@@ -1963,12 +2188,13 @@ static inline GeeTreeSetNode* gee_tree_set_find_higher (GeeTreeSet* self, gconst
 		result = NULL;
 		return result;
 	}
-	_tmp4_ = gee_tree_set_get_compare_func (self);
+	_tmp4_ = gee_tree_set_get_compare_func (self, &_tmp4__target);
 	_tmp5_ = _tmp4_;
+	_tmp5__target = _tmp4__target;
 	_tmp6_ = item;
 	_tmp7_ = node;
 	_tmp8_ = _tmp7_->key;
-	_tmp9_ = _tmp5_ (_tmp6_, _tmp8_);
+	_tmp9_ = _tmp5_ (_tmp6_, _tmp8_, _tmp5__target);
 	if (_tmp9_ >= 0) {
 		GeeTreeSetNode* _tmp10_;
 		GeeTreeSetNode* _tmp11_;
@@ -1993,8 +2219,10 @@ static inline GeeTreeSetNode* gee_tree_set_find_floor (GeeTreeSet* self, gconstp
 	GeeTreeSetNode* node;
 	GeeTreeSetNode* _tmp2_;
 	GeeTreeSetNode* _tmp3_ = NULL;
-	GCompareFunc _tmp4_;
-	GCompareFunc _tmp5_;
+	GCompareDataFunc _tmp4_;
+	void* _tmp4__target;
+	GCompareDataFunc _tmp5_;
+	void* _tmp5__target;
 	gconstpointer _tmp6_;
 	GeeTreeSetNode* _tmp7_;
 	gconstpointer _tmp8_;
@@ -2009,12 +2237,13 @@ static inline GeeTreeSetNode* gee_tree_set_find_floor (GeeTreeSet* self, gconstp
 		result = NULL;
 		return result;
 	}
-	_tmp4_ = gee_tree_set_get_compare_func (self);
+	_tmp4_ = gee_tree_set_get_compare_func (self, &_tmp4__target);
 	_tmp5_ = _tmp4_;
+	_tmp5__target = _tmp4__target;
 	_tmp6_ = item;
 	_tmp7_ = node;
 	_tmp8_ = _tmp7_->key;
-	_tmp9_ = _tmp5_ (_tmp6_, _tmp8_);
+	_tmp9_ = _tmp5_ (_tmp6_, _tmp8_, _tmp5__target);
 	if (_tmp9_ < 0) {
 		GeeTreeSetNode* _tmp10_;
 		GeeTreeSetNode* _tmp11_;
@@ -2039,8 +2268,10 @@ static inline GeeTreeSetNode* gee_tree_set_find_ceil (GeeTreeSet* self, gconstpo
 	GeeTreeSetNode* node;
 	GeeTreeSetNode* _tmp2_;
 	GeeTreeSetNode* _tmp3_ = NULL;
-	GCompareFunc _tmp4_;
-	GCompareFunc _tmp5_;
+	GCompareDataFunc _tmp4_;
+	void* _tmp4__target;
+	GCompareDataFunc _tmp5_;
+	void* _tmp5__target;
 	gconstpointer _tmp6_;
 	GeeTreeSetNode* _tmp7_;
 	gconstpointer _tmp8_;
@@ -2055,12 +2286,13 @@ static inline GeeTreeSetNode* gee_tree_set_find_ceil (GeeTreeSet* self, gconstpo
 		result = NULL;
 		return result;
 	}
-	_tmp4_ = gee_tree_set_get_compare_func (self);
+	_tmp4_ = gee_tree_set_get_compare_func (self, &_tmp4__target);
 	_tmp5_ = _tmp4_;
+	_tmp5__target = _tmp4__target;
 	_tmp6_ = item;
 	_tmp7_ = node;
 	_tmp8_ = _tmp7_->key;
-	_tmp9_ = _tmp5_ (_tmp6_, _tmp8_);
+	_tmp9_ = _tmp5_ (_tmp6_, _tmp8_, _tmp5__target);
 	if (_tmp9_ > 0) {
 		GeeTreeSetNode* _tmp10_;
 		GeeTreeSetNode* _tmp11_;
@@ -2081,7 +2313,7 @@ static inline GeeTreeSetNode* gee_tree_set_find_ceil (GeeTreeSet* self, gconstpo
 /**
  * {@inheritDoc}
  */
-static gpointer gee_tree_set_real_lower (GeeSortedSet* base, gconstpointer item) {
+static gpointer gee_tree_set_real_lower (GeeAbstractSortedSet* base, gconstpointer item) {
 	GeeTreeSet * self;
 	gpointer result = NULL;
 	gconstpointer _tmp0_;
@@ -2099,7 +2331,7 @@ static gpointer gee_tree_set_real_lower (GeeSortedSet* base, gconstpointer item)
 /**
  * {@inheritDoc}
  */
-static gpointer gee_tree_set_real_higher (GeeSortedSet* base, gconstpointer item) {
+static gpointer gee_tree_set_real_higher (GeeAbstractSortedSet* base, gconstpointer item) {
 	GeeTreeSet * self;
 	gpointer result = NULL;
 	gconstpointer _tmp0_;
@@ -2117,7 +2349,7 @@ static gpointer gee_tree_set_real_higher (GeeSortedSet* base, gconstpointer item
 /**
  * {@inheritDoc}
  */
-static gpointer gee_tree_set_real_floor (GeeSortedSet* base, gconstpointer item) {
+static gpointer gee_tree_set_real_floor (GeeAbstractSortedSet* base, gconstpointer item) {
 	GeeTreeSet * self;
 	gpointer result = NULL;
 	gconstpointer _tmp0_;
@@ -2135,7 +2367,7 @@ static gpointer gee_tree_set_real_floor (GeeSortedSet* base, gconstpointer item)
 /**
  * {@inheritDoc}
  */
-static gpointer gee_tree_set_real_ceil (GeeSortedSet* base, gconstpointer item) {
+static gpointer gee_tree_set_real_ceil (GeeAbstractSortedSet* base, gconstpointer item) {
 	GeeTreeSet * self;
 	gpointer result = NULL;
 	gconstpointer _tmp0_;
@@ -2153,19 +2385,22 @@ static gpointer gee_tree_set_real_ceil (GeeSortedSet* base, gconstpointer item) 
 static inline gpointer gee_tree_set_min (GeeTreeSet* self, gconstpointer a, gconstpointer b) {
 	gpointer result = NULL;
 	gconstpointer _tmp0_ = NULL;
-	GCompareFunc _tmp1_;
-	GCompareFunc _tmp2_;
+	GCompareDataFunc _tmp1_;
+	void* _tmp1__target;
+	GCompareDataFunc _tmp2_;
+	void* _tmp2__target;
 	gconstpointer _tmp3_;
 	gconstpointer _tmp4_;
 	gint _tmp5_ = 0;
 	gconstpointer _tmp8_;
 	gpointer _tmp9_;
 	g_return_val_if_fail (self != NULL, NULL);
-	_tmp1_ = gee_tree_set_get_compare_func (self);
+	_tmp1_ = gee_tree_set_get_compare_func (self, &_tmp1__target);
 	_tmp2_ = _tmp1_;
+	_tmp2__target = _tmp1__target;
 	_tmp3_ = a;
 	_tmp4_ = b;
-	_tmp5_ = _tmp2_ (_tmp3_, _tmp4_);
+	_tmp5_ = _tmp2_ (_tmp3_, _tmp4_, _tmp2__target);
 	if (_tmp5_ <= 0) {
 		gconstpointer _tmp6_;
 		_tmp6_ = a;
@@ -2185,19 +2420,22 @@ static inline gpointer gee_tree_set_min (GeeTreeSet* self, gconstpointer a, gcon
 static inline gpointer gee_tree_set_max (GeeTreeSet* self, gconstpointer a, gconstpointer b) {
 	gpointer result = NULL;
 	gconstpointer _tmp0_ = NULL;
-	GCompareFunc _tmp1_;
-	GCompareFunc _tmp2_;
+	GCompareDataFunc _tmp1_;
+	void* _tmp1__target;
+	GCompareDataFunc _tmp2_;
+	void* _tmp2__target;
 	gconstpointer _tmp3_;
 	gconstpointer _tmp4_;
 	gint _tmp5_ = 0;
 	gconstpointer _tmp8_;
 	gpointer _tmp9_;
 	g_return_val_if_fail (self != NULL, NULL);
-	_tmp1_ = gee_tree_set_get_compare_func (self);
+	_tmp1_ = gee_tree_set_get_compare_func (self, &_tmp1__target);
 	_tmp2_ = _tmp1_;
+	_tmp2__target = _tmp1__target;
 	_tmp3_ = a;
 	_tmp4_ = b;
-	_tmp5_ = _tmp2_ (_tmp3_, _tmp4_);
+	_tmp5_ = _tmp2_ (_tmp3_, _tmp4_, _tmp2__target);
 	if (_tmp5_ > 0) {
 		gconstpointer _tmp6_;
 		_tmp6_ = a;
@@ -2225,22 +2463,45 @@ static gint gee_tree_set_real_get_size (GeeAbstractCollection* base) {
 }
 
 
-GCompareFunc gee_tree_set_get_compare_func (GeeTreeSet* self) {
-	GCompareFunc result;
-	GCompareFunc _tmp0_;
-	g_return_val_if_fail (self != NULL, NULL);
-	_tmp0_ = self->priv->_compare_func;
-	result = _tmp0_;
+static gboolean gee_tree_set_real_get_read_only (GeeAbstractCollection* base) {
+	gboolean result;
+	GeeTreeSet* self;
+	self = (GeeTreeSet*) base;
+	result = FALSE;
 	return result;
 }
 
 
-static void gee_tree_set_set_compare_func (GeeTreeSet* self, GCompareFunc value) {
-	GCompareFunc _tmp0_;
+GCompareDataFunc gee_tree_set_get_compare_func (GeeTreeSet* self, gpointer* result_target) {
+	GCompareDataFunc result;
+	GCompareDataFunc _tmp0_;
+	void* _tmp0__target;
+	GCompareDataFunc _tmp1_;
+	void* _tmp1__target;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->_compare_func;
+	_tmp0__target = self->priv->_compare_func_target;
+	_tmp1_ = _tmp0_;
+	_tmp1__target = _tmp0__target;
+	*result_target = _tmp1__target;
+	result = _tmp1_;
+	return result;
+}
+
+
+static void gee_tree_set_set_compare_func (GeeTreeSet* self, GCompareDataFunc value, gpointer value_target) {
+	GCompareDataFunc _tmp0_;
+	void* _tmp0__target;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = value;
+	_tmp0__target = value_target;
+	(self->priv->_compare_func_target_destroy_notify == NULL) ? NULL : (self->priv->_compare_func_target_destroy_notify (self->priv->_compare_func_target), NULL);
+	self->priv->_compare_func = NULL;
+	self->priv->_compare_func_target = NULL;
+	self->priv->_compare_func_target_destroy_notify = NULL;
 	self->priv->_compare_func = _tmp0_;
-	g_object_notify ((GObject *) self, "compare-func");
+	self->priv->_compare_func_target = _tmp0__target;
+	self->priv->_compare_func_target_destroy_notify = NULL;
 }
 
 
@@ -2547,7 +2808,7 @@ static gboolean gee_tree_set_iterator_real_has_next (GeeIterator* base) {
 }
 
 
-static gboolean gee_tree_set_iterator_real_first (GeeIterator* base) {
+static gboolean gee_tree_set_iterator_real_first (GeeBidirIterator* base) {
 	GeeTreeSetIterator * self;
 	gboolean result = FALSE;
 	gint _tmp0_;
@@ -2889,6 +3150,115 @@ static gboolean gee_tree_set_iterator_safe_previous_get (GeeTreeSetIterator* sel
 }
 
 
+static gboolean gee_tree_set_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeTreeSetIterator * self;
+	gboolean result = FALSE;
+	gint _tmp0_;
+	GeeTreeSet* _tmp1_;
+	gint _tmp2_;
+	GeeTreeSetNode* _tmp3_;
+	self = (GeeTreeSetIterator*) base;
+	_tmp0_ = self->priv->stamp;
+	_tmp1_ = self->priv->_set;
+	_tmp2_ = _tmp1_->priv->stamp;
+	_vala_assert (_tmp0_ == _tmp2_, "stamp == _set.stamp");
+	_tmp3_ = self->priv->current;
+	if (_tmp3_ != NULL) {
+		GeeForallFunc _tmp4_;
+		void* _tmp4__target;
+		GeeTreeSetNode* _tmp5_;
+		gconstpointer _tmp6_;
+		gpointer _tmp7_;
+		gboolean _tmp8_ = FALSE;
+		GeeTreeSetNode* _tmp9_;
+		GeeTreeSetNode* _tmp10_;
+		_tmp4_ = f;
+		_tmp4__target = f_target;
+		_tmp5_ = self->priv->current;
+		_tmp6_ = _tmp5_->key;
+		_tmp7_ = ((_tmp6_ != NULL) && (self->priv->g_dup_func != NULL)) ? self->priv->g_dup_func ((gpointer) _tmp6_) : ((gpointer) _tmp6_);
+		_tmp8_ = _tmp4_ (_tmp7_, _tmp4__target);
+		if (!_tmp8_) {
+			result = FALSE;
+			return result;
+		}
+		_tmp9_ = self->priv->current;
+		_tmp10_ = _tmp9_->next;
+		self->priv->_next = _tmp10_;
+	} else {
+		gboolean _tmp11_;
+		_tmp11_ = self->priv->started;
+		if (!_tmp11_) {
+			GeeTreeSet* _tmp12_;
+			GeeTreeSetNode* _tmp13_;
+			_tmp12_ = self->priv->_set;
+			_tmp13_ = _tmp12_->priv->_first;
+			self->priv->_next = _tmp13_;
+		}
+	}
+	while (TRUE) {
+		GeeTreeSetNode* _tmp14_;
+		GeeTreeSetNode* _tmp15_;
+		GeeForallFunc _tmp16_;
+		void* _tmp16__target;
+		GeeTreeSetNode* _tmp17_;
+		gconstpointer _tmp18_;
+		gpointer _tmp19_;
+		gboolean _tmp20_ = FALSE;
+		GeeTreeSetNode* _tmp21_;
+		GeeTreeSetNode* _tmp22_;
+		_tmp14_ = self->priv->_next;
+		if (!(_tmp14_ != NULL)) {
+			break;
+		}
+		_tmp15_ = self->priv->_next;
+		self->priv->current = _tmp15_;
+		_tmp16_ = f;
+		_tmp16__target = f_target;
+		_tmp17_ = self->priv->current;
+		_tmp18_ = _tmp17_->key;
+		_tmp19_ = ((_tmp18_ != NULL) && (self->priv->g_dup_func != NULL)) ? self->priv->g_dup_func ((gpointer) _tmp18_) : ((gpointer) _tmp18_);
+		_tmp20_ = _tmp16_ (_tmp19_, _tmp16__target);
+		if (!_tmp20_) {
+			result = FALSE;
+			return result;
+		}
+		_tmp21_ = self->priv->current;
+		_tmp22_ = _tmp21_->next;
+		self->priv->_next = _tmp22_;
+	}
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean gee_tree_set_iterator_real_get_valid (GeeIterator* base) {
+	gboolean result;
+	GeeTreeSetIterator* self;
+	gint _tmp0_;
+	GeeTreeSet* _tmp1_;
+	gint _tmp2_;
+	GeeTreeSetNode* _tmp3_;
+	self = (GeeTreeSetIterator*) base;
+	_tmp0_ = self->priv->stamp;
+	_tmp1_ = self->priv->_set;
+	_tmp2_ = _tmp1_->priv->stamp;
+	_vala_assert (_tmp0_ == _tmp2_, "stamp == _set.stamp");
+	_tmp3_ = self->priv->current;
+	result = _tmp3_ != NULL;
+	return result;
+}
+
+
+static gboolean gee_tree_set_iterator_real_get_read_only (GeeIterator* base) {
+	gboolean result;
+	GeeTreeSetIterator* self;
+	self = (GeeTreeSetIterator*) base;
+	result = FALSE;
+	return result;
+}
+
+
 static void gee_tree_set_iterator_class_init (GeeTreeSetIteratorClass * klass) {
 	gee_tree_set_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeTreeSetIteratorPrivate));
@@ -2898,6 +3268,32 @@ static void gee_tree_set_iterator_class_init (GeeTreeSetIteratorClass * klass) {
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_ITERATOR_G_TYPE, g_param_spec_gtype ("g-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_ITERATOR_G_DUP_FUNC, g_param_spec_pointer ("g-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_ITERATOR_G_DESTROY_FUNC, g_param_spec_pointer ("g-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_ITERATOR_VALID, g_param_spec_boolean ("valid", "valid", "valid", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_ITERATOR_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static GType gee_tree_set_iterator_gee_traversable_get_g_type (GeeTreeSetIterator* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_set_iterator_gee_traversable_get_g_dup_func (GeeTreeSetIterator* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_set_iterator_gee_traversable_get_g_destroy_func (GeeTreeSetIterator* self) {
+	return self->priv->g_destroy_func;
+}
+
+
+static void gee_tree_set_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_tree_set_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_tree_set_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_tree_set_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_tree_set_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_tree_set_iterator_gee_traversable_get_g_destroy_func;
 }
 
 
@@ -2905,17 +3301,37 @@ static void gee_tree_set_iterator_gee_iterator_interface_init (GeeIteratorIface 
 	gee_tree_set_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->next = (gboolean (*)(GeeIterator*)) gee_tree_set_iterator_real_next;
 	iface->has_next = (gboolean (*)(GeeIterator*)) gee_tree_set_iterator_real_has_next;
-	iface->first = (gboolean (*)(GeeIterator*)) gee_tree_set_iterator_real_first;
 	iface->get = (gpointer (*)(GeeIterator*)) gee_tree_set_iterator_real_get;
 	iface->remove = (void (*)(GeeIterator*)) gee_tree_set_iterator_real_remove;
+	iface->get_valid = gee_tree_set_iterator_real_get_valid;
+	iface->get_read_only = gee_tree_set_iterator_real_get_read_only;
+}
+
+
+static GType gee_tree_set_iterator_gee_bidir_iterator_get_g_type (GeeTreeSetIterator* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_set_iterator_gee_bidir_iterator_get_g_dup_func (GeeTreeSetIterator* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_set_iterator_gee_bidir_iterator_get_g_destroy_func (GeeTreeSetIterator* self) {
+	return self->priv->g_destroy_func;
 }
 
 
 static void gee_tree_set_iterator_gee_bidir_iterator_interface_init (GeeBidirIteratorIface * iface) {
 	gee_tree_set_iterator_gee_bidir_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->first = (gboolean (*)(GeeBidirIterator*)) gee_tree_set_iterator_real_first;
 	iface->previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_set_iterator_real_previous;
 	iface->has_previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_set_iterator_real_has_previous;
 	iface->last = (gboolean (*)(GeeBidirIterator*)) gee_tree_set_iterator_real_last;
+	iface->get_g_type = (GType(*)(GeeBidirIterator*)) gee_tree_set_iterator_gee_bidir_iterator_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeBidirIterator*)) gee_tree_set_iterator_gee_bidir_iterator_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeBidirIterator*)) gee_tree_set_iterator_gee_bidir_iterator_get_g_destroy_func;
 }
 
 
@@ -2940,10 +3356,12 @@ static GType gee_tree_set_iterator_get_type (void) {
 	static volatile gsize gee_tree_set_iterator_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_tree_set_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeSetIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_set_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeSetIterator), 0, (GInstanceInitFunc) gee_tree_set_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_tree_set_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_tree_set_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_bidir_iterator_info = { (GInterfaceInitFunc) gee_tree_set_iterator_gee_bidir_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_tree_set_iterator_type_id;
 		gee_tree_set_iterator_type_id = g_type_register_static (G_TYPE_OBJECT, "GeeTreeSetIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_tree_set_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
 		g_type_add_interface_static (gee_tree_set_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
 		g_type_add_interface_static (gee_tree_set_iterator_type_id, GEE_TYPE_BIDIR_ITERATOR, &gee_bidir_iterator_info);
 		g_once_init_leave (&gee_tree_set_iterator_type_id__volatile, gee_tree_set_iterator_type_id);
@@ -2956,6 +3374,12 @@ static void _vala_gee_tree_set_iterator_get_property (GObject * object, guint pr
 	GeeTreeSetIterator * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_SET_TYPE_ITERATOR, GeeTreeSetIterator);
 	switch (property_id) {
+		case GEE_TREE_SET_ITERATOR_VALID:
+		g_value_set_boolean (value, gee_iterator_get_valid ((GeeIterator*) self));
+		break;
+		case GEE_TREE_SET_ITERATOR_READ_ONLY:
+		g_value_set_boolean (value, gee_iterator_get_read_only ((GeeIterator*) self));
+		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
 		break;
@@ -2988,8 +3412,10 @@ static GeeTreeSetRange* gee_tree_set_range_construct (GType object_type, GType g
 	GeeTreeSet* _tmp0_;
 	GeeTreeSet* _tmp1_;
 	GeeTreeSet* _tmp2_;
-	GCompareFunc _tmp3_;
-	GCompareFunc _tmp4_;
+	GCompareDataFunc _tmp3_;
+	void* _tmp3__target;
+	GCompareDataFunc _tmp4_;
+	void* _tmp4__target;
 	gconstpointer _tmp5_;
 	gconstpointer _tmp6_;
 	gint _tmp7_ = 0;
@@ -3003,11 +3429,12 @@ static GeeTreeSetRange* gee_tree_set_range_construct (GType object_type, GType g
 	_g_object_unref0 (self->priv->set);
 	self->priv->set = _tmp1_;
 	_tmp2_ = set;
-	_tmp3_ = gee_tree_set_get_compare_func (_tmp2_);
+	_tmp3_ = gee_tree_set_get_compare_func (_tmp2_, &_tmp3__target);
 	_tmp4_ = _tmp3_;
+	_tmp4__target = _tmp3__target;
 	_tmp5_ = after;
 	_tmp6_ = before;
-	_tmp7_ = _tmp4_ (_tmp5_, _tmp6_);
+	_tmp7_ = _tmp4_ (_tmp5_, _tmp6_, _tmp4__target);
 	if (_tmp7_ < 0) {
 		gconstpointer _tmp8_;
 		gpointer _tmp9_;
@@ -3373,18 +3800,21 @@ static gint gee_tree_set_range_compare_range (GeeTreeSetRange* self, gconstpoint
 		{
 			gint _tmp1_ = 0;
 			GeeTreeSet* _tmp2_;
-			GCompareFunc _tmp3_;
-			GCompareFunc _tmp4_;
+			GCompareDataFunc _tmp3_;
+			void* _tmp3__target;
+			GCompareDataFunc _tmp4_;
+			void* _tmp4__target;
 			gconstpointer _tmp5_;
 			gconstpointer _tmp6_;
 			gint _tmp7_ = 0;
 			gint _tmp8_;
 			_tmp2_ = self->priv->set;
-			_tmp3_ = gee_tree_set_get_compare_func (_tmp2_);
+			_tmp3_ = gee_tree_set_get_compare_func (_tmp2_, &_tmp3__target);
 			_tmp4_ = _tmp3_;
+			_tmp4__target = _tmp3__target;
 			_tmp5_ = item;
 			_tmp6_ = self->priv->before;
-			_tmp7_ = _tmp4_ (_tmp5_, _tmp6_);
+			_tmp7_ = _tmp4_ (_tmp5_, _tmp6_, _tmp4__target);
 			if (_tmp7_ < 0) {
 				_tmp1_ = 0;
 			} else {
@@ -3398,18 +3828,21 @@ static gint gee_tree_set_range_compare_range (GeeTreeSetRange* self, gconstpoint
 		{
 			gint _tmp9_ = 0;
 			GeeTreeSet* _tmp10_;
-			GCompareFunc _tmp11_;
-			GCompareFunc _tmp12_;
+			GCompareDataFunc _tmp11_;
+			void* _tmp11__target;
+			GCompareDataFunc _tmp12_;
+			void* _tmp12__target;
 			gconstpointer _tmp13_;
 			gconstpointer _tmp14_;
 			gint _tmp15_ = 0;
 			gint _tmp16_;
 			_tmp10_ = self->priv->set;
-			_tmp11_ = gee_tree_set_get_compare_func (_tmp10_);
+			_tmp11_ = gee_tree_set_get_compare_func (_tmp10_, &_tmp11__target);
 			_tmp12_ = _tmp11_;
+			_tmp12__target = _tmp11__target;
 			_tmp13_ = item;
 			_tmp14_ = self->priv->after;
-			_tmp15_ = _tmp12_ (_tmp13_, _tmp14_);
+			_tmp15_ = _tmp12_ (_tmp13_, _tmp14_, _tmp12__target);
 			if (_tmp15_ >= 0) {
 				_tmp9_ = 0;
 			} else {
@@ -3428,33 +3861,39 @@ static gint gee_tree_set_range_compare_range (GeeTreeSetRange* self, gconstpoint
 		{
 			gint _tmp17_ = 0;
 			GeeTreeSet* _tmp18_;
-			GCompareFunc _tmp19_;
-			GCompareFunc _tmp20_;
+			GCompareDataFunc _tmp19_;
+			void* _tmp19__target;
+			GCompareDataFunc _tmp20_;
+			void* _tmp20__target;
 			gconstpointer _tmp21_;
 			gconstpointer _tmp22_;
 			gint _tmp23_ = 0;
 			gint _tmp32_;
 			_tmp18_ = self->priv->set;
-			_tmp19_ = gee_tree_set_get_compare_func (_tmp18_);
+			_tmp19_ = gee_tree_set_get_compare_func (_tmp18_, &_tmp19__target);
 			_tmp20_ = _tmp19_;
+			_tmp20__target = _tmp19__target;
 			_tmp21_ = item;
 			_tmp22_ = self->priv->after;
-			_tmp23_ = _tmp20_ (_tmp21_, _tmp22_);
+			_tmp23_ = _tmp20_ (_tmp21_, _tmp22_, _tmp20__target);
 			if (_tmp23_ >= 0) {
 				gint _tmp24_ = 0;
 				GeeTreeSet* _tmp25_;
-				GCompareFunc _tmp26_;
-				GCompareFunc _tmp27_;
+				GCompareDataFunc _tmp26_;
+				void* _tmp26__target;
+				GCompareDataFunc _tmp27_;
+				void* _tmp27__target;
 				gconstpointer _tmp28_;
 				gconstpointer _tmp29_;
 				gint _tmp30_ = 0;
 				gint _tmp31_;
 				_tmp25_ = self->priv->set;
-				_tmp26_ = gee_tree_set_get_compare_func (_tmp25_);
+				_tmp26_ = gee_tree_set_get_compare_func (_tmp25_, &_tmp26__target);
 				_tmp27_ = _tmp26_;
+				_tmp27__target = _tmp26__target;
 				_tmp28_ = item;
 				_tmp29_ = self->priv->before;
-				_tmp30_ = _tmp27_ (_tmp28_, _tmp29_);
+				_tmp30_ = _tmp27_ (_tmp28_, _tmp29_, _tmp27__target);
 				if (_tmp30_ < 0) {
 					_tmp24_ = 0;
 				} else {
@@ -3796,7 +4235,7 @@ static GeeTreeSetSubSet* gee_tree_set_sub_set_construct (GType object_type, GTyp
 	gconstpointer _tmp4_;
 	GeeTreeSetRange* _tmp5_;
 	g_return_val_if_fail (set != NULL, NULL);
-	self = (GeeTreeSetSubSet*) gee_abstract_set_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
+	self = (GeeTreeSetSubSet*) gee_abstract_bidir_sorted_set_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
 	self->priv->g_type = g_type;
 	self->priv->g_dup_func = g_dup_func;
 	self->priv->g_destroy_func = g_destroy_func;
@@ -3827,7 +4266,7 @@ static GeeTreeSetSubSet* gee_tree_set_sub_set_construct_head (GType object_type,
 	gconstpointer _tmp3_;
 	GeeTreeSetRange* _tmp4_;
 	g_return_val_if_fail (set != NULL, NULL);
-	self = (GeeTreeSetSubSet*) gee_abstract_set_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
+	self = (GeeTreeSetSubSet*) gee_abstract_bidir_sorted_set_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
 	self->priv->g_type = g_type;
 	self->priv->g_dup_func = g_dup_func;
 	self->priv->g_destroy_func = g_destroy_func;
@@ -3857,7 +4296,7 @@ static GeeTreeSetSubSet* gee_tree_set_sub_set_construct_tail (GType object_type,
 	gconstpointer _tmp3_;
 	GeeTreeSetRange* _tmp4_;
 	g_return_val_if_fail (set != NULL, NULL);
-	self = (GeeTreeSetSubSet*) gee_abstract_set_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
+	self = (GeeTreeSetSubSet*) gee_abstract_bidir_sorted_set_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
 	self->priv->g_type = g_type;
 	self->priv->g_dup_func = g_dup_func;
 	self->priv->g_destroy_func = g_destroy_func;
@@ -3887,7 +4326,7 @@ static GeeTreeSetSubSet* gee_tree_set_sub_set_construct_from_range (GType object
 	GeeTreeSetRange* _tmp3_;
 	g_return_val_if_fail (set != NULL, NULL);
 	g_return_val_if_fail (range != NULL, NULL);
-	self = (GeeTreeSetSubSet*) gee_abstract_set_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
+	self = (GeeTreeSetSubSet*) gee_abstract_bidir_sorted_set_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func);
 	self->priv->g_type = g_type;
 	self->priv->g_dup_func = g_dup_func;
 	self->priv->g_destroy_func = g_destroy_func;
@@ -4033,7 +4472,7 @@ static GeeIterator* gee_tree_set_sub_set_real_iterator (GeeAbstractCollection* b
 }
 
 
-static GeeBidirIterator* gee_tree_set_sub_set_real_bidir_iterator (GeeSortedSet* base) {
+static GeeBidirIterator* gee_tree_set_sub_set_real_bidir_iterator (GeeAbstractBidirSortedSet* base) {
 	GeeTreeSetSubSet * self;
 	GeeBidirIterator* result = NULL;
 	GeeTreeSet* _tmp0_;
@@ -4048,7 +4487,7 @@ static GeeBidirIterator* gee_tree_set_sub_set_real_bidir_iterator (GeeSortedSet*
 }
 
 
-static gpointer gee_tree_set_sub_set_real_first (GeeSortedSet* base) {
+static gpointer gee_tree_set_sub_set_real_first (GeeAbstractSortedSet* base) {
 	GeeTreeSetSubSet * self;
 	gpointer result = NULL;
 	GeeTreeSetRange* _tmp0_;
@@ -4068,7 +4507,7 @@ static gpointer gee_tree_set_sub_set_real_first (GeeSortedSet* base) {
 }
 
 
-static gpointer gee_tree_set_sub_set_real_last (GeeSortedSet* base) {
+static gpointer gee_tree_set_sub_set_real_last (GeeAbstractSortedSet* base) {
 	GeeTreeSetSubSet * self;
 	gpointer result = NULL;
 	GeeTreeSetRange* _tmp0_;
@@ -4088,7 +4527,7 @@ static gpointer gee_tree_set_sub_set_real_last (GeeSortedSet* base) {
 }
 
 
-static GeeSortedSet* gee_tree_set_sub_set_real_head_set (GeeSortedSet* base, gconstpointer before) {
+static GeeSortedSet* gee_tree_set_sub_set_real_head_set (GeeAbstractSortedSet* base, gconstpointer before) {
 	GeeTreeSetSubSet * self;
 	GeeSortedSet* result = NULL;
 	GeeTreeSet* _tmp0_;
@@ -4112,7 +4551,7 @@ static GeeSortedSet* gee_tree_set_sub_set_real_head_set (GeeSortedSet* base, gco
 }
 
 
-static GeeSortedSet* gee_tree_set_sub_set_real_tail_set (GeeSortedSet* base, gconstpointer after) {
+static GeeSortedSet* gee_tree_set_sub_set_real_tail_set (GeeAbstractSortedSet* base, gconstpointer after) {
 	GeeTreeSetSubSet * self;
 	GeeSortedSet* result = NULL;
 	GeeTreeSet* _tmp0_;
@@ -4136,7 +4575,7 @@ static GeeSortedSet* gee_tree_set_sub_set_real_tail_set (GeeSortedSet* base, gco
 }
 
 
-static GeeSortedSet* gee_tree_set_sub_set_real_sub_set (GeeSortedSet* base, gconstpointer after, gconstpointer before) {
+static GeeSortedSet* gee_tree_set_sub_set_real_sub_set (GeeAbstractSortedSet* base, gconstpointer after, gconstpointer before) {
 	GeeTreeSetSubSet * self;
 	GeeSortedSet* result = NULL;
 	GeeTreeSet* _tmp0_;
@@ -4162,9 +4601,9 @@ static GeeSortedSet* gee_tree_set_sub_set_real_sub_set (GeeSortedSet* base, gcon
 }
 
 
-static GeeBidirIterator* gee_tree_set_sub_set_real_iterator_at (GeeSortedSet* base, gconstpointer item) {
+static GeeIterator* gee_tree_set_sub_set_real_iterator_at (GeeAbstractSortedSet* base, gconstpointer item) {
 	GeeTreeSetSubSet * self;
-	GeeBidirIterator* result = NULL;
+	GeeIterator* result = NULL;
 	GeeTreeSetRange* _tmp0_;
 	gconstpointer _tmp1_;
 	gboolean _tmp2_ = FALSE;
@@ -4198,12 +4637,12 @@ static GeeBidirIterator* gee_tree_set_sub_set_real_iterator_at (GeeSortedSet* ba
 	_tmp8_ = self->priv->range;
 	_tmp9_ = n;
 	_tmp10_ = gee_tree_set_sub_iterator_new_pointing (self->priv->g_type, (GBoxedCopyFunc) self->priv->g_dup_func, self->priv->g_destroy_func, _tmp7_, _tmp8_, _tmp9_);
-	result = (GeeBidirIterator*) _tmp10_;
+	result = (GeeIterator*) _tmp10_;
 	return result;
 }
 
 
-static gpointer gee_tree_set_sub_set_real_lower (GeeSortedSet* base, gconstpointer item) {
+static gpointer gee_tree_set_sub_set_real_lower (GeeAbstractSortedSet* base, gconstpointer item) {
 	GeeTreeSetSubSet * self;
 	gpointer result = NULL;
 	GeeTreeSetRange* _tmp0_;
@@ -4229,13 +4668,13 @@ static gpointer gee_tree_set_sub_set_real_lower (GeeSortedSet* base, gconstpoint
 	_tmp3_ = res;
 	if (_tmp3_ > 0) {
 		gpointer _tmp4_ = NULL;
-		_tmp4_ = gee_sorted_set_last ((GeeSortedSet*) self);
+		_tmp4_ = gee_abstract_sorted_set_last ((GeeAbstractSortedSet*) self);
 		result = _tmp4_;
 		return result;
 	}
 	_tmp5_ = self->priv->set;
 	_tmp6_ = item;
-	_tmp7_ = gee_sorted_set_lower ((GeeSortedSet*) _tmp5_, _tmp6_);
+	_tmp7_ = gee_abstract_sorted_set_lower ((GeeAbstractSortedSet*) _tmp5_, _tmp6_);
 	l = _tmp7_;
 	_tmp10_ = l;
 	if (_tmp10_ != NULL) {
@@ -4265,7 +4704,7 @@ static gpointer gee_tree_set_sub_set_real_lower (GeeSortedSet* base, gconstpoint
 }
 
 
-static gpointer gee_tree_set_sub_set_real_higher (GeeSortedSet* base, gconstpointer item) {
+static gpointer gee_tree_set_sub_set_real_higher (GeeAbstractSortedSet* base, gconstpointer item) {
 	GeeTreeSetSubSet * self;
 	gpointer result = NULL;
 	GeeTreeSetRange* _tmp0_;
@@ -4291,13 +4730,13 @@ static gpointer gee_tree_set_sub_set_real_higher (GeeSortedSet* base, gconstpoin
 	_tmp3_ = res;
 	if (_tmp3_ < 0) {
 		gpointer _tmp4_ = NULL;
-		_tmp4_ = gee_sorted_set_first ((GeeSortedSet*) self);
+		_tmp4_ = gee_abstract_sorted_set_first ((GeeAbstractSortedSet*) self);
 		result = _tmp4_;
 		return result;
 	}
 	_tmp5_ = self->priv->set;
 	_tmp6_ = item;
-	_tmp7_ = gee_sorted_set_higher ((GeeSortedSet*) _tmp5_, _tmp6_);
+	_tmp7_ = gee_abstract_sorted_set_higher ((GeeAbstractSortedSet*) _tmp5_, _tmp6_);
 	h = _tmp7_;
 	_tmp10_ = h;
 	if (_tmp10_ != NULL) {
@@ -4327,7 +4766,7 @@ static gpointer gee_tree_set_sub_set_real_higher (GeeSortedSet* base, gconstpoin
 }
 
 
-static gpointer gee_tree_set_sub_set_real_floor (GeeSortedSet* base, gconstpointer item) {
+static gpointer gee_tree_set_sub_set_real_floor (GeeAbstractSortedSet* base, gconstpointer item) {
 	GeeTreeSetSubSet * self;
 	gpointer result = NULL;
 	GeeTreeSetRange* _tmp0_;
@@ -4353,13 +4792,13 @@ static gpointer gee_tree_set_sub_set_real_floor (GeeSortedSet* base, gconstpoint
 	_tmp3_ = res;
 	if (_tmp3_ > 0) {
 		gpointer _tmp4_ = NULL;
-		_tmp4_ = gee_sorted_set_last ((GeeSortedSet*) self);
+		_tmp4_ = gee_abstract_sorted_set_last ((GeeAbstractSortedSet*) self);
 		result = _tmp4_;
 		return result;
 	}
 	_tmp5_ = self->priv->set;
 	_tmp6_ = item;
-	_tmp7_ = gee_sorted_set_floor ((GeeSortedSet*) _tmp5_, _tmp6_);
+	_tmp7_ = gee_abstract_sorted_set_floor ((GeeAbstractSortedSet*) _tmp5_, _tmp6_);
 	l = _tmp7_;
 	_tmp10_ = l;
 	if (_tmp10_ != NULL) {
@@ -4389,7 +4828,7 @@ static gpointer gee_tree_set_sub_set_real_floor (GeeSortedSet* base, gconstpoint
 }
 
 
-static gpointer gee_tree_set_sub_set_real_ceil (GeeSortedSet* base, gconstpointer item) {
+static gpointer gee_tree_set_sub_set_real_ceil (GeeAbstractSortedSet* base, gconstpointer item) {
 	GeeTreeSetSubSet * self;
 	gpointer result = NULL;
 	GeeTreeSetRange* _tmp0_;
@@ -4415,13 +4854,13 @@ static gpointer gee_tree_set_sub_set_real_ceil (GeeSortedSet* base, gconstpointe
 	_tmp3_ = res;
 	if (_tmp3_ < 0) {
 		gpointer _tmp4_ = NULL;
-		_tmp4_ = gee_sorted_set_first ((GeeSortedSet*) self);
+		_tmp4_ = gee_abstract_sorted_set_first ((GeeAbstractSortedSet*) self);
 		result = _tmp4_;
 		return result;
 	}
 	_tmp5_ = self->priv->set;
 	_tmp6_ = item;
-	_tmp7_ = gee_sorted_set_ceil ((GeeSortedSet*) _tmp5_, _tmp6_);
+	_tmp7_ = gee_abstract_sorted_set_ceil ((GeeAbstractSortedSet*) _tmp5_, _tmp6_);
 	h = _tmp7_;
 	_tmp10_ = h;
 	if (_tmp10_ != NULL) {
@@ -4481,12 +4920,20 @@ static gint gee_tree_set_sub_set_real_get_size (GeeAbstractCollection* base) {
 }
 
 
-static gboolean gee_tree_set_sub_set_real_get_is_empty (GeeAbstractCollection* base) {
+static gboolean gee_tree_set_sub_set_real_get_read_only (GeeAbstractCollection* base) {
 	gboolean result;
 	GeeTreeSetSubSet* self;
+	self = (GeeTreeSetSubSet*) base;
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean gee_tree_set_sub_set_get_is_empty (GeeTreeSetSubSet* self) {
+	gboolean result;
 	GeeTreeSetRange* _tmp0_;
 	gboolean _tmp1_ = FALSE;
-	self = (GeeTreeSetSubSet*) base;
+	g_return_val_if_fail (self != NULL, FALSE);
 	_tmp0_ = self->priv->range;
 	_tmp1_ = gee_tree_set_range_empty_subset (_tmp0_);
 	result = _tmp1_;
@@ -4502,8 +4949,19 @@ static void gee_tree_set_sub_set_class_init (GeeTreeSetSubSetClass * klass) {
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove = gee_tree_set_sub_set_real_remove;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->clear = gee_tree_set_sub_set_real_clear;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->iterator = gee_tree_set_sub_set_real_iterator;
+	GEE_ABSTRACT_BIDIR_SORTED_SET_CLASS (klass)->bidir_iterator = gee_tree_set_sub_set_real_bidir_iterator;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->first = gee_tree_set_sub_set_real_first;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->last = gee_tree_set_sub_set_real_last;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->head_set = gee_tree_set_sub_set_real_head_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->tail_set = gee_tree_set_sub_set_real_tail_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->sub_set = gee_tree_set_sub_set_real_sub_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->iterator_at = gee_tree_set_sub_set_real_iterator_at;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->lower = gee_tree_set_sub_set_real_lower;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->higher = gee_tree_set_sub_set_real_higher;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->floor = gee_tree_set_sub_set_real_floor;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->ceil = gee_tree_set_sub_set_real_ceil;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_tree_set_sub_set_real_get_size;
-	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_is_empty = gee_tree_set_sub_set_real_get_is_empty;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_tree_set_sub_set_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_set_sub_set_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_set_sub_set_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_tree_set_sub_set_finalize;
@@ -4511,23 +4969,8 @@ static void gee_tree_set_sub_set_class_init (GeeTreeSetSubSetClass * klass) {
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_SUB_SET_G_DUP_FUNC, g_param_spec_pointer ("g-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_SUB_SET_G_DESTROY_FUNC, g_param_spec_pointer ("g-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_SUB_SET_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_SUB_SET_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_SUB_SET_IS_EMPTY, g_param_spec_boolean ("is-empty", "is-empty", "is-empty", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
-}
-
-
-static void gee_tree_set_sub_set_gee_sorted_set_interface_init (GeeSortedSetIface * iface) {
-	gee_tree_set_sub_set_gee_sorted_set_parent_iface = g_type_interface_peek_parent (iface);
-	iface->bidir_iterator = (GeeBidirIterator* (*)(GeeSortedSet*)) gee_tree_set_sub_set_real_bidir_iterator;
-	iface->first = (gpointer (*)(GeeSortedSet*)) gee_tree_set_sub_set_real_first;
-	iface->last = (gpointer (*)(GeeSortedSet*)) gee_tree_set_sub_set_real_last;
-	iface->head_set = (GeeSortedSet* (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_sub_set_real_head_set;
-	iface->tail_set = (GeeSortedSet* (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_sub_set_real_tail_set;
-	iface->sub_set = (GeeSortedSet* (*)(GeeSortedSet*, gconstpointer, gconstpointer)) gee_tree_set_sub_set_real_sub_set;
-	iface->iterator_at = (GeeBidirIterator* (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_sub_set_real_iterator_at;
-	iface->lower = (gpointer (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_sub_set_real_lower;
-	iface->higher = (gpointer (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_sub_set_real_higher;
-	iface->floor = (gpointer (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_sub_set_real_floor;
-	iface->ceil = (gpointer (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_sub_set_real_ceil;
 }
 
 
@@ -4549,10 +4992,8 @@ static GType gee_tree_set_sub_set_get_type (void) {
 	static volatile gsize gee_tree_set_sub_set_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_tree_set_sub_set_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeSetSubSetClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_set_sub_set_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeSetSubSet), 0, (GInstanceInitFunc) gee_tree_set_sub_set_instance_init, NULL };
-		static const GInterfaceInfo gee_sorted_set_info = { (GInterfaceInitFunc) gee_tree_set_sub_set_gee_sorted_set_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_tree_set_sub_set_type_id;
-		gee_tree_set_sub_set_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_SET, "GeeTreeSetSubSet", &g_define_type_info, 0);
-		g_type_add_interface_static (gee_tree_set_sub_set_type_id, GEE_TYPE_SORTED_SET, &gee_sorted_set_info);
+		gee_tree_set_sub_set_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, "GeeTreeSetSubSet", &g_define_type_info, 0);
 		g_once_init_leave (&gee_tree_set_sub_set_type_id__volatile, gee_tree_set_sub_set_type_id);
 	}
 	return gee_tree_set_sub_set_type_id__volatile;
@@ -4566,8 +5007,11 @@ static void _vala_gee_tree_set_sub_set_get_property (GObject * object, guint pro
 		case GEE_TREE_SET_SUB_SET_SIZE:
 		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
 		break;
+		case GEE_TREE_SET_SUB_SET_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
+		break;
 		case GEE_TREE_SET_SUB_SET_IS_EMPTY:
-		g_value_set_boolean (value, gee_abstract_collection_get_is_empty ((GeeAbstractCollection*) self));
+		g_value_set_boolean (value, gee_tree_set_sub_set_get_is_empty (self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -4709,7 +5153,7 @@ static gboolean gee_tree_set_sub_iterator_real_next (GeeIterator* base) {
 		((next == NULL) || (self->priv->g_destroy_func == NULL)) ? NULL : (next = (self->priv->g_destroy_func (next), NULL));
 	} else {
 		gboolean _tmp11_ = FALSE;
-		_tmp11_ = gee_iterator_first ((GeeIterator*) self);
+		_tmp11_ = gee_bidir_iterator_first ((GeeBidirIterator*) self);
 		result = _tmp11_;
 		return result;
 	}
@@ -4759,7 +5203,7 @@ static gboolean gee_tree_set_sub_iterator_real_has_next (GeeIterator* base) {
 }
 
 
-static gboolean gee_tree_set_sub_iterator_real_first (GeeIterator* base) {
+static gboolean gee_tree_set_sub_iterator_real_first (GeeBidirIterator* base) {
 	GeeTreeSetSubIterator * self;
 	gboolean result = FALSE;
 	GeeTreeSetRange* _tmp0_;
@@ -4933,6 +5377,76 @@ static void gee_tree_set_sub_iterator_real_remove (GeeIterator* base) {
 }
 
 
+static gboolean gee_tree_set_sub_iterator_real_foreach (GeeTraversable* base, GeeForallFunc f, void* f_target) {
+	GeeTreeSetSubIterator * self;
+	gboolean result = FALSE;
+	gboolean _tmp0_;
+	gboolean _tmp1_;
+	self = (GeeTreeSetSubIterator*) base;
+	_tmp0_ = gee_iterator_get_valid ((GeeIterator*) self);
+	_tmp1_ = _tmp0_;
+	if (_tmp1_) {
+		GeeForallFunc _tmp2_;
+		void* _tmp2__target;
+		gpointer _tmp3_ = NULL;
+		gboolean _tmp4_ = FALSE;
+		_tmp2_ = f;
+		_tmp2__target = f_target;
+		_tmp3_ = gee_iterator_get ((GeeIterator*) self);
+		_tmp4_ = _tmp2_ (_tmp3_, _tmp2__target);
+		if (!_tmp4_) {
+			result = FALSE;
+			return result;
+		}
+	}
+	while (TRUE) {
+		gboolean _tmp5_ = FALSE;
+		GeeForallFunc _tmp6_;
+		void* _tmp6__target;
+		gpointer _tmp7_ = NULL;
+		gboolean _tmp8_ = FALSE;
+		_tmp5_ = gee_iterator_next ((GeeIterator*) self);
+		if (!_tmp5_) {
+			break;
+		}
+		_tmp6_ = f;
+		_tmp6__target = f_target;
+		_tmp7_ = gee_iterator_get ((GeeIterator*) self);
+		_tmp8_ = _tmp6_ (_tmp7_, _tmp6__target);
+		if (!_tmp8_) {
+			result = FALSE;
+			return result;
+		}
+	}
+	result = TRUE;
+	return result;
+}
+
+
+static gboolean gee_tree_set_sub_iterator_real_get_read_only (GeeIterator* base) {
+	gboolean result;
+	GeeTreeSetSubIterator* self;
+	self = (GeeTreeSetSubIterator*) base;
+	result = FALSE;
+	return result;
+}
+
+
+static gboolean gee_tree_set_sub_iterator_real_get_valid (GeeIterator* base) {
+	gboolean result;
+	GeeTreeSetSubIterator* self;
+	GeeTreeSetIterator* _tmp0_;
+	gboolean _tmp1_;
+	gboolean _tmp2_;
+	self = (GeeTreeSetSubIterator*) base;
+	_tmp0_ = self->priv->iterator;
+	_tmp1_ = gee_iterator_get_valid ((GeeIterator*) _tmp0_);
+	_tmp2_ = _tmp1_;
+	result = _tmp2_;
+	return result;
+}
+
+
 static void gee_tree_set_sub_iterator_class_init (GeeTreeSetSubIteratorClass * klass) {
 	gee_tree_set_sub_iterator_parent_class = g_type_class_peek_parent (klass);
 	g_type_class_add_private (klass, sizeof (GeeTreeSetSubIteratorPrivate));
@@ -4942,6 +5456,32 @@ static void gee_tree_set_sub_iterator_class_init (GeeTreeSetSubIteratorClass * k
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_SUB_ITERATOR_G_TYPE, g_param_spec_gtype ("g-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_SUB_ITERATOR_G_DUP_FUNC, g_param_spec_pointer ("g-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_SUB_ITERATOR_G_DESTROY_FUNC, g_param_spec_pointer ("g-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_SUB_ITERATOR_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_SUB_ITERATOR_VALID, g_param_spec_boolean ("valid", "valid", "valid", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
+}
+
+
+static GType gee_tree_set_sub_iterator_gee_traversable_get_g_type (GeeTreeSetSubIterator* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_set_sub_iterator_gee_traversable_get_g_dup_func (GeeTreeSetSubIterator* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_set_sub_iterator_gee_traversable_get_g_destroy_func (GeeTreeSetSubIterator* self) {
+	return self->priv->g_destroy_func;
+}
+
+
+static void gee_tree_set_sub_iterator_gee_traversable_interface_init (GeeTraversableIface * iface) {
+	gee_tree_set_sub_iterator_gee_traversable_parent_iface = g_type_interface_peek_parent (iface);
+	iface->foreach = (gboolean (*)(GeeTraversable*, GeeForallFunc, void*)) gee_tree_set_sub_iterator_real_foreach;
+	iface->get_g_type = (GType(*)(GeeTraversable*)) gee_tree_set_sub_iterator_gee_traversable_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeTraversable*)) gee_tree_set_sub_iterator_gee_traversable_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeTraversable*)) gee_tree_set_sub_iterator_gee_traversable_get_g_destroy_func;
 }
 
 
@@ -4949,17 +5489,37 @@ static void gee_tree_set_sub_iterator_gee_iterator_interface_init (GeeIteratorIf
 	gee_tree_set_sub_iterator_gee_iterator_parent_iface = g_type_interface_peek_parent (iface);
 	iface->next = (gboolean (*)(GeeIterator*)) gee_tree_set_sub_iterator_real_next;
 	iface->has_next = (gboolean (*)(GeeIterator*)) gee_tree_set_sub_iterator_real_has_next;
-	iface->first = (gboolean (*)(GeeIterator*)) gee_tree_set_sub_iterator_real_first;
 	iface->get = (gpointer (*)(GeeIterator*)) gee_tree_set_sub_iterator_real_get;
 	iface->remove = (void (*)(GeeIterator*)) gee_tree_set_sub_iterator_real_remove;
+	iface->get_read_only = gee_tree_set_sub_iterator_real_get_read_only;
+	iface->get_valid = gee_tree_set_sub_iterator_real_get_valid;
+}
+
+
+static GType gee_tree_set_sub_iterator_gee_bidir_iterator_get_g_type (GeeTreeSetSubIterator* self) {
+	return self->priv->g_type;
+}
+
+
+static GBoxedCopyFunc gee_tree_set_sub_iterator_gee_bidir_iterator_get_g_dup_func (GeeTreeSetSubIterator* self) {
+	return self->priv->g_dup_func;
+}
+
+
+static GDestroyNotify gee_tree_set_sub_iterator_gee_bidir_iterator_get_g_destroy_func (GeeTreeSetSubIterator* self) {
+	return self->priv->g_destroy_func;
 }
 
 
 static void gee_tree_set_sub_iterator_gee_bidir_iterator_interface_init (GeeBidirIteratorIface * iface) {
 	gee_tree_set_sub_iterator_gee_bidir_iterator_parent_iface = g_type_interface_peek_parent (iface);
+	iface->first = (gboolean (*)(GeeBidirIterator*)) gee_tree_set_sub_iterator_real_first;
 	iface->previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_set_sub_iterator_real_previous;
 	iface->has_previous = (gboolean (*)(GeeBidirIterator*)) gee_tree_set_sub_iterator_real_has_previous;
 	iface->last = (gboolean (*)(GeeBidirIterator*)) gee_tree_set_sub_iterator_real_last;
+	iface->get_g_type = (GType(*)(GeeBidirIterator*)) gee_tree_set_sub_iterator_gee_bidir_iterator_get_g_type;
+	iface->get_g_dup_func = (GBoxedCopyFunc(*)(GeeBidirIterator*)) gee_tree_set_sub_iterator_gee_bidir_iterator_get_g_dup_func;
+	iface->get_g_destroy_func = (GDestroyNotify(*)(GeeBidirIterator*)) gee_tree_set_sub_iterator_gee_bidir_iterator_get_g_destroy_func;
 }
 
 
@@ -4983,10 +5543,12 @@ static GType gee_tree_set_sub_iterator_get_type (void) {
 	static volatile gsize gee_tree_set_sub_iterator_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_tree_set_sub_iterator_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeSetSubIteratorClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_set_sub_iterator_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeSetSubIterator), 0, (GInstanceInitFunc) gee_tree_set_sub_iterator_instance_init, NULL };
+		static const GInterfaceInfo gee_traversable_info = { (GInterfaceInitFunc) gee_tree_set_sub_iterator_gee_traversable_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_iterator_info = { (GInterfaceInitFunc) gee_tree_set_sub_iterator_gee_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		static const GInterfaceInfo gee_bidir_iterator_info = { (GInterfaceInitFunc) gee_tree_set_sub_iterator_gee_bidir_iterator_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_tree_set_sub_iterator_type_id;
 		gee_tree_set_sub_iterator_type_id = g_type_register_static (G_TYPE_OBJECT, "GeeTreeSetSubIterator", &g_define_type_info, 0);
+		g_type_add_interface_static (gee_tree_set_sub_iterator_type_id, GEE_TYPE_TRAVERSABLE, &gee_traversable_info);
 		g_type_add_interface_static (gee_tree_set_sub_iterator_type_id, GEE_TYPE_ITERATOR, &gee_iterator_info);
 		g_type_add_interface_static (gee_tree_set_sub_iterator_type_id, GEE_TYPE_BIDIR_ITERATOR, &gee_bidir_iterator_info);
 		g_once_init_leave (&gee_tree_set_sub_iterator_type_id__volatile, gee_tree_set_sub_iterator_type_id);
@@ -4999,6 +5561,12 @@ static void _vala_gee_tree_set_sub_iterator_get_property (GObject * object, guin
 	GeeTreeSetSubIterator * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TREE_SET_TYPE_SUB_ITERATOR, GeeTreeSetSubIterator);
 	switch (property_id) {
+		case GEE_TREE_SET_SUB_ITERATOR_READ_ONLY:
+		g_value_set_boolean (value, gee_iterator_get_read_only ((GeeIterator*) self));
+		break;
+		case GEE_TREE_SET_SUB_ITERATOR_VALID:
+		g_value_set_boolean (value, gee_iterator_get_valid ((GeeIterator*) self));
+		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
 		break;
@@ -5034,7 +5602,19 @@ static void gee_tree_set_class_init (GeeTreeSetClass * klass) {
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->remove = gee_tree_set_real_remove;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->clear = gee_tree_set_real_clear;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->iterator = gee_tree_set_real_iterator;
+	GEE_ABSTRACT_BIDIR_SORTED_SET_CLASS (klass)->bidir_iterator = gee_tree_set_real_bidir_iterator;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->first = gee_tree_set_real_first;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->last = gee_tree_set_real_last;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->head_set = gee_tree_set_real_head_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->tail_set = gee_tree_set_real_tail_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->sub_set = gee_tree_set_real_sub_set;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->iterator_at = gee_tree_set_real_iterator_at;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->lower = gee_tree_set_real_lower;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->higher = gee_tree_set_real_higher;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->floor = gee_tree_set_real_floor;
+	GEE_ABSTRACT_SORTED_SET_CLASS (klass)->ceil = gee_tree_set_real_ceil;
 	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_size = gee_tree_set_real_get_size;
+	GEE_ABSTRACT_COLLECTION_CLASS (klass)->get_read_only = gee_tree_set_real_get_read_only;
 	G_OBJECT_CLASS (klass)->get_property = _vala_gee_tree_set_get_property;
 	G_OBJECT_CLASS (klass)->set_property = _vala_gee_tree_set_set_property;
 	G_OBJECT_CLASS (klass)->finalize = gee_tree_set_finalize;
@@ -5046,25 +5626,9 @@ static void gee_tree_set_class_init (GeeTreeSetClass * klass) {
 	 */
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_SIZE, g_param_spec_int ("size", "size", "size", G_MININT, G_MAXINT, 0, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 	/**
-	 * The elements' comparator function.
+	 * {@inheritDoc}
 	 */
-	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_COMPARE_FUNC, g_param_spec_pointer ("compare-func", "compare-func", "compare-func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
-}
-
-
-static void gee_tree_set_gee_sorted_set_interface_init (GeeSortedSetIface * iface) {
-	gee_tree_set_gee_sorted_set_parent_iface = g_type_interface_peek_parent (iface);
-	iface->bidir_iterator = (GeeBidirIterator* (*)(GeeSortedSet*)) gee_tree_set_real_bidir_iterator;
-	iface->first = (gpointer (*)(GeeSortedSet*)) gee_tree_set_real_first;
-	iface->last = (gpointer (*)(GeeSortedSet*)) gee_tree_set_real_last;
-	iface->head_set = (GeeSortedSet* (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_real_head_set;
-	iface->tail_set = (GeeSortedSet* (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_real_tail_set;
-	iface->sub_set = (GeeSortedSet* (*)(GeeSortedSet*, gconstpointer, gconstpointer)) gee_tree_set_real_sub_set;
-	iface->iterator_at = (GeeBidirIterator* (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_real_iterator_at;
-	iface->lower = (gpointer (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_real_lower;
-	iface->higher = (gpointer (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_real_higher;
-	iface->floor = (gpointer (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_real_floor;
-	iface->ceil = (gpointer (*)(GeeSortedSet*, gconstpointer)) gee_tree_set_real_ceil;
+	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_SET_READ_ONLY, g_param_spec_boolean ("read-only", "read-only", "read-only", FALSE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -5081,6 +5645,11 @@ static void gee_tree_set_instance_init (GeeTreeSet * self) {
 static void gee_tree_set_finalize (GObject* obj) {
 	GeeTreeSet * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (obj, GEE_TYPE_TREE_SET, GeeTreeSet);
+	gee_abstract_collection_clear ((GeeAbstractCollection*) self);
+	(self->priv->_compare_func_target_destroy_notify == NULL) ? NULL : (self->priv->_compare_func_target_destroy_notify (self->priv->_compare_func_target), NULL);
+	self->priv->_compare_func = NULL;
+	self->priv->_compare_func_target = NULL;
+	self->priv->_compare_func_target_destroy_notify = NULL;
 	_gee_tree_set_node_free0 (self->priv->root);
 	G_OBJECT_CLASS (gee_tree_set_parent_class)->finalize (obj);
 }
@@ -5100,10 +5669,8 @@ GType gee_tree_set_get_type (void) {
 	static volatile gsize gee_tree_set_type_id__volatile = 0;
 	if (g_once_init_enter (&gee_tree_set_type_id__volatile)) {
 		static const GTypeInfo g_define_type_info = { sizeof (GeeTreeSetClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gee_tree_set_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GeeTreeSet), 0, (GInstanceInitFunc) gee_tree_set_instance_init, NULL };
-		static const GInterfaceInfo gee_sorted_set_info = { (GInterfaceInitFunc) gee_tree_set_gee_sorted_set_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
 		GType gee_tree_set_type_id;
-		gee_tree_set_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_SET, "GeeTreeSet", &g_define_type_info, 0);
-		g_type_add_interface_static (gee_tree_set_type_id, GEE_TYPE_SORTED_SET, &gee_sorted_set_info);
+		gee_tree_set_type_id = g_type_register_static (GEE_TYPE_ABSTRACT_BIDIR_SORTED_SET, "GeeTreeSet", &g_define_type_info, 0);
 		g_once_init_leave (&gee_tree_set_type_id__volatile, gee_tree_set_type_id);
 	}
 	return gee_tree_set_type_id__volatile;
@@ -5117,8 +5684,8 @@ static void _vala_gee_tree_set_get_property (GObject * object, guint property_id
 		case GEE_TREE_SET_SIZE:
 		g_value_set_int (value, gee_abstract_collection_get_size ((GeeAbstractCollection*) self));
 		break;
-		case GEE_TREE_SET_COMPARE_FUNC:
-		g_value_set_pointer (value, gee_tree_set_get_compare_func (self));
+		case GEE_TREE_SET_READ_ONLY:
+		g_value_set_boolean (value, gee_abstract_collection_get_read_only ((GeeAbstractCollection*) self));
 		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -5131,9 +5698,6 @@ static void _vala_gee_tree_set_set_property (GObject * object, guint property_id
 	GeeTreeSet * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TYPE_TREE_SET, GeeTreeSet);
 	switch (property_id) {
-		case GEE_TREE_SET_COMPARE_FUNC:
-		gee_tree_set_set_compare_func (self, g_value_get_pointer (value));
-		break;
 		case GEE_TREE_SET_G_TYPE:
 		self->priv->g_type = g_value_get_gtype (value);
 		break;

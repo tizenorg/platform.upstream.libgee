@@ -30,6 +30,14 @@
 #include <string.h>
 
 
+#define GEE_TYPE_HASHABLE (gee_hashable_get_type ())
+#define GEE_HASHABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_HASHABLE, GeeHashable))
+#define GEE_IS_HASHABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_HASHABLE))
+#define GEE_HASHABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_HASHABLE, GeeHashableIface))
+
+typedef struct _GeeHashable GeeHashable;
+typedef struct _GeeHashableIface GeeHashableIface;
+
 #define GEE_TYPE_COMPARABLE (gee_comparable_get_type ())
 #define GEE_COMPARABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_COMPARABLE, GeeComparable))
 #define GEE_IS_COMPARABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_COMPARABLE))
@@ -38,19 +46,49 @@
 typedef struct _GeeComparable GeeComparable;
 typedef struct _GeeComparableIface GeeComparableIface;
 
+typedef gboolean (*GeeEqualDataFunc) (gconstpointer a, gconstpointer b, void* user_data);
+struct _GeeHashableIface {
+	GTypeInterface parent_iface;
+	guint (*hash) (GeeHashable* self);
+	gboolean (*equal_to) (GeeHashable* self, gconstpointer object);
+};
+
 struct _GeeComparableIface {
 	GTypeInterface parent_iface;
 	gint (*compare_to) (GeeComparable* self, gconstpointer object);
 };
 
+typedef guint (*GeeHashDataFunc) (gconstpointer v, void* user_data);
 
 
-GEqualFunc gee_functions_get_equal_func_for (GType t);
-GHashFunc gee_functions_get_hash_func_for (GType t);
-GCompareFunc gee_functions_get_compare_func_for (GType t);
+GeeEqualDataFunc gee_functions_get_equal_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+static gboolean ___lambda21_ (gconstpointer a, gconstpointer b);
+static gboolean ____lambda21__gee_equal_data_func (gconstpointer a, gconstpointer b, gpointer self);
+GType gee_hashable_get_type (void) G_GNUC_CONST;
+static gboolean ____lambda22_ (gconstpointer a, gconstpointer b);
+gboolean gee_hashable_equal_to (GeeHashable* self, gconstpointer object);
+static gboolean _____lambda22__gee_equal_data_func (gconstpointer a, gconstpointer b, gpointer self);
 GType gee_comparable_get_type (void) G_GNUC_CONST;
+static gboolean _____lambda23_ (gconstpointer a, gconstpointer b);
 gint gee_comparable_compare_to (GeeComparable* self, gconstpointer object);
-gint gee_direct_compare (void* _val1, void* _val2);
+static gboolean ______lambda23__gee_equal_data_func (gconstpointer a, gconstpointer b, gpointer self);
+static gboolean _____lambda24_ (gconstpointer a, gconstpointer b);
+static gboolean ______lambda24__gee_equal_data_func (gconstpointer a, gconstpointer b, gpointer self);
+GeeHashDataFunc gee_functions_get_hash_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+static guint ___lambda18_ (gconstpointer a);
+static guint ____lambda18__gee_hash_data_func (gconstpointer v, gpointer self);
+static guint ____lambda19_ (gconstpointer a);
+guint gee_hashable_hash (GeeHashable* self);
+static guint _____lambda19__gee_hash_data_func (gconstpointer v, gpointer self);
+static guint ____lambda20_ (gconstpointer a);
+static guint _____lambda20__gee_hash_data_func (gconstpointer v, gpointer self);
+GCompareDataFunc gee_functions_get_compare_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify);
+static gint ___lambda25_ (gconstpointer a, gconstpointer b);
+static gint ____lambda25__gcompare_data_func (gconstpointer a, gconstpointer b, gpointer self);
+static gint ____lambda26_ (gconstpointer a, gconstpointer b);
+static gint _____lambda26__gcompare_data_func (gconstpointer a, gconstpointer b, gpointer self);
+static gint ____lambda27_ (gconstpointer _val1, gconstpointer _val2);
+static gint _____lambda27__gcompare_data_func (gconstpointer a, gconstpointer b, gpointer self);
 
 
 /**
@@ -60,20 +98,228 @@ gint gee_direct_compare (void* _val1, void* _val2);
  *
  * @return the equality testing function corresponding to the given type.
  */
-GEqualFunc gee_functions_get_equal_func_for (GType t) {
-	GEqualFunc result = NULL;
+static gboolean ___lambda21_ (gconstpointer a, gconstpointer b) {
+	gboolean result = FALSE;
+	gconstpointer _tmp0_;
+	gconstpointer _tmp1_;
+	_tmp0_ = a;
+	_tmp1_ = b;
+	if (_tmp0_ == _tmp1_) {
+		result = TRUE;
+		return result;
+	} else {
+		gboolean _tmp2_ = FALSE;
+		gconstpointer _tmp3_;
+		gboolean _tmp5_;
+		_tmp3_ = a;
+		if (_tmp3_ == NULL) {
+			_tmp2_ = TRUE;
+		} else {
+			gconstpointer _tmp4_;
+			_tmp4_ = b;
+			_tmp2_ = _tmp4_ == NULL;
+		}
+		_tmp5_ = _tmp2_;
+		if (_tmp5_) {
+			result = FALSE;
+			return result;
+		} else {
+			GEqualFunc _tmp6_;
+			gconstpointer _tmp7_;
+			gconstpointer _tmp8_;
+			gboolean _tmp9_ = FALSE;
+			_tmp6_ = g_str_equal;
+			_tmp7_ = a;
+			_tmp8_ = b;
+			_tmp9_ = _tmp6_ ((const gchar*) _tmp7_, (const gchar*) _tmp8_);
+			result = _tmp9_;
+			return result;
+		}
+	}
+}
+
+
+static gboolean ____lambda21__gee_equal_data_func (gconstpointer a, gconstpointer b, gpointer self) {
+	gboolean result;
+	result = ___lambda21_ (a, b);
+	return result;
+}
+
+
+static gboolean ____lambda22_ (gconstpointer a, gconstpointer b) {
+	gboolean result = FALSE;
+	gconstpointer _tmp0_;
+	gconstpointer _tmp1_;
+	_tmp0_ = a;
+	_tmp1_ = b;
+	if (_tmp0_ == _tmp1_) {
+		result = TRUE;
+		return result;
+	} else {
+		gboolean _tmp2_ = FALSE;
+		gconstpointer _tmp3_;
+		gboolean _tmp5_;
+		_tmp3_ = a;
+		if (_tmp3_ == NULL) {
+			_tmp2_ = TRUE;
+		} else {
+			gconstpointer _tmp4_;
+			_tmp4_ = b;
+			_tmp2_ = _tmp4_ == NULL;
+		}
+		_tmp5_ = _tmp2_;
+		if (_tmp5_) {
+			result = FALSE;
+			return result;
+		} else {
+			gconstpointer _tmp6_;
+			gconstpointer _tmp7_;
+			gboolean _tmp8_ = FALSE;
+			_tmp6_ = a;
+			_tmp7_ = b;
+			_tmp8_ = gee_hashable_equal_to (G_TYPE_CHECK_INSTANCE_CAST (_tmp6_, GEE_TYPE_HASHABLE, GeeHashable), G_TYPE_CHECK_INSTANCE_CAST (_tmp7_, GEE_TYPE_HASHABLE, GeeHashable));
+			result = _tmp8_;
+			return result;
+		}
+	}
+}
+
+
+static gboolean _____lambda22__gee_equal_data_func (gconstpointer a, gconstpointer b, gpointer self) {
+	gboolean result;
+	result = ____lambda22_ (a, b);
+	return result;
+}
+
+
+static gboolean _____lambda23_ (gconstpointer a, gconstpointer b) {
+	gboolean result = FALSE;
+	gconstpointer _tmp0_;
+	gconstpointer _tmp1_;
+	_tmp0_ = a;
+	_tmp1_ = b;
+	if (_tmp0_ == _tmp1_) {
+		result = TRUE;
+		return result;
+	} else {
+		gboolean _tmp2_ = FALSE;
+		gconstpointer _tmp3_;
+		gboolean _tmp5_;
+		_tmp3_ = a;
+		if (_tmp3_ == NULL) {
+			_tmp2_ = TRUE;
+		} else {
+			gconstpointer _tmp4_;
+			_tmp4_ = b;
+			_tmp2_ = _tmp4_ == NULL;
+		}
+		_tmp5_ = _tmp2_;
+		if (_tmp5_) {
+			result = FALSE;
+			return result;
+		} else {
+			gconstpointer _tmp6_;
+			gconstpointer _tmp7_;
+			gint _tmp8_ = 0;
+			_tmp6_ = a;
+			_tmp7_ = b;
+			_tmp8_ = gee_comparable_compare_to (G_TYPE_CHECK_INSTANCE_CAST (_tmp6_, GEE_TYPE_COMPARABLE, GeeComparable), G_TYPE_CHECK_INSTANCE_CAST (_tmp7_, GEE_TYPE_COMPARABLE, GeeComparable));
+			result = _tmp8_ == 0;
+			return result;
+		}
+	}
+}
+
+
+static gboolean ______lambda23__gee_equal_data_func (gconstpointer a, gconstpointer b, gpointer self) {
+	gboolean result;
+	result = _____lambda23_ (a, b);
+	return result;
+}
+
+
+static gboolean _____lambda24_ (gconstpointer a, gconstpointer b) {
+	gboolean result = FALSE;
+	GEqualFunc _tmp0_;
+	gconstpointer _tmp1_;
+	gconstpointer _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	_tmp0_ = g_direct_equal;
+	_tmp1_ = a;
+	_tmp2_ = b;
+	_tmp3_ = _tmp0_ (_tmp1_, _tmp2_);
+	result = _tmp3_;
+	return result;
+}
+
+
+static gboolean ______lambda24__gee_equal_data_func (gconstpointer a, gconstpointer b, gpointer self) {
+	gboolean result;
+	result = _____lambda24_ (a, b);
+	return result;
+}
+
+
+GeeEqualDataFunc gee_functions_get_equal_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify) {
+	GeeEqualDataFunc result = NULL;
 	GType _tmp0_;
 	_tmp0_ = t;
 	if (_tmp0_ == G_TYPE_STRING) {
-		GEqualFunc _tmp1_;
-		_tmp1_ = g_str_equal;
+		GeeEqualDataFunc _tmp1_;
+		void* _tmp1__target;
+		GDestroyNotify _tmp1__target_destroy_notify;
+		_tmp1_ = ____lambda21__gee_equal_data_func;
+		_tmp1__target = NULL;
+		_tmp1__target_destroy_notify = NULL;
+		*result_target = _tmp1__target;
+		*result_target_destroy_notify = _tmp1__target_destroy_notify;
 		result = _tmp1_;
 		return result;
 	} else {
-		GEqualFunc _tmp2_;
-		_tmp2_ = g_direct_equal;
-		result = _tmp2_;
-		return result;
+		GType _tmp2_;
+		gboolean _tmp3_ = FALSE;
+		_tmp2_ = t;
+		_tmp3_ = g_type_is_a (_tmp2_, GEE_TYPE_HASHABLE);
+		if (_tmp3_) {
+			GeeEqualDataFunc _tmp4_;
+			void* _tmp4__target;
+			GDestroyNotify _tmp4__target_destroy_notify;
+			_tmp4_ = _____lambda22__gee_equal_data_func;
+			_tmp4__target = NULL;
+			_tmp4__target_destroy_notify = NULL;
+			*result_target = _tmp4__target;
+			*result_target_destroy_notify = _tmp4__target_destroy_notify;
+			result = _tmp4_;
+			return result;
+		} else {
+			GType _tmp5_;
+			gboolean _tmp6_ = FALSE;
+			_tmp5_ = t;
+			_tmp6_ = g_type_is_a (_tmp5_, GEE_TYPE_COMPARABLE);
+			if (_tmp6_) {
+				GeeEqualDataFunc _tmp7_;
+				void* _tmp7__target;
+				GDestroyNotify _tmp7__target_destroy_notify;
+				_tmp7_ = ______lambda23__gee_equal_data_func;
+				_tmp7__target = NULL;
+				_tmp7__target_destroy_notify = NULL;
+				*result_target = _tmp7__target;
+				*result_target_destroy_notify = _tmp7__target_destroy_notify;
+				result = _tmp7_;
+				return result;
+			} else {
+				GeeEqualDataFunc _tmp8_;
+				void* _tmp8__target;
+				GDestroyNotify _tmp8__target_destroy_notify;
+				_tmp8_ = ______lambda24__gee_equal_data_func;
+				_tmp8__target = NULL;
+				_tmp8__target_destroy_notify = NULL;
+				*result_target = _tmp8__target;
+				*result_target_destroy_notify = _tmp8__target_destroy_notify;
+				result = _tmp8_;
+				return result;
+			}
+		}
 	}
 }
 
@@ -85,20 +331,121 @@ GEqualFunc gee_functions_get_equal_func_for (GType t) {
  *
  * @return the hash function corresponding to the given type.
  */
-GHashFunc gee_functions_get_hash_func_for (GType t) {
-	GHashFunc result = NULL;
+static guint ___lambda18_ (gconstpointer a) {
+	guint result = 0U;
+	gconstpointer _tmp0_;
+	_tmp0_ = a;
+	if (_tmp0_ == NULL) {
+		result = (guint) 0xdeadbeefLL;
+		return result;
+	} else {
+		GHashFunc _tmp1_;
+		gconstpointer _tmp2_;
+		guint _tmp3_ = 0U;
+		_tmp1_ = g_str_hash;
+		_tmp2_ = a;
+		_tmp3_ = _tmp1_ ((const gchar*) _tmp2_);
+		result = _tmp3_;
+		return result;
+	}
+}
+
+
+static guint ____lambda18__gee_hash_data_func (gconstpointer v, gpointer self) {
+	guint result;
+	result = ___lambda18_ (v);
+	return result;
+}
+
+
+static guint ____lambda19_ (gconstpointer a) {
+	guint result = 0U;
+	gconstpointer _tmp0_;
+	_tmp0_ = a;
+	if (_tmp0_ == NULL) {
+		result = (guint) 0xdeadbeefLL;
+		return result;
+	} else {
+		gconstpointer _tmp1_;
+		guint _tmp2_ = 0U;
+		_tmp1_ = a;
+		_tmp2_ = gee_hashable_hash (G_TYPE_CHECK_INSTANCE_CAST (_tmp1_, GEE_TYPE_HASHABLE, GeeHashable));
+		result = _tmp2_;
+		return result;
+	}
+}
+
+
+static guint _____lambda19__gee_hash_data_func (gconstpointer v, gpointer self) {
+	guint result;
+	result = ____lambda19_ (v);
+	return result;
+}
+
+
+static guint ____lambda20_ (gconstpointer a) {
+	guint result = 0U;
+	GHashFunc _tmp0_;
+	gconstpointer _tmp1_;
+	guint _tmp2_ = 0U;
+	_tmp0_ = g_direct_hash;
+	_tmp1_ = a;
+	_tmp2_ = _tmp0_ (_tmp1_);
+	result = _tmp2_;
+	return result;
+}
+
+
+static guint _____lambda20__gee_hash_data_func (gconstpointer v, gpointer self) {
+	guint result;
+	result = ____lambda20_ (v);
+	return result;
+}
+
+
+GeeHashDataFunc gee_functions_get_hash_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify) {
+	GeeHashDataFunc result = NULL;
 	GType _tmp0_;
 	_tmp0_ = t;
 	if (_tmp0_ == G_TYPE_STRING) {
-		GHashFunc _tmp1_;
-		_tmp1_ = g_str_hash;
+		GeeHashDataFunc _tmp1_;
+		void* _tmp1__target;
+		GDestroyNotify _tmp1__target_destroy_notify;
+		_tmp1_ = ____lambda18__gee_hash_data_func;
+		_tmp1__target = NULL;
+		_tmp1__target_destroy_notify = NULL;
+		*result_target = _tmp1__target;
+		*result_target_destroy_notify = _tmp1__target_destroy_notify;
 		result = _tmp1_;
 		return result;
 	} else {
-		GHashFunc _tmp2_;
-		_tmp2_ = g_direct_hash;
-		result = _tmp2_;
-		return result;
+		GType _tmp2_;
+		gboolean _tmp3_ = FALSE;
+		_tmp2_ = t;
+		_tmp3_ = g_type_is_a (_tmp2_, GEE_TYPE_HASHABLE);
+		if (_tmp3_) {
+			GeeHashDataFunc _tmp4_;
+			void* _tmp4__target;
+			GDestroyNotify _tmp4__target_destroy_notify;
+			_tmp4_ = _____lambda19__gee_hash_data_func;
+			_tmp4__target = NULL;
+			_tmp4__target_destroy_notify = NULL;
+			*result_target = _tmp4__target;
+			*result_target_destroy_notify = _tmp4__target_destroy_notify;
+			result = _tmp4_;
+			return result;
+		} else {
+			GeeHashDataFunc _tmp5_;
+			void* _tmp5__target;
+			GDestroyNotify _tmp5__target_destroy_notify;
+			_tmp5_ = _____lambda20__gee_hash_data_func;
+			_tmp5__target = NULL;
+			_tmp5__target_destroy_notify = NULL;
+			*result_target = _tmp5__target;
+			*result_target_destroy_notify = _tmp5__target_destroy_notify;
+			result = _tmp5_;
+			return result;
+		}
 	}
 }
 
@@ -110,47 +457,99 @@ GHashFunc gee_functions_get_hash_func_for (GType t) {
  *
  * @return the comparator function corresponding to the given type.
  */
-GCompareFunc gee_functions_get_compare_func_for (GType t) {
-	GCompareFunc result = NULL;
-	GType _tmp0_;
-	_tmp0_ = t;
-	if (_tmp0_ == G_TYPE_STRING) {
-		GCompareFunc _tmp1_;
-		_tmp1_ = g_strcmp0;
-		result = (GCompareFunc) _tmp1_;
+static gint ___lambda25_ (gconstpointer a, gconstpointer b) {
+	gint result = 0;
+	gconstpointer _tmp0_;
+	gconstpointer _tmp1_;
+	_tmp0_ = a;
+	_tmp1_ = b;
+	if (_tmp0_ == _tmp1_) {
+		result = 0;
 		return result;
 	} else {
-		GType _tmp2_;
-		gboolean _tmp3_ = FALSE;
-		_tmp2_ = t;
-		_tmp3_ = g_type_is_a (_tmp2_, GEE_TYPE_COMPARABLE);
-		if (_tmp3_) {
-			result = (GCompareFunc) gee_comparable_compare_to;
+		gconstpointer _tmp2_;
+		_tmp2_ = a;
+		if (_tmp2_ == NULL) {
+			result = -1;
 			return result;
 		} else {
-			result = (GCompareFunc) gee_direct_compare;
-			return result;
+			gconstpointer _tmp3_;
+			_tmp3_ = b;
+			if (_tmp3_ == NULL) {
+				result = 1;
+				return result;
+			} else {
+				GCompareFunc _tmp4_;
+				gconstpointer _tmp5_;
+				gconstpointer _tmp6_;
+				gint _tmp7_ = 0;
+				_tmp4_ = g_strcmp0;
+				_tmp5_ = a;
+				_tmp6_ = b;
+				_tmp7_ = _tmp4_ ((const gchar*) _tmp5_, (const gchar*) _tmp6_);
+				result = _tmp7_;
+				return result;
+			}
 		}
 	}
 }
 
 
-/**
- * Compares two arbitrary elements together.
- *
- * The comparison is done on pointers and not on values behind.
- *
- * @param _val1 the first value to compare.
- * @param _val2 the second value to compare.
- *
- * @return a negative value if _val1 is lesser than _val2, a positive value
- *         if _val1 is greater then _val2 and zero if both are equal.
- */
-gint gee_direct_compare (void* _val1, void* _val2) {
+static gint ____lambda25__gcompare_data_func (gconstpointer a, gconstpointer b, gpointer self) {
+	gint result;
+	result = ___lambda25_ (a, b);
+	return result;
+}
+
+
+static gint ____lambda26_ (gconstpointer a, gconstpointer b) {
 	gint result = 0;
-	void* _tmp0_;
+	gconstpointer _tmp0_;
+	gconstpointer _tmp1_;
+	_tmp0_ = a;
+	_tmp1_ = b;
+	if (_tmp0_ == _tmp1_) {
+		result = 0;
+		return result;
+	} else {
+		gconstpointer _tmp2_;
+		_tmp2_ = a;
+		if (_tmp2_ == NULL) {
+			result = -1;
+			return result;
+		} else {
+			gconstpointer _tmp3_;
+			_tmp3_ = b;
+			if (_tmp3_ == NULL) {
+				result = 1;
+				return result;
+			} else {
+				gconstpointer _tmp4_;
+				gconstpointer _tmp5_;
+				gint _tmp6_ = 0;
+				_tmp4_ = a;
+				_tmp5_ = b;
+				_tmp6_ = gee_comparable_compare_to (G_TYPE_CHECK_INSTANCE_CAST (_tmp4_, GEE_TYPE_COMPARABLE, GeeComparable), G_TYPE_CHECK_INSTANCE_CAST (_tmp5_, GEE_TYPE_COMPARABLE, GeeComparable));
+				result = _tmp6_;
+				return result;
+			}
+		}
+	}
+}
+
+
+static gint _____lambda26__gcompare_data_func (gconstpointer a, gconstpointer b, gpointer self) {
+	gint result;
+	result = ____lambda26_ (a, b);
+	return result;
+}
+
+
+static gint ____lambda27_ (gconstpointer _val1, gconstpointer _val2) {
+	gint result = 0;
+	gconstpointer _tmp0_;
 	glong val1;
-	void* _tmp1_;
+	gconstpointer _tmp1_;
 	glong val2;
 	glong _tmp2_;
 	glong _tmp3_;
@@ -173,6 +572,60 @@ gint gee_direct_compare (void* _val1, void* _val2) {
 			return result;
 		} else {
 			result = -1;
+			return result;
+		}
+	}
+}
+
+
+static gint _____lambda27__gcompare_data_func (gconstpointer a, gconstpointer b, gpointer self) {
+	gint result;
+	result = ____lambda27_ (a, b);
+	return result;
+}
+
+
+GCompareDataFunc gee_functions_get_compare_func_for (GType t, void** result_target, GDestroyNotify* result_target_destroy_notify) {
+	GCompareDataFunc result = NULL;
+	GType _tmp0_;
+	_tmp0_ = t;
+	if (_tmp0_ == G_TYPE_STRING) {
+		GCompareDataFunc _tmp1_;
+		void* _tmp1__target;
+		GDestroyNotify _tmp1__target_destroy_notify;
+		_tmp1_ = ____lambda25__gcompare_data_func;
+		_tmp1__target = NULL;
+		_tmp1__target_destroy_notify = NULL;
+		*result_target = _tmp1__target;
+		*result_target_destroy_notify = _tmp1__target_destroy_notify;
+		result = _tmp1_;
+		return result;
+	} else {
+		GType _tmp2_;
+		gboolean _tmp3_ = FALSE;
+		_tmp2_ = t;
+		_tmp3_ = g_type_is_a (_tmp2_, GEE_TYPE_COMPARABLE);
+		if (_tmp3_) {
+			GCompareDataFunc _tmp4_;
+			void* _tmp4__target;
+			GDestroyNotify _tmp4__target_destroy_notify;
+			_tmp4_ = _____lambda26__gcompare_data_func;
+			_tmp4__target = NULL;
+			_tmp4__target_destroy_notify = NULL;
+			*result_target = _tmp4__target;
+			*result_target_destroy_notify = _tmp4__target_destroy_notify;
+			result = _tmp4_;
+			return result;
+		} else {
+			GCompareDataFunc _tmp5_;
+			void* _tmp5__target;
+			GDestroyNotify _tmp5__target_destroy_notify;
+			_tmp5_ = _____lambda27__gcompare_data_func;
+			_tmp5__target = NULL;
+			_tmp5__target_destroy_notify = NULL;
+			*result_target = _tmp5__target;
+			*result_target_destroy_notify = _tmp5__target_destroy_notify;
+			result = _tmp5_;
 			return result;
 		}
 	}

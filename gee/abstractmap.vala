@@ -29,19 +29,17 @@
  * @see HashMap
  * @see TreeMap
  */
-public abstract class Gee.AbstractMap<K,V> : Object, Iterable<Map.Entry<K,V>>, Map<K,V> {
+public abstract class Gee.AbstractMap<K,V> : Object, Traversable<Map.Entry<K,V>>, Iterable<Map.Entry<K,V>>, Map<K,V> {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public abstract int size { get; }
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
-	public virtual bool is_empty {
-		get { return size == 0; }
-	}
+	public abstract bool read_only { get; }
 
 	/**
 	 * {@inheritDoc}
@@ -62,13 +60,6 @@ public abstract class Gee.AbstractMap<K,V> : Object, Iterable<Map.Entry<K,V>>, M
 	 * {@inheritDoc}
 	 */
 	public abstract bool has_key (K key);
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public bool contains (K key) {
-		return has_key (key);
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -98,65 +89,7 @@ public abstract class Gee.AbstractMap<K,V> : Object, Iterable<Map.Entry<K,V>>, M
 	/**
 	 * {@inheritDoc}
 	 */
-	public bool remove (K key, out V? value = null) {
-		V removed_value;
-		bool result = unset (key, out removed_value);
-		if (&value != null) {
-			value = removed_value;
-		}
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public abstract void clear ();
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public virtual void set_all (Map<K,V> map) {
-		foreach (Map.Entry<K,V> entry in map.entries) {
-			set (entry.key, entry.value);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public virtual bool unset_all (Map<K,V> map) {
-		bool changed = false;
-		foreach (K key in map.keys) {
-			changed = changed | unset (key);
-		}
-		return changed;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public bool remove_all (Map<K,V> map) {
-		return unset_all (map);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public virtual bool has_all (Map<K,V> map) {
-		foreach (Map.Entry<K,V> entry in map.entries) {
-			if (!has (entry.key, entry.value)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public bool contains_all (Map<K,V> map) {
-		return has_all (map);
-	}
 
 	private weak Map<K,V> _read_only_view;
 
@@ -178,28 +111,33 @@ public abstract class Gee.AbstractMap<K,V> : Object, Iterable<Map.Entry<K,V>>, M
 	/**
 	 * {@inheritDoc}
 	 */
-	public Type key_type {
-		get { return typeof (K); }
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Type value_type {
-		get { return typeof (V); }
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Type element_type {
-		get { return typeof (Map.Entry<K,V>); }
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public Iterator<Map.Entry<K,V>> iterator () {
 		return entries.iterator ();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public virtual bool foreach (ForallFunc<Map.Entry<K,V>> f) {
+		return iterator ().foreach (f);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public virtual Iterator<A> stream<A> (owned StreamFunc<Map.Entry<K,V>, A> f) {
+		return iterator ().stream<A> ((owned) f);
+	}
+
+	// Future-proofing
+	internal new virtual void reserved0() {}
+	internal new virtual void reserved1() {}
+	internal new virtual void reserved2() {}
+	internal new virtual void reserved3() {}
+	internal new virtual void reserved4() {}
+	internal new virtual void reserved5() {}
+	internal new virtual void reserved6() {}
+	internal new virtual void reserved7() {}
+	internal new virtual void reserved8() {}
+	internal new virtual void reserved9() {}
 }

@@ -64,7 +64,6 @@ typedef struct _HashMapTests HashMapTests;
 typedef struct _HashMapTestsClass HashMapTestsClass;
 typedef struct _HashMapTestsPrivate HashMapTestsPrivate;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
-#define _vala_assert(expr, msg) if G_LIKELY (expr) ; else g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
 
 struct _GeeTestCase {
 	GObject parent_instance;
@@ -96,7 +95,6 @@ struct _HashMapTestsClass {
 	MapTestsClass parent_class;
 };
 
-typedef void (*GeeTestCaseTestMethod) (void* user_data);
 
 static gpointer hash_map_tests_parent_class = NULL;
 
@@ -109,30 +107,13 @@ enum  {
 HashMapTests* hash_map_tests_new (void);
 HashMapTests* hash_map_tests_construct (GType object_type);
 MapTests* map_tests_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
-void hash_map_tests_test_selected_functions (HashMapTests* self);
-static void _hash_map_tests_test_selected_functions_gee_test_case_test_method (gpointer self);
-void hash_map_tests_test_gobject_properties (HashMapTests* self);
-static void _hash_map_tests_test_gobject_properties_gee_test_case_test_method (gpointer self);
 static void hash_map_tests_real_set_up (GeeTestCase* base);
 static void hash_map_tests_real_tear_down (GeeTestCase* base);
-
-
-static void _hash_map_tests_test_selected_functions_gee_test_case_test_method (gpointer self) {
-	hash_map_tests_test_selected_functions (self);
-}
-
-
-static void _hash_map_tests_test_gobject_properties_gee_test_case_test_method (gpointer self) {
-	hash_map_tests_test_gobject_properties (self);
-}
 
 
 HashMapTests* hash_map_tests_construct (GType object_type) {
 	HashMapTests * self = NULL;
 	self = (HashMapTests*) map_tests_construct (object_type, "HashMap");
-	gee_test_case_add_test ((GeeTestCase*) self, "[HashMap] selected functions", _hash_map_tests_test_selected_functions_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[HashMap] GObject properties", _hash_map_tests_test_gobject_properties_gee_test_case_test_method, self);
 	return self;
 }
 
@@ -146,7 +127,7 @@ static void hash_map_tests_real_set_up (GeeTestCase* base) {
 	HashMapTests * self;
 	GeeHashMap* _tmp0_;
 	self = (HashMapTests*) base;
-	_tmp0_ = gee_hash_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
+	_tmp0_ = gee_hash_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 	_g_object_unref0 (((MapTests*) self)->test_map);
 	((MapTests*) self)->test_map = (GeeMap*) _tmp0_;
 }
@@ -157,105 +138,6 @@ static void hash_map_tests_real_tear_down (GeeTestCase* base) {
 	self = (HashMapTests*) base;
 	_g_object_unref0 (((MapTests*) self)->test_map);
 	((MapTests*) self)->test_map = NULL;
-}
-
-
-static gpointer _g_object_ref0 (gpointer self) {
-	return self ? g_object_ref (self) : NULL;
-}
-
-
-void hash_map_tests_test_selected_functions (HashMapTests* self) {
-	GeeMap* _tmp0_;
-	GeeHashMap* _tmp1_;
-	GeeHashMap* test_hash_map;
-	GHashFunc _tmp2_;
-	GHashFunc _tmp3_;
-	GHashFunc _tmp4_;
-	GEqualFunc _tmp5_;
-	GEqualFunc _tmp6_;
-	GEqualFunc _tmp7_;
-	GEqualFunc _tmp8_;
-	GEqualFunc _tmp9_;
-	GEqualFunc _tmp10_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((MapTests*) self)->test_map;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_HASH_MAP) ? ((GeeHashMap*) _tmp0_) : NULL);
-	test_hash_map = _tmp1_;
-	_vala_assert (test_hash_map != NULL, "test_hash_map != null");
-	_tmp2_ = gee_hash_map_get_key_hash_func (test_hash_map);
-	_tmp3_ = _tmp2_;
-	_tmp4_ = g_str_hash;
-	_vala_assert (_tmp3_ == _tmp4_, "test_hash_map.key_hash_func == str_hash");
-	_tmp5_ = gee_hash_map_get_key_equal_func (test_hash_map);
-	_tmp6_ = _tmp5_;
-	_tmp7_ = g_str_equal;
-	_vala_assert (_tmp6_ == _tmp7_, "test_hash_map.key_equal_func == str_equal");
-	_tmp8_ = gee_hash_map_get_value_equal_func (test_hash_map);
-	_tmp9_ = _tmp8_;
-	_tmp10_ = g_str_equal;
-	_vala_assert (_tmp9_ == _tmp10_, "test_hash_map.value_equal_func == str_equal");
-	_g_object_unref0 (test_hash_map);
-}
-
-
-void hash_map_tests_test_gobject_properties (HashMapTests* self) {
-	GeeMap* _tmp0_;
-	GeeHashMap* _tmp1_;
-	GeeHashMap* test_hash_map;
-	GValue value = {0};
-	GValue _tmp2_ = {0};
-	GValue _tmp3_;
-	void* _tmp4_ = NULL;
-	GHashFunc _tmp5_;
-	GHashFunc _tmp6_;
-	GValue _tmp7_ = {0};
-	GValue _tmp8_;
-	void* _tmp9_ = NULL;
-	GEqualFunc _tmp10_;
-	GEqualFunc _tmp11_;
-	GValue _tmp12_ = {0};
-	GValue _tmp13_;
-	void* _tmp14_ = NULL;
-	GEqualFunc _tmp15_;
-	GEqualFunc _tmp16_;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = ((MapTests*) self)->test_map;
-	_tmp1_ = _g_object_ref0 (G_TYPE_CHECK_INSTANCE_TYPE (_tmp0_, GEE_TYPE_HASH_MAP) ? ((GeeHashMap*) _tmp0_) : NULL);
-	test_hash_map = _tmp1_;
-	_vala_assert (test_hash_map != NULL, "test_hash_map != null");
-	g_value_init (&_tmp2_, G_TYPE_POINTER);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	value = _tmp2_;
-	_tmp3_ = value;
-	g_object_get_property ((GObject*) test_hash_map, "key-hash-func", &value);
-	_tmp4_ = g_value_get_pointer (&value);
-	_tmp5_ = gee_hash_map_get_key_hash_func (test_hash_map);
-	_tmp6_ = _tmp5_;
-	_vala_assert (_tmp4_ == ((void*) _tmp6_), "value.get_pointer () == (void*) test_hash_map.key_hash_func");
-	g_value_unset (&value);
-	g_value_init (&_tmp7_, G_TYPE_POINTER);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	value = _tmp7_;
-	_tmp8_ = value;
-	g_object_get_property ((GObject*) test_hash_map, "key-equal-func", &value);
-	_tmp9_ = g_value_get_pointer (&value);
-	_tmp10_ = gee_hash_map_get_key_equal_func (test_hash_map);
-	_tmp11_ = _tmp10_;
-	_vala_assert (_tmp9_ == ((void*) _tmp11_), "value.get_pointer () == (void*) test_hash_map.key_equal_func");
-	g_value_unset (&value);
-	g_value_init (&_tmp12_, G_TYPE_POINTER);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	value = _tmp12_;
-	_tmp13_ = value;
-	g_object_get_property ((GObject*) test_hash_map, "value-equal-func", &value);
-	_tmp14_ = g_value_get_pointer (&value);
-	_tmp15_ = gee_hash_map_get_value_equal_func (test_hash_map);
-	_tmp16_ = _tmp15_;
-	_vala_assert (_tmp14_ == ((void*) _tmp16_), "value.get_pointer () == (void*) test_hash_map.value_equal_func");
-	g_value_unset (&value);
-	G_IS_VALUE (&value) ? (g_value_unset (&value), NULL) : NULL;
-	_g_object_unref0 (test_hash_map);
 }
 
 

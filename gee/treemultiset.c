@@ -27,13 +27,25 @@
 #include <glib-object.h>
 
 
-#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
-#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
-#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
-#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+#define GEE_TYPE_TRAVERSABLE (gee_traversable_get_type ())
+#define GEE_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversable))
+#define GEE_IS_TRAVERSABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_TRAVERSABLE))
+#define GEE_TRAVERSABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_TRAVERSABLE, GeeTraversableIface))
 
-typedef struct _GeeIterable GeeIterable;
-typedef struct _GeeIterableIface GeeIterableIface;
+typedef struct _GeeTraversable GeeTraversable;
+typedef struct _GeeTraversableIface GeeTraversableIface;
+
+#define GEE_TRAVERSABLE_TYPE_STREAM (gee_traversable_stream_get_type ())
+
+#define GEE_TYPE_LAZY (gee_lazy_get_type ())
+#define GEE_LAZY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_LAZY, GeeLazy))
+#define GEE_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_LAZY, GeeLazyClass))
+#define GEE_IS_LAZY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_LAZY))
+#define GEE_IS_LAZY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_LAZY))
+#define GEE_LAZY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_LAZY, GeeLazyClass))
+
+typedef struct _GeeLazy GeeLazy;
+typedef struct _GeeLazyClass GeeLazyClass;
 
 #define GEE_TYPE_ITERATOR (gee_iterator_get_type ())
 #define GEE_ITERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERATOR, GeeIterator))
@@ -42,6 +54,14 @@ typedef struct _GeeIterableIface GeeIterableIface;
 
 typedef struct _GeeIterator GeeIterator;
 typedef struct _GeeIteratorIface GeeIteratorIface;
+
+#define GEE_TYPE_ITERABLE (gee_iterable_get_type ())
+#define GEE_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ITERABLE, GeeIterable))
+#define GEE_IS_ITERABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ITERABLE))
+#define GEE_ITERABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GEE_TYPE_ITERABLE, GeeIterableIface))
+
+typedef struct _GeeIterable GeeIterable;
+typedef struct _GeeIterableIface GeeIterableIface;
 
 #define GEE_TYPE_COLLECTION (gee_collection_get_type ())
 #define GEE_COLLECTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_COLLECTION, GeeCollection))
@@ -136,6 +156,26 @@ typedef struct _GeeTreeMultiSetPrivate GeeTreeMultiSetPrivate;
 typedef struct _GeeAbstractMap GeeAbstractMap;
 typedef struct _GeeAbstractMapClass GeeAbstractMapClass;
 
+#define GEE_TYPE_ABSTRACT_SORTED_MAP (gee_abstract_sorted_map_get_type ())
+#define GEE_ABSTRACT_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_SORTED_MAP, GeeAbstractSortedMap))
+#define GEE_ABSTRACT_SORTED_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_SORTED_MAP, GeeAbstractSortedMapClass))
+#define GEE_IS_ABSTRACT_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_SORTED_MAP))
+#define GEE_IS_ABSTRACT_SORTED_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_SORTED_MAP))
+#define GEE_ABSTRACT_SORTED_MAP_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_SORTED_MAP, GeeAbstractSortedMapClass))
+
+typedef struct _GeeAbstractSortedMap GeeAbstractSortedMap;
+typedef struct _GeeAbstractSortedMapClass GeeAbstractSortedMapClass;
+
+#define GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP (gee_abstract_bidir_sorted_map_get_type ())
+#define GEE_ABSTRACT_BIDIR_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP, GeeAbstractBidirSortedMap))
+#define GEE_ABSTRACT_BIDIR_SORTED_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP, GeeAbstractBidirSortedMapClass))
+#define GEE_IS_ABSTRACT_BIDIR_SORTED_MAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP))
+#define GEE_IS_ABSTRACT_BIDIR_SORTED_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP))
+#define GEE_ABSTRACT_BIDIR_SORTED_MAP_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GEE_TYPE_ABSTRACT_BIDIR_SORTED_MAP, GeeAbstractBidirSortedMapClass))
+
+typedef struct _GeeAbstractBidirSortedMap GeeAbstractBidirSortedMap;
+typedef struct _GeeAbstractBidirSortedMapClass GeeAbstractBidirSortedMapClass;
+
 #define GEE_TYPE_TREE_MAP (gee_tree_map_get_type ())
 #define GEE_TREE_MAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEE_TYPE_TREE_MAP, GeeTreeMap))
 #define GEE_TREE_MAP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GEE_TYPE_TREE_MAP, GeeTreeMapClass))
@@ -147,23 +187,55 @@ typedef struct _GeeTreeMap GeeTreeMap;
 typedef struct _GeeTreeMapClass GeeTreeMapClass;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
+typedef gboolean (*GeeForallFunc) (gpointer g, void* user_data);
+typedef enum  {
+	GEE_TRAVERSABLE_STREAM_YIELD,
+	GEE_TRAVERSABLE_STREAM_CONTINUE,
+	GEE_TRAVERSABLE_STREAM_END
+} GeeTraversableStream;
+
+typedef GeeTraversableStream (*GeeStreamFunc) (GeeTraversableStream state, GeeLazy* g, GeeLazy** lazy, void* user_data);
 struct _GeeIteratorIface {
 	GTypeInterface parent_iface;
 	gboolean (*next) (GeeIterator* self);
 	gboolean (*has_next) (GeeIterator* self);
-	gboolean (*first) (GeeIterator* self);
 	gpointer (*get) (GeeIterator* self);
 	void (*remove) (GeeIterator* self);
+	gboolean (*get_valid) (GeeIterator* self);
+	gboolean (*get_read_only) (GeeIterator* self);
+};
+
+typedef gpointer (*GeeFoldFunc) (gpointer g, gpointer a, void* user_data);
+typedef gpointer (*GeeMapFunc) (gpointer g, void* user_data);
+typedef gboolean (*GeePredicate) (gconstpointer g, void* user_data);
+struct _GeeTraversableIface {
+	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeTraversable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeTraversable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeTraversable* self);
+	gboolean (*foreach) (GeeTraversable* self, GeeForallFunc f, void* f_target);
+	GeeIterator* (*stream) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeStreamFunc f, void* f_target, GDestroyNotify f_target_destroy_notify);
+	gpointer (*fold) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*map) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeMapFunc f, void* f_target);
+	GeeIterator* (*scan) (GeeTraversable* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldFunc f, void* f_target, gpointer seed);
+	GeeIterator* (*filter) (GeeTraversable* self, GeePredicate pred, void* pred_target, GDestroyNotify pred_target_destroy_notify);
+	GeeIterator* (*chop) (GeeTraversable* self, gint offset, gint length);
+	GType (*get_element_type) (GeeTraversable* self);
 };
 
 struct _GeeIterableIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeIterable* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeIterable* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeIterable* self);
 	GeeIterator* (*iterator) (GeeIterable* self);
-	GType (*get_element_type) (GeeIterable* self);
 };
 
 struct _GeeCollectionIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeCollection* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeCollection* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeCollection* self);
 	gboolean (*contains) (GeeCollection* self, gconstpointer item);
 	gboolean (*add) (GeeCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeCollection* self, gconstpointer item);
@@ -175,6 +247,7 @@ struct _GeeCollectionIface {
 	gpointer* (*to_array) (GeeCollection* self, int* result_length1);
 	gint (*get_size) (GeeCollection* self);
 	gboolean (*get_is_empty) (GeeCollection* self);
+	gboolean (*get_read_only) (GeeCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeCollection* self);
 };
 
@@ -189,62 +262,88 @@ struct _GeeAbstractCollectionClass {
 	gboolean (*add) (GeeAbstractCollection* self, gconstpointer item);
 	gboolean (*remove) (GeeAbstractCollection* self, gconstpointer item);
 	void (*clear) (GeeAbstractCollection* self);
-	gpointer* (*to_array) (GeeAbstractCollection* self, int* result_length1);
-	gboolean (*add_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*contains_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*remove_all) (GeeAbstractCollection* self, GeeCollection* collection);
-	gboolean (*retain_all) (GeeAbstractCollection* self, GeeCollection* collection);
 	GeeIterator* (*iterator) (GeeAbstractCollection* self);
+	gboolean (*foreach) (GeeAbstractCollection* self, GeeForallFunc f, void* f_target);
+	void (*reserved0) (GeeAbstractCollection* self);
+	void (*reserved1) (GeeAbstractCollection* self);
+	void (*reserved2) (GeeAbstractCollection* self);
+	void (*reserved3) (GeeAbstractCollection* self);
+	void (*reserved4) (GeeAbstractCollection* self);
+	void (*reserved5) (GeeAbstractCollection* self);
+	void (*reserved6) (GeeAbstractCollection* self);
+	void (*reserved7) (GeeAbstractCollection* self);
+	void (*reserved8) (GeeAbstractCollection* self);
+	void (*reserved9) (GeeAbstractCollection* self);
 	gint (*get_size) (GeeAbstractCollection* self);
-	gboolean (*get_is_empty) (GeeAbstractCollection* self);
+	gboolean (*get_read_only) (GeeAbstractCollection* self);
 	GeeCollection* (*get_read_only_view) (GeeAbstractCollection* self);
 };
 
 struct _GeeMultiSetIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeMultiSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeMultiSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeMultiSet* self);
 	gint (*count) (GeeMultiSet* self, gconstpointer item);
+	GeeMultiSet* (*get_read_only_view) (GeeMultiSet* self);
 };
 
+typedef gpointer (*GeeFoldMapFunc) (gconstpointer k, gconstpointer v, gpointer a, void* user_data);
+typedef gboolean (*GeeForallMapFunc) (gconstpointer k, gconstpointer v, void* user_data);
 struct _GeeMapIteratorIface {
 	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeMapIterator* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeMapIterator* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeMapIterator* self);
+	GType (*get_v_type) (GeeMapIterator* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeMapIterator* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeMapIterator* self);
 	gboolean (*next) (GeeMapIterator* self);
 	gboolean (*has_next) (GeeMapIterator* self);
-	gboolean (*first) (GeeMapIterator* self);
 	gpointer (*get_key) (GeeMapIterator* self);
 	gpointer (*get_value) (GeeMapIterator* self);
 	void (*set_value) (GeeMapIterator* self, gconstpointer value);
 	void (*unset) (GeeMapIterator* self);
+	gpointer (*fold) (GeeMapIterator* self, GType a_type, GBoxedCopyFunc a_dup_func, GDestroyNotify a_destroy_func, GeeFoldMapFunc f, void* f_target, gpointer seed);
+	gboolean (*foreach) (GeeMapIterator* self, GeeForallMapFunc f, void* f_target);
+	gboolean (*get_valid) (GeeMapIterator* self);
+	gboolean (*get_mutable) (GeeMapIterator* self);
+	gboolean (*get_read_only) (GeeMapIterator* self);
 };
 
 struct _GeeSetIface {
 	GTypeInterface parent_iface;
+	GType (*get_g_type) (GeeSet* self);
+	GBoxedCopyFunc (*get_g_dup_func) (GeeSet* self);
+	GDestroyNotify (*get_g_destroy_func) (GeeSet* self);
 	GeeSet* (*get_read_only_view) (GeeSet* self);
 };
 
 struct _GeeMapIface {
 	GTypeInterface parent_iface;
+	GType (*get_k_type) (GeeMap* self);
+	GBoxedCopyFunc (*get_k_dup_func) (GeeMap* self);
+	GDestroyNotify (*get_k_destroy_func) (GeeMap* self);
+	GType (*get_v_type) (GeeMap* self);
+	GBoxedCopyFunc (*get_v_dup_func) (GeeMap* self);
+	GDestroyNotify (*get_v_destroy_func) (GeeMap* self);
 	gboolean (*has_key) (GeeMap* self, gconstpointer key);
-	gboolean (*contains) (GeeMap* self, gconstpointer key);
 	gboolean (*has) (GeeMap* self, gconstpointer key, gconstpointer value);
 	gpointer (*get) (GeeMap* self, gconstpointer key);
 	void (*set) (GeeMap* self, gconstpointer key, gconstpointer value);
 	gboolean (*unset) (GeeMap* self, gconstpointer key, gpointer* value);
-	gboolean (*remove) (GeeMap* self, gconstpointer key, gpointer* value);
 	void (*clear) (GeeMap* self);
 	GeeMapIterator* (*map_iterator) (GeeMap* self);
 	void (*set_all) (GeeMap* self, GeeMap* map);
 	gboolean (*unset_all) (GeeMap* self, GeeMap* map);
-	gboolean (*remove_all) (GeeMap* self, GeeMap* map);
 	gboolean (*has_all) (GeeMap* self, GeeMap* map);
-	gboolean (*contains_all) (GeeMap* self, GeeMap* map);
 	gint (*get_size) (GeeMap* self);
 	gboolean (*get_is_empty) (GeeMap* self);
+	gboolean (*get_read_only) (GeeMap* self);
 	GeeSet* (*get_keys) (GeeMap* self);
 	GeeCollection* (*get_values) (GeeMap* self);
 	GeeSet* (*get_entries) (GeeMap* self);
 	GeeMap* (*get_read_only_view) (GeeMap* self);
-	GType (*get_key_type) (GeeMap* self);
-	GType (*get_value_type) (GeeMap* self);
 };
 
 struct _GeeAbstractMultiSet {
@@ -255,6 +354,16 @@ struct _GeeAbstractMultiSet {
 
 struct _GeeAbstractMultiSetClass {
 	GeeAbstractCollectionClass parent_class;
+	void (*reserved0) (GeeAbstractMultiSet* self);
+	void (*reserved1) (GeeAbstractMultiSet* self);
+	void (*reserved2) (GeeAbstractMultiSet* self);
+	void (*reserved3) (GeeAbstractMultiSet* self);
+	void (*reserved4) (GeeAbstractMultiSet* self);
+	void (*reserved5) (GeeAbstractMultiSet* self);
+	void (*reserved6) (GeeAbstractMultiSet* self);
+	void (*reserved7) (GeeAbstractMultiSet* self);
+	void (*reserved8) (GeeAbstractMultiSet* self);
+	GeeMultiSet* (*get_read_only_view) (GeeAbstractMultiSet* self);
 };
 
 struct _GeeTreeMultiSet {
@@ -272,10 +381,20 @@ struct _GeeTreeMultiSetPrivate {
 	GDestroyNotify g_destroy_func;
 };
 
+typedef gboolean (*GeeEqualDataFunc) (gconstpointer a, gconstpointer b, void* user_data);
 
 static gpointer gee_tree_multi_set_parent_class = NULL;
 
+GType gee_traversable_stream_get_type (void) G_GNUC_CONST;
+gpointer gee_lazy_ref (gpointer instance);
+void gee_lazy_unref (gpointer instance);
+GParamSpec* gee_param_spec_lazy (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void gee_value_set_lazy (GValue* value, gpointer v_object);
+void gee_value_take_lazy (GValue* value, gpointer v_object);
+gpointer gee_value_get_lazy (const GValue* value);
+GType gee_lazy_get_type (void) G_GNUC_CONST;
 GType gee_iterator_get_type (void) G_GNUC_CONST;
+GType gee_traversable_get_type (void) G_GNUC_CONST;
 GType gee_iterable_get_type (void) G_GNUC_CONST;
 GType gee_collection_get_type (void) G_GNUC_CONST;
 GType gee_abstract_collection_get_type (void) G_GNUC_CONST;
@@ -291,18 +410,19 @@ enum  {
 	GEE_TREE_MULTI_SET_DUMMY_PROPERTY,
 	GEE_TREE_MULTI_SET_G_TYPE,
 	GEE_TREE_MULTI_SET_G_DUP_FUNC,
-	GEE_TREE_MULTI_SET_G_DESTROY_FUNC,
-	GEE_TREE_MULTI_SET_COMPARE_FUNC
+	GEE_TREE_MULTI_SET_G_DESTROY_FUNC
 };
-GeeTreeMultiSet* gee_tree_multi_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func);
-GeeTreeMultiSet* gee_tree_multi_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func);
-GeeTreeMap* gee_tree_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareFunc key_compare_func, GEqualFunc value_equal_func);
-GeeTreeMap* gee_tree_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareFunc key_compare_func, GEqualFunc value_equal_func);
+GeeTreeMultiSet* gee_tree_multi_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
+GeeTreeMultiSet* gee_tree_multi_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify);
+GeeTreeMap* gee_tree_map_new (GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareDataFunc key_compare_func, void* key_compare_func_target, GDestroyNotify key_compare_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
+GeeTreeMap* gee_tree_map_construct (GType object_type, GType k_type, GBoxedCopyFunc k_dup_func, GDestroyNotify k_destroy_func, GType v_type, GBoxedCopyFunc v_dup_func, GDestroyNotify v_destroy_func, GCompareDataFunc key_compare_func, void* key_compare_func_target, GDestroyNotify key_compare_func_target_destroy_notify, GeeEqualDataFunc value_equal_func, void* value_equal_func_target, GDestroyNotify value_equal_func_target_destroy_notify);
 GType gee_abstract_map_get_type (void) G_GNUC_CONST;
+GType gee_abstract_sorted_map_get_type (void) G_GNUC_CONST;
+GType gee_abstract_bidir_sorted_map_get_type (void) G_GNUC_CONST;
 GType gee_tree_map_get_type (void) G_GNUC_CONST;
 GeeAbstractMultiSet* gee_abstract_multi_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GeeMap* storage_map);
-GCompareFunc gee_tree_multi_set_get_compare_func (GeeTreeMultiSet* self);
-GCompareFunc gee_tree_map_get_key_compare_func (GeeTreeMap* self);
+GCompareDataFunc gee_tree_multi_set_get_compare_func (GeeTreeMultiSet* self, gpointer* result_target);
+GCompareDataFunc gee_tree_map_get_key_compare_func (GeeTreeMap* self, gpointer* result_target);
 static void _vala_gee_tree_multi_set_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
 static void _vala_gee_tree_multi_set_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 
@@ -315,38 +435,52 @@ static void _vala_gee_tree_multi_set_set_property (GObject * object, guint prope
  *
  * @param compare_func an optional element comparator function
  */
-GeeTreeMultiSet* gee_tree_multi_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func) {
+GeeTreeMultiSet* gee_tree_multi_set_construct (GType object_type, GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify) {
 	GeeTreeMultiSet * self = NULL;
-	GCompareFunc _tmp0_;
+	GCompareDataFunc _tmp0_;
+	void* _tmp0__target;
 	GeeTreeMap* _tmp1_;
 	GeeTreeMap* _tmp2_;
 	_tmp0_ = compare_func;
-	_tmp1_ = gee_tree_map_new (g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func, G_TYPE_INT, NULL, NULL, _tmp0_, NULL);
+	_tmp0__target = compare_func_target;
+	_tmp1_ = gee_tree_map_new (g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func, G_TYPE_INT, NULL, NULL, _tmp0_, _tmp0__target, NULL, NULL, NULL, NULL);
 	_tmp2_ = _tmp1_;
 	self = (GeeTreeMultiSet*) gee_abstract_multi_set_construct (object_type, g_type, (GBoxedCopyFunc) g_dup_func, g_destroy_func, (GeeMap*) _tmp2_);
 	self->priv->g_type = g_type;
 	self->priv->g_dup_func = g_dup_func;
 	self->priv->g_destroy_func = g_destroy_func;
 	_g_object_unref0 (_tmp2_);
+	(compare_func_target_destroy_notify == NULL) ? NULL : (compare_func_target_destroy_notify (compare_func_target), NULL);
+	compare_func = NULL;
+	compare_func_target = NULL;
+	compare_func_target_destroy_notify = NULL;
 	return self;
 }
 
 
-GeeTreeMultiSet* gee_tree_multi_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareFunc compare_func) {
-	return gee_tree_multi_set_construct (GEE_TYPE_TREE_MULTI_SET, g_type, g_dup_func, g_destroy_func, compare_func);
+GeeTreeMultiSet* gee_tree_multi_set_new (GType g_type, GBoxedCopyFunc g_dup_func, GDestroyNotify g_destroy_func, GCompareDataFunc compare_func, void* compare_func_target, GDestroyNotify compare_func_target_destroy_notify) {
+	return gee_tree_multi_set_construct (GEE_TYPE_TREE_MULTI_SET, g_type, g_dup_func, g_destroy_func, compare_func, compare_func_target, compare_func_target_destroy_notify);
 }
 
 
-GCompareFunc gee_tree_multi_set_get_compare_func (GeeTreeMultiSet* self) {
-	GCompareFunc result;
+GCompareDataFunc gee_tree_multi_set_get_compare_func (GeeTreeMultiSet* self, gpointer* result_target) {
+	GCompareDataFunc result;
 	GeeMap* _tmp0_;
-	GCompareFunc _tmp1_;
-	GCompareFunc _tmp2_;
+	GCompareDataFunc _tmp1_;
+	void* _tmp1__target;
+	GCompareDataFunc _tmp2_;
+	void* _tmp2__target;
+	GCompareDataFunc _tmp3_;
+	void* _tmp3__target;
 	g_return_val_if_fail (self != NULL, NULL);
 	_tmp0_ = ((GeeAbstractMultiSet*) self)->_storage_map;
-	_tmp1_ = gee_tree_map_get_key_compare_func (G_TYPE_CHECK_INSTANCE_CAST (_tmp0_, GEE_TYPE_TREE_MAP, GeeTreeMap));
+	_tmp1_ = gee_tree_map_get_key_compare_func (G_TYPE_CHECK_INSTANCE_CAST (_tmp0_, GEE_TYPE_TREE_MAP, GeeTreeMap), &_tmp1__target);
 	_tmp2_ = _tmp1_;
-	result = _tmp2_;
+	_tmp2__target = _tmp1__target;
+	_tmp3_ = _tmp2_;
+	_tmp3__target = _tmp2__target;
+	*result_target = _tmp3__target;
+	result = _tmp3_;
 	return result;
 }
 
@@ -359,7 +493,6 @@ static void gee_tree_multi_set_class_init (GeeTreeMultiSetClass * klass) {
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MULTI_SET_G_TYPE, g_param_spec_gtype ("g-type", "type", "type", G_TYPE_NONE, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MULTI_SET_G_DUP_FUNC, g_param_spec_pointer ("g-dup-func", "dup func", "dup func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MULTI_SET_G_DESTROY_FUNC, g_param_spec_pointer ("g-destroy-func", "destroy func", "destroy func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
-	g_object_class_install_property (G_OBJECT_CLASS (klass), GEE_TREE_MULTI_SET_COMPARE_FUNC, g_param_spec_pointer ("compare-func", "compare-func", "compare-func", G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE));
 }
 
 
@@ -388,9 +521,6 @@ static void _vala_gee_tree_multi_set_get_property (GObject * object, guint prope
 	GeeTreeMultiSet * self;
 	self = G_TYPE_CHECK_INSTANCE_CAST (object, GEE_TYPE_TREE_MULTI_SET, GeeTreeMultiSet);
 	switch (property_id) {
-		case GEE_TREE_MULTI_SET_COMPARE_FUNC:
-		g_value_set_pointer (value, gee_tree_multi_set_get_compare_func (self));
-		break;
 		default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
 		break;

@@ -93,7 +93,7 @@ ReadOnlyCollectionTests* read_only_collection_tests_construct (GType object_type
 ReadOnlyCollectionTests* read_only_collection_tests_new_with_name (const gchar* name);
 ReadOnlyCollectionTests* read_only_collection_tests_construct_with_name (GType object_type, const gchar* name);
 GeeTestCase* gee_test_case_construct (GType object_type, const gchar* name);
-void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target);
+void gee_test_case_add_test (GeeTestCase* self, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify);
 void read_only_collection_tests_test_unique_read_only_view_instance (ReadOnlyCollectionTests* self);
 static void _read_only_collection_tests_test_unique_read_only_view_instance_gee_test_case_test_method (gpointer self);
 void read_only_collection_tests_test_immutable_iterator (ReadOnlyCollectionTests* self);
@@ -147,10 +147,10 @@ ReadOnlyCollectionTests* read_only_collection_tests_construct_with_name (GType o
 	g_return_val_if_fail (name != NULL, NULL);
 	_tmp0_ = name;
 	self = (ReadOnlyCollectionTests*) gee_test_case_construct (object_type, _tmp0_);
-	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyCollection] unique read-only view instance", _read_only_collection_tests_test_unique_read_only_view_instance_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyCollection] immutable iterator", _read_only_collection_tests_test_immutable_iterator_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyCollection] immutable", _read_only_collection_tests_test_immutable_gee_test_case_test_method, self);
-	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyCollection] accurate view", _read_only_collection_tests_test_accurate_view_gee_test_case_test_method, self);
+	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyCollection] unique read-only view instance", _read_only_collection_tests_test_unique_read_only_view_instance_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyCollection] immutable iterator", _read_only_collection_tests_test_immutable_iterator_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyCollection] immutable", _read_only_collection_tests_test_immutable_gee_test_case_test_method, g_object_ref (self), g_object_unref);
+	gee_test_case_add_test ((GeeTestCase*) self, "[ReadOnlyCollection] accurate view", _read_only_collection_tests_test_accurate_view_gee_test_case_test_method, g_object_ref (self), g_object_unref);
 	return self;
 }
 
@@ -166,7 +166,7 @@ static void read_only_collection_tests_real_set_up (GeeTestCase* base) {
 	GeeCollection* _tmp1_;
 	GeeCollection* _tmp2_ = NULL;
 	self = (ReadOnlyCollectionTests*) base;
-	_tmp0_ = gee_hash_multi_set_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL);
+	_tmp0_ = gee_hash_multi_set_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL, NULL);
 	_g_object_unref0 (self->test_collection);
 	self->test_collection = (GeeCollection*) _tmp0_;
 	_tmp1_ = self->test_collection;
@@ -275,22 +275,29 @@ void read_only_collection_tests_test_immutable_iterator (ReadOnlyCollectionTests
 	GeeIterator* iterator;
 	gboolean one_found;
 	gboolean two_found;
-	gboolean _tmp22_;
-	gboolean _tmp23_;
-	GeeIterator* _tmp24_;
-	gboolean _tmp25_ = FALSE;
-	GeeIterator* _tmp26_;
-	gboolean _tmp27_ = FALSE;
-	GeeIterator* _tmp28_;
-	gboolean _tmp29_ = FALSE;
+	gboolean _tmp25_;
+	gboolean _tmp26_;
+	GeeIterator* _tmp27_;
+	gboolean _tmp28_ = FALSE;
+	GeeIterator* _tmp29_;
 	gboolean _tmp30_ = FALSE;
-	GeeCollection* _tmp32_;
-	gint _tmp33_;
-	gint _tmp34_;
-	GeeCollection* _tmp35_;
+	GeeCollection* _tmp31_;
+	GeeIterator* _tmp32_ = NULL;
+	GeeIterator* _tmp33_;
+	gboolean _tmp34_ = FALSE;
+	GeeIterator* _tmp35_;
 	gboolean _tmp36_ = FALSE;
-	GeeCollection* _tmp37_;
-	gboolean _tmp38_ = FALSE;
+	GeeIterator* _tmp37_;
+	gboolean _tmp38_;
+	gboolean _tmp39_;
+	gboolean _tmp40_ = FALSE;
+	GeeCollection* _tmp42_;
+	gint _tmp43_;
+	gint _tmp44_;
+	GeeCollection* _tmp45_;
+	gboolean _tmp46_ = FALSE;
+	GeeCollection* _tmp47_;
+	gboolean _tmp48_ = FALSE;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->test_collection;
 	_tmp1_ = gee_collection_add (_tmp0_, "one");
@@ -317,39 +324,46 @@ void read_only_collection_tests_test_immutable_iterator (ReadOnlyCollectionTests
 		GeeIterator* _tmp13_;
 		gboolean _tmp14_ = FALSE;
 		GeeIterator* _tmp15_;
-		gpointer _tmp16_ = NULL;
-		gchar* _tmp17_;
-		GQuark _tmp19_ = 0U;
-		static GQuark _tmp18_label0 = 0;
-		static GQuark _tmp18_label1 = 0;
+		gboolean _tmp16_;
+		gboolean _tmp17_;
+		GeeIterator* _tmp18_;
+		gpointer _tmp19_ = NULL;
+		gchar* _tmp20_;
+		GQuark _tmp22_ = 0U;
+		static GQuark _tmp21_label0 = 0;
+		static GQuark _tmp21_label1 = 0;
 		_tmp13_ = iterator;
 		_tmp14_ = gee_iterator_next (_tmp13_);
 		if (!_tmp14_) {
 			break;
 		}
 		_tmp15_ = iterator;
-		_tmp16_ = gee_iterator_get (_tmp15_);
-		_tmp17_ = (gchar*) _tmp16_;
-		_tmp19_ = (NULL == _tmp17_) ? 0 : g_quark_from_string (_tmp17_);
-		g_free (_tmp17_);
-		if (_tmp19_ == ((0 != _tmp18_label0) ? _tmp18_label0 : (_tmp18_label0 = g_quark_from_static_string ("one")))) {
+		_tmp16_ = gee_iterator_get_valid (_tmp15_);
+		_tmp17_ = _tmp16_;
+		_vala_assert (_tmp17_, "iterator.valid");
+		_tmp18_ = iterator;
+		_tmp19_ = gee_iterator_get (_tmp18_);
+		_tmp20_ = (gchar*) _tmp19_;
+		_tmp22_ = (NULL == _tmp20_) ? 0 : g_quark_from_string (_tmp20_);
+		g_free (_tmp20_);
+		if (_tmp22_ == ((0 != _tmp21_label0) ? _tmp21_label0 : (_tmp21_label0 = g_quark_from_static_string ("one")))) {
 			switch (0) {
 				default:
 				{
-					gboolean _tmp20_;
-					_tmp20_ = one_found;
-					_vala_assert (!_tmp20_, "! one_found");
+					gboolean _tmp23_;
+					_tmp23_ = one_found;
+					_vala_assert (!_tmp23_, "! one_found");
 					one_found = TRUE;
 					break;
 				}
 			}
-		} else if (_tmp19_ == ((0 != _tmp18_label1) ? _tmp18_label1 : (_tmp18_label1 = g_quark_from_static_string ("two")))) {
+		} else if (_tmp22_ == ((0 != _tmp21_label1) ? _tmp21_label1 : (_tmp21_label1 = g_quark_from_static_string ("two")))) {
 			switch (0) {
 				default:
 				{
-					gboolean _tmp21_;
-					_tmp21_ = two_found;
-					_vala_assert (!_tmp21_, "! two_found");
+					gboolean _tmp24_;
+					_tmp24_ = two_found;
+					_vala_assert (!_tmp24_, "! two_found");
 					two_found = TRUE;
 					break;
 				}
@@ -363,37 +377,48 @@ void read_only_collection_tests_test_immutable_iterator (ReadOnlyCollectionTests
 			}
 		}
 	}
-	_tmp22_ = one_found;
-	_vala_assert (_tmp22_, "one_found");
-	_tmp23_ = two_found;
-	_vala_assert (_tmp23_, "two_found");
-	_tmp24_ = iterator;
-	_tmp25_ = gee_iterator_has_next (_tmp24_);
-	_vala_assert (!_tmp25_, "! iterator.has_next ()");
-	_tmp26_ = iterator;
-	_tmp27_ = gee_iterator_next (_tmp26_);
-	_vala_assert (!_tmp27_, "! iterator.next ()");
-	_tmp28_ = iterator;
-	_tmp29_ = gee_iterator_first (_tmp28_);
-	_vala_assert (_tmp29_, "iterator.first ()");
-	_tmp30_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
-	if (_tmp30_) {
-		GeeIterator* _tmp31_;
-		_tmp31_ = iterator;
-		gee_iterator_remove (_tmp31_);
+	_tmp25_ = one_found;
+	_vala_assert (_tmp25_, "one_found");
+	_tmp26_ = two_found;
+	_vala_assert (_tmp26_, "two_found");
+	_tmp27_ = iterator;
+	_tmp28_ = gee_iterator_has_next (_tmp27_);
+	_vala_assert (!_tmp28_, "! iterator.has_next ()");
+	_tmp29_ = iterator;
+	_tmp30_ = gee_iterator_next (_tmp29_);
+	_vala_assert (!_tmp30_, "! iterator.next ()");
+	_tmp31_ = self->ro_collection;
+	_tmp32_ = gee_iterable_iterator ((GeeIterable*) _tmp31_);
+	_g_object_unref0 (iterator);
+	iterator = _tmp32_;
+	_tmp33_ = iterator;
+	_tmp34_ = gee_iterator_has_next (_tmp33_);
+	_vala_assert (_tmp34_, "iterator.has_next ()");
+	_tmp35_ = iterator;
+	_tmp36_ = gee_iterator_next (_tmp35_);
+	_vala_assert (_tmp36_, "iterator.next ()");
+	_tmp37_ = iterator;
+	_tmp38_ = gee_iterator_get_read_only (_tmp37_);
+	_tmp39_ = _tmp38_;
+	_vala_assert (_tmp39_, "iterator.read_only");
+	_tmp40_ = g_test_trap_fork ((guint64) 0, G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR);
+	if (_tmp40_) {
+		GeeIterator* _tmp41_;
+		_tmp41_ = iterator;
+		gee_iterator_remove (_tmp41_);
 		exit (0);
 	}
 	g_test_trap_assert_failed ();
-	_tmp32_ = self->ro_collection;
-	_tmp33_ = gee_collection_get_size (_tmp32_);
-	_tmp34_ = _tmp33_;
-	_vala_assert (_tmp34_ == 2, "ro_collection.size == 2");
-	_tmp35_ = self->ro_collection;
-	_tmp36_ = gee_collection_contains (_tmp35_, "one");
-	_vala_assert (_tmp36_, "ro_collection.contains (\"one\")");
-	_tmp37_ = self->ro_collection;
-	_tmp38_ = gee_collection_contains (_tmp37_, "two");
-	_vala_assert (_tmp38_, "ro_collection.contains (\"two\")");
+	_tmp42_ = self->ro_collection;
+	_tmp43_ = gee_collection_get_size (_tmp42_);
+	_tmp44_ = _tmp43_;
+	_vala_assert (_tmp44_ == 2, "ro_collection.size == 2");
+	_tmp45_ = self->ro_collection;
+	_tmp46_ = gee_collection_contains (_tmp45_, "one");
+	_vala_assert (_tmp46_, "ro_collection.contains (\"one\")");
+	_tmp47_ = self->ro_collection;
+	_tmp48_ = gee_collection_contains (_tmp47_, "two");
+	_vala_assert (_tmp48_, "ro_collection.contains (\"two\")");
 	_g_object_unref0 (iterator);
 }
 
@@ -461,7 +486,7 @@ void read_only_collection_tests_test_immutable (ReadOnlyCollectionTests* self) {
 	_tmp5_ = self->ro_collection;
 	_tmp6_ = gee_collection_contains (_tmp5_, "one");
 	_vala_assert (_tmp6_, "ro_collection.contains (\"one\")");
-	_tmp7_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp7_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	dummy = (GeeCollection*) _tmp7_;
 	_tmp8_ = dummy;
 	_tmp9_ = gee_collection_add (_tmp8_, "one");
@@ -648,14 +673,14 @@ void read_only_collection_tests_test_accurate_view (ReadOnlyCollectionTests* sel
 	GeeCollection* _tmp61_;
 	gboolean _tmp62_ = FALSE;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL);
+	_tmp0_ = gee_array_list_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, NULL, NULL, NULL);
 	dummy = (GeeCollection*) _tmp0_;
 	_tmp1_ = gee_collection_add (dummy, "one");
 	_vala_assert (_tmp1_, "dummy.add (\"one\")");
 	_tmp2_ = gee_collection_add (dummy, "two");
 	_vala_assert (_tmp2_, "dummy.add (\"two\")");
 	_tmp3_ = self->ro_collection;
-	_tmp4_ = gee_iterable_get_element_type ((GeeIterable*) _tmp3_);
+	_tmp4_ = gee_traversable_get_element_type ((GeeTraversable*) _tmp3_);
 	_tmp5_ = _tmp4_;
 	_vala_assert (_tmp5_ == G_TYPE_STRING, "ro_collection.element_type == typeof (string)");
 	_tmp6_ = self->ro_collection;

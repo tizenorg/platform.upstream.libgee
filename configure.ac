@@ -1,4 +1,4 @@
-AC_INIT([libgee], [0.6.6.1], [ptitjes@free.fr], [libgee])
+AC_INIT([libgee], [0.9.92], [https://bugzilla.gnome.org/enter_bug.cgi?product=libgee], [libgee])
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_MACRO_DIR([m4])
@@ -11,11 +11,15 @@ AM_PROG_CC_C_O
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 
-LIBGEE_LT_VERSION="2:0:0"
+LIBGEE_LT_VERSION="4:0:2"
 AC_SUBST(LIBGEE_LT_VERSION)
 
-AC_PATH_PROG(VALAC, valac, valac)
+GLIB_REQUIRED=2.32
+
+AM_PROG_VALAC([0.17.5])
 AC_SUBST(VALAC)
+
+VALAFLAGS=--target-glib=$GLIB_REQUIRED
 
 AC_SUBST(VALAFLAGS)
 
@@ -50,8 +54,6 @@ AS_IF([test "x$enable_coverage" != xno],
 AC_ARG_ENABLE(benchmark, AS_HELP_STRING([--enable-benchmark], [Enable benchmark]), enable_benchmark=$enableval, enable_benchmark=no)
 AM_CONDITIONAL(ENABLE_BENCHMARK, test x$enable_benchmark = xyes)
 
-GLIB_REQUIRED=2.12.0
-
 PKG_CHECK_MODULES(GLIB, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED)
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
@@ -59,7 +61,7 @@ AC_SUBST(GLIB_LIBS)
 GOBJECT_INTROSPECTION_CHECK([0.9.0])
 
 AC_OUTPUT([Makefile
-           gee-1.0.pc
+           gee-0.8.pc
            benchmark/Makefile
            doc/Makefile
            gee/Makefile
