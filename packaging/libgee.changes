@@ -1,2 +1,5 @@
+* Fri Mar 22 2013 Regis Merlino <regis.merlino@intel.com>
+- Update libgee to 0.9.92 (3462b25)
+
 * Mon Nov 26 14:45:43 CET 2012 - Mark Ryan <mark.d.ryan@intel.com>
 - Submit version 0.6.6.1 ( 38af23e ) of libgee 
