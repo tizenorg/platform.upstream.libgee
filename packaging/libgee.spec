@@ -1,9 +1,9 @@
-%define baseline 0.9
+%define baseline 0.10
 %define apiversion 0.8
 
 
 Name:           libgee
-Version:        0.9.92
+Version:        0.10.0
 Release:        0
 Summary:        GObject-based library providing commonly used data structures
 License:        LGPL-2.1+
@@ -12,10 +12,9 @@ Url:            http://live.gnome.org/Libgee
 Source:         http://download.gnome.org/sources/libgee/%{baseline}/%{name}-%{version}.tar.xz
 
 BuildRequires:  gnome-common
-BuildRequires:  vala
-BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  vala >= 0.17.5
+BuildRequires:  pkgconfig(glib-2.0) >= 2.32
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
-
 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
