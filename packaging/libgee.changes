@@ -1,3 +1,6 @@
+* Tue Jun 11 2013 Regis Merlino <regis.merlino@intel.com>
+- Update libgee to 0.10.0 (b7aeceb)
+
 * Fri Apr 26 2013 Philippe Coval <philippe.coval@eurogiciel.fr> submit/devel/20130417.092817@f8d06ad
 - Bump to 0.10.1
 
