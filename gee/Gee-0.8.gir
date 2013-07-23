@@ -8,7 +8,7 @@
 	<annotation key="ccode.gir-version" value="0.8"/>
 	<annotation key="ccode.gir-namespace" value="Gee"/>
 	<function name="functions_get_equal_func_for" c:identifier="gee_functions_get_equal_func_for">
-		<return-value transfer-ownership="none" closure="1" destroy="2">
+		<return-value transfer-ownership="none" closure="1" scope="notified" destroy="2">
 			<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 		</return-value>
 		<parameters>
@@ -24,7 +24,7 @@
 		</parameters>
 	</function>
 	<function name="functions_get_hash_func_for" c:identifier="gee_functions_get_hash_func_for">
-		<return-value transfer-ownership="none" closure="1" destroy="2">
+		<return-value transfer-ownership="none" closure="1" scope="notified" destroy="2">
 			<type name="Gee.HashDataFunc" c:type="GeeHashDataFunc"/>
 		</return-value>
 		<parameters>
@@ -40,7 +40,7 @@
 		</parameters>
 	</function>
 	<function name="functions_get_compare_func_for" c:identifier="gee_functions_get_compare_func_for">
-		<return-value transfer-ownership="none" closure="1" destroy="2">
+		<return-value transfer-ownership="none" closure="1" scope="notified" destroy="2">
 			<type name="GLib.CompareDataFunc" c:type="GCompareDataFunc"/>
 		</return-value>
 		<parameters>
@@ -1508,7 +1508,7 @@
 				</type>
 			</return-value>
 			<parameters>
-				<parameter name="f" transfer-ownership="none" closure="1" destroy="2">
+				<parameter name="f" transfer-ownership="none" closure="1" scope="notified" destroy="2">
 					<type name="Gee.StreamFunc" c:type="GeeStreamFunc"/>
 				</parameter>
 				<parameter name="f_target" transfer-ownership="none" allow-none="1">
@@ -1526,7 +1526,7 @@
 				</type>
 			</return-value>
 			<parameters>
-				<parameter name="f" transfer-ownership="none" closure="1" destroy="2">
+				<parameter name="f" transfer-ownership="none" closure="1" scope="notified" destroy="2">
 					<type name="Gee.StreamFunc" c:type="GeeStreamFunc"/>
 				</parameter>
 				<parameter name="f_target" transfer-ownership="none" allow-none="1">
@@ -1712,7 +1712,7 @@
 					<parameter name="self" transfer-ownership="none">
 						<type name="Gee.AbstractMap" c:type="GeeAbstractMap*"/>
 					</parameter>
-					<parameter name="f" transfer-ownership="none" closure="2" destroy="3">
+					<parameter name="f" transfer-ownership="none" closure="2" scope="notified" destroy="3">
 						<type name="Gee.StreamFunc" c:type="GeeStreamFunc"/>
 					</parameter>
 					<parameter name="f_target" transfer-ownership="none" allow-none="1">
@@ -1891,7 +1891,7 @@
 			</return-value>
 		</virtual-method>
 		<method name="get_value_equal_func" c:identifier="gee_abstract_multi_map_get_value_equal_func">
-			<return-value transfer-ownership="none" closure="0" destroy="1">
+			<return-value transfer-ownership="none" closure="0" scope="notified" destroy="1">
 				<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 			</return-value>
 			<parameters>
@@ -1904,7 +1904,7 @@
 			</parameters>
 		</method>
 		<virtual-method name="get_value_equal_func" invoker="get_value_equal_func">
-			<return-value transfer-ownership="none" closure="0" destroy="1">
+			<return-value transfer-ownership="none" closure="0" scope="notified" destroy="1">
 				<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 			</return-value>
 			<parameters>
@@ -1957,7 +1957,7 @@
 		</field>
 				<field name="get_value_equal_func">
 			<callback name="get_value_equal_func" c:type="get_value_equal_func">
-				<return-value transfer-ownership="none" closure="1" destroy="2">
+				<return-value transfer-ownership="none" closure="1" scope="notified" destroy="2">
 					<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 				</return-value>
 				<parameters>
@@ -3343,7 +3343,7 @@
 				<type name="Gee.ArrayList" c:type="GeeArrayList*"/>
 			</return-value>
 			<parameters>
-				<parameter name="equal_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="equal_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 				</parameter>
 				<parameter name="equal_func_target" transfer-ownership="none" allow-none="1">
@@ -3367,7 +3367,7 @@
 				<parameter name="items_length1" transfer-ownership="none">
 					<type name="gint" c:type="gint"/>
 				</parameter>
-				<parameter name="equal_func" transfer-ownership="none" allow-none="1" closure="3" destroy="4">
+				<parameter name="equal_func" transfer-ownership="none" allow-none="1" closure="3" scope="notified" destroy="4">
 					<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 				</parameter>
 				<parameter name="equal_func_target" transfer-ownership="none" allow-none="1">
@@ -3414,7 +3414,7 @@
 				<type name="Gee.ArrayQueue" c:type="GeeArrayQueue*"/>
 			</return-value>
 			<parameters>
-				<parameter name="equal_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="equal_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 				</parameter>
 				<parameter name="equal_func_target" transfer-ownership="none" allow-none="1">
@@ -3451,7 +3451,7 @@
 				<type name="Gee.ConcurrentList" c:type="GeeConcurrentList*"/>
 			</return-value>
 			<parameters>
-				<parameter name="equal_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="equal_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 				</parameter>
 				<parameter name="equal_func_target" transfer-ownership="none" allow-none="1">
@@ -3488,7 +3488,7 @@
 				<type name="Gee.ConcurrentSet" c:type="GeeConcurrentSet*"/>
 			</return-value>
 			<parameters>
-				<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="GLib.CompareDataFunc" c:type="GCompareDataFunc"/>
 				</parameter>
 				<parameter name="compare_func_target" transfer-ownership="none" allow-none="1">
@@ -3524,7 +3524,7 @@
 				<type name="Gee.HashMap" c:type="GeeHashMap*"/>
 			</return-value>
 			<parameters>
-				<parameter name="key_hash_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="key_hash_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="Gee.HashDataFunc" c:type="GeeHashDataFunc"/>
 				</parameter>
 				<parameter name="key_hash_func_target" transfer-ownership="none" allow-none="1">
@@ -3533,7 +3533,7 @@
 				<parameter name="key_hash_func_target_destroy_notify" transfer-ownership="none">
 					<type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
 				</parameter>
-				<parameter name="key_equal_func" transfer-ownership="none" allow-none="1" closure="4" destroy="5">
+				<parameter name="key_equal_func" transfer-ownership="none" allow-none="1" closure="4" scope="notified" destroy="5">
 					<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 				</parameter>
 				<parameter name="key_equal_func_target" transfer-ownership="none" allow-none="1">
@@ -3542,7 +3542,7 @@
 				<parameter name="key_equal_func_target_destroy_notify" transfer-ownership="none">
 					<type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
 				</parameter>
-				<parameter name="value_equal_func" transfer-ownership="none" allow-none="1" closure="7" destroy="8">
+				<parameter name="value_equal_func" transfer-ownership="none" allow-none="1" closure="7" scope="notified" destroy="8">
 					<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 				</parameter>
 				<parameter name="value_equal_func_target" transfer-ownership="none" allow-none="1">
@@ -3584,7 +3584,7 @@
 				<type name="Gee.HashMultiMap" c:type="GeeHashMultiMap*"/>
 			</return-value>
 			<parameters>
-				<parameter name="key_hash_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="key_hash_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="Gee.HashDataFunc" c:type="GeeHashDataFunc"/>
 				</parameter>
 				<parameter name="key_hash_func_target" transfer-ownership="none" allow-none="1">
@@ -3593,7 +3593,7 @@
 				<parameter name="key_hash_func_target_destroy_notify" transfer-ownership="none">
 					<type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
 				</parameter>
-				<parameter name="key_equal_func" transfer-ownership="none" allow-none="1" closure="4" destroy="5">
+				<parameter name="key_equal_func" transfer-ownership="none" allow-none="1" closure="4" scope="notified" destroy="5">
 					<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 				</parameter>
 				<parameter name="key_equal_func_target" transfer-ownership="none" allow-none="1">
@@ -3602,7 +3602,7 @@
 				<parameter name="key_equal_func_target_destroy_notify" transfer-ownership="none">
 					<type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
 				</parameter>
-				<parameter name="value_hash_func" transfer-ownership="none" allow-none="1" closure="7" destroy="8">
+				<parameter name="value_hash_func" transfer-ownership="none" allow-none="1" closure="7" scope="notified" destroy="8">
 					<type name="Gee.HashDataFunc" c:type="GeeHashDataFunc"/>
 				</parameter>
 				<parameter name="value_hash_func_target" transfer-ownership="none" allow-none="1">
@@ -3611,7 +3611,7 @@
 				<parameter name="value_hash_func_target_destroy_notify" transfer-ownership="none">
 					<type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
 				</parameter>
-				<parameter name="value_equal_func" transfer-ownership="none" allow-none="1" closure="10" destroy="11">
+				<parameter name="value_equal_func" transfer-ownership="none" allow-none="1" closure="10" scope="notified" destroy="11">
 					<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 				</parameter>
 				<parameter name="value_equal_func_target" transfer-ownership="none" allow-none="1">
@@ -3694,7 +3694,7 @@
 				<type name="Gee.HashSet" c:type="GeeHashSet*"/>
 			</return-value>
 			<parameters>
-				<parameter name="hash_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="hash_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="Gee.HashDataFunc" c:type="GeeHashDataFunc"/>
 				</parameter>
 				<parameter name="hash_func_target" transfer-ownership="none" allow-none="1">
@@ -3703,7 +3703,7 @@
 				<parameter name="hash_func_target_destroy_notify" transfer-ownership="none">
 					<type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
 				</parameter>
-				<parameter name="equal_func" transfer-ownership="none" allow-none="1" closure="4" destroy="5">
+				<parameter name="equal_func" transfer-ownership="none" allow-none="1" closure="4" scope="notified" destroy="5">
 					<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 				</parameter>
 				<parameter name="equal_func_target" transfer-ownership="none" allow-none="1">
@@ -3879,7 +3879,7 @@
 				<type name="none"/>
 			</return-value>
 			<parameters>
-				<parameter name="notify" transfer-ownership="none" closure="1" destroy="2">
+				<parameter name="notify" transfer-ownership="none" closure="1" scope="notified" destroy="2">
 					<type name="Gee.HazardPointerDestroyNotify" c:type="GeeHazardPointerDestroyNotify"/>
 				</parameter>
 				<parameter name="notify_target" transfer-ownership="none" allow-none="1">
@@ -4004,7 +4004,7 @@
 				<type name="Gee.Lazy" c:type="GeeLazy*"/>
 			</return-value>
 			<parameters>
-				<parameter name="func" transfer-ownership="none" closure="1" destroy="2">
+				<parameter name="func" transfer-ownership="none" closure="1" scope="notified" destroy="2">
 					<type name="Gee.LazyFunc" c:type="GeeLazyFunc"/>
 				</parameter>
 				<parameter name="func_target" transfer-ownership="none" allow-none="1">
@@ -4053,7 +4053,7 @@
 				<type name="Gee.LinkedList" c:type="GeeLinkedList*"/>
 			</return-value>
 			<parameters>
-				<parameter name="equal_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="equal_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 				</parameter>
 				<parameter name="equal_func_target" transfer-ownership="none" allow-none="1">
@@ -4097,7 +4097,7 @@
 				<type name="Gee.PriorityQueue" c:type="GeePriorityQueue*"/>
 			</return-value>
 			<parameters>
-				<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="GLib.CompareDataFunc" c:type="GCompareDataFunc"/>
 				</parameter>
 				<parameter name="compare_func_target" transfer-ownership="none" allow-none="1">
@@ -4156,7 +4156,7 @@
 				<type name="Gee.TreeMap" c:type="GeeTreeMap*"/>
 			</return-value>
 			<parameters>
-				<parameter name="key_compare_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="key_compare_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="GLib.CompareDataFunc" c:type="GCompareDataFunc"/>
 				</parameter>
 				<parameter name="key_compare_func_target" transfer-ownership="none" allow-none="1">
@@ -4165,7 +4165,7 @@
 				<parameter name="key_compare_func_target_destroy_notify" transfer-ownership="none">
 					<type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
 				</parameter>
-				<parameter name="value_equal_func" transfer-ownership="none" allow-none="1" closure="4" destroy="5">
+				<parameter name="value_equal_func" transfer-ownership="none" allow-none="1" closure="4" scope="notified" destroy="5">
 					<type name="Gee.EqualDataFunc" c:type="GeeEqualDataFunc"/>
 				</parameter>
 				<parameter name="value_equal_func_target" transfer-ownership="none" allow-none="1">
@@ -4203,7 +4203,7 @@
 				<type name="Gee.TreeMultiMap" c:type="GeeTreeMultiMap*"/>
 			</return-value>
 			<parameters>
-				<parameter name="key_compare_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="key_compare_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="GLib.CompareDataFunc" c:type="GCompareDataFunc"/>
 				</parameter>
 				<parameter name="key_compare_func_target" transfer-ownership="none" allow-none="1">
@@ -4212,7 +4212,7 @@
 				<parameter name="key_compare_func_target_destroy_notify" transfer-ownership="none">
 					<type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
 				</parameter>
-				<parameter name="value_compare_func" transfer-ownership="none" allow-none="1" closure="4" destroy="5">
+				<parameter name="value_compare_func" transfer-ownership="none" allow-none="1" closure="4" scope="notified" destroy="5">
 					<type name="GLib.CompareDataFunc" c:type="GCompareDataFunc"/>
 				</parameter>
 				<parameter name="value_compare_func_target" transfer-ownership="none" allow-none="1">
@@ -4249,7 +4249,7 @@
 				<type name="Gee.TreeMultiSet" c:type="GeeTreeMultiSet*"/>
 			</return-value>
 			<parameters>
-				<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="GLib.CompareDataFunc" c:type="GCompareDataFunc"/>
 				</parameter>
 				<parameter name="compare_func_target" transfer-ownership="none" allow-none="1">
@@ -4282,7 +4282,7 @@
 				<type name="Gee.TreeSet" c:type="GeeTreeSet*"/>
 			</return-value>
 			<parameters>
-				<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="GLib.CompareDataFunc" c:type="GCompareDataFunc"/>
 				</parameter>
 				<parameter name="compare_func_target" transfer-ownership="none" allow-none="1">
@@ -5549,7 +5549,7 @@
 				</type>
 			</return-value>
 			<parameters>
-				<parameter name="f" transfer-ownership="none" closure="1" destroy="2">
+				<parameter name="f" transfer-ownership="none" closure="1" scope="notified" destroy="2">
 					<type name="Gee.UnfoldFunc" c:type="GeeUnfoldFunc"/>
 				</parameter>
 				<parameter name="f_target" transfer-ownership="none" allow-none="1">
@@ -5854,7 +5854,7 @@
 				<type name="none"/>
 			</return-value>
 			<parameters>
-				<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="GLib.CompareDataFunc" c:type="GCompareDataFunc"/>
 				</parameter>
 				<parameter name="compare_func_target" transfer-ownership="none" allow-none="1">
@@ -5870,7 +5870,7 @@
 				<type name="none"/>
 			</return-value>
 			<parameters>
-				<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="1" destroy="2">
+				<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="1" scope="notified" destroy="2">
 					<type name="GLib.CompareDataFunc" c:type="GCompareDataFunc"/>
 				</parameter>
 				<parameter name="compare_func_target" transfer-ownership="none" allow-none="1">
@@ -6066,7 +6066,7 @@
 					<parameter name="self" transfer-ownership="none">
 						<type name="Gee.List" c:type="GeeList*"/>
 					</parameter>
-					<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="2" destroy="3">
+					<parameter name="compare_func" transfer-ownership="none" allow-none="1" closure="2" scope="notified" destroy="3">
 						<type name="GLib.CompareDataFunc" c:type="GCompareDataFunc"/>
 					</parameter>
 					<parameter name="compare_func_target" transfer-ownership="none" allow-none="1">
@@ -8131,7 +8131,7 @@
 				</type>
 			</return-value>
 			<parameters>
-				<parameter name="f" transfer-ownership="none" closure="1" destroy="2">
+				<parameter name="f" transfer-ownership="none" closure="1" scope="notified" destroy="2">
 					<type name="Gee.StreamFunc" c:type="GeeStreamFunc"/>
 				</parameter>
 				<parameter name="f_target" transfer-ownership="none" allow-none="1">
@@ -8149,7 +8149,7 @@
 				</type>
 			</return-value>
 			<parameters>
-				<parameter name="f" transfer-ownership="none" closure="1" destroy="2">
+				<parameter name="f" transfer-ownership="none" closure="1" scope="notified" destroy="2">
 					<type name="Gee.StreamFunc" c:type="GeeStreamFunc"/>
 				</parameter>
 				<parameter name="f_target" transfer-ownership="none" allow-none="1">
@@ -8265,7 +8265,7 @@
 				</type>
 			</return-value>
 			<parameters>
-				<parameter name="pred" transfer-ownership="none" closure="1" destroy="2">
+				<parameter name="pred" transfer-ownership="none" closure="1" scope="notified" destroy="2">
 					<type name="Gee.Predicate" c:type="GeePredicate"/>
 				</parameter>
 				<parameter name="pred_target" transfer-ownership="none" allow-none="1">
@@ -8283,7 +8283,7 @@
 				</type>
 			</return-value>
 			<parameters>
-				<parameter name="pred" transfer-ownership="none" closure="1" destroy="2">
+				<parameter name="pred" transfer-ownership="none" closure="1" scope="notified" destroy="2">
 					<type name="Gee.Predicate" c:type="GeePredicate"/>
 				</parameter>
 				<parameter name="pred_target" transfer-ownership="none" allow-none="1">
@@ -8361,7 +8361,7 @@
 					<parameter name="self" transfer-ownership="none">
 						<type name="Gee.Traversable" c:type="GeeTraversable*"/>
 					</parameter>
-					<parameter name="f" transfer-ownership="none" closure="2" destroy="3">
+					<parameter name="f" transfer-ownership="none" closure="2" scope="notified" destroy="3">
 						<type name="Gee.StreamFunc" c:type="GeeStreamFunc"/>
 					</parameter>
 					<parameter name="f_target" transfer-ownership="none" allow-none="1">
@@ -8448,7 +8448,7 @@
 					<parameter name="self" transfer-ownership="none">
 						<type name="Gee.Traversable" c:type="GeeTraversable*"/>
 					</parameter>
-					<parameter name="pred" transfer-ownership="none" closure="2" destroy="3">
+					<parameter name="pred" transfer-ownership="none" closure="2" scope="notified" destroy="3">
 						<type name="Gee.Predicate" c:type="GeePredicate"/>
 					</parameter>
 					<parameter name="pred_target" transfer-ownership="none" allow-none="1">
