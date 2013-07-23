@@ -6675,7 +6675,7 @@
 			</callback>
 		</field>
 	</record>
-	<class name="MapEntry" c:type="GeeMapEntry" glib:type-name="GeeMapEntry" glib:get-type="gee_map_entry_get_type" glib:type-struct="EntryClass" parent="GObject.Object" abstract="1">
+	<class name="MapEntry" c:type="GeeMapEntry" glib:type-name="GeeMapEntry" glib:get-type="gee_map_entry_get_type" glib:type-struct="MapEntryClass" parent="GObject.Object" abstract="1">
 		<field name="parent_instance">
 			<type name="GObject.Object" c:type="GObject"/>
 		</field>
@@ -6692,7 +6692,7 @@
 			<type name="gboolean" c:type="gboolean"/>
 		</property>
 	</class>
-	<record name="EntryClass" c:type="GeeMapEntryClass" glib:is-gtype-struct-for="Entry">
+	<record name="MapEntryClass" c:type="GeeMapEntryClass" glib:is-gtype-struct-for="Entry">
 		<field name="parent_class">
 			<type name="GObject.ObjectClass" c:type="GObjectClass"/>
 		</field>

@@ -1,3 +1,9 @@
+2013-03-31  Simon McVittie  <simon.mcvittie@collabora.co.uk>
+
+	Return true from HashSet.Iterator.foreach() if we fall off the end
+	This is documented to happen, and was implemented correctly in the other
+	collections, but not in HashSet.
+
 2013-03-25  Maciej Piechotka  <uzytkownik2@gmail.com>
 
 	Release 0.10.0
