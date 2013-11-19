@@ -3,7 +3,7 @@
 
 
 Name:           libgee
-Version:        0.10.1
+Version:        0.10.5
 Release:        0
 Summary:        GObject-based library providing commonly used data structures
 License:        LGPL-2.1+
@@ -51,7 +51,9 @@ classes for commonly used data structures.
 
 %build
 
-%autogen \
+[ -x ./autogen.sh ] && NOCONFIGURE=1 ./autogen.sh
+
+%configure \
  --disable-static
 
 make %{?jobs:-j%jobs}
