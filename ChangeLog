@@ -1,3 +1,23 @@
+2013-07-24  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Fix the foreach in TreeMap.values
+
+2013-07-16  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Fix Gee.TreeSet.Iterator.foreach
+
+	Fix Gee.ArrayQueue.Iterator.foreach
+
+2013-07-15  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Fix the PriorityQueue.Iterator.foreach
+
+	Fix the HashSet.Iterator.foreach
+
+2013-07-12  Maciej Piechotka  <uzytkownik2@gmail.com>
+
+	Release 0.10.2
+
 2013-07-06  Maciej Piechotka  <uzytkownik2@gmail.com>
 
 	Use .value instead of value directly in unfold
@@ -1129,3 +1149,14 @@
 
 	gee: Fix memory leak in HashMap.remove and HashSet.remove
 	Fixes bug 584440.
+
+2009-04-30  Jürg Billeter  <j@bitron.ch>
+
+	Update code using deprecated # modifier or operator
+
+	Fix build with Vala 0.7
+	Based on patch by Thijs Vermeir, fixes bug 579182.
+
+	Generate ChangeLog from git log
+	Add gitlog-to-changelog script from gnulib and a dist-hook to
+	generate ChangeLog file when creating tarballs.
