@@ -1,3 +1,9 @@
+* Mon Dec 16 2013 Philippe Coval <philippe.coval@open.eurogiciel.org> 0.10.5@42d3c09
+- Bump to 0.10.5 (git)
+  merge TZPC and TIVI git tree to tizen's platform/upstream
+  Bug-Tizen: TINF-175 (libgee: make it a common component)
+  Bug-Tizen: TZPC-4722 (libgee: maintain ... on tizen.org ...)
+
 * Tue Jul 09 2013 Patrick Ohly <patrick.ohly@intel.com>
 - enable introspection
 
