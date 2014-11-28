@@ -1,9 +1,9 @@
-%define baseline 0.10
+%define baseline 0.16
 %define apiversion 0.8
 
 
 Name:           libgee
-Version:        0.10.5
+Version:        0.16.1
 Release:        0
 Summary:        GObject-based library providing commonly used data structures
 License:        LGPL-2.1+
